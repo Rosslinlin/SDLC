@@ -37,4 +37,4 @@ Do not recommend more identical retries, lower the score threshold, discard ACs 
 
 Return reviewResult, mode, identity, artifact paths, gateResults, scoreGate, reviewedBindings, findings, repair scope, title validation, jiraReady/updateReady, attachmentAction/mapping, userActionRequired/userRequestedEvidence and recommendedNextAction as specified by report template.
 
-Score facts stay in this internal report/state, not SPEC notes or update manifest. Parent synchronizes the verdict header in every intended SPEC, immediately reads back the complete files, records the review attempt and each fileRevision, and keeps jiraReady=false until all header checks are verified. Candidate PASS does not claim Jira approval, export, or whole-batch completion.
+Score facts stay in this internal report/state, not SPEC notes or update manifest. Parent synchronizes the verdict header in every intended SPEC, immediately reads back the complete files, records the review attempt and each fileRevision, and keeps jiraReady=false until all header checks are verified. Candidate PASS does not claim final export readiness, Jira write success, or whole-batch completion.

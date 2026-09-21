@@ -11,7 +11,7 @@
     "evidenceRevisionBindings": []
   },
   "jiraPreviewPath": "jira-preview.md",
-  "latestJiraApprovalRecordPath": null,
+  "latestJiraExportRecordPath": null,
   "executionOrder": [],
   "writeResults": []
 }

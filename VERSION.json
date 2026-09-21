@@ -1,5 +1,5 @@
 {
-  "bundleVersion": "4.0.0",
+  "bundleVersion": "4.1.0",
   "releaseDate": "2026-09-21",
   "executionProfile": "text-only",
   "activeSkills": [
@@ -16,6 +16,8 @@
   "internalHistoryPolicy": "numbered-and-retained",
   "specHeaderPolicy": "synchronize-readback-verify-before-jira-ready",
   "jiraDescriptionFormat": "jira-wiki-transport-rendering",
+  "jiraWritePolicy": "validated-sdlc-direct-export-after-final-preview-readback-preflight",
+  "jiraRoutingProfile": "user-workspace-jira-user-info.md",
   "notes": [
     "No executable scripts are included.",
     "The inherited flow-testcase-source-export.md is a byte-preserved WPS/OLE resource and requires a platform compatibility check."

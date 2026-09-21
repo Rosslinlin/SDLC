@@ -1,4 +1,4 @@
-# CEAIA SDLC Skill Bundle v4.0.0
+# CEAIA SDLC Skill Bundle v4.1.0
 
 发布日期：2026-09-21
 
@@ -39,7 +39,7 @@ v4 以 v3 为基线，将最后的 Jira 写入阶段从 `ceaia-sdlc-only-jira-pu
 ### 4. 输出最新版，中间记录保留
 
 - `outputs/ceaia/...` 的 `STORY.md`、`TEST_CASE.md` 和 SPEC 始终是最新版，可被修复后的版本替换。
-- `.ceaia-work/...` 中的 plan、score、review、post-repair verification 和 approval records 单调编号、不可覆盖。
+- `.ceaia-work/...` 中的 plan、score、review、post-repair verification 和 Jira export-attempt records 单调编号、不可覆盖。
 - compact state / batch state 仍可更新，只保存指针、计数和状态，不复制完整文档正文。
 - 不创建历史 Story/Test Case/SPEC 副本，避免十个 Story 时重复占用大量上下文。
 
@@ -59,9 +59,18 @@ v4 以 v3 为基线，将最后的 Jira 写入阶段从 `ceaia-sdlc-only-jira-pu
 - Test Case Jira-visible 字段统一使用 newline characters，禁止 literal `<br>` 及其 escaped variants。
 - `common-field-assembly.md`、`common-guardrails.md` 和 preview validation 增加对应检查。
 
+### 7. v4.1 直接导出与路由修正
+
+- 删除 SDLC 对额外审批工具的依赖；最终 preview、payload read-back 和附件 preflight 通过后直接调用 `exportJiraByDynamicFields`。
+- `handoffType=ceaia-sdlc-validated` 仅作为内部路由状态，禁止进入任何 Jira MCP 参数或序列化字段。
+- SDLC 批量导出使用工具实际暴露的 `issuesJson`；所有参数直接传递，不使用 `requestJson` wrapper。
+- 项目、issue type 和 metadata 查询参数与当前工具契约对齐。
+- `jira-user-info.md` 增加 CEAIA SDLC 默认配置，可复用已验证的 source、project、Story type、Epic Link 和 Parent Link。
+- 初次请求即使包含“push to Jira”，仍先执行 generation → score → review，直到 Jira 阶段才读取或询问目的地字段。
+
 ## 未修改或保留的范围
 
-- `flow-create-issue.md`、`flow-update-issue.md`、`flow-associate-issue.md`、`common-tools-and-inputs.md`、`common-attachments.md` 保持 v3 字节不变。
+- `flow-create-issue.md`、`flow-update-issue.md`、`flow-associate-issue.md`、`common-attachments.md` 和 Test Case 专用资源未改写业务流程。共享工具契约只做了当前参数 schema 与 SDLC 分支边界修正。
 - 原始 `flow-testcase-source-export.md` 实际是 WPS/OLE 二进制文档而不是纯文本 Markdown。根据“不修改别人的 Test Case 流程”的要求，v4 中保持其字节和 SHA-256 不变；跨流程的换行保护已放到共享文本规则中。该遗留文件是否能被纯文本平台读取，需要在平台测试中单独确认。
 - 评分阈值仍为 `ok === true` 且 `finalScore >= 76`，并要求 AC/parser 完整性。
 - 三轮自动修复预算、无进展提前停止和用户授权额外有限轮次逻辑保持不变。

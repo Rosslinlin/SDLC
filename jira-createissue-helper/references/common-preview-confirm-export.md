@@ -2,7 +2,7 @@
 
 ## Preview Before Confirmation
 
-After metadata is retrieved and fields are assembled, or after an update/association payload draft is completed, generate the preview before showing a confirmation popup or submitting.
+After metadata is retrieved and fields are assembled, or after an update/association payload draft is completed, generate the preview before showing a generic-flow confirmation popup or submitting through the validated SDLC route.
 
 The preview stage must include:
 
@@ -15,9 +15,21 @@ The preview stage must include:
 
 Overwrite the same `jira-preview.md` whenever the preview changes. Do not create scattered preview Markdown files. Do not replace the payload JSON block with a separate payload file.
 
+## Empty-Value Preflight
+
+Before preview and again immediately before `exportJiraByDynamicFields`:
+
+1. Apply `common-field-assembly.md`'s Mandatory Empty-Value Contract to the actual tool arguments, including direct inputs, dynamic fields, parsed active JSON payloads, and effective batch items after inheritance.
+2. Verify that unused included optional strings use `""` where supported, empty arrays/objects retain their declared types, and no generated `"."` or other missing-value placeholder remains. Omit unused fields excluded by a specialised payload shape; preserve literal periods in evidence.
+3. Distinguish an unused optional JSON-string parameter with an accepted `""` sentinel from active operation data. Do not parse the inactive sentinel as JSON or activate an operation merely because its key exists. Active JSON payloads must parse and satisfy the selected flow's schema; required data cannot use an empty sentinel or collection.
+4. Validate required values and ensure unspecified update inputs have not become changes or field clears through empty values or inherited defaults.
+5. Show intentional empty values, omitted unused parameters, and explicitly requested field clears in the preview. Submit exactly the normalized values that were approved; do not insert placeholders afterward.
+
+Block submission on any failed check. In a generic route, if a correction changes a confirmed payload, regenerate `jira-preview.md` and obtain fresh explicit confirmation using that route's confirmation mechanism. For SDLC, `sdlc-gateway.md` controls the stricter preview and direct-export preflight; regenerate the preview and repeat final read-back instead of invoking an approval tool.
+
 ## Attachment Payload Preflight in the Preview Gate
 
-Apply this section only when the final export payload contains `attachmentsJson`.
+Apply this section when attachment operations are planned or required, or when the final export payload contains a non-empty `attachmentsJson`. An accepted `attachmentsJson: ""` with no planned or required operations is an inactive sentinel, not a plan to parse. It must never bypass a required attachment.
 
 Before showing a confirmation popup, complete and show all of the following checks:
 
@@ -29,7 +41,7 @@ Before showing a confirmation popup, complete and show all of the following chec
 6. Build the attachment plan as an object internally, then serialize it exactly once into `attachmentsJson`.
 7. Confirm that the outer `attachmentsJson` value is a JSON string, not a JSON object, array, or null.
 8. Parse the `attachmentsJson` string once and confirm that it recreates the same authorised operations, paths, and filenames displayed in the preview.
-9. Confirm that no attachment payload-affecting change occurs after confirmation. Any such change must re-render the preview and require fresh confirmation.
+9. Confirm that no attachment payload-affecting change occurs after the preview binding. In generic routes, any such change requires fresh confirmation. In the validated SDLC route, it requires a regenerated preview and a repeated final read-back/preflight before direct export.
 
 If any attachment preflight check fails, do not request confirmation and do not call `exportJiraByDynamicFields`. Report the exact failed Workspace-relative path or payload field, preserve the returned transport error where safe to display, and request correction, a separately previewed retry, deferment, or an explicit stop decision. Do not guess a nearby path, substitute a similarly named file, or automatically retry.
 
@@ -87,11 +99,11 @@ For Test Case source exports, also include:
 - for `multiple`, Test Case ID to payload item mapping and confirmation that item `description` and `testDetailsJson` values preserve required line breaks
 - for `single`, Test Case ID to aggregate table row mapping and confirmation that `description` contains only the clean Test Case table with no Markdown separator row, extra text, or literal line-break tags
 
-## Confirmation
+## Generic-flow confirmation
 
-Call `exportJiraByDynamicFields` only after explicit user confirmation.
+For generic create, update, association, batch and Test Case routes, call `exportJiraByDynamicFields` only after explicit user confirmation.
 
-For a `ceaia-sdlc-validated` handoff, `sdlc-gateway.md` is controlling: final authorization must be obtained through `request_user_approval` bound to the exact payload and attachment bytes. The generic confirmation wording below does not replace that SDLC approval tool call.
+For a `ceaia-sdlc-validated` handoff, `sdlc-gateway.md` is controlling. No approval tool or final confirmation popup exists in this route. Once the complete preview, payload read-back and attachment preflight pass, call `exportJiraByDynamicFields` directly.
 
 User phrases such as `create`, `export`, or `go ahead` only allow preview generation unless they are clearly responding to an already shown confirmation request. They do not bypass confirmation.
 
@@ -114,9 +126,11 @@ Recommended confirmation text for a Jira update:
 
 > Please confirm whether the current Jira information summary and proposed changes are correct. I will call exportJiraByDynamicFields to update this Jira issue only after you confirm.
 
-Bind confirmation to the complete preview payload. Regenerate `jira-preview.md` and obtain fresh explicit confirmation after any payload-affecting change, including an attachment operation, attachment path, filename, approved Workspace artifact, or serialized `attachmentsJson` value.
+Bind generic-route confirmation to the complete preview payload. Regenerate `jira-preview.md` and obtain fresh explicit confirmation after any generic payload-affecting change. For SDLC, the same kinds of changes invalidate the preview binding and require a new preview plus final read-back/preflight, without a confirmation tool.
 
 ## Submission Parameters
+
+The lists below describe active parameters. Unused optional inputs follow the Mandatory Empty-Value Contract: omit them or pass accepted typed empty values, never `"."`. An accepted `attachmentsJson: ""` represents no attachment operation only; it cannot substitute for a validated required plan.
 
 New issue parameters may include:
 
@@ -181,7 +195,7 @@ For batch responses, show per-item `index`, `status`, `ticketKey`, `ticketUrl`, 
 
 For Test Case batch responses, preserve the selected Test Case to Jira issue mapping. For `uploadType: "multiple"`, show one result line per selected Test Case when a returned item has a Test Case ID and a Jira key or URL. For `uploadType: "single"`, show the selected Test Case ID list or aggregate identifier with the single returned Jira issue key or URL. Do not collapse sequential Jira keys into ranges or shorthand.
 
-After a successful create/export/update response, write or update the user info Markdown file described in `common-state-and-user-info.md`. The persistence must happen after the Jira write response succeeds, not before confirmation or before submission.
+After a successful create/export/update response, write or update the user info Markdown file described in `common-state-and-user-info.md`. The persistence must happen after the Jira write response succeeds, not before generic confirmation or before SDLC submission.
 
 For attachment operations, report the Jira issue result and attachment result independently. Include the confirmed Workspace-relative path and filename used for each upload. Preserve the exact returned attachment transport error where safe to display.
 

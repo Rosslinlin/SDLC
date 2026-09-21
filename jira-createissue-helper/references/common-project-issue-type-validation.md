@@ -6,11 +6,13 @@ When collecting or validating a project, first load reusable values from convers
 
 If the user already provided a project name, project key, or project keyword, still call `queryJiraProjectsByName` first to validate that the project exists unless an already selected project remains valid and the user did not ask to change it.
 
+For a persisted SDLC default, use its stored project name as `projectName`; if only a project key is stored, use that exact key as the required fuzzy-search keyword. Do not ask the user for a redundant project keyword before this validation call.
+
 When calling `queryJiraProjectsByName`, use only these fixed conditions:
 
+- `staffId`
 - `almType`
 - `projectName`
-- `staffId`, only when required by tool authentication/context
 
 Do not dynamically load project query parameters or append other search conditions.
 
@@ -21,7 +23,7 @@ After project query results return:
 - If the user's provided project clearly matches one returned project, store that project and continue without asking for a project popup again.
 - If multiple returned projects could match the user's provided project, generate a dynamic project popup from the actual returned results. Do not ask the user to choose by replying in normal chat.
 - If there are zero results, collect another `projectName` search keyword through the allowed popup input and do not continue to issue type lookup.
-- If there is exactly one result, still confirm it through a project popup before continuing.
+- If there is exactly one result and no explicit or stored exact project was supplied, confirm it through a project popup before continuing. If a current user request or validated `jira-user-info.md` SDLC default already names that exact returned key/name, store it and continue without another popup.
 - When selection or confirmation is needed, each popup option must include at least project key and project name.
 
 Any project popup must:
@@ -41,9 +43,11 @@ Do not use a fixed project list. Do not proceed with a project selected from cha
 
 When calling `queryJiraIssueTypesByProject`, pass only:
 
+- `staffId`
+- `almType`
 - selected `projectKey`
 
-Do not pass source, project name, staff id, or other dynamic conditions unless the MCP runtime requires authentication context outside tool arguments.
+Do not pass project name or other dynamic conditions.
 
 ## Issue Type Selection
 

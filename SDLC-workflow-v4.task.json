@@ -7,7 +7,8 @@
       "content": "Classify the request and complete source intake",
       "active_form": "Classifying the request and reading required evidence",
       "instructions": [
-        "Load ceaia-sdlc-story-spec-generation and only its intake/workflow references. This task owns the four-stage schedule; do not run later stages automatically from inside this intake invocation.",
+        "Load ceaia-sdlc-story-spec-generation first and only its intake/workflow references. Lock the planned sequence as generation and score -> ceaia-spec-review -> jira-createissue-helper SDLC gateway. This task owns the four-stage schedule; do not run later stages automatically from inside this intake invocation.",
+        "If the initial request also says push/export to Jira, record jiraExportRequested=true but do not load jira-createissue-helper, query Jira projects/types, or ask Jira destination fields during intake. Jira destination resolution is deferred until every selected candidate passes generation and independent review.",
         "Classify new_story or existing_ticket_update. A Jira ticket supplied only as evidence is not automatically an update target. Never create a new Jira ticket for an explicit update request.",
         "Before any Jira read, require explicit source WPB, ALM, DATA, FCR or GO independently for every target. Missing source makes the next interaction ask_user_question with one constrained selector per unresolved ticket; no unrelated questions or Jira URL substitute.",
         "Retain the confirmed ticket-to-source mapping. On ticket/source errors show the relevant exact error, ticket and confirmed source; ask correction, same-mapping retry or stop. Never probe other sources.",
@@ -70,7 +71,7 @@
         "Perform one bounded read-based formatting/check cycle before review when needed. Fix platform-owned formatting, names, exact embedding and accidental internal leakage without presenting them as missing business facts. Repeated mechanical failure requires technical diagnosis.",
         "Every finding uses a complete workspace-relative path and actual line when known, evidence, impact and targeted action. Preserve compatibility report fields, sizing decision, source coverage and each SPEC's reviewed binding.",
         "On PASS synchronize only the Result and Reviewer Notes header in every intended SPEC, identify the latest review attempt in Reviewer Notes, then immediately read back each complete file. Compare both fields to the numbered PASS report, confirm the body is unchanged, record fileRevision and specHeaderSync=verified. One targeted header-only retry is allowed after a write/read mismatch; a second mismatch is WAITING_TOOL and blocks jiraReady. Header synchronization alone requires no new Story score or substantive review. Verify global coverage from original evidence across all selected candidates.",
-        "Proceed automatically to Jira preparation only after all selected candidates have current independent PASS and global coverage passes. No continue prompt; no Jira approval inferred from review. Explicit stop is unresolved termination, not successful delivery."
+        "Proceed automatically to Jira preparation only after all selected candidates have current independent PASS and global coverage passes. No continue prompt and no early Jira destination popup. Review PASS does not bypass the helper's final payload/preflight gates. Explicit stop is unresolved termination, not successful delivery."
       ],
       "completion_criteria": [
         "Every selected artifact set and every intended replacement SPEC has a current independent PASS.",
@@ -84,22 +85,24 @@
     },
     {
       "id": "prepare-and-execute-jira-operation",
-      "content": "Prepare and execute the explicitly approved Jira operation",
-      "active_form": "Preparing exact Jira payloads and obtaining final authorization",
+      "content": "Prepare and execute the validated Jira operation",
+      "active_form": "Preparing exact Jira payloads and executing the validated export",
       "instructions": [
-        "Load jira-createissue-helper and enter its dedicated sdlc-gateway.md before any generic create, update or batch route. Require handoffType=ceaia-sdlc-validated. A failed SDLC gate must not fall back to another helper flow.",
+        "Load jira-createissue-helper and enter its dedicated sdlc-gateway.md before any generic create, update or batch route. Set handoffType=ceaia-sdlc-validated only in internal workflow state for routing. Never send handoffType to any Jira MCP tool or include it in dynamicFieldsJson, attachmentsJson or issuesJson. A failed SDLC gate must not fall back to another helper flow.",
         "Validate the actual current Markdown score record and raw JSON block, latest numbered review, verified SPEC-header synchronization, global coverage and every final upload binding. Do not rewrite approved business content inside export; return affected defects to generation and then required review.",
-        "Collect missing mode-specific destination and supported fields, reuse confirmed sources and resolve attachment ambiguity. New Stories include their matching SPEC. Explicit new Epic-plus-Stories requests use the preserved combined branch; never create an Epic implicitly.",
+        "Before asking Jira destination questions, read conversation/user workspace context and jira-user-info.md, especially its CEAIA SDLC Jira Defaults section. Reuse and validate saved staffId, almType, project, Story issue type, Epic Link and Parent Link. Ask only for missing, stale, ambiguous or explicitly changed values. New Stories include their matching SPEC. Explicit new Epic-plus-Stories requests use the preserved combined branch; never create an Epic implicitly.",
+        "Use the live direct tool contracts: queryJiraProjectsByName receives staffId, almType and projectName; queryJiraIssueTypesByProject receives staffId, almType and projectKey; queryJiraCreateMetaFields receives staffId, almType, projectKey and issueType or issueTypeId. Do not use a request wrapper.",
         "Existing updates change only supported description, expressly supported replacement summary and selected attachment replacements. Description-only/zero-attachment none is valid. Multiple selected attachments may map to distinct reviewed files in one ticket's attachments.replace array; do not collapse them.",
         "Create a transport-only Jira-wiki rendering of each exact reviewed STORY.md. Preserve business text and ordering, but convert Markdown headings such as ## Title to h2. Title, list markers, fenced code and inline code according to the SDLC gateway. Never edit STORY.md. Block if raw Markdown headings remain outside code blocks or if rendering changes meaning.",
         "Show the exact per-target preview, full Jira-wiki rendered description, metadata/links, conversion validation, readable attachment changes and original→replacement mappings. Exclude standalone TEST_CASE.md, internal score records, planning/state/review files and diagnostics from Jira payloads.",
-        "Serialize complete actual exportJiraByDynamicFields payloads once. Obtain request_user_approval bound to every exact payload and final upload bytes in execution order. ask_user_question or ordinary chat is not final approval. Any approved-content or rendering change invalidates approval. Preserve each numbered approval-attempt record in .ceaia-work while jira-preview.md remains the single current preview.",
-        "After actual approval, re-read the exact payload and attachments, then use java-base-mcp.exportJiraByDynamicFields with the approved content. Await asynchronous approval by yielding; act only on the actual approved decision.",
-        "Execute updates one ticket at a time. At a failed/partial/unknown result pause remaining writes, record known issue-vs-attachment outcomes and reconcile remote state before offering a supported, newly approved recovery. Never replay successful creation or upload to fix only an unfinished step.",
-        "Rejected/unavailable approval, failures and partial/unknown outcomes remain resumable waiting states. Ask focused correction/recovery/defer/stop choices; do not spin or declare success. Report each actual returned key/URL, attachment outcome and unattempted target separately."
+        "Serialize complete actual exportJiraByDynamicFields arguments once and show them in jira-preview.md. Pass arguments directly without requestJson. For a batch use the exposed issuesJson string, not an unexposed issues parameter. handoffType is absent from the outer arguments and every serialized value.",
+        "No approval tool or final confirmation popup exists for the validated SDLC route. Preserve each numbered jira-export-attempt record in .ceaia-work while jira-preview.md remains the single current preview. Re-read the exact arguments and attachments, repeat final preflight, then call java-base-mcp.exportJiraByDynamicFields immediately with the displayed content.",
+        "Execute updates one ticket at a time. At a failed/partial/unknown result pause remaining writes, record known issue-vs-attachment outcomes and reconcile remote state before offering a supported, newly previewed recovery selected by the user. Never replay successful creation or upload to fix only an unfinished step.",
+        "After each successful Jira write, update the canonical CEAIA SDLC Jira Defaults section in user-workspace jira-user-info.md with validated non-secret routing values. Failures and partial/unknown outcomes remain resumable waiting states. Ask focused correction/recovery/defer/stop choices; do not spin or declare success. Report each actual returned key/URL, attachment outcome and unattempted target separately."
       ],
       "completion_criteria": [
-        "Every write used an exact preview and final approval bound to its payload and uploaded content.",
+        "Every write used an exact final preview/read-back binding for its direct tool arguments and uploaded content, with no approval-tool dependency.",
+        "No Jira MCP call or serialized payload contains handoffType, and batch SDLC export uses issuesJson.",
         "Every requested issue/attachment operation is confirmed successful, or user explicitly stopped remaining work.",
         "Partial, unknown, blocked or awaiting-input states are not marked successful workflow completion.",
         "Final result includes individual verified Jira keys/URLs and operation outcomes."
@@ -109,7 +112,7 @@
       ]
     }
   ],
-  "description": "CEAIA SDLC v4: preserve business capabilities; generate canonical-AC Stories; save each external score as readable Markdown with complete raw JSON; retain numbered .ceaia-work audit records while outputs stay latest-only; create executable tests/SPECs; enforce verified SPEC review-header synchronization; then use jira-createissue-helper's dedicated SDLC gateway for Jira-wiki rendering and explicitly approved Jira writes. Pure-text instructions and data only; no scripts or hash-computation prerequisite.",
+  "description": "CEAIA SDLC v4.1: begin with generation, defer Jira destination collection until review PASS, preserve business capabilities, generate canonical-AC Stories, save each external score as readable Markdown with complete raw JSON, retain numbered .ceaia-work audit records while outputs stay latest-only, create executable tests/SPECs, enforce verified SPEC review-header synchronization, then use jira-createissue-helper's dedicated SDLC gateway for Jira-wiki rendering and direct validated Jira writes. Pure-text instructions and data only; no scripts, approval-tool dependency or hash-computation prerequisite.",
   "skills": [
     {
       "skill_id": "96c6bb68-ab4c-4a34-a634-3fb5c66c96d8",
@@ -134,7 +137,6 @@
     "java-base-mcp.fuzzyMatchingConfluence",
     "java-base-mcp.readJiraAttachments",
     "ask_user_question",
-    "request_user_approval",
     "nodejs-base-mcp.score_requirement_markdown"
   ]
 }

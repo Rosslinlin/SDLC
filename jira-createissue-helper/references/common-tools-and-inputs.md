@@ -38,6 +38,8 @@ All Jira write operations require at least:
 
 Do not allow arbitrary unsupported source names.
 
+Required base inputs must contain real validated values, not empties or fabricated `"."` placeholders. For unused optional inputs, follow the Mandatory Empty-Value Contract in `common-field-assembly.md`: use accepted typed empty values or omit the input, without bypassing required operation data or changing unspecified update fields.
+
 ## New Issue Inputs
 
 New issue creation also requires:
@@ -63,7 +65,7 @@ Batch create/update also requires:
 
 - `issues` or `issuesJson`: A single batch item list used for one `exportJiraByDynamicFields` call.
 - Per-item `summary`, `issueIdOrKey`, `testDetailsJson`, dynamic fields, or attachments as required by the operation.
-- One integrated batch preview and confirmation before the entire batch.
+- One integrated batch preview before the entire batch. Generic batch routes also require confirmation; the validated SDLC route follows its gateway's direct-export rule.
 
 For Test Case source export with `uploadType` mode `single`, do not use `issues` or `issuesJson`; assemble one aggregate Test issue with top-level `summary`, clean table-only `description`, and `dynamicFieldsJson.labels` containing `CEAIA_GEN`.
 
@@ -79,10 +81,12 @@ Test Case source export also requires:
 
 ## Tool Responsibilities
 
-- `queryJiraProjectsByName`: Query projects only by `almType` + `projectName`; include `staffId` only when required by tool authentication/context.
-- `queryJiraIssueTypesByProject`: Query issue types only for the selected `projectKey`.
-- `queryJiraCreateMetaFields`: Retrieve create-field metadata and drive automatic field assembly; for Jira updates, confirm the target project's update field rules before export.
+- `queryJiraProjectsByName`: Pass exactly the required `staffId`, `almType`, and `projectName` search keyword.
+- `queryJiraIssueTypesByProject`: Pass exactly the required `staffId`, `almType`, and selected `projectKey`.
+- `queryJiraCreateMetaFields`: Pass `staffId`, `almType`, `projectKey`, plus at least one of `issueType` or `issueTypeId`; retrieve create-field metadata and drive automatic field assembly. For Jira updates, confirm the target project's field rules before export.
 - `getJiraInfos`: Read existing Jira information, especially for update and association flows.
-- `exportJiraByDynamicFields`: Create, update, or associate Jira only after user confirmation.
+- `exportJiraByDynamicFields`: Pass tool arguments directly, without a `requestJson` wrapper. Generic routes call it after their existing confirmation step. A validated SDLC route calls it directly after the gateway's final preview/read-back/preflight, with no approval-tool call.
+
+`handoffType` is workflow metadata, not a Jira MCP parameter. Never send it to any tool or place it in a serialized Jira field payload.
 
 Association-specific parameters such as `linkedIssueKeys` and `linkType` must be passed directly to `exportJiraByDynamicFields`; they are not dynamic Jira fields and must never be nested in `dynamicFieldsJson`.

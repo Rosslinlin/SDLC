@@ -16,4 +16,4 @@ Use core-review-gates.md as the authority for definitions. Every row must have c
 - [ ] Repair eligibility accounts for phase, consumed rounds, stagnation and user evidence; no second edit within the same round.
 - [ ] Reviewed content revisions and actual read-back findings and SCORE gate appear in structured conclusion.
 - [ ] Verdict/header synchronization and final-file read-back are assigned to parent.
-- [ ] No Jira readiness on non-PASS, no export/approval claims from review.
+- [ ] No Jira readiness on non-PASS and no export-readiness or write-success claims from review.

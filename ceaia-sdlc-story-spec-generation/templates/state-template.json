@@ -65,9 +65,10 @@
   },
   "jiraReady": false,
   "updateReady": false,
-  "approval": {
-    "status": "not-requested",
-    "approvalAttempt": 0,
+  "jiraExportRequested": false,
+  "exportPreparation": {
+    "status": "not-prepared",
+    "exportAttempt": 0,
     "requestPath": null,
     "previewPath": "jira-preview.md",
     "requestIndex": null,

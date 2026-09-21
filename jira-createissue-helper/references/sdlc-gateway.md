@@ -1,12 +1,14 @@
 # CEAIA SDLC Jira Gateway
 
-Gateway version: 1.0.0 — v4
+Gateway version: 1.1.0 — v4
 
-This is the controlling entry point for a `ceaia-sdlc-validated` handoff. It adds SDLC-specific validation, Jira rendering, preview, approval and recovery rules without changing the helper's generic create, update, batch, association or Test Case flows.
+This is the controlling entry point for a `ceaia-sdlc-validated` handoff. It adds SDLC-specific validation, Jira rendering, preview, direct export and recovery rules without changing the helper's generic create, update, batch, association or Test Case flows.
 
 ## 1. Routing boundary
 
 Enter this gateway only when the user explicitly requests Jira export/update of reviewed CEAIA SDLC artifacts, or the handoff declares `handoffType: ceaia-sdlc-validated`.
+
+`handoffType` is an internal routing discriminator. Retain it in workflow state/handoff validation, but strip it before every Jira MCP call. It is not exposed by the Jira tool schema and must never appear in tool arguments, `dynamicFieldsJson`, `attachmentsJson`, or `issuesJson`.
 
 Load in this order:
 
@@ -26,7 +28,7 @@ The current reviewed workspace artifacts are authoritative:
 - `TEST_CASE.md`, plans, score records, review records, state and manifests never become Jira attachments;
 - Jira preparation must not repair, regenerate, summarize or silently omit approved business content.
 
-If Story/SPEC content, attachment selection, ticket mapping, or a business-bearing Jira field must change, invalidate the current preview/approval and return the affected artifact to generation and independent review. Jira-wiki rendering described below is a transport transformation and must not modify the workspace source files.
+If Story/SPEC content, attachment selection, ticket mapping, or a business-bearing Jira field must change, invalidate the current preview/export binding and return the affected artifact to generation and independent review. Jira-wiki rendering described below is a transport transformation and must not modify the workspace source files.
 
 ## 3. Pre-export gate
 
@@ -83,9 +85,20 @@ Use `flow-sdlc-validated-handoff.md` and metadata returned by Jira. For each ite
 - attachments follow the validated reviewed mapping and `common-attachments.md` serialization contract;
 - labels include `CEAIA_GEN` whenever labels are included or changed.
 
-Never put internal paths, scores, review diagnostics, state, or approval records into Jira-visible fields.
+Never put internal paths, scores, review diagnostics, state, or export-attempt records into Jira-visible fields.
 
-## 6. Preview and final approval
+### Live Jira tool argument boundary
+
+Call tools with direct named arguments, never a `requestJson` wrapper:
+
+- `queryJiraProjectsByName`: `staffId`, `almType`, `projectName`.
+- `queryJiraIssueTypesByProject`: `staffId`, `almType`, `projectKey`.
+- `queryJiraCreateMetaFields`: `staffId`, `almType`, `projectKey`, plus at least one of `issueType` or `issueTypeId`.
+- `exportJiraByDynamicFields`: `staffId` and `almType`, plus only the applicable exposed fields such as `projectKey`, `summary`, `issueType`, `description`, `projectName`, `epicName`, `epicLink`, `parentLink`, `dynamicFieldsJson`, `testDetailsJson`, `issueIdOrKey`, `conversationId`, `attachmentsJson`, `linkedIssueKeys`, `linkType`, or `issuesJson`.
+
+For a single create, use direct create fields and a once-serialized `dynamicFieldsJson`; add the reviewed SPEC through a once-serialized `attachmentsJson`. For a single update, send `issueIdOrKey` plus only authorised changed fields. For multiple SDLC items, use one once-serialized JSON array string in `issuesJson`; do not send an `issues` argument that the exposed tool does not provide. Batch attachment operations stay inside their corresponding item. Never include `handoffType`, workflow status, score, review data or preview metadata in the export arguments.
+
+## 6. Final preview and export binding
 
 Write or replace the single current `jira-preview.md`. Include:
 
@@ -95,18 +108,18 @@ Write or replace the single current `jira-preview.md`. Include:
 - a Markdown-to-Jira-wiki conversion status with any syntax changes listed by type;
 - exact attachment add/replace/delete plan and preflight status;
 - complete final `exportJiraByDynamicFields` payload;
-- a statement that the displayed payload and final attachment bytes are the approval subject.
+- a statement that the displayed payload and final attachment bytes are the exact content that will be submitted.
 
-After the preview is complete, invoke `request_user_approval`. The approval request must identify the current preview, exact serialized payload, operation order and final attachment paths/bytes. `ask_user_question`, normal chat, inferred intent, earlier approval or review PASS is not authorization.
+No approval capability is part of this workflow. Do not replace it with a final `ask_user_question` popup. The user's SDLC export intent was captured by the bundled workflow, and the reviewed handoff plus this final preflight authorise the direct tool call within that requested scope. `ask_user_question` remains available only for missing required values, ambiguity and recovery choices.
 
-Before invoking approval, save a numbered internal record such as `.ceaia-work/jira/jira-approval-attempt-001.md` containing the preview binding, payload, attachment revisions, request status and eventual decision. Never overwrite a completed approval record. `jira-preview.md` remains the single current user preview; the numbered record is internal audit history and is never sent to Jira.
+Before export, save a numbered internal record such as `.ceaia-work/jira/jira-export-attempt-001.md` containing the preview binding, exact tool arguments, serialized payload values, attachment revisions, preflight result and eventual Jira response. Never overwrite a completed export-attempt record. `jira-preview.md` remains the single current user preview; the numbered record is internal audit history and is never sent to Jira.
 
-While approval is pending, yield. On reject or unavailable approval capability, keep a resumable waiting state and do not call Jira. Any payload, rendered Description, metadata value, attachment mapping/path/content, operation order, or target change invalidates approval and requires a regenerated preview plus a new approval request.
+Immediately before the tool call, re-read the payload and every upload artifact. Any change to the rendered Description, metadata value, attachment mapping/path/content, operation order or target invalidates the preview binding. Regenerate `jira-preview.md`, repeat all affected checks and allocate the next export-attempt record before calling Jira.
 
 ## 7. Write and recovery
 
-Only after actual approval, call `exportJiraByDynamicFields` with the exact approved payload. Re-read the final payload and attachments immediately before the call; if they differ from the approved content, invalidate approval.
+After the final read-back/preflight succeeds, call `exportJiraByDynamicFields` immediately with the exact direct arguments shown in `jira-preview.md`. Do not add `handoffType`, do not wrap the arguments, and do not add omitted optional parameters after preview.
 
-For multiple update targets, execute in the approved order and pause after the first failed, partial or unknown result before attempting later targets. Record known issue-field and attachment outcomes separately. Do not automatically retry, replay a successful create, or delete an old attachment after a failed replacement upload.
+For multiple update targets, execute in the exact order shown in the final preview and pause after the first failed, partial or unknown result before attempting later targets. Record known issue-field and attachment outcomes separately. Do not automatically retry, replay a successful create, or delete an old attachment after a failed replacement upload.
 
-Whole-workflow success requires every intended operation to be confirmed successful, or the user to explicitly stop the remainder. Waiting, rejected, failed, partial and unknown outcomes are resumable states, not success.
+Whole-workflow success requires every intended operation to be confirmed successful by the Jira tool result, or the user to explicitly stop the remainder. Waiting, failed, partial and unknown outcomes are resumable states, not success.

@@ -58,6 +58,39 @@ Add `required = false` fields to the payload only when:
 
 Omitted optional fields must not block creation.
 
+## Mandatory Empty-Value Contract
+
+Apply this contract to every export flow, top-level parameter, batch item, inherited default, and generated dynamic field before preview and again before submission.
+
+- Never invent `"."`, `"-"`, `"N/A"`, `"null"`, `"undefined"`, or whitespace as a substitute for a missing value. These are not empty values.
+- When an unused optional string parameter is passed, use the actual empty string `""` only if the active tool accepts it as inactive. Otherwise omit it. Do not add unused parameters merely to fill every tool input or add parameters excluded by a specialised payload shape.
+- Preserve schema types: an empty array is `[]`, not `""` or `"[]"`; an empty object is `{}`, not `"."`. Use empty collections only when supported and semantically appropriate. Do not substitute JSON `null` unless explicitly supported.
+- If neither omission nor a valid empty value is supported, explain the schema conflict and block submission; never fall back to a dot to satisfy validation.
+
+| Parameter | Rule when unused or absent |
+|---|---|
+| `epicLink`, `epicName`, `parentLink`, `conversationId` | Use `""` if included and accepted by the active tool; otherwise omit. If required for the selected issue type or operation, resolve the real value instead. |
+| `linkType` | Use `""` or omit when no association is requested. Actual associations require a validated link type. Keep it outside `dynamicFieldsJson`. |
+| `issueIdOrKey` | For a new issue, use `""` if included and supported, otherwise omit. Updates and associations require a real existing issue id/key; never let a missing update target change the operation into a create. |
+| `issuesJson` | For a non-batch flow, use `""` if included and supported, otherwise omit. An active batch requires its valid serialized item array, not an empty sentinel. |
+| `attachmentsJson` | With no planned or required attachment operations, use `""` if included and supported, otherwise omit. Actual operations require the once-serialized validated plan from `common-attachments.md`. |
+| `testDetailsJson` | When no Test Details are needed, use `""` only for a supported optional string parameter; otherwise omit or use `[]` if an optional array is expected and accepted. Required Test Case steps must remain populated and obey the selected flow's array/string contract. |
+| `linkedIssueKeys` | Use `[]` if included and empty arrays are supported, otherwise omit when no association is requested. Actual associations require real target keys. Keep it outside `dynamicFieldsJson`. |
+| `dynamicFieldsJson` | Preserve actual validated fields. If none exist, omit or use `{}` for an object parameter / `"{}"` for a serialized-object parameter when accepted. Never insert dummy fields or replace real fields with an empty object. |
+
+Required values such as `staffId`, `almType`, and operation-specific `projectKey`, `issueType`, `summary`, or required metadata values must be resolved using existing input/metadata rules; block export if unresolved. Do not bypass non-empty requirements with empty values. A required key whose schema explicitly allows an empty value, such as absent Test Data mapped to `data: ""`, remains allowed.
+
+For updates, missing means unchanged: omit unrequested fields rather than populating them with empty values, inferred values, or defaults. Clearing an existing Jira field requires explicit user intent, metadata/tool support for the clear representation, and a preview identifying the clear operation. Inspect effective batch defaults too; remove or relocate defaults that would modify unrequested fields on update items. This update protection takes precedence over generic optional-field inference and value-generation strategies.
+
+Normalize known generated placeholders before preview. Do not globally replace periods or other characters inside descriptions, summaries, URLs, filenames, identifiers, decimals, Test Case content, or user-supplied evidence. If a value might be intentional rather than a placeholder, validate or clarify it instead of silently changing it.
+
+Regression checks:
+
+- A new Bug with no Epic, parent, association, batch, attachment, or Test Details must not receive `"."` in unused parameters. Included supported optional strings use `""`; an included supported empty `linkedIssueKeys` array is `[]`.
+- A summary-only update omits unrelated fields; neither empty values nor batch defaults clear or modify Epic Link, Parent Link, labels, or Test Details.
+- An active batch, attachment operation, or required Test Case step export cannot replace its required data with `""` or an empty collection.
+- Literal periods in supplied report text, URLs, decimals, and filenames remain unchanged.
+
 ## Default Label
 
 Every create or update payload must include `CEAIA_GEN` when labels are included or changed.
@@ -88,6 +121,8 @@ Direct parameters:
 - `issuetype` / `issueType` -> `issueType`
 - `description` -> `description`
 
+`handoffType` is never a direct Jira parameter. Keep it only in workflow routing/state and remove it before assembling the tool arguments or any serialized payload.
+
 Put other fields into `dynamicFieldsJson`:
 
 - Put custom fields such as `customfield_25800`, `customfield_12251`, `customfield_26615`, or `customfield_27708` into `customFields` unless the tool has a dedicated parameter.
@@ -102,6 +137,7 @@ For batch create/update, apply the same field assembly rules to each item, then 
 
 - Top-level `projectKey`, `issueType`, `description`, `dynamicFieldsJson`, and `conversationId` can act as defaults.
 - Item-level values override top-level defaults.
+- For update items, validate the effective payload after inheritance against the Mandatory Empty-Value Contract. Do not let defaults modify unrequested fields; relocate such defaults to the intended items instead.
 - Unknown item fields such as `labels`, `components`, `fixVersions`, and `customfield_xxxxx` are treated as dynamic Jira fields for that item.
 - Item-level attachments or attachment operations must not be merged into Jira dynamic fields.
 - Use `testDetailsJson` per item for Test Case steps.

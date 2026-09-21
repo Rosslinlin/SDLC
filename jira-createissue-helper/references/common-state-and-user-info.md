@@ -8,6 +8,8 @@ Maintain and reuse the current Jira flow state:
 - `almType`
 - selected project key / project name
 - selected issue type name / issue type id
+- SDLC default Epic Link, when explicitly selected and still applicable
+- SDLC default Parent Link, when explicitly selected and still applicable
 - `issueIdOrKey`, for existing ticket updates
 - association source / target issue key / `linkedIssueKeys` / `linkType`
 - latest `queryJiraCreateMetaFields` response
@@ -39,11 +41,29 @@ Reusable values include:
 - selected project name
 - selected issue type name
 - selected issue type id
-- selected Test Case upload type, only for Test Case export flows
+- SDLC default Epic Link
+- SDLC default Parent Link
+
+Do not treat `uploadType` as reusable user information. For Test Case export flows, collect the mode with a constrained selection for every export request.
 
 If these values are found and remain relevant to the current request, reuse them. Do not show a popup for a value that is already available and validated.
 
 Do not ask for Jira source or project again unless the user explicitly asks to change Jira source or project, or the stored value cannot be validated for the current operation.
+
+## CEAIA SDLC Jira Defaults
+
+For the validated SDLC route, read the `## CEAIA SDLC Jira Defaults` section of `jira-user-info.md` before opening any Jira destination popup. Reuse current non-secret values for:
+
+- `staffId`
+- `almType`
+- `projectKey` and project name
+- Story issue type name and id
+- `epicLink`, when the user previously selected a reusable Epic Link
+- `parentLink`, when the user previously selected a reusable Parent Link
+
+Stored values are defaults, not proof that Jira still accepts them. Validate the stored project through `queryJiraProjectsByName`, the stored Story type through `queryJiraIssueTypesByProject`, and writable fields through `queryJiraCreateMetaFields`. If the returned data still matches, continue without asking the user again. Ask only for a missing, invalid, stale, ambiguous or explicitly changed value.
+
+Do not collect these destination values during the initial Story-generation intake merely because the user also said “push to Jira”. The generation Skill records that final intent; this helper reads or collects destination values only after the reviewed SDLC handoff reaches the Jira stage.
 
 ## User Info Persistence After Successful Writes
 
@@ -61,11 +81,31 @@ Store only reusable, non-secret workflow information:
 - selected project name
 - selected issue type name
 - selected issue type id, when available
+- SDLC default Epic Link, when explicitly supplied and successfully used
+- SDLC default Parent Link, when explicitly supplied and successfully used
 - latest successful operation type, such as create, update, batch create, batch update, or association update
 - latest successful ticket key or a short list of successful batch ticket keys, when available
 - last updated date
 
 Do not store Jira tokens, passwords, raw authentication headers, sensitive payload details, or full issue descriptions.
+
+Keep one canonical `## CEAIA SDLC Jira Defaults` section rather than appending duplicate sections. Store visible Jira values, not raw metadata responses. A suitable shape is:
+
+```markdown
+## CEAIA SDLC Jira Defaults
+
+- Staff ID: 12345678
+- Jira source: wpb
+- Project key: AIWPB
+- Project name: AI Wealth Personal Banking
+- Issue type: Story
+- Issue type ID: 10001
+- Epic Link: AIWPB-1234
+- Parent Link:
+- Last successful SDLC export: YYYY-MM-DD
+```
+
+An empty optional line means no reusable default and must not be converted into a Jira field-clear request.
 
 When the file already exists, update known values instead of creating duplicate sections. Preserve useful previous values when the current operation does not provide replacements.
 
@@ -75,10 +115,10 @@ Persist reusable top-level and validated item-level values for batch operations 
 
 ## De-Duplication Rules
 
-- When a project has already been selected, do not call `queryJiraProjectsByName` again unless the user changes source/project keyword or asks to search again.
-- When `staffId`, `almType`, and `projectKey` already exist, skip project collection and go directly to issue type lookup.
+- When a project has already been selected and validated during the current Jira stage, do not call `queryJiraProjectsByName` again unless the user changes source/project keyword or asks to search again. A project loaded from a previous user-workspace session is validated exactly once for the new export; use its key as the `projectName` search keyword when no display name is stored.
+- When `staffId`, `almType`, and `projectKey` already exist and that project is current-stage validated, skip project collection and go directly to issue type lookup. Persisted but not-yet-validated values do not qualify for this shortcut.
 - For Test Case export, when `staffId`, `almType`, and `projectKey` already exist but `uploadType` is missing, skip source/project collection and collect only `uploadType` before preview.
-- When issue types for the selected project already exist, do not call `queryJiraIssueTypesByProject` again unless the user changes project or asks to refresh.
+- When issue types for the selected project have already been returned and validated during the current Jira stage, do not call `queryJiraIssueTypesByProject` again unless the user changes project or asks to refresh. Validate a persisted Story type once per new export stage.
 - When metadata for the same project + issue type already exists, do not call `queryJiraCreateMetaFields` again unless the user changes project/issue type or asks to refresh.
 - When metadata has already been explained, do not repeat the full explanation; assemble values directly and generate the preview.
 - Do not reopen popups for already collected or generated field values unless the user asks to modify them.

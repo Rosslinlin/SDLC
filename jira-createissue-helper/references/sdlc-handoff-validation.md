@@ -1,6 +1,6 @@
 # SDLC Handoff Validation
 
-Reference version: 1.2.0
+Reference version: 1.3.0
 
 Used by: `flow-sdlc-validated-handoff.md`
 
@@ -23,12 +23,12 @@ Validate the following logical fields before Jira payload assembly. The fields m
 
 | Field | Required for create | Required for update | Validation |
 | --- | --- | --- | --- |
-| `handoffType` | Yes | Yes | Must equal `ceaia-sdlc-validated`. |
+| `handoffType` | Yes | Yes | Set automatically by the bundled workflow. Internal routing metadata only; must equal `ceaia-sdlc-validated` and must be removed before every Jira MCP call. |
 | `operation` | Yes | Yes | Must equal `create` or `update`. |
-| `staffId` | Yes | Yes | Reuse from valid state only where permitted by common state rules. |
-| `source` / `almType` | Yes | Yes | Must be explicitly supplied as `WPB`, `ALM`, `DATA`, `FCR` or `GO`; never infer it. |
-| `projectKey` / project selection | Yes | From current issue | Create must validate project; update obtains project from `getJiraInfos`. |
-| `issueType` | Yes | From current issue | Create must validate issue type; update obtains current type and confirms metadata. |
+| `staffId` | At export | At export | Resolve in the helper from current context or `jira-user-info.md`; do not require generation intake to collect it. |
+| `source` / `almType` | At export | Yes | Create may resolve it from validated SDLC defaults or final helper selection. Updates retain the explicitly confirmed ticket source from intake. Never infer it. |
+| `projectKey` / project selection | At export | From current issue | Create resolves and validates project in the helper; update obtains project from `getJiraInfos`. |
+| `issueType` | At export | From current issue | Create validates the saved/default Story type in the helper; update obtains current type and confirms metadata. |
 | `storyPath` | Yes | Yes | Must point to reviewed `STORY.md`. |
 | `storyContent` | Yes | Yes | Must exactly equal the reviewed `STORY.md` content after line-ending normalization only. |
 | `testCasePath` | Yes | Yes | Must point to `TEST_CASE.md`; audit only, never exported. |
@@ -154,6 +154,6 @@ Block the SDLC payload and export when any of the following applies:
 - `attachmentsJson` is not a string containing the validated serialized attachment plan; or
 - Jira metadata or existing-ticket information cannot be confirmed.
 
-Also block if the Jira-bound Description still contains raw Markdown headings outside code blocks, if a Jira-wiki conversion changes business meaning, or if the current preview/approval is bound to a different rendered Description.
+Also block if the Jira-bound Description still contains raw Markdown headings outside code blocks, if a Jira-wiki conversion changes business meaning, if `handoffType` appears anywhere in Jira tool arguments or serialized Jira data, or if the current preview/export binding contains a different rendered Description.
 
 Never downgrade a blocked SDLC handoff to generic create, update, or batch export.

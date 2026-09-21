@@ -31,11 +31,11 @@ Jira source is WPB, ALM, DATA, FCR or GO, explicitly confirmed per target. Valid
 
 Keep only the latest deliverable Story, Test Case and SPEC files under `outputs/ceaia/...`; replace those paths after supported repairs. Do not create historical Story/Test Case/SPEC copies in outputs or `.ceaia-work`.
 
-Preserve workflow evidence under each candidate's `.ceaia-work` internal root. Every planning revision, score invocation result, independent review execution, post-repair verification and Jira approval attempt receives a monotonically numbered file and is never overwritten. Examples: `plan-revision-001.md`, `story-quality-score-attempt-001.md`, `review-attempt-001.md`, `review-attempt-001-post-repair.md`, and `jira-approval-attempt-001.md`. Never renumber or reuse an earlier attempt file. State points to the latest applicable file and may be compactly replaced.
+Preserve workflow evidence under each candidate's `.ceaia-work` internal root. Every planning revision, score invocation result, independent review execution, post-repair verification and Jira export attempt receives a monotonically numbered file and is never overwritten. Examples: `plan-revision-001.md`, `story-quality-score-attempt-001.md`, `review-attempt-001.md`, `review-attempt-001-post-repair.md`, and `jira-export-attempt-001.md`. Never renumber or reuse an earlier attempt file. State points to the latest applicable file and may be compactly replaced.
 
 The score record is Markdown for user-readable audit. It contains a concise readable summary and the complete untouched tool JSON text in a fenced `json` block. The readable summary must not replace or edit the raw response. Review records remain full Markdown reports. Preserve original user evidence and original Jira baseline separately.
 
-Maintain compact candidate state plus `.ceaia-work/batch-state.json`: selected candidate IDs, source assignments, per-candidate status, global source coverage and known write outcomes. Do not duplicate document bodies in state. State and batch state are mutable control files, not audit logs. For final preparation retain each numbered approval record under `.ceaia-work`; `jira-preview.md` remains the one current user preview required by the helper. State references the latest approval attempt, request revision and indices.
+Maintain compact candidate state plus `.ceaia-work/batch-state.json`: selected candidate IDs, source assignments, per-candidate status, global source coverage and known write outcomes. Do not duplicate document bodies in state. State and batch state are mutable control files, not audit logs. For final preparation retain each numbered Jira export-attempt record under `.ceaia-work`; `jira-preview.md` remains the one current user preview required by the helper. State references the latest export attempt, request revision and indices.
 
 Invalidate affected gates before modifying a file; after writing and reading back, advance its workflow revision and record the supported change. Interrupted writes remain invalid and resume at the earliest affected step. Existing stale Test Case/SPEC may remain at current paths but are not deliverable until rebuilt/revalidated. Do not delete files to satisfy initial-generation sequencing.
 
@@ -49,9 +49,9 @@ Before scoring read the saved Story in full, record its path and storyRevision, 
 
 Reviewer reads actual current source and artifact text, compares it with the current score association, and records the revisions it actually reviewed. Only the two-field Review Result header is excluded from substantive SPEC body review. A currentness label or matching counter alone never proves unchanged content.
 
-Before approval read the complete current request and intended attachment text, record requestRevision and per-file revisions, and show the exact supported approval preview. Between approval and sending perform no edits; re-read the request and attachments and compare them with the content just approved. Any difference invalidates approval and affected gates. Do not claim this procedure provides atomic or cryptographic immutability.
+Before Jira export, read the complete current request and intended attachment text, record requestRevision and per-file revisions, and show the exact final preview. Immediately before sending, re-read the request and attachments and compare them with that preview. Any difference invalidates the export binding and affected gates; regenerate the preview and repeat the preflight. Do not claim this procedure provides atomic or cryptographic immutability.
 
-On resume, read current files and the latest state/report before reusing gates. Use real platform version references if already exposed, without requiring that capability. If an external edit, interrupted write, lost context or unclear association prevents establishing currentness, mark only affected gates stale and re-establish them from the readable current content. Do not repeatedly invalidate a gate just because no hash exists. If safe final comparison cannot be made, pause for re-review/re-approval or clarification rather than sending uncertain content.
+On resume, read current files and the latest state/report before reusing gates. Use real platform version references if already exposed, without requiring that capability. If an external edit, interrupted write, lost context or unclear association prevents establishing currentness, mark only affected gates stale and re-establish them from the readable current content. Do not repeatedly invalidate a gate just because no hash exists. If safe final comparison cannot be made, pause for re-review, regenerated preview or clarification rather than sending uncertain content.
 
 At intake check file reading/writing, the scoring tool and independent-review capability. Lack of a script runtime or hashing capability is NOT a WAITING_TOOL reason. Missing access to the actual files/tools can still block the affected step.
 
@@ -68,7 +68,7 @@ Valid JSON, real booleans/numbers, null for unavailable values, no secrets:
 - `review`: result (Not Reviewed/PASS/NEEDS_REVISION/NEEDS_HUMAN_CLARIFICATION/FINAL_WITH_UNRESOLVED), reviewAttempt, recordPath, storyRevision, testCaseRevision, specBodyRevision, contentReadBack, testCaseTitleValidation, unresolvedIssueIds, specHeaderSync.
 - `repair`: round (0–3 by default), usedInRound, stagnantRounds, lastBlockingIssueIds, diagnosticUsed, reasonForBudgetReset, extraRoundsAuthorized (default 0).
 - `technicalRecovery`: operation, attempts, outcome.
-- `executionProfile: text-only`, `bindingMethod: readback-and-revision`, `artifactRevisions` (storyRevision/testCaseRevision), `jiraReady`, `updateReady`, `finalSpecRevision`, `approval` (status, requestRevision, attachmentRevisions, contentReadBack), per-operation `writeResults`.
+- `executionProfile: text-only`, `bindingMethod: readback-and-revision`, `artifactRevisions` (storyRevision/testCaseRevision), `jiraExportRequested`, `jiraReady`, `updateReady`, `finalSpecRevision`, `exportPreparation` (status, exportAttempt, requestRevision, attachmentRevisions, contentReadBack), per-operation `writeResults`.
 - `specArtifacts`: every current SPEC's path/fileName/uploaded/bodyRevision/fileRevision; `attachmentReplacementMapping`: each selected returned attachment ID and corresponding reviewed relativePath/fileName.
 - `reviewAttempt`: monotonic number of actual reviews, not repair allowance. `scoreAttempt` is the monotonic number of actual score-tool invocations. `aiSelfRepairCount` is a compatibility alias of repair.cumulativeRounds; the active allowance comes from repair.round/evidenceRevision/extraRoundsAuthorized. Preserve each numbered score/review record and keep only pointers/counters in state.
 
@@ -78,13 +78,13 @@ Normalized workflow facts are separate from the complete current score response;
 
 | Change | Invalidated | Return point |
 |---|---|---|
-| Any Story content | score, tests/SPEC alignment, review, readiness, preview/approval | score current Story; repair affected downstream |
-| Test Case content | SPEC test embedding, review, readiness, approval | fix tests; synchronize SPEC; review |
-| Any primary/additional SPEC body | affected SPEC review, cross-artifact review, readiness, approval | affected SPEC checks and review |
-| Accurate review-header synchronization only | final SPEC file revision and approval | bind final file; no score or review rerun |
-| Business source/scope or attachment selection | affected planning/content/preservation review/readiness/approval | impact analysis; rescore only if Story changes |
-| Jira routing-only field | destination compatibility and approval | destination checks/preview; review if business/mapping changes |
-| External change to original ticket | preservation review and approval | reconcile baseline with requested delta |
+| Any Story content | score, tests/SPEC alignment, review, readiness, preview/export binding | score current Story; repair affected downstream |
+| Test Case content | SPEC test embedding, review, readiness, export binding | fix tests; synchronize SPEC; review |
+| Any primary/additional SPEC body | affected SPEC review, cross-artifact review, readiness, export binding | affected SPEC checks and review |
+| Accurate review-header synchronization only | final SPEC file revision and export binding | bind final file; no score or review rerun |
+| Business source/scope or attachment selection | affected planning/content/preservation review/readiness/export binding | impact analysis; rescore only if Story changes |
+| Jira routing-only field | destination compatibility and export binding | destination checks/preview; review if business/mapping changes |
+| External change to original ticket | preservation review and export binding | reconcile baseline with requested delta |
 
 Existence is not currentness. Never carry a score to changed Story content. Low score does not authorize altering source requirements.
 
@@ -112,9 +112,9 @@ Reviewer reads actual sources/artifacts, not generator summaries. All selected c
 
 Handoff contains statePath, actual source/planning paths, identity, artifact paths and updateManifestPath where applicable. Receiving Skill validates state before resuming, not repeating calls unconditionally.
 
-Internal update manifest contains baseline preservation and attachment selection, not score/audit fields. Scores/provenance belong in score record and state. Approval preview shows actual business changes and upload mapping, not diagnostics. Jira payload contains only supported approved fields and selected SPECs. Test Case is user-visible workspace content, never a standalone Jira attachment.
+Internal update manifest contains baseline preservation and attachment selection, not score/audit fields. Scores/provenance belong in score record and state. Final Jira preview shows actual business changes and upload mapping, not diagnostics. Jira payload contains only supported reviewed fields and selected SPECs. Test Case is user-visible workspace content, never a standalone Jira attachment.
 
-Final approval refers to the exact serialized helper payload and final attachment content checked by the read-back procedure above. Current state holds bindings/results; numbered internal approval records are retained, while historical Story snapshots are neither needed nor allowed.
+The export binding refers to the exact serialized helper payload and final attachment content checked by the read-back procedure above. The SDLC gateway calls the Jira export tool directly after this preflight; no separate approval tool is used. Current state holds bindings/results; numbered internal export-attempt records are retained, while historical Story snapshots are neither needed nor allowed.
 
 ## Waiting and completion
 

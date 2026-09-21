@@ -117,7 +117,7 @@ Compatibility fields are required, not optional prose replacements. validatedIss
 
 reviewAttempt is the monotonic review count. aiSelfRepairCount is cumulative actual repair batches; it may exceed three only across legitimate evidence revisions or explicitly bounded extensions. It is not the current revision's allowance. repairRound remains the active budget counter.
 
-reviewedSpecArtifacts lists every state.specArtifacts path with the observed bodyRevision, contentReadBack, result and preservation conclusion. Header synchronization happens later; parent records final fileRevision and approval read-back. Revision numbers describe observed edits, not computed fingerprints.
+reviewedSpecArtifacts lists every state.specArtifacts path with the observed bodyRevision, contentReadBack, result and preservation conclusion. Header synchronization happens later; parent records final fileRevision and the final export-preflight read-back. Revision numbers describe observed edits, not computed fingerprints.
 
 automaticPostReviewJiraHandoffRequired is true only when the parent supplies verified all-target PASS, current global coverage and export availability. Otherwise false for this per-candidate review; parent sets the aggregate handoff flag after all reviews. False does not authorize an unnecessary "continue?" prompt.
 

@@ -1,6 +1,6 @@
 # Flow SDLC Validated Handoff Export
 
-Flow version: 1.2.0
+Flow version: 1.3.0
 
 Applies to: reviewed CEAIA SDLC Story/SPEC handoffs
 
@@ -14,7 +14,7 @@ Use this flow for an explicit reviewed CEAIA SDLC handoff that creates or update
 
 This flow has priority over generic create, update and batch flows. It does not replace the dedicated Test Case source-export flow. If the SDLC validation gate fails, report the exact blocker and stop; do not regenerate content or route the request through a generic flow.
 
-Execute `sdlc-gateway.md` before this procedure. The gateway controls SDLC eligibility, Jira-wiki Description rendering, final approval binding and write recovery. Common modules remain reusable mechanics and do not override the gateway.
+Execute `sdlc-gateway.md` before this procedure. The gateway controls SDLC eligibility, Jira-wiki Description rendering, final export binding and write recovery. Common modules remain reusable mechanics and do not override the gateway.
 
 ## 2. Supported operations
 
@@ -46,8 +46,8 @@ Read and apply:
 
 1. Confirm explicit SDLC handoff intent and identify all selected items.
 2. Classify each item as `create` or `update`; preserve item order and independent identity.
-3. Inspect conversation context, user workspace context and `jira-user-info.md` before asking for reusable staff ID or source.
-4. Validate each item using `sdlc-handoff-validation.md` before Jira payload assembly.
+3. Inspect conversation context, user workspace context and `jira-user-info.md` before asking for reusable staff ID, source, project, Story issue type, Epic Link or Parent Link. Prefer the validated `## CEAIA SDLC Jira Defaults` section and ask only for missing/stale values.
+4. Validate artifact/review gates using `sdlc-handoff-validation.md`. Destination fields marked “At export” are resolved in Stage B from user-workspace defaults or focused final-stage selection; their absence must not send the workflow back to initial generation intake.
 5. If any selected item fails validation, show the item-specific blocker. Do not construct a partial integrated batch payload unless the user explicitly removes the blocked item(s).
 
 ### Stage B — Resolve project, issue type and current issues
@@ -55,9 +55,9 @@ Read and apply:
 #### Create items
 
 1. Reuse a valid project only when it is unchanged and compatible with the handoff.
-2. Otherwise validate project using `queryJiraProjectsByName`; never invent a project key.
-3. Query issue types using `queryJiraIssueTypesByProject` and select the Jira-returned Story type required by the handoff.
-4. Retrieve create metadata using `queryJiraCreateMetaFields`.
+2. Otherwise validate project using `queryJiraProjectsByName` with direct `staffId`, `almType`, and `projectName` arguments; never invent a project key.
+3. Query issue types using `queryJiraIssueTypesByProject` with direct `staffId`, `almType`, and `projectKey` arguments, then select or validate the Jira-returned Story type required by the handoff.
+4. Retrieve create metadata using `queryJiraCreateMetaFields` with direct `staffId`, `almType`, `projectKey`, plus `issueType` or `issueTypeId`.
 
 #### Update items
 
@@ -99,7 +99,7 @@ Do not update unsupported fields. Preserve current values for all other fields.
 
 #### Multiple creates or updates
 
-Use one `issues` or `issuesJson` list and one export call by default. Every item must retain its own project/type where required, item-specific Description, Acceptance Criteria mapping, required-field values and attachment plan.
+Use one `issuesJson` JSON-array string and one export call by default. Every item must retain its own project/type where required, item-specific Description, Acceptance Criteria mapping, required-field values and attachment plan. Do not send an `issues` argument because it is not exposed by the active export tool.
 
 For mixed create/update work, use one integrated payload only when the user explicitly requests a mixed batch. Otherwise produce separate operation previews to avoid accidental combined writes.
 
@@ -117,13 +117,13 @@ Create the attachment plan separately from dynamic fields.
 8. On replace, upload the new SPEC before deleting the old attachment.
 9. Report issue-write and attachment outcomes separately; a partial attachment failure does not conceal a successful Jira field update.
 
-If the file preflight or serialization validation fails, do not create a preview, request confirmation, call export, retry automatically, or substitute another path. Report the exact blocker and use the approved recovery interaction.
+If the file preflight or serialization validation fails, do not create a preview, call export, retry automatically, or substitute another path. Report the exact blocker and use the supported recovery interaction.
 
-### Stage F — Preview and explicit confirmation
+### Stage F — Final preview and direct-export preflight
 
 Create or overwrite the sole preview file: `jira-preview.md`. It must include:
 
-- SDLC flow version and handoff type;
+- SDLC flow version and internal handoff type, clearly marked “routing only; omitted from Jira tool arguments”;
 - operation and item count;
 - source project/issue type for every item;
 - exact ticket key for update items;
@@ -137,14 +137,43 @@ Create or overwrite the sole preview file: `jira-preview.md`. It must include:
 - full valid JSON payload; and
 - for batch, the one-call export statement and per-item identifiers.
 
-Request final authorization through `request_user_approval`, bound to the exact displayed payload and final attachment bytes. `ask_user_question`, normal chat and ambiguous language do not authorise export. Regenerate the preview and obtain fresh approval after any payload-affecting change, including an attachment path, filename, operation, Workspace artefact, rendered Description, or serialized `attachmentsJson` value.
+The JSON block must represent the direct named arguments to `exportJiraByDynamicFields`; never wrap them in `requestJson`. Remove `handoffType` before producing that block and verify it is absent from the outer arguments, `dynamicFieldsJson`, `attachmentsJson`, and `issuesJson`.
+
+No approval tool or final confirmation popup exists in this route. After the complete preview is written, allocate the next `.ceaia-work/.../jira-export-attempt-<nnn>.md`, re-read the exact tool arguments and every upload file, and compare them with the preview. Any payload-affecting change requires a regenerated preview and repeated preflight before direct export.
+
+Example single-create argument shape:
+
+```json
+{
+  "staffId": "12345678",
+  "almType": "wpb",
+  "projectKey": "AIWPB",
+  "summary": "Reviewed Story title",
+  "issueType": "Story",
+  "description": "h1. Reviewed Story title\n\nh2. User Story\n...",
+  "dynamicFieldsJson": "{\"fields\":{\"labels\":[\"CEAIA_GEN\"],\"customfield_12345\":\"approved AC content\"}}",
+  "attachmentsJson": "{\"add\":[{\"relativePath\":\"outputs/ceaia/example/example-spec.md\",\"fileName\":\"example-spec.md\"}]}"
+}
+```
+
+Example batch argument shape:
+
+```json
+{
+  "staffId": "12345678",
+  "almType": "wpb",
+  "issuesJson": "[{\"projectKey\":\"AIWPB\",\"summary\":\"Story 1\",\"issueType\":\"Story\",\"description\":\"h1. Story 1\",\"dynamicFieldsJson\":\"{\\\"fields\\\":{\\\"labels\\\":[\\\"CEAIA_GEN\\\"]}}\",\"attachmentsJson\":\"{\\\"add\\\":[{\\\"relativePath\\\":\\\"outputs/ceaia/story-1/story-1-spec.md\\\",\\\"fileName\\\":\\\"story-1-spec.md\\\"}]}\"}]"
+}
+```
+
+These are structural examples only. Use actual validated metadata field IDs and current artifact paths; never copy example IDs or paths into a real payload.
 
 ### Stage G — Export and report
 
-1. After actual `request_user_approval` approval only, re-read the final payload and attachments and call `exportJiraByDynamicFields` with exactly the approved content.
+1. After the final preview/read-back/preflight passes, call `exportJiraByDynamicFields` immediately with exactly the displayed direct arguments.
 2. Do not automatically retry a failed call.
 3. For each successful item, repeat the path/filename consistency check if the Workspace artefact or plan changed after preview, then run its validated attachment operations after the Issue write result is known.
-4. On success, update `jira-user-info.md` with allowed non-secret reusable values only.
+4. On success, update the canonical `## CEAIA SDLC Jira Defaults` section in `jira-user-info.md` with allowed non-secret reusable values, including validated source, project, Story issue type and explicitly selected Epic/Parent Link defaults.
 5. Report each item separately: handoff item identifier, operation, Jira key/URL, Issue-write status, attachment operation status and sanitised errors.
 6. For uploads, report the confirmed Workspace-relative path and filename used in the final plan.
 7. Never compress returned Jira keys into ranges.

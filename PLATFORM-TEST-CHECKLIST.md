@@ -4,7 +4,7 @@
 
 - [ ] 上传三个活动 Skill，并记录平台返回的 skill IDs。
 - [ ] 替换 task 中的 helper skill ID 占位值。
-- [ ] 确认平台提供 `ask_user_question`、`request_user_approval`、Jira MCP tools 和 `nodejs-base-mcp.score_requirement_markdown`。
+- [ ] 确认平台提供 `ask_user_question`、Jira MCP tools 和 `nodejs-base-mcp.score_requirement_markdown`；SDLC 路由不依赖审批工具。
 - [ ] 确认平台能读取所有文本资源；单独检查遗留 WPS/OLE `flow-testcase-source-export.md`。
 
 ## 场景 A：新 Story 正常链路
@@ -15,7 +15,9 @@
 - [ ] review 产生 `review-attempt-001.md`，不是覆盖固定 `review.md`。
 - [ ] PASS 后 SPEC header 显示 PASS 和正确 attempt，完整复读成功后才 `jiraReady=true`。
 - [ ] Jira preview 的 Description 使用 `h2.` 等 Jira wiki 标题，不包含代码块外的 `## `。
-- [ ] `request_user_approval` 出现；未批准时不调用 Jira。
+- [ ] 最终 preview/read-back/preflight 通过后直接调用 `exportJiraByDynamicFields`，不出现额外批准等待。
+- [ ] 外层参数、`dynamicFieldsJson`、`attachmentsJson` 和 `issuesJson` 中均不存在 `handoffType`。
+- [ ] 批量 SDLC 使用 `issuesJson`，不发送未暴露的 `issues` 参数或 `requestJson` wrapper。
 
 ## 场景 B：评分或 review 修复
 
@@ -51,3 +53,10 @@
 - [ ] 普通 create/update/association/batch 不进入 SDLC gateway。
 - [ ] project/issue type 需要选择时使用 popup，而不是普通 chat。
 - [ ] Test Case Jira-visible 换行使用 newline，不出现 `<br>` 或 escaped equivalents。
+
+## 场景 G：首次请求与用户工作区复用
+
+- [ ] 初次输入末尾包含 “push to Jira” 时，先运行 generation/score/review，不在 intake 阶段询问 project 或 Epic Link。
+- [ ] 首次成功 SDLC 导出后，user workspace 的 `jira-user-info.md` 只有一个 CEAIA SDLC 默认配置区。
+- [ ] 下一次 SDLC 导出先读取并验证保存的 source、project、Story type、Epic/Parent Link；有效时不重复询问。
+- [ ] 保存值失效或用户明确变更时，只询问受影响字段并重新验证。

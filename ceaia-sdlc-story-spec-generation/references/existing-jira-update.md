@@ -36,7 +36,7 @@ Inherited broad baseline scope is not by itself a reason to split into newly cre
 
 Decide before Story scoring:
 - `none`: no attachment write intended (including description-only/zero-attachment updates). Record an empty replacement mapping. Story Attachments says no attachment changes; it must not name the generated workspace-only SPEC as an uploaded attachment. Still generate and review the local SPEC and tests.
-- `replace`: replace each explicitly selected existing SPEC using its corresponding reviewed output SPEC. Propose a uniquely evidenced target; when ambiguous show filenames, MIME and purpose in a selector, keeping returned IDs internal. Final preview/approval confirms each selection.
+- `replace`: replace each explicitly selected existing SPEC using its corresponding reviewed output SPEC. Propose a uniquely evidenced target; when ambiguous show filenames, MIME and purpose in a selector, keeping returned IDs internal. Final preview and export preflight confirm each selection.
 
 One ticket has one current Story and Test Case set, with a primary SPEC and additional distinct replacement SPECs when requested. Do not ask the user to discard a requested replacement merely to fit a single-SPEC assumption. Different content requires separate reviewed files, not separate Jira tickets.
 
@@ -44,7 +44,7 @@ Before Story scoring, establish all intended final basenames and explicit origin
 
 Record every current SPEC in state.specArtifacts (including the primary paths.specPath) with path, fileName, uploaded, bodyRevision, fileRevision. Keep attachmentReplacementMapping entries with attachmentId, relativePath, fileName. IDs come only from the reader. If multiple originals intentionally receive one file, require explicit many-to-one confirmation; otherwise mappings are one-to-one. Document per-original baseline preservation.
 
-Each final SPEC follows the active template, embeds current shared Story and test table, declares shared FR coverage, and preserves its own source-specific details. Review every file and mapping; bind every SPEC body in reviewedSpecArtifacts and every final uploaded file in approval. A primary SPEC PASS is never sufficient for an unreviewed secondary file.
+Each final SPEC follows the active template, embeds current shared Story and test table, declares shared FR coverage, and preserves its own source-specific details. Review every file and mapping; bind every SPEC body in reviewedSpecArtifacts and every final uploaded file in export preparation. A primary SPEC PASS is never sufficient for an unreviewed secondary file.
 
 No safe existing target when action=replace is a blocker. Do not silently switch to none, add a new attachment or delete an attachment. A requested new attachment is outside this bundled update surface and needs an explicitly chosen supported workflow.
 

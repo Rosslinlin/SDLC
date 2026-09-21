@@ -6,13 +6,15 @@
 | Story 规划与拆分 | generation | evidence-backed、INVEST、全局 coverage |
 | Story 评分 | generation + external tool | 每次保存编号 Markdown，完整 raw JSON，76 分门禁 |
 | Test Case / SPEC 生成 | generation | score PASS 后生成；outputs 仅最新版 |
-| 中间历史 | generation/review/helper | `.ceaia-work` 编号保存 plan/score/review/approval |
+| 中间历史 | generation/review/helper | `.ceaia-work` 编号保存 plan/score/review/export-attempt |
 | 独立 review | review | reviewer 只读；检查 SCORE/STRUCTURE/COVERAGE/STORY/TESTS/SPEC/UPDATE |
 | SPEC review header | generation parent | PASS 后回写、完整复读、一次 targeted retry、未验证不得 jiraReady |
 | Jira SDLC routing | helper SDLC gateway | 禁止 generic fallback |
 | Jira wiki rendering | helper SDLC gateway | `##`→`h2.` 等，仅 transport copy |
 | Jira metadata / project / issue type | helper common modules | 动态 popup、不得 chat 替代所需选择 |
-| Jira preview / approval | helper SDLC gateway | `jira-preview.md` 当前版；`request_user_approval` 绑定精确 payload/bytes |
+| Jira final preview / preflight | helper SDLC gateway | `jira-preview.md` 当前版；完整 payload/附件复读后直接导出 |
+| Jira routing state | generation + helper | `handoffType` 仅内部路由，禁止发送到 Jira MCP |
+| Jira user defaults | helper | 成功后更新 user workspace 的 `jira-user-info.md`，下次先复用再询问 |
 | Jira write | helper | `exportJiraByDynamicFields`，失败/partial/unknown 可恢复但不自动重试 |
 | Generic helper flows | helper original modules | 不被 SDLC gateway 改写 |
 

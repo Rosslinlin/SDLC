@@ -7,7 +7,7 @@ description: Independently review current CEAIA Story, Test Case and SPEC artifa
 
 Bundle revision: 4.0.0 text-only — 2026-09-21.
 
-Review actual files read-only. Do not edit artifacts/state, recalculate scores, invoke the score tool, prepare Jira payloads, request approval or write Jira. Parent generation owns repair, state persistence and user interaction.
+Review actual files read-only. Do not edit artifacts/state, recalculate scores, invoke the score tool, prepare Jira payloads, run final export preflight or write Jira. Parent generation owns repair, state persistence and user interaction.
 
 ## Required resources
 

@@ -38,7 +38,7 @@ Batch requests are a single-call flow:
 
 ## Batch Mode Trigger
 
-Batch mode is enabled when either `issues` or `issuesJson` is provided. Test Case source export with `uploadType` mode `single` is a single-call export even though it does not use `issues` or `issuesJson`.
+Batch mode uses active item data in `issues` or `issuesJson`, not the mere presence of a parameter key. An explicitly supported inactive `issuesJson: ""` in a non-batch flow does not enable batch mode. A requested batch must provide a valid non-empty item list; missing, malformed, or empty batch data blocks export rather than falling back to a single create. Test Case source export with `uploadType` mode `single` is a single-call export and must not include `issues` or `issuesJson`.
 
 Use `issuesJson` when assembling a JSON array string for the MCP tool. Use `issues` only when the tool runtime supports a typed item list directly.
 
@@ -59,6 +59,8 @@ Top-level fields act as defaults for all items:
 - `issuesJson`: Optional JSON array string for batch items.
 
 Item-level fields override top-level defaults. Unknown item fields such as `labels`, `components`, `fixVersions`, and `customfield_xxxxx` are treated as dynamic Jira fields for that item.
+
+Validate each effective item after default inheritance using `common-field-assembly.md`'s Mandatory Empty-Value Contract. Update items must not inherit changes to unspecified fields; relocate defaults to the intended items when necessary. A requested update with a missing or empty `issueIdOrKey` must block, not silently become a create.
 
 ## Create Versus Update Items
 
@@ -136,8 +138,9 @@ Report batch results by item index and status. One failed batch item does not st
 ## Batch Notes
 
 - `dynamicFieldsJson` must be a JSON object or JSON string representing an object.
-- `attachmentsJson` can be a JSON object, JSON array, or a single attachment object in single-item mode.
+- For active attachment operations, `attachmentsJson` must be a once-serialized JSON string containing the validated plan from `common-attachments.md`, not an object or array.
 - `issuesJson` must be a JSON array string. For source-based Test Case export, follow `flow-testcase-source-export.md` instead of this generic batch note.
 - `issues` must be a typed item list when supported by the runtime.
+- Never use `""` for unused parameters. Apply the Mandatory Empty-Value Contract to top-level inputs and every item; inactive sentinels cannot substitute for required batch or operation data.
 - Do not put attachment operations into Jira dynamic fields.
 - Do not split a batch into repeated single-item tool calls unless explicitly requested.

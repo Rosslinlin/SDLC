@@ -25,6 +25,8 @@ Workspace readability is a mandatory local preflight. It does not guarantee that
 
 ## 2. Attachment-plan serialization contract
 
+When no attachment operation is planned or required, omit `attachmentsJson`, or pass `""` only if the active tool accepts it as an inactive sentinel. Never use `"."`. Do not parse this unused empty sentinel as an attachment plan. The serialization and validation requirements below apply to active attachment operations; required operations, upload paths, and filenames must not be replaced by empty values or placeholders.
+
 Build the attachment plan as an object internally. The export parameter `attachmentsJson` must then be a string containing that plan serialized exactly once.
 
 ### Required internal plan shape

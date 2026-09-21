@@ -1,4 +1,4 @@
-# CEAIA SDLC v4
+# CEAIA SDLC v4.1
 
 本目录是 v4 独立版本，不覆盖 v3。
 
@@ -15,5 +15,7 @@
 3. 在 `SDLC-workflow-v4.task.json` 中，将 `REPLACE_WITH_PLATFORM_JIRA_CREATEISSUE_HELPER_SKILL_ID` 替换为 helper 的实际 ID。
 4. 导入 task，确认 tools 列表中的评分工具位于最后。
 5. 按 `PLATFORM-TEST-CHECKLIST.md` 先跑一个新 Story 和一个现有 Jira 更新场景。
+
+SDLC 路由在最终 `jira-preview.md`、payload read-back 和附件 preflight 通过后直接调用 `exportJiraByDynamicFields`，不依赖额外审批工具。普通 Helper 与 Test Case 路由仍保留各自原有确认流程。
 
 详细变化见 `RELEASE-NOTES.md`。
