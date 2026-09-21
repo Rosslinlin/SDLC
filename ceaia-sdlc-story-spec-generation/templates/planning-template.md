@@ -1,39 +1,46 @@
-# SDLC Internal Planning Register
+# CEAIA Internal Planning
 
-> Internal artifact only. Do not expose this file, source links, source paths, or source identifiers in Jira-facing content.
+Internal only. Replace example cells; use mode-specific planningPath from workflow-contract.md.
 
 ## Source Evidence Register
-
-| Evidence ID | Evidence class | Source summary | Reliability / limitation | Used for |
-|---|---|---|---|---|
-| EV-001 | Direct requirement | [Concise source fact] | [Known limitation] | [SR IDs / Story candidates] |
+| Evidence ID | Class | Exact source / section / location | Supported fact | Limitation | Used by SR |
+|---|---|---|---|---|---|
+| EV-001 | Direct requirement | [source location] | [fact] | [limitation or None] | SR-001 |
 
 ## Atomic Requirement Register
-
-| SR ID | Source requirement | Actor / trigger | Journey / screen / state | Action / decision | Rule / data / dependency | Expected outcome | Evidence class | Coverage disposition |
-|---|---|---|---|---|---|---|---|---|
-| SR-001 | [Evidence-backed requirement] | [Actor/event] | [Known location or Not provided] | [Action/decision] | [Known fact] | [Observable result] | Direct requirement | Story candidate ST-001 |
+| SR ID | Evidence IDs | Requirement | Actor / trigger | Journey / state | Rule / data / dependency | Observable outcome | Disposition / candidate |
+|---|---|---|---|---|---|---|---|
+| SR-001 | EV-001 | [requirement] | [actor/event] | [known state] | [supported rule] | [outcome] | [candidate or clarification or supported exclusion] |
 
 ## Coverage Capability Matrix
+| Candidate / journey | UI | API / FSD | Backend | Integration / async | Persistence | Downstream / reporting | Permission / security | Coverage statement |
+|---|---|---|---|---|---|---|---|---|---|
+| [candidate] | Confirmed | Not provided | Not provided | Not provided | Not provided | Not provided | To confirm | [honest supported scope] |
 
-| Journey / Story candidate | UI states | API / FSD | Backend rules | Integration / async | Data persistence | Downstream / reporting | Permission / security | Coverage statement |
+## UX State Inventory
+| Screen / state | Evidence IDs | Actor / entry | Actions | Decision / validation | Transition / visible result |
+|---|---|---|---|---|---|
+| [state or N/A] | [EV IDs] | [actor] | [actions] | [rules] | [result] |
+
+## Candidate Register
+| Candidate ID | Mode / source / ticket | Value and scope | SR IDs | Independent delivery or inherited baseline rationale | Dependencies | Readiness / blockers | Final SPEC name | Attachment action |
 |---|---|---|---|---|---|---|---|---|
-| ST-001 | Confirmed | Not provided | To confirm | Not provided | Not provided | Not provided | Confirmed | Frontend behavior coverage only |
+| [unique ID] | [mode/identity] | [outcome] | SR-001 | [rationale] | [confirmed/gap] | [ready or exact gap] | [final-name.md] | [add/replace/none] |
 
-## UX/UI State Inventory
-
-| Screen / state | Entry point | Actor | Controls / actions | Decision / validation | Visible outcome | Evidence |
-|---|---|---|---|---|---|---|
-| [Screen] | [Entry point] | [Actor] | [Actions] | [Rule] | [State / message / transition] | EV-001 |
-
-## Story Candidate Matrix
-
-| Candidate ID | Proposed Story | Business value | SR IDs | Journey / state / action | Acceptance outcome | Dependencies | Independent delivery rationale |
-|---|---|---|---|---|---|---|---|
-| ST-001 | [Title] | [Value] | SR-001 | [Scope] | [Observable outcome] | [Known dependency] | [Why this is a vertical slice] |
+## Artifact Traceability
+Fill after corresponding artifacts exist. Do not create placeholder Test Case/SPEC files.
+| SR ID | Candidate | Story scope / AC IDs | FR IDs | TC IDs | Status / supported exclusion |
+|---|---|---|---|---|---|
+| SR-001 | [candidate] | AC-001 | FR-001 | TC-001 | [covered or gap] |
 
 ## Test Design Register
-
-| AC / FR | Preconditions | Trigger / input | Expected outcome | Verification location | Scenario type | Priority | Negative coverage disposition |
+| AC / FR | Preconditions | Trigger / data | Expected outcome | Verification location | Type | Priority | Negative disposition / rationale |
 |---|---|---|---|---|---|---|---|
-| AC-001 | [State] | [Action/data] | [Observable result] | [UI/API/log/data/report] | Positive | P0 | Covered |
+| AC-001 / FR-001 | [state] | [input] | [observable] | [supported observation] | [type] | [priority] | [Covered/N/A/To Confirm and rationale] |
+
+## Global Coverage Decision
+- Original evidence reconciled: [yes/no and precise omissions]
+- Selected candidate IDs: [complete list]
+- Every in-scope SR has a disposition: [yes/no]
+- Blocking clarifications: [exact items or None]
+- Unsupported claims / cross-Story inconsistencies: [items or None]

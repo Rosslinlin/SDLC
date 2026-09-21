@@ -1,149 +1,120 @@
-# CEAIA SDLC Review Report: [FEATURE / STORY]
+# CEAIA Current Review: [Candidate]
 
-## Template Contents
+Internal report only; parent replaces reviewPath after each verification. Replace placeholders with observed values. Structured conclusion is valid JSON, not prose masquerading as booleans.
 
-- Artifact register and review summary
-- Existing Jira update context
-- Gate results and source coverage audit
-- Sizing decision and validated issues
-- Required structured conclusion
-
-**Review Date:** YYYY-MM-DD
-
-**Artifact Set:** [Story folder or title]
-
-**Attempt:** [Positive integer; continue 4, 5, 6, ... as required]
-
-**Review Phase:** [initial-review / post-repair-verification]
-
-**AI Self-Repair Count:** [0-3; lifetime count for this artifact set]
-
-**AI Self-Repair Allowed:** [true only for attempts 1-3 while count is below 3 / false]
-
-**Overall Status:** [PASS / NEEDS_REVISION / NEEDS_HUMAN_CLARIFICATION / FINAL_WITH_UNRESOLVED]
-
-## Artifact Register
-
-| Artifact | Path | Review status | Jira export use |
-|---|---|---|---|
-| Planning | `.ceaia-work/planning.md` | [PASS / Limited / Not available] | Internal only |
-| Story | [workspace-relative STORY.md] | [PASS / FAIL] | Jira description |
-| Test Case | [workspace-relative TEST_CASE.md] | [PASS / FAIL] | Workspace deliverable; not exported to Jira |
-| SPEC | [workspace-relative story-named SPEC] | [PASS / FAIL] | Jira attachment |
-| Update Manifest | `.ceaia-work/updates/<TICKET-KEY>/update-manifest.md` or N/A | [PASS / N/A] | Internal only |
-| Imported Jira Attachments | [attachment IDs and workspace-relative paths or N/A] | [Reviewed / N/A] | Source evidence |
-
-## Review Summary
-
-**Reviewer Notes:** [Concise evidence-backed conclusion.]
-
-**Jira Ready:** [true / false]
-
-**Coverage Capability:** [E2E confirmed / Frontend behavior only / Mixed - state confirmed layers]
-
-**Review Status Synchronization Required:** [true / false]
-
-**Test Case Title Validation:** [manual-pass / failed]
-
-**Recommended Next Action:** [Automatic self-fix and rerun / Ask focused clarification / Synchronize PASS and hand off when export capability is available]
-
-**User Action Required:** [true / false]
-
-**User Requested Evidence:** [Exact missing evidence or None]
-
-## Existing Jira Update Context
-
-Use this section only for an update to an existing Jira ticket. Use N/A for new Story creation.
-
-**Jira Source:** [WPB / ALM / DATA / FCR / GO / N/A]
-
-**Ticket Key:** [TICKET-123 / N/A]
-
-**Attachment Read Status:** [Completed / Completed - no attachments / Blocked / N/A]
-
-**Acceptance Criteria Field Status:** [retrieved / empty-or-unavailable / blocked / N/A]
-
-**Incremental Requirement Summary:** [Concise summary / N/A]
-
-**Summary Update:** [Unchanged / Explicit replacement summary / N/A]
-
-**Description Update:** [Replace with reviewed STORY.md / N/A]
-
-**Preservation Risk:** [None / Concise risk and disposition]
-
-| Attachment ID | Original filename | Imported path | Proposed action | Replacement filename / path | User selection confirmed |
-|---|---|---|---|---|---|
-| [ID] | [filename] | [workspace-relative path] | [Evidence only / Replace / N/A] | [filename and path / N/A] | [Yes / No / N/A] |
+## Context
+- Mode / candidate / source / ticket: [identity]
+- Evidence revision / repair round / phase: [current values]
+- Sources actually read: [precise paths/locations]
+- Planning / state / Story / score / Test Case / SPEC / manifest paths: [complete workspace-relative paths]
+- Original ticket baseline and attachment inventory: [update only]
 
 ## Gate Results
-
-| Gate | Result | Evidence and conclusion |
+| Gate | Result | Current evidence / finding IDs |
 |---|---|---|
-| Artifact structure | [PASS / FAIL] | [Template/file-name/table-header result] |
-| Source coverage and decomposition | [PASS / FAIL / LIMITED] | [SR coverage, split decision, coverage capability] |
-| Story and AC quality | [PASS / FAIL] | [Actor/value/AC/BDD/traceability result] |
-| Test design and executability | [PASS / FAIL] | [Positive/negative/priority/steps/deduplication result] |
-| SPEC alignment and Jira readiness | [PASS / FAIL] | [Embedding/diagram/format/alignment result] |
-| Existing Jira update integrity | [PASS / FAIL / N/A] | [Baseline preservation, delta coverage, attachment mapping, and supported-field result] |
+| SCORE | [PASS/FAIL] | [response path, currentness, provenance, actual ok/finalScore] |
+| STRUCTURE | [PASS/FAIL] | [files/template/names/action] |
+| COVERAGE | [PASS/FAIL] | [SR coverage, original evidence and layers] |
+| STORY | [PASS/FAIL] | [AC/BDD/support] |
+| TESTS | [PASS/FAIL] | [coverage/executability/manual title validation] |
+| SPEC | [PASS/FAIL] | [embedding/flow/FR/SC] |
+| UPDATE | [PASS/FAIL/N/A] | [baseline/preservation/attachmentAction/mapping] |
 
-## Source Coverage Audit
+## Findings
+| ID | Severity | Gate / owner | Full path and line | Evidence / impact | Targeted repair | Story change required |
+|---|---|---|---|---|---|---|
+| [ID or None] | [severity] | [gate/owner] | [path:line] | [observed facts] | [specific action] | [true/false] |
 
-| SR ID | Requirement summary | Story / AC / FR / Test Case coverage | Status |
-|---|---|---|---|
-| SR-001 | [Requirement] | [ST-001 / AC-001 / FR-001 / TC-001] | [Covered / Gap / Clarification needed] |
+## Coverage and Repair Decision
+- Candidate SR→AC→FR→TC coverage: [mapped IDs and gaps]
+- Cross-candidate omissions/contradictions for parent: [items or None]
+- Inherited update scope limitation: [update only or None]
+- Affected files/gates: [explicit set]
+- User input or technical recovery needed: [exact information/decision or None]
+- Budget/stagnation decision: [current state and next action]
 
 ## Sizing and Split Decision
+- Decision: [NO SPLIT / SPLIT RECOMMENDED / NOT ASSESSABLE]
+- INVEST and ownership rationale: [evidence-backed assessment]
+- Proposed split, if needed: [titles, business value, SR allocation, dependencies]
+- Update preservation risk and change summary: [actual values or N/A]
 
-**Decision:** [NO SPLIT / SPLIT RECOMMENDED / NOT ASSESSABLE]
+## SPEC and Attachment Register
+| Current SPEC path | Original attachment ID / filename | Preserved obligations | Body binding | Review result | Intended upload |
+|---|---|---|---|---|---|
+| [each primary/additional SPEC] | [reader evidence or N/A] | [trace] | [observed bodyRevision and read-back finding] | [PASS/FAIL] | [yes/no] |
 
-**Rationale:** [Evidence-based explanation.]
-
-| Proposed Story when split is required | Business value | Scope / SR IDs | Dependency |
-|---|---|---|---|
-| [Title] | [Value] | [Scope] | [Dependency] |
-
-## Validated Issues
-
-| Issue ID | Severity | Category | Complete workspace-relative path and line | Evidence | Material impact | Recommended fix | Disposition |
-|---|---|---|---|---|---|---|---|
-| ISS-001 | [Critical / Major / Minor] | [Category] | `[outputs/ceaia/<story-slug>/STORY.md:42 or complete path plus heading/ID]` | [Evidence] | [Impact] | [Fix] | [Self-fixable / Needs human clarification] |
-
-Use `None` when no validated issues exist.
-
-Never use bare location to `STORY.md`, `TEST_CASE.md`, a SPEC filename, or line N. For a range, use `<complete-workspace-relative-path>:<start>-<end>`.
-
-## Required Structured Conclusion
-
-```text
-reviewResult: [PASS / NEEDS_REVISION / NEEDS_HUMAN_CLARIFICATION / FINAL_WITH_UNRESOLVED]
-reviewerNotes: [summary]
-reviewAttempt: [positive integer]
-reviewPhase: [initial-review / post-repair-verification]
-aiSelfRepairCount: [0-3]
-aiSelfRepairAllowed: [true/false]
-issues: [issue IDs or None]
-validatedIssues: [issue IDs or None]
-selfFixableIssues: [issue IDs or None]
-platformOwnedIssues: [issue IDs or None]
-needsHumanClarification: [questions or None]
-userActionRequired: [true only when new user evidence is required]
-userRequestedEvidence: [exact information/files required or None]
-sourceCoverage: [covered/total and limiting evidence]
-coverageCapability: [confirmed layers and gaps]
-sizingSplitRecommendation: [none or proposal]
-storyPath: [path]
-testCasePath: [path]
-specPath: [path]
-specFileName: [file name]
-jiraReady: [true/false]
-updateReady: [true for a reviewed existing-ticket update with resolved mapping; otherwise false]
-ticketKey: [ticket key or N/A]
-source: [WPB / ALM / DATA / FCR / GO / N/A]
-attachmentReplacementMapping: [one-to-one mapping or N/A]
-changeSummary: [baseline-to-proposed summary or N/A]
-preservationRisks: [None or risks]
-automaticPostReviewJiraHandoffRequired: [true only when this set has PASS, every Jira-targeted set has PASS, and export capability is available; otherwise false]
-reviewStatusSynchronizationRequired: [true after every verdict; false only when no SPEC exists]
-testCaseTitleValidation: [manual-pass / failed]
-recommendedNextAction: [action]
+## Structured Conclusion
+Required fields; use actual values and arrays/objects. This illustration is a non-PASS report, not a default to copy unchanged.
+```json
+{
+  "contractVersion": 3,
+  "candidateId": "example-story",
+  "mode": "new_story",
+  "source": null,
+  "ticketKey": null,
+  "reviewResult": "NEEDS_REVISION",
+  "reviewerNotes": "Replace with evidence-backed conclusion.",
+  "reviewPhase": "initial-review",
+  "reviewAttempt": 1,
+  "aiSelfRepairCount": 0,
+  "repairRound": 0,
+  "aiSelfRepairAllowed": true,
+  "storyPath": "outputs/ceaia/example-story/STORY.md",
+  "testCasePath": "outputs/ceaia/example-story/TEST_CASE.md",
+  "specPath": "outputs/ceaia/example-story/example-story-spec.md",
+  "specFileName": "example-story-spec.md",
+  "gateResults": {
+    "SCORE": "FAIL", "STRUCTURE": "FAIL", "COVERAGE": "FAIL",
+    "STORY": "FAIL", "TESTS": "FAIL", "SPEC": "FAIL", "UPDATE": "N/A"
+  },
+  "scoreGate": {
+    "scoreRecordPath": ".ceaia-work/stories/example-story/story-quality-score.json",
+    "recordComplete": false, "recordCurrent": false,
+    "provenanceVerified": false, "ok": null, "finalScore": null,
+    "passed": false
+  },
+  "reviewedBindings": {
+    "bindingMethod": "readback-and-revision",
+    "storyRevision": null, "testCaseRevision": null, "specBodyRevision": null,
+    "contentReadBack": false
+  },
+  "issues": [],
+  "validatedIssues": [],
+  "selfFixableIssues": [],
+  "platformOwnedIssues": [],
+  "needsHumanClarification": [],
+  "sourceCoverage": {"covered": 0, "total": 0, "gaps": []},
+  "coverageCapability": {"confirmedLayers": [], "gaps": []},
+  "sizingSplitRecommendation": {"decision": "NOT ASSESSABLE", "rationale": "", "proposedStories": []},
+  "changeSummary": null,
+  "preservationRisks": [],
+  "reviewedSpecArtifacts": [],
+  "affectedArtifacts": [],
+  "storyChangeRequired": false,
+  "testCaseTitleValidation": "failed",
+  "attachmentAction": "add",
+  "attachmentReplacementMapping": [],
+  "jiraReady": false,
+  "updateReady": false,
+  "userActionRequired": false,
+  "userRequestedEvidence": [],
+  "reviewStatusSynchronizationRequired": true,
+  "automaticPostReviewJiraHandoffRequired": false,
+  "recommendedNextAction": "classify-and-repair"
+}
 ```
+
+Each issues entry includes id, severity, gate, owner, path, line (null if unknown), evidence, impact, action and storyChangeRequired. Never invent line numbers or optional audit IDs.
+
+Compatibility fields are required, not optional prose replacements. validatedIssues/selfFixableIssues/platformOwnedIssues contain applicable issue IDs; needsHumanClarification contains concrete questions. sourceCoverage gives actual counts and gaps; coverageCapability states supported layers; sizingSplitRecommendation always has a reason, even for NO SPLIT.
+
+reviewAttempt is the monotonic review count. aiSelfRepairCount is cumulative actual repair batches; it may exceed three only across legitimate evidence revisions or explicitly bounded extensions. It is not the current revision's allowance. repairRound remains the active budget counter.
+
+reviewedSpecArtifacts lists every state.specArtifacts path with the observed bodyRevision, contentReadBack, result and preservation conclusion. Header synchronization happens later; parent records final fileRevision and approval read-back. Revision numbers describe observed edits, not computed fingerprints.
+
+automaticPostReviewJiraHandoffRequired is true only when the parent supplies verified all-target PASS, current global coverage and export availability. Otherwise false for this per-candidate review; parent sets the aggregate handoff flag after all reviews. False does not authorize an unnecessary "continue?" prompt.
+
+PASS requires all gates PASS except UPDATE=N/A for new_story, scoreGate.passed=true with verified completeness/currentness/provenance, all reviewed revisions recorded with actual current-content checks, manual-pass titles and zero unresolved material issues. Set jiraReady=true and updateReady according to valid update mode/action. Post-repair-verification always returns aiSelfRepairAllowed=false for that same round. UserActionRequired covers missing evidence and required recovery/budget decisions.
+
+Parent copies verified gate state, not merely a PASS string, into current state and synchronizes only the SPEC review header.

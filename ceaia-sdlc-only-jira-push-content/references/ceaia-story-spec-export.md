@@ -1,148 +1,50 @@
-# CEAIA Story/SPEC Export Mode
+# CEAIA Story/SPEC creation
 
-## Contents
+For CEAIA creation read ceaia-jira-write-gate.md. Generic callers retain common-jira-write-gate.md and may reuse shared JSON mechanics here, but not the CEAIA readiness, mandatory SPEC or C3/C5 workflow gates.
 
-- Required fields and Epic linking
-- Story-named SPEC attachment rules
-- Work item payload construction
-- Export manifest
-- Approval payload
-- Pre-write validation
+## E1 — Ready inputs
 
-Use `ceaia_story_spec_export` when the available source artifacts are reviewed CEAIA `STORY.md` and story-named SPEC files, or when the user asks to create Jira Stories with SPEC attachments.
+For every selected candidate require current complete Story/score/Test Case/SPEC/review state and PASS gates. Check global source coverage and identity; actual current Story is the description, not the full SPEC. Titles/summaries come from reviewed Story.
 
-For CEAIA workflow, Jira export includes only:
+CEAIA issueType is Story. A broad requirement is not permission to export Epic or Task instead. New Epic creation is a separately explicit generic request. Existing Epic linking is optional, with known destination and explicit actual key.
 
-- Jira Story created from `STORY.md`.
-- Matching story-named SPEC file attached to that Jira Story.
+Every Story gets exactly its own reviewed named SPEC. Do not export Test Case independently or reference internal score/planning/review. Attachment filename is the reviewed actual basename (lowercase kebab-case by default, or a recorded safe exact user-requested name), path workspace-relative.
 
-Do not export, attach, upload, reference, or include standalone `TEST_CASE.md` as a separate Jira artifact. Test Case content may be included inside the story-named SPEC attachment.
+## E2 — Payloads
 
-Read CEAIA creation artifacts from the user-visible deliverable folder:
-
-```text
-outputs/ceaia/<story-slug>/STORY.md
-outputs/ceaia/<story-slug>/TEST_CASE.md
-outputs/ceaia/<story-slug>/<story-named-spec>.md
-```
-
-Only `STORY.md` and the matching story-named SPEC are Jira-facing. Do not use `.ceaia-work` planning, scoring, or review artifacts as Jira payload content or attachments.
-
-## CEAIA Required Fields
-
-Common root fields:
-
-- `source`
-- `projectKey`
-
-Required fields for every Story:
-
-- `issueType`
-- `summary`
-- `description`
-
-Use these safe defaults only when defensible:
-
-- `issueType: "Story"` for user-facing requirements.
-- `issueType: "Task"` for implementation work.
-- `issueType: "Epic"` for large grouped scope.
-- `linkType: "Relates"` unless the user gives another Jira link type.
-
-When a Story description is copied from Markdown content such as `STORY.md`, set `descriptionFormat: "markdown"`.
-
-Do not paste full SPEC content into the Jira description. Keep the story-named SPEC as an attachment only.
-
-## Epic Link Information
-
-Only after Jira `source` and `projectKey` are known, ask whether generated Stories need to link to an Epic when that information is not already known.
-
-If the user says no:
-
-- Record `epic_link_required: false` in the manifest details.
-- Omit `epicKey` and parent Epic fields from the Jira payload unless another explicit parent field is already valid.
-
-If the user says yes:
-
-- Ask for the Epic ticket key.
-- Validate that the Epic key is non-empty and plausibly Jira-shaped, such as `PROJECT-123`.
-- Include the Epic key in every applicable Story payload as `epicKey` unless the Jira source requires a different supported parent field.
-- Include the Epic ticket in the Jira Export Manifest and `request_user_approval` details.
-
-Do not invent an Epic ticket.
-
-If Epic linking is requested but the Epic ticket is missing, do not request final Jira approval.
-
-## Story-Named SPEC Attachment Rule
-
-When creating any Jira Story, include the generated story-named SPEC file as an attachment on that Story.
-
-Use the attachment object:
-
-```json
-{
-  "fileName": "<actual-story-named-spec-file-name>.md",
-  "relativePath": "<workspace-relative path to this story's story-named SPEC file>"
-}
-```
-
-Rules:
-
-- `fileName` must match the actual SPEC file name.
-- `fileName` must not default to `SPEC.md` unless the user explicitly requested that exact name.
-- `relativePath` is mandatory.
-- `relativePath` must point to the matching Story's own story-named SPEC workspace file.
-- Do not attach one Story's SPEC to another Story.
-- Do not attach old review attempts as SPEC attachments.
-- Use workspace-relative paths only.
-
-Do not pass artifact IDs, Story paths as attachment content, review report paths, conversation IDs as file references, HTTP URLs, `blob:` URLs, `data:` URLs, `file:` URLs, temporary URLs, absolute filesystem paths, or paths containing `..` as attachment references.
-
-## Work Item Payload Construction
-
-Construct the Jira payload object before serialization using one of these supported shapes.
-
-### Single issue
-
+Minimal single-Story example (replace every example value from validated current artifacts):
 ```json
 {
   "source": "WPB",
-  "projectKey": "AIWPB",
+  "projectKey": "EXAMPLE",
   "issueType": "Story",
-  "summary": "Short summary",
-  "description": "Full Markdown description from STORY.md",
+  "summary": "Review application details",
+  "description": "Actual complete reviewed STORY.md content",
   "descriptionFormat": "markdown",
-  "epicKey": "AIWPB-100",
-  "parentLink": "AIWPB-100",
-  "priority": "Medium",
-  "assignee": "staff",
-  "linkedIssueKeys": ["AIWPB-1"],
-  "linkType": "Relates",
   "attachments": [
     {
-      "fileName": "review-term-deposit-spec.md",
-      "relativePath": "outputs/ceaia/review-term-deposit/review-term-deposit-spec.md"
+      "fileName": "review-application-spec.md",
+      "relativePath": "outputs/ceaia/review-application/review-application-spec.md"
     }
   ]
 }
 ```
 
-### Multiple Stories
-
+Multiple Stories sharing source/project:
 ```json
 {
   "source": "WPB",
-  "projectKey": "AIWPB",
+  "projectKey": "EXAMPLE",
   "stories": [
     {
       "issueType": "Story",
-      "summary": "Review term deposit details before confirmation",
-      "description": "Full Markdown description from STORY.md",
+      "summary": "Review application details",
+      "description": "Actual complete reviewed STORY.md content",
       "descriptionFormat": "markdown",
-      "epicKey": "AIWPB-100",
       "attachments": [
         {
-          "fileName": "review-term-deposit-spec.md",
-          "relativePath": "outputs/ceaia/review-term-deposit/review-term-deposit-spec.md"
+          "fileName": "review-application-spec.md",
+          "relativePath": "outputs/ceaia/review-application/review-application-spec.md"
         }
       ]
     }
@@ -150,117 +52,20 @@ Construct the Jira payload object before serialization using one of these suppor
 }
 ```
 
-### Epic plus Stories
+Group differing source/project destinations into separate supported payloads; approval binds every group in execution order. Do not apply a shared inferred source. Optional epicKey applies only to explicitly selected Story/Epic mapping. Other optional links/priority/assignee/custom fields must be supported by actual schema, evidenced and displayed; do not copy example defaults. Do not send label/labels: the existing pushJiraContent contract adds CEAIA_GEN.
 
-```json
-{
-  "source": "WPB",
-  "projectKey": "AIWPB",
-  "epic": {
-    "summary": "Epic summary",
-    "description": "Epic description",
-    "epicName": "Board epic name",
-    "attachments": []
-  },
-  "stories": [
-    {
-      "summary": "Story summary",
-      "description": "Markdown story description from STORY.md",
-      "descriptionFormat": "markdown",
-      "attachments": []
-    }
-  ]
-}
-```
+Generic Epic/Task creation and explicitly requested combined Epic-plus-Stories are preserved in [work-item-field-mapping.md](work-item-field-mapping.md). Do not infer that request; use the combined branch only with explicit scope, actual supported schema and a SPEC on every CEAIA Story.
 
-Association rules:
+## E3 — Preview and approval
 
-- If an Epic is created in the same request, every Story in `story` or `stories` is linked to that new Epic by the correct Epic Link field for the Jira source.
-- If no Epic is created but `epicKey` is supplied, Story issues are linked to that existing Epic.
-- `parentLink` is applied through the source-specific Parent Link custom field.
-- `linkedIssueKeys` creates standard Jira issue links using `linkType`, default `Relates`.
+Show mode, selected candidate count, source/project, issueType, exact summary/description per Story, Epic decision/mapping, each SPEC filename/path and readable content or change summary, no unresolved blockers, and complete request object(s). State that standalone Test Case is not uploaded. Do not expose its path or internal audit fields in the user export manifest.
 
-Label rules for work item export:
+Serialize full real payload(s) and follow C3 approval binding with final attachment content and recorded file revisions. Validate every Story's description and SPEC against current review, not just file names. Use actual request_user_approval schema; action target is source/project and tool is java-base-mcp.pushJiraContent.
 
-- Do not provide `label` or `labels` in the request.
-- `java-base-mcp.pushJiraContent` sets Jira labels to `["CEAIA_GEN"]` for every created work item.
+## E4 — Execute and recover
 
-## CEAIA Jira Export Manifest
+Send only {"requestJson": "<actual approved serialized object>"} to pushJiraContent. Verify arguments and file bytes immediately before each group. Capture each returned issue and attachment result.
 
-Before final approval, prepare and show:
+If only some items succeeded, do not re-export the original batch. Map confirmed items using service-provided identifiers/order per its contract, not guessed similar summaries. Unknown correspondence is a recovery blocker. Follow C5 reconciliation and obtain approval for any safe supported remaining operation.
 
-```markdown
-## Jira Export Manifest
-
-- Export mode: ceaia_story_spec_export
-- Export trigger: Automatic post-review handoff or explicit user request
-- Story count:
-- Spec count:
-- Jira source:
-- Project key:
-- Issue type:
-- Description format:
-- Epic link required: [Yes/No]
-- Epic ticket or per-story Epic mapping: [None / <EPIC-KEY> / mapping]
-- Story to story-named SPEC workspace mapping:
-- SPEC attachment names:
-- Standalone Test Case export:
-  - The standalone `TEST_CASE.md` will not be exported to Jira.
-  - The standalone `TEST_CASE.md` will not be attached to Jira.
-  - The standalone `TEST_CASE.md` will not be referenced in Jira.
-  - Test Case content may be included in the attached story-named SPEC.
-- Known unresolved items:
-```
-
-Do not include standalone `TEST_CASE.md` workspace paths in the export manifest.
-
-For `ceaia_story_spec_export` and `generic_work_item_export`, use this approval payload shape:
-
-```json
-{
-  "title": "Approve Jira export?",
-  "reason": "Explicit authorization is required before creating Jira issue(s) and uploading attachment(s).",
-  "action_type": "jira_export",
-  "target": "<source>/<projectKey>",
-  "summary": "Create <issue_count> Jira issue(s) in <projectKey> and upload approved attachment(s) where applicable.",
-  "risk_level": "medium",
-  "details": {
-    "export_mode": "ceaia_story_spec_export_or_generic_work_item_export",
-    "issue_count": "<number>",
-    "jira_source": "<source>",
-    "project_key": "<projectKey>",
-    "issue_type": "<issueType>",
-    "description_format": "markdown_or_wiki_or_none",
-    "epic_link_required": "<true|false>",
-    "epic_key_or_mapping": "<none|EPIC-123|per-story mapping>",
-    "attachment_mapping": [
-      {
-        "issue": "<issue title or id>",
-        "attachment_file_name": "<actual-file-name>",
-        "relative_path": "<workspace-relative path>"
-      }
-    ],
-    "known_unresolved_items": "none"
-  },
-  "approve_label": "Approve Jira export",
-  "reject_label": "Reject",
-  "require_reason": true,
-  "action_binding": {
-    "tool_name": "java-base-mcp.pushJiraContent",
-    "target": "<source>/<projectKey>",
-    "arguments_preview": {
-      "requestJson": "{\"source\":\"<source>\",\"projectKey\":\"<projectKey>\",\"stories\":[{\"issueType\":\"Story\",\"summary\":\"<summary>\",\"description\":\"<description>\",\"descriptionFormat\":..."
-    }
-  }
-}
-```
-
-For `ceaia_story_spec_export` and `generic_work_item_export`, additionally validate:
-
-- Every issue has `issueType`, `summary`, and `description` where required.
-- Every Markdown description has `descriptionFormat: "markdown"`.
-- Epic link requirements match the user's answer and approved manifest.
-- Every attachment `fileName` matches the actual file name.
-- Every attachment `relativePath` points to the intended workspace file.
-- No standalone CEAIA `TEST_CASE.md` appears as an attachment or separate Jira export item.
-- No `label` or `labels` field is included in work item payloads.
+Current-ready artifacts do not prove Jira success. Return individual keys/links, attachment outcomes, remaining targets and exact recovery action.

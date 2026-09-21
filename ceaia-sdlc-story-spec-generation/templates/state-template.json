@@ -1,0 +1,85 @@
+{
+  "contractVersion": 3,
+  "candidateId": "example-story",
+  "mode": "new_story",
+  "source": null,
+  "ticketKey": null,
+  "attachmentAction": "add",
+  "evidenceRevision": 1,
+  "evidenceRevisionReason": "Initial confirmed evidence",
+  "paths": {
+    "planningPath": ".ceaia-work/planning.md",
+    "storyPath": "outputs/ceaia/example-story/STORY.md",
+    "testCasePath": "outputs/ceaia/example-story/TEST_CASE.md",
+    "specPath": "outputs/ceaia/example-story/example-story-spec.md",
+    "scoreRecordPath": ".ceaia-work/stories/example-story/story-quality-score.json",
+    "reviewPath": ".ceaia-work/stories/example-story/review.md"
+  },
+  "status": "IN_PROGRESS",
+  "nextAction": "plan",
+  "score": {
+    "status": "missing",
+    "persistenceMode": null,
+    "invocationRef": null,
+    "ok": null,
+    "finalScore": null,
+    "storyRevision": null,
+    "assessmentOrdinal": 0,
+    "responseReadBack": false
+  },
+  "review": {
+    "result": "Not Reviewed",
+    "testCaseTitleValidation": "not-checked",
+    "unresolvedIssueIds": [],
+    "specArtifacts": [],
+    "storyRevision": null,
+    "testCaseRevision": null,
+    "specBodyRevision": null,
+    "contentReadBack": false
+  },
+  "repair": {
+    "round": 0,
+    "usedInRound": false,
+    "stagnantRounds": 0,
+    "lastBlockingIssueIds": [],
+    "diagnosticUsed": false,
+    "reasonForBudgetReset": null,
+    "extraRoundsAuthorized": 0,
+    "cumulativeRounds": 0
+  },
+  "technicalRecovery": {
+    "operation": null,
+    "attempts": 0,
+    "outcome": null
+  },
+  "jiraReady": false,
+  "updateReady": false,
+  "approval": {
+    "status": "not-requested",
+    "requestPath": ".ceaia-work/jira-request.json",
+    "requestIndex": null,
+    "requestRevision": null,
+    "attachmentRevisions": [],
+    "contentReadBack": false
+  },
+  "writeResults": [],
+  "bindingMethod": "readback-and-revision",
+  "reviewAttempt": 0,
+  "aiSelfRepairCount": 0,
+  "specArtifacts": [
+    {
+      "path": "outputs/ceaia/example-story/example-story-spec.md",
+      "fileName": "example-story-spec.md",
+      "uploaded": true,
+      "bodyRevision": 0,
+      "fileRevision": 0
+    }
+  ],
+  "attachmentReplacementMapping": [],
+  "finalSpecRevision": null,
+  "executionProfile": "text-only",
+  "artifactRevisions": {
+    "storyRevision": 0,
+    "testCaseRevision": 0
+  }
+}

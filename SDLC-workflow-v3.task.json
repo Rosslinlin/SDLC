@@ -1,0 +1,135 @@
+{
+  "schema_version": "enriched-agent.task/v2",
+  "display_name": "SDLC-workflow-v3",
+  "todo_list": [
+    {
+      "id": "classify-and-complete-intake",
+      "content": "Classify the request and complete source intake",
+      "active_form": "Classifying the request and reading required evidence",
+      "instructions": [
+        "Load ceaia-sdlc-story-spec-generation and only its intake/workflow references. This task owns the four-stage schedule; do not run later stages automatically from inside this intake invocation.",
+        "Classify new_story or existing_ticket_update. A Jira ticket supplied only as evidence is not automatically an update target. Never create a new Jira ticket for an explicit update request.",
+        "Before any Jira read, require explicit source WPB, ALM, DATA, FCR or GO independently for every target. Missing source makes the next interaction ask_user_question with one constrained selector per unresolved ticket; no unrelated questions or Jira URL substitute.",
+        "Retain the confirmed ticket-to-source mapping. On ticket/source errors show the relevant exact error, ticket and confirmed source; ask correction, same-mapping retry or stop. Never probe other sources.",
+        "Inventory every supplied requirement, UX/UI, FSD/API/data, Jira, Confluence and workspace source. For each update read description and AcceptanceCriteria in separate getJiraInfos calls, then complete readJiraAttachments intake before planning or selection. Reuse a completed current-baseline intake; a bounded technical recovery or remote reconciliation may justify a re-read.",
+        "Empty/unavailable separate AC is acceptable with a usable description. Record empty-or-unavailable, inspect embedded acceptance statements and continue. Unusable description or incomplete attachment inventory blocks only that target.",
+        "Read all returned readable attachments; preserve originals, inventory, IDs and skip reasons. Potentially material unreadable attachments require readable evidence or a supported handling decision.",
+        "This is a text-only workflow: never generate or execute scripts, command-line programs or local validation code. Confirm ordinary workspace read/write tools, the scoring tool and an independent read-only reviewer are available. Use observed revisions plus full-content read-back; no local hash or special content-version tool is required. Missing actual file/tool access is a target-specific WAITING_TOOL blocker, not lack of script execution.",
+        "Use ask_user_question for unresolved input/recovery choices and yield while waiting. No busy loop, fictional success or automatic stop. UAT-only requests are outside this task: offer the dedicated existing workflow or explicit stop without loading/changing its Test Case rules.",
+        "Finish the initial intake pass by recording each selected target as ready-for-planning or explicitly blocked with its exact missing input. Do not silently remove blocked targets. The coordinator may run stage 2 for ready independent targets; a blocked target remains pending and re-enters intake when its input arrives. A missing-source popup still precedes any Jira access."
+      ],
+      "completion_criteria": [
+        "Request mode and selected target list are explicit.",
+        "Every target's Jira source is confirmed before its first Jira read.",
+        "Every update has either completed baseline/AC/attachment intake or a precise recorded target-specific blocker; none is falsely marked ready.",
+        "The initial intake pass has classified all targets and recorded runtime/evidence blockers. This stage result is not whole-workflow completion or permission to process a blocked target."
+      ],
+      "depends_on": []
+    },
+    {
+      "id": "plan-generate-and-score",
+      "content": "Plan, generate and tool-score Stories, then generate tests and SPECs",
+      "active_form": "Generating parser-safe Stories and enforcing the audited score gate",
+      "instructions": [
+        "Use ceaia-sdlc-story-spec-generation in preparation-only stage mode. Read business planning checklist, active templates, scoring-tool-contract and artifact rules. Do not run independent review or Jira writes inside this stage.",
+        "Complete source Evidence→SR→candidate mapping, coverage layers, UX inventory, INVEST/decomposition and candidate readiness. Preserve all explicit source obligations; do not optimize for the fewest Stories or invent unsupported scope.",
+        "Process only intake-ready targets; finish independent ready candidates even when another target waits. Keep blocked targets selected and pending. This stage cannot fully complete until every selected candidate meets its gates or the user explicitly changes/stops that scope.",
+        "Process candidates serially. Resolve current output paths, final SPEC basenames and attachment action before writing Story. Existing updates use source+ticketKey paths and preserve original baseline; distinct selected replacement contents get distinct current SPEC files and explicit mappings.",
+        "Write complete STORY.md with exactly one standalone ## Acceptance Criteria heading, stable AC-001 IDs and Given/When/Then in each criterion. Do not use Acceptance Criteria and BDD Scenarios as the heading and do not duplicate criteria for the scorer.",
+        "Immediately assess the actual saved Story using nodejs-base-mcp.score_requirement_markdown with its real workspace-relative relativePath. Normal invocation omits optional force_review and metadata, using documented cached default. Never send conversationId; workspace identity comes from the trusted request header. Explicit fresh-review requests follow the Skill's typed live-schema exception.",
+        "Extract the single JSON text content block and persist the full text verbatim at the current score-record path; if only the exact decoded object is exposed, preserve all fields and record complete-object-json. Do not build normalized evaluator input, implement a rubric, derive scores or use section_scores.overall_score.",
+        "Pass requires complete current persisted response, boolean ok=true and finite numeric finalScore>=76 within 0–100, with no unresolved AC recognition or parser issue. ok=true/finalScore=36 does not pass. Preserve both newer diagnostic fields and observed scoreBreakdown/dimensions/warnings/details when returned.",
+        "Compare available acCount and dimensions.sizingSplit.acCount against actual distinct Story AC declarations. No Acceptance Criteria section found, parseErrors or conflicting counts blocks downstream generation. Correct a noncanonical heading as a format defect; if canonical content still fails recognition, request technical recovery rather than inventing requirements or endlessly rescoring.",
+        "First generation must not create Test Case/SPEC before score PASS. A repair may leave stale current files in place but must invalidate their readiness. Supported content defects share the candidate's three-round score/review repair budget; missing facts ask immediately. Never rescore identical current Story without a documented freshness exception.",
+        "After score PASS generate executable TEST_CASE.md with original columns, accurate scenario types, P0/P1/P2 and one negative disposition per AC. Manually inspect every title for standalone or and actual alternative splits. To Confirm is draft-only and blocks final readiness.",
+        "Generate primary and any distinctly required update SPECs from active templates. Preserve supplied metadata and approved design references; embed current Story and executable test table, and retain source-specific attachment obligations.",
+        "Overwrite current generated Story/tests/SPEC/score/review, never create historical Story copies. Keep compact state and original source evidence. Perform the generation Skill's text-only verification checklist by reading actual files with existing tools, then return nextAction=independent-review."
+      ],
+      "completion_criteria": [
+        "Every selected candidate has a current successful score and resolved parser integrity.",
+        "Every canonical AC is traceable and executable; no unsupported requirements or silent exclusions remain.",
+        "Each candidate has current Story, tests and all intended SPECs; all replacement mappings and supplied metadata are preserved.",
+        "Title semantic/lexical validation passes and no stale artifact is declared ready.",
+        "No independent review or Jira write has been duplicated by the generation stage."
+      ],
+      "depends_on": [
+        "classify-and-complete-intake"
+      ]
+    },
+    {
+      "id": "review-and-resolve-artifacts",
+      "content": "Independently review artifact sets and resolve affected defects",
+      "active_form": "Reviewing original evidence and applying bounded targeted repairs",
+      "instructions": [
+        "Load ceaia-spec-review only now. For each review use a fresh read-only subagent through the platform agent capability; provide actual original sources, active templates, plan, state, Story, full score response, tests, every SPEC and update baseline/manifest/attachments. Never replace independent review with generator self-approval.",
+        "Reviewer checks SCORE including parser integrity, STRUCTURE, COVERAGE/INVEST, STORY, TESTS, SPEC and UPDATE. It must not invoke scoring, edit artifacts, ask the user or write Jira.",
+        "Persist only the latest review.md per candidate and compact aggregate status. Keep monotonic reviewAttempt and cumulative aiSelfRepairCount counters, not numbered full historical review documents.",
+        "Classify owner and smallest affected file set. SPEC-only problems repair SPEC; test-only problems repair tests and SPEC embedding; only changed Story content need a new score. Missing business facts require immediate focused ask_user_question.",
+        "Generation owns all repairs. Score-driven and review-driven content repair share three rounds per candidate/current evidence revision. Each round is one consolidated edit then affected verification; no second edit inside post-repair verification. A failed review does not restart the whole task.",
+        "After two consecutive no-progress repair verifications or exhaustion of three rounds, stop automatic editing. At most one useful read-only diagnosis may follow. Ask for evidence, correction, environment fix, explicit finite extra rounds, defer or stop. Cosmetic edits never reset budget; substantive new evidence resets only affected candidates with a recorded reason.",
+        "Perform one bounded read-based formatting/check cycle before review when needed. Fix platform-owned formatting, names, exact embedding and accidental internal leakage without presenting them as missing business facts. Repeated mechanical failure requires technical diagnosis.",
+        "Every finding uses a complete workspace-relative path and actual line when known, evidence, impact and targeted action. Preserve compatibility report fields, sizing decision, source coverage and each SPEC's reviewed binding.",
+        "On PASS synchronize only each SPEC's review header and read back final file content and record fileRevision; header synchronization alone requires no new Story score or substantive review. Verify global coverage from original evidence across all selected candidates.",
+        "Proceed automatically to Jira preparation only after all selected candidates have current independent PASS and global coverage passes. No continue prompt; no Jira approval inferred from review. Explicit stop is unresolved termination, not successful delivery."
+      ],
+      "completion_criteria": [
+        "Every selected artifact set and every intended replacement SPEC has a current independent PASS.",
+        "Current score/parser evidence, source coverage, baseline preservation and complete mapping agree.",
+        "Repair counters and exceptions are recorded without historical document copies.",
+        "All headers and final upload bindings are current and the original requirement set has no unsupported omissions."
+      ],
+      "depends_on": [
+        "plan-generate-and-score"
+      ]
+    },
+    {
+      "id": "prepare-and-execute-jira-operation",
+      "content": "Prepare and execute the explicitly approved Jira operation",
+      "active_form": "Preparing exact Jira payloads and obtaining final authorization",
+      "instructions": [
+        "Load ceaia-sdlc-only-jira-push-content. Select ceaia_story_spec_export for new reviewed Stories or ceaia_story_spec_update for existing tickets. Do not route to jira-createissue-helper; its future migration is outside this task.",
+        "Validate actual current score/parser, review, global coverage and every final upload binding. Do not rewrite approved business content inside export; return affected defects to generation and then required review.",
+        "Collect missing mode-specific destination and supported fields, reuse confirmed sources and resolve attachment ambiguity. New Stories include their matching SPEC. Explicit new Epic-plus-Stories requests use the preserved combined branch; never create an Epic implicitly.",
+        "Existing updates change only supported description, expressly supported replacement summary and selected attachment replacements. Description-only/zero-attachment none is valid. Multiple selected attachments may map to distinct reviewed files in one ticket's attachments.replace array; do not collapse them.",
+        "Show exact per-target preview, full description, metadata/links, readable attachment changes and original→replacement mappings. Exclude standalone TEST_CASE.md, internal score JSON, planning/state/review files and diagnostics from Jira payloads.",
+        "Serialize complete actual payloads once. Obtain request_user_approval bound to every exact requestJson and final upload bytes in execution order. ask_user_question or ordinary chat is not final approval. Any approved-content change invalidates approval.",
+        "Use java-base-mcp.pushJiraContent for creation or java-base-mcp.updateJiraTicket for updates, with exactly one top-level requestJson string argument. Await asynchronous approval by yielding; act only on the actual approved decision.",
+        "Execute updates one ticket at a time. At a failed/partial/unknown result pause remaining writes, record known issue-vs-attachment outcomes and reconcile remote state before offering a supported, newly approved recovery. Never replay successful creation or upload to fix only an unfinished step.",
+        "Rejected/unavailable approval, failures and partial/unknown outcomes remain resumable waiting states. Ask focused correction/recovery/defer/stop choices; do not spin or declare success. Report each actual returned key/URL, attachment outcome and unattempted target separately."
+      ],
+      "completion_criteria": [
+        "Every write used an exact preview and final approval bound to its payload and uploaded content.",
+        "Every requested issue/attachment operation is confirmed successful, or user explicitly stopped remaining work.",
+        "Partial, unknown, blocked or awaiting-input states are not marked successful workflow completion.",
+        "Final result includes individual verified Jira keys/URLs and operation outcomes."
+      ],
+      "depends_on": [
+        "review-and-resolve-artifacts"
+      ]
+    }
+  ],
+  "description": "CEAIA SDLC v3: preserve business capabilities; generate canonical-AC Stories, assess the saved Markdown with the external tool, create executable tests/SPECs, run independent review with bounded targeted repairs, and perform only explicitly approved Jira writes. Store current generated artifacts only. Pure-text instructions and data only; no scripts or hash-computation prerequisite.",
+  "skills": [
+    {
+      "skill_id": "96c6bb68-ab4c-4a34-a634-3fb5c66c96d8",
+      "skill_name": "ceaia-sdlc-story-spec-generation"
+    },
+    {
+      "skill_id": "670e4bce-cfcd-4883-824d-2fdfc9092d76",
+      "skill_name": "ceaia-spec-review"
+    },
+    {
+      "skill_id": "9ab0d7ef-4696-4a92-a43d-ab64ee7639e0",
+      "skill_name": "ceaia-sdlc-only-jira-push-content"
+    }
+  ],
+  "tools": [
+    "java-base-mcp.pushJiraContent",
+    "java-base-mcp.getJiraInfos",
+    "java-base-mcp.fetchConfluenceContent",
+    "java-base-mcp.fuzzyMatchingConfluence",
+    "java-base-mcp.readJiraAttachments",
+    "java-base-mcp.updateJiraTicket",
+    "nodejs-base-mcp.score_requirement_markdown"
+  ]
+}

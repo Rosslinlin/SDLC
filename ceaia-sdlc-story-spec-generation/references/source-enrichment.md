@@ -1,39 +1,29 @@
-# Evidence and source enrichment
+# Evidence intake
 
-Use all relevant conversation and workspace materials: requirements, UX/UI flows, screenshots, wireframes, FSDs, APIs, data mappings, existing artifacts, Jira keys, Confluence URLs, keywords, and prior clarifications.
-
-Never invent behavior. Separate source facts from background context.
+Use supplied requirements, UX/UI, FSD/API/data materials, ticket fields, attachments, Confluence, workspace evidence and explicit clarifications. Separate direct facts from background. Record locations internally, never in Jira-facing documents.
 
 ## Jira
 
-For an explicit existing-ticket update request, apply Existing Jira update intake before this generic Jira enrichment rule. Do not treat an update request as a description-only read just because the user did not explicitly mention attachments.
+Explicit update requests use existing-jira-update.md before generic enrichment.
 
-When the user supplies a Jira key for generation, review, or non-update enrichment, use `java-base-mcp.getJiraInfos` before decomposition.
+Before first Jira read require explicit per-ticket source: WPB, ALM, DATA, FCR or GO. If missing, use ask_user_question with one independent constrained selector per unresolved ticket; wait. Do not infer from prefix/project/another ticket, probe alternate sources or ask for a URL in place of source confirmation.
 
-- Require the user to explicitly supply or confirm `source` as `WPB`, `ALM`, `DATA`, `FCR`, or `GO` before the first Jira call.
-- Never infer or default Jira source from the ticket prefix, project key, prior tool behavior, organization context, or another ticket.
-- For multiple tickets with missing sources, use one `ask_user_question` popup with one independent constrained source selector per ticket. Preserve a per-ticket mapping because tickets may belong to different Jira sources; never apply a shared default.
-- A Jira URL is not a substitute for the required `WPB`, `ALM`, `DATA`, `FCR`, or `GO` selection.
-- Do not call `java-base-mcp.getJiraInfos` for a ticket until its source is confirmed.
-- If a read returns not-found or another source-related error, preserve the exact tool error and ask the user to reconfirm or correct that ticket's key and source. Do not probe other sources automatically.
-- Retrieve `description` and `AcceptanceCriteria` by default.
-- Retrieve `comments` only when needed for missing or recent clarification.
-- Retrieve `changelog`, `priority`, or `assignee` only when they materially affect scope, sequencing, dependency, or Jira readiness.
-- Read each required field in a separate call.
+Use java-base-mcp.getJiraInfos for supplied tickets before decomposition. Read description and AcceptanceCriteria separately. Read comments only for missing/recent clarification; other supported fields only if materially relevant. Use actual tool schema; do not assume summary or arbitrary fields are exposed.
 
-The source gate is strict: when a source is missing, the next and only action is the source-selection `ask_user_question` popup. Do not combine it with requirement clarification or other intake questions, and do not continue until every target ticket has a confirmed source.
+A separate AC field that is empty/null/unavailable/not-found/field-error does not block a successfully retrieved description. Record empty-or-unavailable and inspect the complete description for embedded acceptance statements. A genuine ticket/source error is different: show the exact relevant error, key and confirmed source in a correction/retry/stop popup. Never expose credentials or unrelated sensitive transport data.
+
+Missing description or relevant unreadable evidence blocks that candidate, not unrelated candidate generation. Follow current-state recovery; successful intake is reused, not repeated because another Skill was invoked.
 
 ## Confluence
 
-For a supplied supported URL, use `java-base-mcp.fetchConfluenceContent`. Supported hosts are:
+For supplied supported URLs use java-base-mcp.fetchConfluenceContent:
+- https://wpb-confluence.systems.uk.hsbc
+- https://digital-confluence.systems.uk.hsbc
+- https://alm-confluence.systems.uk.hsbc/confluence
+- https://fcr-wiki.systems.uk.hsbc
+- https://gbmt-confluence.prd.fx.gbm.cloud.uk.hsbc
+- https://data-confluence.systems.uk.hsbc:5050
 
-- `https://wpb-confluence.systems.uk.hsbc`
-- `https://digital-confluence.systems.uk.hsbc`
-- `https://alm-confluence.systems.uk.hsbc/confluence`
-- `https://fcr-wiki.systems.uk.hsbc`
-- `https://gbmt-confluence.prd.fx.gbm.cloud.uk.hsbc`
-- `https://data-confluence.systems.uk.hsbc:5050`
+For useful keywords use targeted java-base-mcp.fuzzyMatchingConfluence, queryType=true to discover and queryType=false for a small detail result (number <=5). Use a supplied spaceKey or relevant Confluence URL. For this Confluence search only, infer source from supported context (DIGITAL→WPB, GBMT→MSS; ALM fallback when the service contract permits). This is not permission to infer Jira source.
 
-For useful keywords without a full source, use targeted `java-base-mcp.fuzzyMatchingConfluence` searches. Use `queryType=true` to discover pages and `queryType=false` for a small amount of detailed background with number no higher than 5. Supply `spaceKey` when the user provides it; otherwise supply a relevant Confluence URL so the tool can infer the space. Infer source from context; map DIGITAL to WPB, GBMT to MSS, and use ALM only when no source can be inferred.
-
-Do not turn fuzzy-search background into deliverable scope unless direct evidence supports it. Ask for pasted content or a valid URL if access fails.
+Fuzzy background does not become delivery scope without direct evidence. If access fails, ask for readable content or a valid supported URL.

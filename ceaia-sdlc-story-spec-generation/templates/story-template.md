@@ -1,45 +1,27 @@
-# <Story Title>
+# [Story Title]
 
 ## Summary
-
-[Concise Jira-ready summary of the independently testable user value delivered by this single Story.]
+[Concise independently testable outcome.]
 
 ## User Story
-
-As a <role>, I want <goal>, so that <benefit>.
+As a [evidenced role], I want [capability], so that [value].
 
 ## Business Context
-
-[Why this story matters to the user, business, journey, or operational outcome.]
+[Supported reason and outcome.]
 
 ## Scope
+[Supported in-scope behavior and material dependencies. Do not hide explicit requirements as exclusions.]
 
-[In-scope behavior for this single Story. Keep this granular and independently testable. A Story should not combine unrelated journeys, screen states, actions, decisions, or error behaviors when those can be tested and delivered independently.]
-
-## Acceptance Criteria and BDD Scenarios
-
-<!--
-Combined Acceptance Criteria and BDD rules:
-- Assign every acceptance criterion a stable ID: AC-001, AC-002, AC-003, ...
-- Use Given/When/Then wording.
-- Each AC must be independently testable.
-- ACs must cover happy path, negative/error, boundary, dependency, and permission behavior when relevant.
-- Include enough scenario detail under each AC for execution.
-- Do not add criteria for behavior unsupported by source requirements.
-- Do not omit explicit in-scope source requirements; split into another Story when needed.
--->
-
-- **AC-001**: Given [initial state], when [action/event], then [verifiable expected outcome].
-- **AC-002**: Given [initial state], when [action/event], then [verifiable expected outcome].
+## Acceptance Criteria
+- **AC-001**: Given [initial state], when [action/event], then [observable expected outcome].
 
 ## Attachments
+[New Story: - SPEC: `final-story-name.md`. Update/replace: list each intended reviewed replacement SPEC basename. Update/none: - No attachment changes in this update.]
 
-- SPEC: `<matching-story-named-spec-file-name>.md`
-
-<!--
-Jira export rule:
-- STORY.md becomes the Jira Story description.
-- The Jira-facing SPEC attachment reference contains the SPEC filename only. Do not include `outputs/`, a workspace directory, an absolute path, or a URL.
-- The matching story-named SPEC is the Jira attachment.
-- Standalone TEST_CASE.md is a user-visible workspace deliverable and must not be referenced here as a Jira-facing attachment.
+<!-- Authoring instructions: replace all bracket placeholders and remove this comment.
+Keep exactly one standalone ## Acceptance Criteria heading, without "and BDD Scenarios" or other suffix.
+Use stable unique AC IDs; add as many evidenced ACs as needed, no mandatory filler cases.
+Keep each AC's Given/When/Then BDD in this section. Count declarations, not references.
+Choose final SPEC name before scoring. Story includes only uploaded SPEC basename for add/replace.
+No workspace paths, source IDs/URLs, scores, review operations or TEST_CASE.md reference.
 -->

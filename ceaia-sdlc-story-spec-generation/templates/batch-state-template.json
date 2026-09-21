@@ -1,0 +1,16 @@
+{
+  "contractVersion": 3,
+  "selectedCandidateIds": [],
+  "candidates": [],
+  "globalCoverage": {
+    "status": "pending",
+    "inScopeSRIds": [],
+    "coveredSRIds": [],
+    "pendingSRIds": [],
+    "supportedExclusions": [],
+    "evidenceRevisionBindings": []
+  },
+  "jiraRequestPath": ".ceaia-work/jira-request.json",
+  "executionOrder": [],
+  "writeResults": []
+}
