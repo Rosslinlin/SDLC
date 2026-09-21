@@ -1,6 +1,17 @@
-# CEAIA Skill Bundle v3.0.1（纯文本修订） — 交付与修改说明
+# CEAIA Skill Bundle v3.0.2（纯文本审批修订） — 交付与修改说明
 
 2026-09-20 开始整理，2026-09-21 完成。状态：可供平台测试的候选版，尚未生产联调。
+
+## v3.0.2 Jira 审批调用修复
+
+本次只修改 `ceaia-sdlc-only-jira-push-content`，task 和前两个 CEAIA Skill 不变：
+
+- 对照原始版确认：用户原先确实提供过 `request_user_approval` 的完整创建/更新参数结构，而不只是工具名称。
+- 恢复创建与更新批次的 title、reason、action_type、target、details、按钮字段和 action_binding/arguments_preview。
+- 强制 Luna 在最终预览后执行真实工具调用；不得把工具名或 JSON 当作聊天文字输出，也不得要求用户输入 continue/approve。
+- 明确异步调用后结束当前轮并等待真实 decision；同步完成的 decision 可立即处理。
+- 如果平台没有暴露审批能力，返回一次明确 WAITING_TOOL，绝不绕过审批写 Jira，也不反复只说工具名称。
+- task 的 tools 数组未添加虚构 ID：原始 task 截图同样未把审批能力列入该数组。该能力应由平台作为内建工具暴露；如平台实际要求注册 ID，需要平台提供真实 ID/schema 后再配置。
 
 ## 本次纯文本平台修订
 

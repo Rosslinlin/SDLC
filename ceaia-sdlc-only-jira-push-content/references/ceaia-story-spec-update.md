@@ -57,7 +57,7 @@ Example IDs are not usable evidence. Summary is omitted unless expressly support
 
 Per ticket show source/key, summary unchanged or exact replacement, full proposed description and baseline change summary, readable/skipped attachment evidence, attachmentAction, original filenames and selected replacement filenames/paths, reviewable SPEC changes, and unsupported fields omitted. No score/audit fields.
 
-After all selected tickets are current PASS, show the full batch order and non-atomic execution statement. Bind every exact per-ticket requestJson and final uploaded-file content and recorded revision in one approval when supported by approval tool's published schema; otherwise use supported per-ticket approvals, never pretend a single-payload binding covers an array.
+After all selected tickets are current PASS, show the full batch order and non-atomic execution statement. Load and invoke the exact update shape in [approval-interface-examples.md](approval-interface-examples.md), binding every per-ticket requestJson and final uploaded-file content/revision. If the approval capability cannot bind an array, use one actual popup call per exact ticket payload; never print the tool name as a substitute or pretend one wrapper covers the batch.
 
 After approval execute one ticket at a time in approved order. Recheck exact arguments and file bytes before each call. Any changed content or destination invalidates applicable gates/approval. Asynchronous approval yields until actual result; no chat assent substitutes.
 

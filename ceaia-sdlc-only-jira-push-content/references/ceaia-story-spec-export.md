@@ -60,7 +60,7 @@ Generic Epic/Task creation and explicitly requested combined Epic-plus-Stories a
 
 Show mode, selected candidate count, source/project, issueType, exact summary/description per Story, Epic decision/mapping, each SPEC filename/path and readable content or change summary, no unresolved blockers, and complete request object(s). State that standalone Test Case is not uploaded. Do not expose its path or internal audit fields in the user export manifest.
 
-Serialize full real payload(s) and follow C3 approval binding with final attachment content and recorded file revisions. Validate every Story's description and SPEC against current review, not just file names. Use actual request_user_approval schema; action target is source/project and tool is java-base-mcp.pushJiraContent.
+Serialize full real payload(s), then load and invoke the exact creation shape in [approval-interface-examples.md](approval-interface-examples.md). Validate every Story's description and SPEC against current review, not just filenames. The action target is source/project and the bound tool is `java-base-mcp.pushJiraContent`; do not merely describe the approval tool in chat.
 
 ## E4 — Execute and recover
 

@@ -5,7 +5,7 @@ description: Final Jira write gate for reviewed CEAIA Story/SPEC creation and up
 
 # CEAIA Jira Push
 
-Bundle revision: 3.0.1 text-only — 2026-09-21.
+Bundle revision: 3.0.2 text-only — 2026-09-21.
 
 Own Jira fields, preview, content-bound final approval, writes and per-operation results. Do not generate/review CEAIA content or replace independent review with export checks.
 
@@ -17,7 +17,7 @@ Select exactly one mode; load only that mode's references:
 - `generic_work_item_export`: original [common write gate](references/common-jira-write-gate.md), [generic export](references/generic-work-item-export.md), [work-item field mapping](references/work-item-field-mapping.md) and shared payload rules in Story export; CEAIA artifact gates do not apply to generic work.
 - `uat_testcase_export`: original [common write gate](references/common-jira-write-gate.md) and [UAT testcase export](references/uat-testcase-export.md). Preserve the dedicated caller's existing Test Case flow; do not route it through CEAIA generation, review or Story export.
 
-For CEAIA modes read [CEAIA write gate](references/ceaia-jira-write-gate.md) and [shared workflow contract](../ceaia-sdlc-story-spec-generation/references/workflow-contract.md), not the legacy common write gate. All remaining sections below apply only to CEAIA modes. Other callers follow their original common and mode-specific references. Links are Skill-relative; artifact paths are workspace-relative.
+For CEAIA modes read [CEAIA write gate](references/ceaia-jira-write-gate.md), [final approval call contract](references/approval-interface-examples.md) and [shared workflow contract](../ceaia-sdlc-story-spec-generation/references/workflow-contract.md), not the legacy common write gate. All remaining sections below apply only to CEAIA modes. Other callers follow their original common and mode-specific references. Links are Skill-relative; artifact paths are workspace-relative.
 
 For explicitly requested optional creation fields or new Epic-plus-Stories, also read [work-item field mapping](references/work-item-field-mapping.md). This preserves the combined creation branch; it is never triggered automatically.
 
@@ -33,11 +33,11 @@ Reuse confirmed per-target source and completed stage state. If a source is miss
 
 1. Validate handoff and destination; collect missing mode-specific fields.
 2. Construct actual complete payload, show preview and attachment content/change summary.
-3. Bind exact serialized requestJson and every uploaded file's final bytes to request_user_approval.
-4. When approved, verify bindings again and execute the exact approved request.
+3. Invoke the actual `request_user_approval` tool with the exact mode-specific JSON object from the final approval call contract. Do not print the tool name/payload as prose, ask the user to type approval, or substitute `ask_user_question`.
+4. End/yield the current turn after an asynchronous approval call. Resume the write only from the tool's actual approved decision; a synchronous completed decision may continue immediately.
 5. Record actual issue/attachment outcomes; reconcile partial or unknown results before any retry.
 
-Clean handoff automatically starts preparation without asking the user to type continue. Final authorization remains mandatory. Await asynchronous approvals by yielding; if the approval tool returns a completed decision synchronously, use that actual decision. Never infer approval from ordinary chat or an information popup.
+Clean handoff automatically starts preparation without asking the user to type continue. Final authorization remains mandatory. If `request_user_approval` is not exposed as a callable runtime capability, return `WAITING_TOOL: final approval capability unavailable` once; do not repeatedly say the tool name as if that were a popup. Await asynchronous approvals by yielding; if the approval tool returns a completed decision synchronously, use that actual decision. Never infer approval from ordinary chat or an information popup.
 
 Create uses java-base-mcp.pushJiraContent; update uses java-base-mcp.updateJiraTicket. Each has exactly one argument: `requestJson`, a serialized JSON object string. Never switch to jira-createissue-helper automatically.
 

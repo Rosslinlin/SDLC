@@ -36,7 +36,7 @@ Epic is optional: reuse explicit choice or ask whether to link when unknown; exi
 
 ## C3 — Artifact currentness and approval binding
 
-During final preparation read [approval-interface-examples.md](approval-interface-examples.md) for preserved preview fields and original approval vocabulary. Actual runtime schema controls transport types.
+During final preparation read [approval-interface-examples.md](approval-interface-examples.md) as the required final approval tool-call contract. Use its original mode-specific field vocabulary unless the platform owner has explicitly supplied a newer contract.
 
 CEAIA: read current state, current full review and actual artifact bytes. Check SCORE and review gates are bound to current Story/Test Case/SPEC body; header is synchronized; global selected-source coverage is complete. Perform the shared text-only verification checklist; it does not replace independent source review.
 
@@ -44,7 +44,7 @@ Save exact requestJson string(s) in the current `.ceaia-work/jira-request.json`;
 
 Show actual business summary/description, destination and attachment plan/content or reviewable changes. No score diagnostics/audit fields in preview or payload. Internal paths used solely as transport attachment references are permitted, not embedded in description.
 
-Call request_user_approval using its published runtime schema and action binding. Binding must include actual complete arguments, not a representative/truncated example. A batch binds each serialized payload and the reviewed attachment content/revision in order. Information collection via ask_user_question is not approval.
+Invoke `request_user_approval` as a tool call using the applicable complete JSON shape in the approval contract. Do not print its name or arguments as prose. Binding must include actual complete arguments, not a representative/truncated example. A batch binds each serialized payload and reviewed attachment content/revision in order. Information collection via `ask_user_question` is not approval.
 
 If rejected, use any correction to determine affected gates; ask a focused revise/defer/stop question only if needed. If unavailable, WAITING_TOOL; do not substitute chat approval. Never immediately re-prompt identical approval without a change or user direction.
 
