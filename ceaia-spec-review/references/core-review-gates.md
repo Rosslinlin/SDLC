@@ -4,7 +4,7 @@ Each gate has PASS/FAIL; UPDATE may be N/A only for new_story. Return evidence f
 
 ## SCORE — Current audited Story assessment
 
-Verify complete persisted evaluation response and persistenceMode (verbatim-text or complete-object-json), genuine invocation provenance, candidate association and current exact Story bytes. Read the complete stored response and Story, verify the actual invocation association and observed storyRevision, and apply the shared text-only currentness checks. Service checksum is preserved if returned; no local hash calculation is required.
+Verify the complete persisted Markdown evaluation record and persistenceMode (`verbatim-json-in-markdown` or `complete-object-json-in-markdown`), genuine invocation provenance, candidate association and current exact Story bytes. The readable summary must agree with the complete raw JSON block, but only the raw block is evaluator evidence. Read the complete record and Story, verify the actual invocation association and observed storyRevision, and apply the shared text-only currentness checks. Service checksum is preserved if returned; no local hash calculation is required.
 
 Require boolean ok=true and finite numeric finalScore>=76 within 0–100. Also require parser integrity: no missing-AC-section warning, unresolved parseErrors or disagreement between returned AC counts and declared Story ACs. Optional diagnostic fields may differ between documented and observed response versions; never require absent diagnostics or substitute section scores. Strings, stale results, malformed/partial response, unknown provenance and fabricated records fail. Optional audit/review IDs are reported only when returned. Never rescore or calculate a replacement.
 
@@ -36,7 +36,7 @@ Manually inspect every Test Case Description; no standalone case-insensitive or.
 
 Every SPEC embeds current sibling Story and executable Test Case table exactly. FR/SC references resolve, success criteria are measurable without invented SLAs, and Mermaid matches evidenced behavior. Preserve supplied template metadata and explicitly approved design-reference fields. No unresolved promises, generic diagram, internal provenance/audit leakage or undocumented integration branches.
 
-Only the two-field review header is excluded from body binding. Parent synchronizes it after verdict and records the final fileRevision after read-back. Any other change requires affected review.
+Only the two-field review header is excluded from body binding. Parent synchronizes it after verdict, re-reads every complete intended SPEC, compares both fields with the latest numbered review record, and records the final fileRevision plus `specHeaderSync`. Any other change requires affected review. A stale, mismatched or unreadable header blocks jiraReady even when the substantive verdict is PASS.
 
 ## UPDATE — Preservation and supported write scope
 

@@ -1,8 +1,8 @@
-# CEAIA workflow contract v3
+# CEAIA workflow contract v4
 
-This file owns shared state, invalidation and repair policy. Generation, review and bundled push load it. It defines local workflow metadata, not a scoring rubric or remote tool schema.
+This file owns shared state, invalidation and repair policy. Generation, review and the `jira-createissue-helper` SDLC gateway load it. It defines local workflow metadata, not a scoring rubric or remote tool schema.
 
-Keep the four Skill folders together when using filesystem links. On a platform that resolves resources by Skill name instead of sibling directories, resolve this contract as Skill ceaia-sdlc-story-spec-generation, resource references/workflow-contract.md; apply the same name-plus-resource rule to sibling templates. Do not read workspace artifacts from a Skill resource root.
+Keep the three active Skill folders together when using filesystem links. On a platform that resolves resources by Skill name instead of sibling directories, resolve this contract as Skill ceaia-sdlc-story-spec-generation, resource references/workflow-contract.md; apply the same name-plus-resource rule to sibling templates. Do not read workspace artifacts from a Skill resource root.
 
 ## Identity and paths
 
@@ -12,12 +12,12 @@ Each new candidate owns one Story, Test Case and SPEC. Each update ticket owns o
 |---|---|---|
 | outputRoot | outputs/ceaia/<slug> | outputs/ceaia/updates/<SOURCE>/<TICKET-KEY> |
 | internalRoot | .ceaia-work/stories/<slug> | .ceaia-work/updates/<SOURCE>/<TICKET-KEY> |
-| planningPath | .ceaia-work/planning.md | <internalRoot>/plan.md |
+| planningPath | <internalRoot>/plan-revision-<nnn>.md | <internalRoot>/plan-revision-<nnn>.md |
 | storyPath | <outputRoot>/STORY.md | <outputRoot>/STORY.md |
 | testCasePath | <outputRoot>/TEST_CASE.md | <outputRoot>/TEST_CASE.md |
 | specPath | <outputRoot>/<final-spec-name>.md | <outputRoot>/<final-spec-name>.md |
-| scoreRecordPath | <internalRoot>/story-quality-score.json | <internalRoot>/story-quality-score.json |
-| reviewPath | <internalRoot>/review.md | <internalRoot>/review.md |
+| scoreRecordPath | <internalRoot>/story-quality-score-attempt-<nnn>.md | <internalRoot>/story-quality-score-attempt-<nnn>.md |
+| reviewPath | <internalRoot>/review-attempt-<nnn>.md | <internalRoot>/review-attempt-<nnn>.md |
 | statePath | <internalRoot>/state.json | <internalRoot>/state.json |
 | updateManifestPath | not applicable | <internalRoot>/update-manifest.md |
 
@@ -27,11 +27,15 @@ Default SPEC basename is short lowercase kebab-case. An explicit user-requested 
 
 Jira source is WPB, ALM, DATA, FCR or GO, explicitly confirmed per target. Validate safe path components; reject separators/traversal in ticket/slug components. Do not silently relocate older workspace artifacts: explicitly map and revalidate earlier work when adopting it.
 
-## Current-only storage
+## Latest outputs and retained internal history
 
-Overwrite current generated Story, Test Case, SPEC, score response and review report. Do not create revision directories, Story history copies or per-attempt full reports. Preserve original user evidence and original Jira baseline; these are evidence, not generation history.
+Keep only the latest deliverable Story, Test Case and SPEC files under `outputs/ceaia/...`; replace those paths after supported repairs. Do not create historical Story/Test Case/SPEC copies in outputs or `.ceaia-work`.
 
-Maintain compact candidate state plus `.ceaia-work/batch-state.json`: selected candidate IDs, source assignments, per-candidate status, global source coverage and known write outcomes. Do not duplicate document bodies in state. At final preparation keep only the latest exact serialized request strings in `.ceaia-work/jira-request.json`; state references their request revisions and indices. This required current approval payload is not a Story history copy.
+Preserve workflow evidence under each candidate's `.ceaia-work` internal root. Every planning revision, score invocation result, independent review execution, post-repair verification and Jira approval attempt receives a monotonically numbered file and is never overwritten. Examples: `plan-revision-001.md`, `story-quality-score-attempt-001.md`, `review-attempt-001.md`, `review-attempt-001-post-repair.md`, and `jira-approval-attempt-001.md`. Never renumber or reuse an earlier attempt file. State points to the latest applicable file and may be compactly replaced.
+
+The score record is Markdown for user-readable audit. It contains a concise readable summary and the complete untouched tool JSON text in a fenced `json` block. The readable summary must not replace or edit the raw response. Review records remain full Markdown reports. Preserve original user evidence and original Jira baseline separately.
+
+Maintain compact candidate state plus `.ceaia-work/batch-state.json`: selected candidate IDs, source assignments, per-candidate status, global source coverage and known write outcomes. Do not duplicate document bodies in state. State and batch state are mutable control files, not audit logs. For final preparation retain each numbered approval record under `.ceaia-work`; `jira-preview.md` remains the one current user preview required by the helper. State references the latest approval attempt, request revision and indices.
 
 Invalidate affected gates before modifying a file; after writing and reading back, advance its workflow revision and record the supported change. Interrupted writes remain invalid and resume at the earliest affected step. Existing stale Test Case/SPEC may remain at current paths but are not deliverable until rebuilt/revalidated. Do not delete files to satisfy initial-generation sequencing.
 
@@ -41,7 +45,7 @@ This platform does not execute code. Never generate or run Python, shell, JavaSc
 
 Set executionProfile=text-only and bindingMethod=readback-and-revision. Maintain workflow-owned integer revisions, initially 0 for unwritten files: storyRevision, testCaseRevision, and each SPEC's bodyRevision/fileRevision. Advance the affected revision after a real edit and successful read-back. SPEC body edits advance both revisions; header-only synchronization advances fileRevision only. These counters describe observed workflow edits, not cryptographic fingerprints or platform version IDs.
 
-Before scoring read the saved Story in full, record its path and storyRevision, and invalidate the old score. Do not edit that Story during the call. Save/read back the complete response and record assessmentOrdinal plus actual invocation/review IDs if returned. Confirm the current Story still matches the submitted content using available file reads and the observed edit sequence. Never fabricate checksums or invocation IDs; preserve a service content_checksum only as returned.
+Before scoring read the saved Story in full, record its path and storyRevision, and invalidate the old score. Do not edit that Story during the call. Allocate the next unused score attempt path, save/read back the complete Markdown score record, and record assessmentOrdinal plus actual invocation/review IDs if returned. Confirm the current Story still matches the submitted content using available file reads and the observed edit sequence. Never fabricate checksums or invocation IDs; preserve a service content_checksum only as returned.
 
 Reviewer reads actual current source and artifact text, compares it with the current score association, and records the revisions it actually reviewed. Only the two-field Review Result header is excluded from substantive SPEC body review. A currentness label or matching counter alone never proves unchanged content.
 
@@ -56,17 +60,17 @@ At intake check file reading/writing, the scoring tool and independent-review ca
 Initialize from [state template](../templates/state-template.json) and [batch-state template](../templates/batch-state-template.json). Replace example identity/paths, derive update paths from the table and add updateManifestPath for updates. Templates create metadata only, not future Test Case/SPEC files. Unknown values remain null or pending; never copy a ready/pass assertion from a prior candidate.
 
 Valid JSON, real booleans/numbers, null for unavailable values, no secrets:
-- `contractVersion: 3`, `candidateId`, `mode`, `source`, `ticketKey`, `attachmentAction`.
+- `contractVersion: 4`, `candidateId`, `mode`, `source`, `ticketKey`, `attachmentAction`.
 - `evidenceRevision`: changes only for substantive supported source/decision changes, with a short reason.
-- `paths`: planningPath, storyPath, testCasePath, specPath, scoreRecordPath, reviewPath; updateManifestPath for updates.
+- `paths`: latest planningPath, storyPath, testCasePath, specPath, latest scoreRecordPath, latest reviewPath; updateManifestPath for updates. Add `historyRoot` for the candidate's retained internal records.
 - `status`: IN_PROGRESS / READY / WAITING_USER / WAITING_TOOL / STOPPED / COMPLETE; `nextAction`. Initialize IN_PROGRESS, never READY before all gates.
-- `score`: status (missing/pending/pass/fail/unknown), storyRevision, assessmentOrdinal, responseReadBack, persistenceMode, invocationRef, ok, finalScore.
-- `review`: result (Not Reviewed/PASS/NEEDS_REVISION/NEEDS_HUMAN_CLARIFICATION/FINAL_WITH_UNRESOLVED), storyRevision, testCaseRevision, specBodyRevision, contentReadBack, testCaseTitleValidation, unresolvedIssueIds.
+- `score`: status (missing/pending/pass/fail/unknown), storyRevision, scoreAttempt, assessmentOrdinal, responseReadBack, persistenceMode, invocationRef, ok, finalScore.
+- `review`: result (Not Reviewed/PASS/NEEDS_REVISION/NEEDS_HUMAN_CLARIFICATION/FINAL_WITH_UNRESOLVED), reviewAttempt, recordPath, storyRevision, testCaseRevision, specBodyRevision, contentReadBack, testCaseTitleValidation, unresolvedIssueIds, specHeaderSync.
 - `repair`: round (0–3 by default), usedInRound, stagnantRounds, lastBlockingIssueIds, diagnosticUsed, reasonForBudgetReset, extraRoundsAuthorized (default 0).
 - `technicalRecovery`: operation, attempts, outcome.
 - `executionProfile: text-only`, `bindingMethod: readback-and-revision`, `artifactRevisions` (storyRevision/testCaseRevision), `jiraReady`, `updateReady`, `finalSpecRevision`, `approval` (status, requestRevision, attachmentRevisions, contentReadBack), per-operation `writeResults`.
 - `specArtifacts`: every current SPEC's path/fileName/uploaded/bodyRevision/fileRevision; `attachmentReplacementMapping`: each selected returned attachment ID and corresponding reviewed relativePath/fileName.
-- `reviewAttempt`: monotonic number of actual reviews, not repair allowance. `aiSelfRepairCount` is a compatibility alias of repair.cumulativeRounds; the active allowance comes from repair.round/evidenceRevision/extraRoundsAuthorized. Preserve these compact counters, not historical document copies.
+- `reviewAttempt`: monotonic number of actual reviews, not repair allowance. `scoreAttempt` is the monotonic number of actual score-tool invocations. `aiSelfRepairCount` is a compatibility alias of repair.cumulativeRounds; the active allowance comes from repair.round/evidenceRevision/extraRoundsAuthorized. Preserve each numbered score/review record and keep only pointers/counters in state.
 
 Normalized workflow facts are separate from the complete current score response; never insert state fields into that response.
 
@@ -100,7 +104,7 @@ Track blockers by requirement/behavior/location, not score. Same material blocke
 
 At either boundary allow at most one read-only diagnosis per evidenceRevision when useful. It distinguishes missing evidence, wrong repair, rule conflict or invalid review finding. It does not edit, rescore, manufacture PASS or waive gates. Return the smallest needed decision: evidence, user correction, environment fix, an explicit finite extra repair budget, defer or stop. Extra rounds require the user's bounded authorization recorded in extraRoundsAuthorized.
 
-Substantive new evidence/decisions may start a new evidenceRevision with its three-round budget for affected candidates only. Renaming or cosmetic edits never reset it. Keep compact cumulative counts/reset reasons, not historical document bodies.
+Substantive new evidence/decisions may start a new evidenceRevision with its three-round budget for affected candidates only. Renaming or cosmetic edits never reset it. Keep compact cumulative counts/reset reasons in state and retain numbered score/review/diagnostic records as audit history; do not duplicate deliverable document bodies.
 
 ## Handoff, batch and internal boundaries
 
@@ -110,7 +114,7 @@ Handoff contains statePath, actual source/planning paths, identity, artifact pat
 
 Internal update manifest contains baseline preservation and attachment selection, not score/audit fields. Scores/provenance belong in score record and state. Approval preview shows actual business changes and upload mapping, not diagnostics. Jira payload contains only supported approved fields and selected SPECs. Test Case is user-visible workspace content, never a standalone Jira attachment.
 
-Final approval refers to the exact serialized per-ticket requestJson and the final attachment content checked by the read-back procedure above. Current state holds bindings/results; no historical Story snapshots are needed.
+Final approval refers to the exact serialized helper payload and final attachment content checked by the read-back procedure above. Current state holds bindings/results; numbered internal approval records are retained, while historical Story snapshots are neither needed nor allowed.
 
 ## Waiting and completion
 

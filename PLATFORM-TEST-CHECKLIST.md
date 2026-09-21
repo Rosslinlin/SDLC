@@ -1,41 +1,53 @@
-# v3 平台测试与替换清单
+# v4 Platform Test Checklist
 
-先在测试空间小批量验收，暂不直接替换生产。“通过”需要真实运行结果，不是本地静态检查结果。
+## 安装前
 
-## 导入前
+- [ ] 上传三个活动 Skill，并记录平台返回的 skill IDs。
+- [ ] 替换 task 中的 helper skill ID 占位值。
+- [ ] 确认平台提供 `ask_user_question`、`request_user_approval`、Jira MCP tools 和 `nodejs-base-mcp.score_requirement_markdown`。
+- [ ] 确认平台能读取所有文本资源；单独检查遗留 WPS/OLE `flow-testcase-source-export.md`。
 
-1. 备份平台三个 Skill 和 task。本包未修改本机已安装版、原始目录或 v2。
-2. 更新三个 CEAIA Skill 及其全部资源。helper 原样附带，不替换 review，无须重新发布。
-3. 使用 SDLC-workflow-v3.task.json。三个 Skill ID 沿用截图；新建条目或换环境需换实际 ID。评分工具位于 tools 数组最后。
-4. 确认资源读取、独立只读评审、文件持久化、ask_user_question 和 request_user_approval 可用。不需要运行脚本或计算哈希；只使用平台已有工具读取、写入文本及执行业务调用。
-5. 工具截图对可选参数类型有冲突：默认只传 relativePath，省略 force_review/metadata。用户明确要求新评审时，按真实 schema 提交 force_review。
-6. 核对平台自定义报告/状态解析器对 contractVersion 3 的支持；纯文本修订已把哈希字段替换为 readback-and-revision。task schema_version 仍为 enriched-agent.task/v2。
+## 场景 A：新 Story 正常链路
 
-## 场景与预期
+- [ ] Story 只有一个 `## Acceptance Criteria`，AC 使用稳定编号和 Given/When/Then。
+- [ ] 评分后产生 `story-quality-score-attempt-001.md`，可读摘要与 raw JSON 一致。
+- [ ] score PASS 后才生成 Test Case 和 SPEC。
+- [ ] review 产生 `review-attempt-001.md`，不是覆盖固定 `review.md`。
+- [ ] PASS 后 SPEC header 显示 PASS 和正确 attempt，完整复读成功后才 `jiraReady=true`。
+- [ ] Jira preview 的 Description 使用 `h2.` 等 Jira wiki 标题，不包含代码块外的 `## `。
+- [ ] `request_user_approval` 出现；未批准时不调用 Jira。
 
-| 场景 | 应观察到的结果 |
-|---|---|
-| 无代码执行环境 | 全流程不得请求终端、Python 或任何脚本执行；无哈希工具不会单独阻断 |
-| 单个正常新 Story | Story→真实评分→测试→SPEC→独立评审；评分通过前不新建下游占位 |
-| AC 识别 | 精确 ## Acceptance Criteria 与 AC-001；无缺 AC 警告，计数与正文相符 |
-| 原示例低分 | ok=true、finalScore=36 不能放行；修标题不保证业务缺项自动消失 |
-| 高分但解析异常 | 缺 AC 警告、parseErrors 或数量冲突仍阻断；定位解析问题 |
-| 新旧诊断结构 | sectionScores 或 scoreBreakdown/dimensions 可读取；原始响应保留，不编造缺失字段 |
-| 仅 SPEC/测试变化 | 不重写不重评未变 Story；同步嵌入并重审 |
-| Story 确实变化 | 旧分失效，重评分后同步下游并重审 |
-| 缺证据与三轮预算 | 业务缺口立即问；三轮或连续两轮无进展后停止自动编辑，不暗中第四轮修复 |
-| 十个 Story 中一个阻塞 | 路径预算隔离，其余独立候选可继续；未明确移除阻塞项前不判定全批可推 |
-| 已有票独立 AC 为空 | Description 非空时继续；source 逐票明确、附件盘点完整 |
-| 两个不同附件替换 | 各自保留原义、各自评审、绑定真实 ID，不强制合并 |
-| 显式 SPEC.md 文件名 | 经确认的安全名称可用，否则默认 kebab-case |
-| 显式 Epic + Stories | 仅明确请求才包含 Epic，每个 Story 绑定自己的 reviewed SPEC |
-| 审批后文件/字段变化 | 原审批失效，重新预览与审批 |
-| 部分成功或写入超时 | 区分成功/失败/未尝试/未知，不盲重发成功或未知创建 |
-| 中断恢复和缓存 | 回读文件和最新状态；确认未变才复用，无法确认则重走受影响门禁；不因无哈希而循环评分，不新增历史目录 |
-| 范围隔离 | helper 与 push 独立 Test Case 资源保持原样，本 task 不调用这些分支 |
+## 场景 B：评分或 review 修复
 
-## 执行与记录
+- [ ] Story 修复后 outputs 中 STORY 被替换，不产生历史 Story 副本。
+- [ ] 新评分写入 attempt-002，attempt-001 保留。
+- [ ] 新 review 写入新的编号文件，旧 review 保留。
+- [ ] SPEC-only 修复不触发 Story 重写或不必要的重新评分。
+- [ ] 三轮预算用尽或连续两轮无进展后停止自动编辑并请求明确决策。
 
-先测单 Story，再测局部修复、已有票更新，最后测十个 Story。Jira 写入只在专用测试项目且获得明确审批后执行。
+## 场景 C：SPEC header 回写失败
 
-记录候选 ID、证据版本、真实工具调用次数、各门禁状态、失败位置和恢复结果；不能把未实际调用记录为成功。验收完成后再决定是否替换生产。
+- [ ] 首次 mismatch 只执行一次 header-only retry。
+- [ ] 第二次 mismatch 进入 WAITING_TOOL。
+- [ ] helper gateway 拒绝未验证的 SPEC，即使 review report 为 PASS。
+
+## 场景 D：Jira wiki 转换
+
+- [ ] `#` 至 `######` 分别转换为 `h1.` 至 `h6.`。
+- [ ] code fence 内的 `#`/`##` 不转换。
+- [ ] 有序/无序列表层级保持。
+- [ ] AC IDs、Given/When/Then 和业务文案没有改写或重排。
+- [ ] Workspace `STORY.md` 未因 Jira rendering 被修改。
+
+## 场景 E：现有 Jira 更新
+
+- [ ] `attachmentAction=none` 可完成 description-only update。
+- [ ] 多个不同 replacement SPEC 保持独立 mapping，均有独立 review/header binding。
+- [ ] preview 显示 original→replacement mapping。
+- [ ] 第一个失败/partial/unknown 后暂停剩余更新，不重放已成功操作。
+
+## 场景 F：Helper 通用流程回归
+
+- [ ] 普通 create/update/association/batch 不进入 SDLC gateway。
+- [ ] project/issue type 需要选择时使用 popup，而不是普通 chat。
+- [ ] Test Case Jira-visible 换行使用 newline，不出现 `<br>` 或 escaped equivalents。

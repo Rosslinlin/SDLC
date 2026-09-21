@@ -22,13 +22,13 @@ Workspace identity comes from trusted X-AF-Conversation-ID request header. Do no
 
 Reject URL/URI, absolute path, artifact ID, data/blob/file URL, null byte and '..' traversal. Use actual workspace path from tools. The documented UI form documents/<active-conversation-id>/name.md may be accepted along with equivalent workspace-relative forms; do not manufacture that prefix or strip a real directory by guesswork.
 
-Optional metadata is audit-only and contains no secrets or copied source bodies. Every invocation writes an immutable service audit row, including cache hits. Local current-only storage does not delete or modify service audit history.
+Optional metadata is audit-only and contains no secrets or copied source bodies. Every invocation writes an immutable service audit row, including cache hits. Local numbered Markdown score records supplement that service history and are never overwritten.
 
 ## Extract and preserve the response
 
-Documented return: a single JSON text content block. For an MCP transport object, read its single type=text content item's text and parse that full JSON object. Save that text verbatim at scoreRecordPath. Do not persist the outer MCP wrapper as the evaluation object. Do not scrape a rendered screenshot or truncated chat log.
+Documented return: a single JSON text content block. For an MCP transport object, read its single type=text content item's text and parse that full JSON object. Allocate the next unused `story-quality-score-attempt-<nnn>.md`, render the human-readable fields from `templates/score-record-template.md`, and place the complete JSON text verbatim and unedited in its fenced `json` block. Do not persist the outer MCP wrapper as the evaluation object. Do not scrape a rendered screenshot or truncated chat log.
 
-If the runtime already exposes exactly that decoded object, serialize the entire object once with persistenceMode=complete-object-json; never claim byte-verbatim preservation. Multiple conflicting text blocks, truncated JSON or ambiguous nested evaluation objects require technical recovery. Never pick a favorable nested result.
+If the runtime already exposes exactly that decoded object, serialize the entire object once into the fenced block with persistenceMode=complete-object-json-in-markdown; never claim byte-verbatim preservation. When raw text is available, use persistenceMode=verbatim-json-in-markdown. Multiple conflicting text blocks, truncated JSON or ambiguous nested evaluation objects require technical recovery. Never pick a favorable nested result.
 
 The current tool description lists:
 ok, cache_hit, review_id, audit_id, content_checksum, title, finalStatus, finalScore,
@@ -61,6 +61,6 @@ Preserve service content_checksum exactly when returned; it is service metadata,
 
 Generation owns invocation, response preservation and evidence-backed Story repair. Review only inspects current persisted evidence; it never invokes or refreshes the tool. Each candidate owns its own result; no averaging or cross-candidate reuse.
 
-No repeated call for an unchanged current version in normal operation. An explicitly authorized fresh review is the sole freshness exception; invalidate downstream readiness first and assess its new returned evidence. At most one supported technical retry after a confirmed pre-evaluation failure; an unknown timeout must be reconciled, not blindly replayed. Saving an already received response can be retried without another score call.
+No repeated call for an unchanged current version in normal operation. An explicitly authorized fresh review is the sole freshness exception; invalidate downstream readiness first and assess its new returned evidence. At most one supported technical retry after a confirmed pre-evaluation failure; an unknown timeout must be reconciled, not blindly replayed. Saving an already received response can be retried without another score call, using the same reserved attempt path when no complete record was committed. Never overwrite a completed earlier attempt.
 
 Scores, audit IDs, checksums, conversation identity and diagnostic data stay internal. Never include them in Story, Test Case, SPEC, update manifest, Jira preview or payload.

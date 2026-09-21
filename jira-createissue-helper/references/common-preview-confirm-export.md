@@ -83,12 +83,15 @@ For Test Case source exports, also include:
 - selected export behavior
 - selected `uploadType` mode: `single` or `multiple`, plus the user-facing label selected by the user; this is previewed as routing state, not as a final tool payload field
 - source-to-payload integrity status for execution fields
-- for `multiple`, Test Case ID to payload item mapping
-- for `single`, Test Case ID to aggregate table row mapping and confirmation that `description` contains only the clean Test Case table with no Markdown separator row or extra text
+- line-break validation status confirming Jira-visible Test Case fields keep required breaks as newline characters and contain no literal or escaped HTML break tags
+- for `multiple`, Test Case ID to payload item mapping and confirmation that item `description` and `testDetailsJson` values preserve required line breaks
+- for `single`, Test Case ID to aggregate table row mapping and confirmation that `description` contains only the clean Test Case table with no Markdown separator row, extra text, or literal line-break tags
 
 ## Confirmation
 
 Call `exportJiraByDynamicFields` only after explicit user confirmation.
+
+For a `ceaia-sdlc-validated` handoff, `sdlc-gateway.md` is controlling: final authorization must be obtained through `request_user_approval` bound to the exact payload and attachment bytes. The generic confirmation wording below does not replace that SDLC approval tool call.
 
 User phrases such as `create`, `export`, or `go ahead` only allow preview generation unless they are clearly responding to an already shown confirmation request. They do not bypass confirmation.
 

@@ -5,9 +5,9 @@ description: Generate or update evidence-backed CEAIA Stories, apply the Story s
 
 # CEAIA Story and SPEC Generation
 
-Bundle revision: 3.0.1 text-only — 2026-09-21.
+Bundle revision: 4.0.0 text-only — 2026-09-21.
 
-Own intake, planning, generation, current-state persistence and evidence-supported repairs. The independent reviewer is `ceaia-spec-review`; Jira writes belong to `ceaia-sdlc-only-jira-push-content`. Do not substitute `jira-createissue-helper` in this bundled workflow.
+Own intake, planning, generation, current-state persistence and evidence-supported repairs. The independent reviewer is `ceaia-spec-review`; Jira writes belong to the dedicated SDLC gateway in `jira-createissue-helper`.
 
 ## Load for the current phase
 
@@ -32,9 +32,9 @@ For each candidate:
 4. Only a complete current score with boolean `ok: true`, numeric `finalScore >= 76` and no unresolved parser/AC-recognition blocker opens Test Case generation. A 36 score with ok=true is not PASS.
 5. Generate Test Case, validate titles and executable coverage, then assemble SPEC from current sibling content. Updates may require multiple distinctly reviewed replacement SPECs; preserve each explicit attachment mapping.
 6. Run mechanical checks and independent read-only `ceaia-spec-review` against actual evidence. A fresh read-only subagent or task-provided independent reviewer satisfies this; do not duplicate it or substitute generator self-approval. If no independent review capability is available, return WAITING_TOOL.
-7. Persist the latest review, classify repairs by affected file, and apply the shared budget. Story changes require new scoring; unchanged Story does not.
-8. Synchronize SPEC review header after the verdict; check global source coverage across the selected batch.
-9. When all selected targets have current PASS, continue to the Jira push skill's preview and final approval, unless assigned a preparation-only stage.
+7. Persist every review in the next unused numbered `.ceaia-work` record, point state to the latest review, classify repairs by affected file, and apply the shared budget. Story changes require a new numbered score record; unchanged Story does not.
+8. Synchronize every intended SPEC review header after the verdict, immediately read back and verify the header against the latest PASS, then check global source coverage across the selected batch. A failed header sync blocks jiraReady.
+9. When all selected targets have current PASS, continue to `jira-createissue-helper`'s dedicated SDLC gateway for Jira-wiki rendering, preview and final approval, unless assigned a preparation-only stage.
 
 ## Invocation boundary
 
@@ -46,6 +46,6 @@ Resume from validated current state on every entry; do not unconditionally repea
 
 Return current artifact paths, candidate statuses, blockers and one concrete next action. Findings use complete workspace-relative paths and known lines. Source paths, scores and workflow state stay out of Jira-facing content.
 
-Use `ask_user_question` for missing business facts or supported recovery choices, never final write approval. If that tool is unavailable, explain once and return the exact question with a waiting state; do not loop. Jira approval requires `request_user_approval` in the push skill.
+Use `ask_user_question` for missing business facts or supported recovery choices, never final write approval. If that tool is unavailable, explain once and return the exact question with a waiting state; do not loop. Jira approval requires `request_user_approval` in the helper's SDLC gateway.
 
 Preparation completion is distinct from whole-workflow success. Whole-workflow success requires all intended writes confirmed, or explicit user stop. Waiting is a resumable pause.

@@ -1,10 +1,10 @@
 # Planning and scoring
 
-Read workflow-contract.md for paths, current-only storage, invalidation and repair budget. Read [business-planning-checklist.md](business-planning-checklist.md) before planning and [scoring-tool-contract.md](scoring-tool-contract.md) before invoking or interpreting the evaluator.
+Read workflow-contract.md for latest-output paths, retained internal history, invalidation and repair budget. Read [business-planning-checklist.md](business-planning-checklist.md) before planning and [scoring-tool-contract.md](scoring-tool-contract.md) before invoking or interpreting the evaluator.
 
 ## P1 — Evidence-backed planning
 
-Use templates/planning-template.md at planningPath. Inventory requirements, designs, FSD/API/data contracts, Jira fields/attachments, Confluence and clarifications. Classify direct requirement, UX evidence, implementation constraint, background or supported exclusion. Keep exact source locations internally. Background is not automatically scope.
+Use templates/planning-template.md at the next unused `plan-revision-<nnn>.md` planningPath. Never overwrite a completed planning revision; state points to the latest applicable plan. Inventory requirements, designs, FSD/API/data contracts, Jira fields/attachments, Confluence and clarifications. Classify direct requirement, UX evidence, implementation constraint, background or supported exclusion. Keep exact source locations internally. Background is not automatically scope.
 
 Each explicit requirement gets SR-### and Evidence ID, actor/trigger, action/rule, observable outcome, journey/state and candidate disposition. Every SR is covered, waiting for clarification or explicitly excluded by source/user decision. Missing detail is not exclusion.
 
@@ -36,15 +36,15 @@ Before invocation:
 
 ## S2 — Persist complete response and bind currentness
 
-Keep one current scoreRecordPath. A new assessment replaces its previous generated response. Preserve all returned fields, including optional identifiers and diagnostics.
+Allocate one new monotonically numbered Markdown scoreRecordPath for every actual tool invocation. A later assessment never replaces a completed earlier record; state points to the latest applicable attempt. Preserve all returned fields, including optional identifiers and diagnostics.
 
-- Documented MCP result: extract the single JSON text content block; persist its entire text verbatim, unedited. The MCP envelope is not the score object.
-- Only a parsed object available: serialize the complete designated evaluation object once; set persistenceMode=complete-object-json. Do not claim server-byte preservation.
+- Documented MCP result: extract the single JSON text content block; use `templates/score-record-template.md` to create a readable Markdown record and persist the entire JSON text verbatim, unedited, in its fenced block. The MCP envelope is not the score object.
+- Only a parsed object available: serialize the complete designated evaluation object once inside the Markdown raw-response block; set persistenceMode=complete-object-json-in-markdown. Do not claim server-byte preservation.
 - Follow the tool's documented evaluation channel. Conflicting envelopes or undocumented wrapping mean WAITING_TOOL; do not pick a favorable nested score or reconstruct from partial logs.
 
 Record the input storyRevision, assessmentOrdinal, responseReadBack and actual invocation reference when exposed. Read back the saved response and confirm Story remained unchanged during the call using the shared text-only procedure. Preserve returned service checksums without calculating replacements. No checksum is required locally; unknown actual invocation provenance still requires recovery.
 
-State metadata is separate from response. Score records, audit IDs and diagnostics never enter Story, Test Case, SPEC, update manifest, Jira preview or payload.
+The record's readable summary must agree with the raw JSON but is not evaluator evidence by itself. State metadata is separate from the raw response. Score records, audit IDs and diagnostics never enter Story, Test Case, SPEC, update manifest, Jira preview or payload.
 
 ## S3 — Gate and recovery
 

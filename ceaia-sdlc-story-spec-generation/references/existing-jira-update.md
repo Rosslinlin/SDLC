@@ -1,6 +1,6 @@
 # Existing-ticket updates
 
-Read workflow-contract.md for source-qualified paths and current-only state. Preserve each target's baseline plus supported requested delta; never merge tickets or implicitly create new tickets.
+Read workflow-contract.md for source-qualified latest-output paths and retained internal records. Preserve each target's baseline plus supported requested delta; never merge tickets or implicitly create new tickets.
 
 ## U1 — Intake
 
@@ -54,6 +54,6 @@ Reader evidence is immutable; write replacement content under outputRoot. Upload
 
 Use normal planning, Story scoring and repair gates. Story changes preserve baseline and update only supported behavior. Review checks original description, available AC, every relevant readable attachment, preservation matrix and action-specific mapping.
 
-A none mapping is resolved and can yield updateReady=true. A replace mapping must be fully resolved before PASS. Send statePath and reviewed manifest to the push skill; generation never calls updateJiraTicket.
+A none mapping is resolved and can yield updateReady=true. A replace mapping must be fully resolved before PASS. Send statePath and reviewed manifest to the `jira-createissue-helper` SDLC gateway; generation never calls the Jira export tool directly.
 
 If a ticket changed externally before submission, reconcile the current baseline and rerun affected preservation/content review. Do not overwrite concurrent user changes from stale intake. Maintain ticket/source-specific status and exact affected paths.

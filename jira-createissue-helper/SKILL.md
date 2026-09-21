@@ -5,7 +5,7 @@ description: Jira issue export and write helper for create, update, batch export
 
 # Jira Create Issue Helper
 
-Version: 2.1.0
+Version: 2.2.0-sdlc-v4
 
 This skill separates reusable Jira helper capabilities from business flows. Read this entry file first, then load the common and flow modules required by the selected route.
 
@@ -23,17 +23,21 @@ This skill separates reusable Jira helper capabilities from business flows. Read
 10. Use one export call for a batch unless split explicitly by the user.
 11. Persist reusable, non-secret user information only after success.
 12. Check conversation context, user-info.md, and jira-user-info.md before asking reusable basics.
-13. Preserve Test Case execution fields exactly apart from transport-safe line-break normalisation.
-14. Test Case source export must use `flow-testcase-source-export.md` and its two forced payload shapes.
-15. Final Jira-visible Test Case fields must be source-contained; do not substitute file references.
-16. A CEAIA SDLC validated handoff has priority over generic create, update and batch flows.
-17. SDLC export requires `sdlc-handoff-validation.md`; do not regenerate or rewrite approved Story content.
-18. An SDLC handoff is exportable only when its review result is `PASS`, `jiraReady` is `true`, and `testCaseTitleValidation` is `manual-pass`.
-19. SDLC Story Description is the reviewed `STORY.md` content. Extract approved Acceptance Criteria into the metadata-confirmed writable Jira Acceptance Criteria field; do not append a duplicate AC section to Description.
-20. SDLC export includes exactly one reviewed SPEC attachment per Story. Do not export `TEST_CASE.md`, planning, scoring, review or manifest artefacts.
-21. SDLC update exports are restricted to authorised Summary changes, reviewed Story Description replacement, Acceptance Criteria mapping, metadata-required fields, and explicitly authorised attachment add/replace/delete operations.
-22. For SDLC exports, inspect current Jira metadata and resolve required fields from visible defaults, safe evidence-based inference, or a focused user question only when no safe value is available.
-23. Never place `linkedIssueKeys` or `linkType` in `dynamicFieldsJson`; pass them as dedicated top-level parameters to `exportJiraByDynamicFields` for association operations.
+13. For missing, ambiguous, stale, or user-changed allowed input values, follow the popup / selection UI contract in `common-state-and-user-info.md`; do not terminate the flow with normal chat asking for those values.
+14. Preserve Test Case execution fields exactly apart from transport-safe line-break normalisation. For all Test Case export modes, keep required line breaks as newline characters in Jira-visible payload values and never submit literal HTML break tags such as `<br>`.
+15. Test Case source export must use `flow-testcase-source-export.md` and its two forced payload shapes.
+16. Final Jira-visible Test Case fields must be source-contained; do not substitute file references.
+17. A CEAIA SDLC validated handoff has priority over generic create, update and batch flows.
+18. Every SDLC export must first execute the dedicated `sdlc-gateway.md`; generic create, update, batch and Test Case rules do not override that gateway.
+19. SDLC export requires `sdlc-handoff-validation.md`; do not regenerate or rewrite approved Story or SPEC business content.
+20. An SDLC handoff is exportable only when its review result is `PASS`, `jiraReady` is `true`, `testCaseTitleValidation` is `manual-pass`, and every final SPEC review header has been synchronized and read back against that PASS.
+21. SDLC Story Description is a Jira-wiki transport rendering of the reviewed `STORY.md` content. Preserve meaning and ordering while converting Markdown presentation syntax such as `## Heading` to Jira wiki syntax such as `h2. Heading`; never edit the workspace Story to perform this conversion.
+22. Extract approved Acceptance Criteria into the metadata-confirmed writable Jira Acceptance Criteria field; do not append another AC section to Description.
+23. SDLC export includes exactly one reviewed SPEC attachment per new Story unless an approved update manifest explicitly maps multiple distinct replacement SPECs. Do not export `TEST_CASE.md`, planning, scoring, review, state or manifest artefacts.
+24. SDLC update exports are restricted to authorised Summary changes, reviewed Story Description replacement, Acceptance Criteria mapping, metadata-required fields, and explicitly authorised attachment add/replace/delete operations.
+25. For SDLC exports, inspect current Jira metadata and resolve required fields from visible defaults, safe evidence-based inference, or a focused user question only when no safe value is available.
+26. SDLC final write authorization must use `request_user_approval` bound to the exact displayed payload and final attachment bytes. Normal chat, `ask_user_question`, or an earlier approval is not final write authorization.
+27. Never place `linkedIssueKeys` or `linkType` in `dynamicFieldsJson`; pass them as dedicated top-level parameters to `exportJiraByDynamicFields` for association operations.
 
 ## Module index
 
@@ -55,13 +59,14 @@ This skill separates reusable Jira helper capabilities from business flows. Read
 - [flow-batch-export.md](references/flow-batch-export.md)
 - [flow-testcase-source-export.md](references/flow-testcase-source-export.md)
 - [flow-sdlc-validated-handoff.md](references/flow-sdlc-validated-handoff.md)
+- [sdlc-gateway.md](references/sdlc-gateway.md)
 - [sdlc-handoff-validation.md](references/sdlc-handoff-validation.md)
 
 ## Routing
 
 Routing is semantic and ordered. Select the first matching route; do not downgrade a blocked specialised route to a generic route.
 
-1. **SDLC validated handoff export:** When the request explicitly asks to export reviewed CEAIA SDLC Story/SPEC artefacts, or supplies a handoff whose `handoffType` is `ceaia-sdlc-validated`, read `flow-sdlc-validated-handoff.md` and `sdlc-handoff-validation.md` before any generic create, update or batch flow. Use the relevant common tools, state, validation, field assembly, attachments, preview and guardrail modules.
+1. **SDLC validated handoff export:** When the request explicitly asks to export reviewed CEAIA SDLC Story/SPEC artefacts, or supplies a handoff whose `handoffType` is `ceaia-sdlc-validated`, read `sdlc-gateway.md`, `flow-sdlc-validated-handoff.md`, and `sdlc-handoff-validation.md` before any generic create, update or batch flow. The dedicated gateway is controlling for SDLC routing, rendering, approval and final-write safety; common modules supply reusable mechanics only.
 2. **Test Case source export:** When exporting Test Cases from a file, pasted table, spreadsheet-like content or another structured source, use `flow-testcase-source-export.md`. This route is independent of generic batch/create rules.
 3. **Association:** For link, associate or relate requests, use `flow-associate-issue.md`.
 4. **Generic update:** For a non-SDLC update request containing a Jira key or `/browse/<KEY>` link, use `flow-update-issue.md`.
@@ -88,3 +93,8 @@ If an SDLC or Test Case specialised-flow gate fails, explain the blocker and sto
 - `java-base-mcp.queryJiraCreateMetaFields`
 - `java-base-mcp.getJiraInfos`
 - `java-base-mcp.exportJiraByDynamicFields`
+
+## Platform interaction capabilities
+
+- `ask_user_question`: collect allowed missing/ambiguous selections or supported recovery decisions; never treat its answer as final Jira write authorization.
+- `request_user_approval`: mandatory final authorization for every SDLC gateway write, bound to the exact payload and attachment bytes. If unavailable, return a resumable waiting state and do not export.

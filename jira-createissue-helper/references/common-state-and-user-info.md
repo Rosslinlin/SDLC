@@ -85,7 +85,11 @@ Persist reusable top-level and validated item-level values for batch operations 
 
 ## Popup Boundary
 
-Only show a popup for values that are missing, ambiguous, stale, or explicitly changed by the user.
+This section is the controlling popup / selection UI contract for Jira input collection.
+
+For values listed under Allowed popup/selection inputs, if the value is missing, ambiguous, stale, or explicitly changed by the user, present a popup / selection UI, not normal chat text. Until the user provides the value or makes a selection, do not continue to downstream Jira lookup, metadata retrieval, preview generation, or export.
+
+Do not use a popup for values outside the allowed list. Handle blockers for non-popup fields in normal chat according to the relevant flow.
 
 Allowed popup/selection inputs:
 
@@ -95,6 +99,8 @@ Allowed popup/selection inputs:
 - `projectKey` selected from `queryJiraProjectsByName` results
 - `issueType` selected from `queryJiraIssueTypesByProject` results
 - `uploadType`, only for Test Case export flows
+
+Normal chat must not be used as a substitute for popup collection of the allowed inputs above. If the runtime cannot render a required popup / selection UI, state that the required input UI is unavailable and stop before continuing the Jira flow.
 
 Do not collect these through popup:
 
@@ -121,6 +127,12 @@ When `staffId` or Jira source is missing, use a fixed popup with independent con
 - source: use available source choices; final customer input shows Other supported sources: `FCR`, `GO`, `DATA`.
 
 Do not dynamically add or reorder source options.
+
+When `projectName` search keyword is missing, stale, or explicitly changed by the user, collect it with a focused popup input before calling `queryJiraProjectsByName`.
+
+When `projectKey` selection is needed from `queryJiraProjectsByName` results, collect it with a dynamic project popup generated from the actual returned results. Each option must preserve at least the returned project key and project name.
+
+When `issueType` selection is needed from `queryJiraIssueTypesByProject` results, collect it with a dynamic issue-type popup generated from the actual returned results. Each option must preserve the returned issue type name and id when available.
 
 When Test Case export `uploadType` is missing, ambiguous, stale, or explicitly changed by the user, collect it with a constrained selection instead of free text. Use the selected value only to choose the final payload shape; do not include `uploadType` in the final `exportJiraByDynamicFields` payload.
 

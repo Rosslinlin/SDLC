@@ -1,5 +1,5 @@
 {
-  "contractVersion": 3,
+  "contractVersion": 4,
   "candidateId": "example-story",
   "mode": "new_story",
   "source": null,
@@ -8,12 +8,13 @@
   "evidenceRevision": 1,
   "evidenceRevisionReason": "Initial confirmed evidence",
   "paths": {
-    "planningPath": ".ceaia-work/planning.md",
+    "historyRoot": ".ceaia-work/stories/example-story",
+    "planningPath": ".ceaia-work/stories/example-story/plan-revision-001.md",
     "storyPath": "outputs/ceaia/example-story/STORY.md",
     "testCasePath": "outputs/ceaia/example-story/TEST_CASE.md",
     "specPath": "outputs/ceaia/example-story/example-story-spec.md",
-    "scoreRecordPath": ".ceaia-work/stories/example-story/story-quality-score.json",
-    "reviewPath": ".ceaia-work/stories/example-story/review.md"
+    "scoreRecordPath": ".ceaia-work/stories/example-story/story-quality-score-attempt-001.md",
+    "reviewPath": ".ceaia-work/stories/example-story/review-attempt-001.md"
   },
   "status": "IN_PROGRESS",
   "nextAction": "plan",
@@ -24,18 +25,28 @@
     "ok": null,
     "finalScore": null,
     "storyRevision": null,
+    "scoreAttempt": 0,
     "assessmentOrdinal": 0,
     "responseReadBack": false
   },
   "review": {
     "result": "Not Reviewed",
     "testCaseTitleValidation": "not-checked",
+    "reviewAttempt": 0,
+    "recordPath": null,
     "unresolvedIssueIds": [],
     "specArtifacts": [],
     "storyRevision": null,
     "testCaseRevision": null,
     "specBodyRevision": null,
-    "contentReadBack": false
+    "contentReadBack": false,
+    "specHeaderSync": {
+      "status": "not-required",
+      "reviewAttempt": null,
+      "verifiedSpecPaths": [],
+      "failedSpecPaths": [],
+      "retryUsed": false
+    }
   },
   "repair": {
     "round": 0,
@@ -56,7 +67,9 @@
   "updateReady": false,
   "approval": {
     "status": "not-requested",
-    "requestPath": ".ceaia-work/jira-request.json",
+    "approvalAttempt": 0,
+    "requestPath": null,
+    "previewPath": "jira-preview.md",
     "requestIndex": null,
     "requestRevision": null,
     "attachmentRevisions": [],

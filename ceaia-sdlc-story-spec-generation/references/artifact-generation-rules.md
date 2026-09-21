@@ -55,7 +55,7 @@ For multiple update replacements, write one distinct final SPEC per selected map
 
 ## A5 — Review and repair
 
-Before review validate current score binding, structure, references, exact embedding and titles. Send actual files, original evidence, planning and state to independent review. Parent saves only latest review.md.
+Before review validate current score binding, structure, references, exact embedding and titles. Send actual files, original evidence, planning and state to independent review. Parent saves each returned report at the next unused `review-attempt-<nnn>.md` path (or the same attempt's `-post-repair.md` verification path) and points state to the latest applicable report; never overwrite a completed review record.
 
 Classify affected layer before editing:
 - SPEC formatting/diagram/embedding defect → SPEC only.
@@ -65,6 +65,6 @@ Classify affected layer before editing:
 
 Run shared bounded repair policy. After fixes recheck changed gates and cross-artifact relationships; never blindly regenerate unchanged Story or rescore it. Independent verifier confirms fixes plus affected consistency gates.
 
-Review header is output of review, not evidence for that same review. Parent writes actual verdict/brief notes after the reviewer returns; header-only synchronization does not trigger another review. Notes must contain no internal paths/score data in Jira-facing SPEC.
+Review header is output of review, not evidence for that same review. Parent writes actual verdict/brief notes after the reviewer returns; header-only synchronization does not trigger another substantive review. Immediately re-read every intended SPEC and compare its Result and Reviewer Notes to the latest review. Record `specHeaderSync` with the review attempt, path, expected values and verified read-back. If the first header-only write/read check fails, retry that header synchronization once; a second mismatch is WAITING_TOOL and jiraReady remains false. Notes must contain no internal paths/score data in Jira-facing SPEC.
 
-After all selected candidates have PASS, verify global source coverage and current content and observed revisions; hand over to bundled push. If export capability is missing, return WAITING_TOOL with artifacts prepared, not fictional Jira success.
+After all selected candidates have PASS and verified SPEC-header synchronization, verify global source coverage and current content and observed revisions; hand over to the `jira-createissue-helper` SDLC gateway. If export capability is missing, return WAITING_TOOL with artifacts prepared, not fictional Jira success.

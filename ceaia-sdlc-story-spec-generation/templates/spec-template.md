@@ -1,7 +1,7 @@
 # Review Result
 
 **Result**: Not Reviewed
-**Reviewer Notes**: Independent review pending.
+**Reviewer Notes**: Independent review pending. After review, replace with `Attempt <N> — <brief evidence-backed notes>`.
 
 ---
 
@@ -53,11 +53,13 @@
 
 <!-- Authoring instructions: replace placeholders and remove this comment.
 The first standalone --- separates the review header from reviewed business content.
-Only Result and Reviewer Notes go above it. Valid verdicts: Not Reviewed, PASS,
+Only Result and Reviewer Notes go above it. Reviewer Notes must identify the latest review attempt. Valid verdicts: Not Reviewed, PASS,
 NEEDS_REVISION, NEEDS_HUMAN_CLARIFICATION, FINAL_WITH_UNRESOLVED.
 Copy Story and table rather than using separate embedded examples.
 Retain applicable supplied metadata; never fabricate values or silently omit supplied fields.
 Only the two approved design-link fields above may include intended business references.
 No internal source paths/provenance URLs, audit IDs, scores, workflow notes or unresolved promises.
-After review, only synchronize the header unless substantive repair is required.
+After review, only synchronize the header unless substantive repair is required. Re-read the
+complete file immediately and verify both header fields against the latest numbered review record;
+do not mark jiraReady until state records a successful header read-back.
 -->

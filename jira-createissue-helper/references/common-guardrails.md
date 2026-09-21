@@ -52,6 +52,8 @@
 - Treat source Test Case execution fields as authoritative. Preserve Test Steps, Expected Results, and Test Data exactly except for transport-safe line-break normalization.
 - If numbered steps, expected results, or test data do not align between source and payload, block export until the mismatch is corrected. Do not downgrade this to a warning.
 - Keep numbered lists line-separated in every Jira-visible Test Case field. If source content or generated content contains `1. ... 2. ...` on one line, rewrite it as `1. \n2. ...` before preview/export; block export if any numbered list remains collapsed on one line.
+- For every Test Case export mode, keep required line breaks as newline characters in Jira-visible payload values (`\n` in JSON). This applies to `multiple` mode item `description` and `testDetailsJson` values, and to `single` mode top-level table `description`.
+- Do not use literal `<br>`, `<br/>`, `<br />`, `&lt;br&gt;`, `&lt;br/&gt;`, or `&lt;br /&gt;` in any Jira-visible Test Case payload field. Normalize those line-break surrogates back to newline characters, or block export if they remain.
 - Do not silently truncate, abbreviate, cap, split, merge, reorder, renumber, or paraphrase Test Case execution fields.
 - Make Jira-visible Test Case payload fields source-contained. Do not use `.md` files, generated files, source artefacts, preview files, attachments, or external documents as references in place of the actual Test Case description, steps, test data, or expected results.
 - Block export if any Jira-visible Test Case payload field contains a placeholder such as `see source`, `refer to`, `preserved in`, a workspace filename, or a document path instead of the complete source content.

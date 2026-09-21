@@ -11,7 +11,7 @@ Use this checklist with the actual saved files and the platform's existing tools
 
 ## After the score call
 
-1. Follow scoring-tool-contract.md: read the documented single JSON text response, preserve its entire content and unknown fields, and read back the saved score record.
+1. Follow scoring-tool-contract.md: read the documented single JSON text response, preserve its entire content and unknown fields inside the numbered Markdown score record, and read back both its readable summary and complete raw JSON block.
 2. Check genuine invocation association, candidate/path/revision, boolean ok=true and numeric finalScore from 76 through 100. Do not coerce a numeric string or infer a score from labels.
 3. Inspect parseErrors and missing-AC warnings. Compare any returned top-level/legacy AC counts with the declared criteria. Missing optional counts alone are not failure.
 4. Record actual result and currentness in state. Unsupported envelopes, incomplete response or uncertain association require recovery, not invented PASS.
@@ -27,8 +27,8 @@ Use this checklist with the actual saved files and the platform's existing tools
 
 ## Before Jira preparation and sending
 
-1. Read the latest full independent report: identity, actual score, all required gates, unresolved issues, every SPEC's preservation conclusion and reviewed revisions must agree with current content.
-2. Synchronize only the review header after substantive PASS. Check body content did not change, advance the file revision and record current full upload paths.
+1. Read the latest numbered full independent report: identity, actual score, all required gates, unresolved issues, every SPEC's preservation conclusion and reviewed revisions must agree with current content.
+2. After substantive PASS, synchronize only the first two review-header fields in every intended SPEC, then immediately re-read each complete SPEC. Verify the Result and Reviewer Notes match the latest report, the body is unchanged, advance fileRevision, and record `specHeaderSync.status=verified` plus the review attempt and current full upload path. One targeted header-only retry is allowed after a write/read mismatch; a second mismatch is WAITING_TOOL and blocks jiraReady.
 3. Reconcile all selected candidates against original global source coverage. Never treat a missing candidate as implicitly excluded.
 4. Apply the shared workflow's read-back/approval procedure to the complete request and every attachment immediately before sending. A content change invalidates affected gates and approval.
 5. If content cannot be read or safely associated, pause with the precise missing item; lack of a script engine or hash is not a blocker.

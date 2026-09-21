@@ -1,8 +1,10 @@
 # Flow SDLC Validated Handoff Export
 
-Flow version: 1.1.0
+Flow version: 1.2.0
 
 Applies to: reviewed CEAIA SDLC Story/SPEC handoffs
+
+Required controlling gateway: `sdlc-gateway.md`
 
 Required companion: `sdlc-handoff-validation.md`
 
@@ -11,6 +13,8 @@ Required companion: `sdlc-handoff-validation.md`
 Use this flow for an explicit reviewed CEAIA SDLC handoff that creates or updates Jira Stories and manages their approved attachments. This flow supports one item or multiple independent items.
 
 This flow has priority over generic create, update and batch flows. It does not replace the dedicated Test Case source-export flow. If the SDLC validation gate fails, report the exact blocker and stop; do not regenerate content or route the request through a generic flow.
+
+Execute `sdlc-gateway.md` before this procedure. The gateway controls SDLC eligibility, Jira-wiki Description rendering, final approval binding and write recovery. Common modules remain reusable mechanics and do not override the gateway.
 
 ## 2. Supported operations
 
@@ -26,6 +30,7 @@ This flow has priority over generic create, update and batch flows. It does not 
 
 Read and apply:
 
+- `sdlc-gateway.md`
 - `common-tools-and-inputs.md`
 - `common-state-and-user-info.md`
 - `common-project-issue-type-validation.md` for creates
@@ -67,7 +72,7 @@ Read and apply:
 For every item:
 
 1. Map reviewed Story title to Summary under the summary rule in `sdlc-handoff-validation.md`.
-2. Map the exact reviewed `STORY.md` content to Description. Do not rewrite it.
+2. Render the exact reviewed `STORY.md` content into a Jira-wiki transport copy using `sdlc-gateway.md`, then map that copy to Description. Preserve meaning and order; do not edit the workspace Story. In particular, convert Markdown headings such as `## Title` to `h2. Title` before payload assembly.
 3. Extract the approved `AC-###` Given/When/Then content from Story and map it to the metadata-confirmed writable Jira Acceptance Criteria field.
 4. Process all other required metadata fields using this strict order: current preserved value for updates; visible metadata default; safe evidence-based allowed option; focused user question.
 5. Add optional fields only where user-provided, safely inferred, useful by default or directly relevant to the reviewed handoff.
@@ -125,17 +130,18 @@ Create or overwrite the sole preview file: `jira-preview.md`. It must include:
 - artefact validation status: Story, Test Case audit-only status, one SPEC, review PASS, `jiraReady`, title validation and update readiness where applicable;
 - field provenance for every required field;
 - a clear statement that reviewed Story content is used as Description and approved ACs are mapped to the Acceptance Criteria field;
+- the full Jira-wiki rendered Description plus conversion validation confirming no raw Markdown heading markers remain outside code blocks;
 - a clear statement that `TEST_CASE.md`, planning, scoring, review reports and manifests are not exported;
 - attachment add/replace/delete plans with confirmed paths or filenames as appropriate;
 - attachment preflight status, including confirmation that `attachmentsJson` is a serialized JSON string and parses to the displayed plan;
 - full valid JSON payload; and
 - for batch, the one-call export statement and per-item identifiers.
 
-Request explicit confirmation. Ambiguous language does not authorise export. Regenerate the preview and obtain fresh confirmation after any payload-affecting change, including an attachment path, filename, operation, Workspace artefact, or serialized `attachmentsJson` value.
+Request final authorization through `request_user_approval`, bound to the exact displayed payload and final attachment bytes. `ask_user_question`, normal chat and ambiguous language do not authorise export. Regenerate the preview and obtain fresh approval after any payload-affecting change, including an attachment path, filename, operation, Workspace artefact, rendered Description, or serialized `attachmentsJson` value.
 
 ### Stage G — Export and report
 
-1. After explicit confirmation only, call `exportJiraByDynamicFields` once for the planned single or batch Issue write.
+1. After actual `request_user_approval` approval only, re-read the final payload and attachments and call `exportJiraByDynamicFields` with exactly the approved content.
 2. Do not automatically retry a failed call.
 3. For each successful item, repeat the path/filename consistency check if the Workspace artefact or plan changed after preview, then run its validated attachment operations after the Issue write result is known.
 4. On success, update `jira-user-info.md` with allowed non-secret reusable values only.

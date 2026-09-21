@@ -119,7 +119,7 @@ When Test Case source content contains Test Steps and Expected Results, assemble
 - Map the exact Expected Results source value to `result`.
 - Map the exact Test Data source value to `data`. Use an empty string only when the source row has no Test Data value and the active Jira Test Step contract requires the `data` key.
 - Preserve item order and wording. If `step`, `result`, `data`, `description`, or any other Jira-visible field contains numbered list items, keep each numbered item on its own line using `\n`; do not collapse `1. ... 2. ...` into one line.
-- Only convert line breaks to Jira-safe `<br>` when the active Jira tool requires it, and keep one break between each numbered item.
+- Do not convert source-based Test Case line breaks to literal `<br>` tags in any export mode. For `uploadType=multiple`, item `description` and every `testDetailsJson[].step`, `testDetailsJson[].data`, and `testDetailsJson[].result` value must keep required line breaks as newline characters (`\n` in JSON). For `uploadType=single`, the top-level table `description` must do the same. Normalize `<br>`, `<br/>`, `<br />` and escaped equivalents back to newline characters before preview and export.
 - If source step/result counts do not match, preserve all available content, mark the mismatch in the preview, and block export until the user corrects or explicitly provides a safe mapping.
 - Do not reconstruct `step`, `result`, or `data` from a preview summary, serialized JSON string, or prior response.
 

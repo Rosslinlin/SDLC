@@ -1,6 +1,6 @@
 {
   "schema_version": "enriched-agent.task/v2",
-  "display_name": "SDLC-workflow-v3",
+  "display_name": "SDLC-workflow-v4",
   "todo_list": [
     {
       "id": "classify-and-complete-intake",
@@ -37,13 +37,13 @@
         "Process candidates serially. Resolve current output paths, final SPEC basenames and attachment action before writing Story. Existing updates use source+ticketKey paths and preserve original baseline; distinct selected replacement contents get distinct current SPEC files and explicit mappings.",
         "Write complete STORY.md with exactly one standalone ## Acceptance Criteria heading, stable AC-001 IDs and Given/When/Then in each criterion. Do not use Acceptance Criteria and BDD Scenarios as the heading and do not duplicate criteria for the scorer.",
         "Immediately assess the actual saved Story using nodejs-base-mcp.score_requirement_markdown with its real workspace-relative relativePath. Normal invocation omits optional force_review and metadata, using documented cached default. Never send conversationId; workspace identity comes from the trusted request header. Explicit fresh-review requests follow the Skill's typed live-schema exception.",
-        "Extract the single JSON text content block and persist the full text verbatim at the current score-record path; if only the exact decoded object is exposed, preserve all fields and record complete-object-json. Do not build normalized evaluator input, implement a rubric, derive scores or use section_scores.overall_score.",
+        "Extract the single JSON text content block. Allocate the next unused .ceaia-work story-quality-score-attempt-<nnn>.md, render the supplied readable score-record template, and preserve the complete JSON text verbatim in its fenced json block. If only the exact decoded object is exposed, serialize every field once and record complete-object-json-in-markdown. Never overwrite an earlier completed attempt. Do not build normalized evaluator input, implement a rubric, derive scores or use section_scores.overall_score.",
         "Pass requires complete current persisted response, boolean ok=true and finite numeric finalScore>=76 within 0–100, with no unresolved AC recognition or parser issue. ok=true/finalScore=36 does not pass. Preserve both newer diagnostic fields and observed scoreBreakdown/dimensions/warnings/details when returned.",
         "Compare available acCount and dimensions.sizingSplit.acCount against actual distinct Story AC declarations. No Acceptance Criteria section found, parseErrors or conflicting counts blocks downstream generation. Correct a noncanonical heading as a format defect; if canonical content still fails recognition, request technical recovery rather than inventing requirements or endlessly rescoring.",
         "First generation must not create Test Case/SPEC before score PASS. A repair may leave stale current files in place but must invalidate their readiness. Supported content defects share the candidate's three-round score/review repair budget; missing facts ask immediately. Never rescore identical current Story without a documented freshness exception.",
         "After score PASS generate executable TEST_CASE.md with original columns, accurate scenario types, P0/P1/P2 and one negative disposition per AC. Manually inspect every title for standalone or and actual alternative splits. To Confirm is draft-only and blocks final readiness.",
         "Generate primary and any distinctly required update SPECs from active templates. Preserve supplied metadata and approved design references; embed current Story and executable test table, and retain source-specific attachment obligations.",
-        "Overwrite current generated Story/tests/SPEC/score/review, never create historical Story copies. Keep compact state and original source evidence. Perform the generation Skill's text-only verification checklist by reading actual files with existing tools, then return nextAction=independent-review."
+        "Keep outputs/ceaia Story, Test Case and SPEC paths as the latest files and replace them after supported repairs; never create historical deliverable copies. Preserve every numbered plan, score and later review record in the candidate .ceaia-work directory, while compact state points to the latest applicable records. Perform the generation Skill's text-only verification checklist by reading actual files with existing tools, then return nextAction=independent-review."
       ],
       "completion_criteria": [
         "Every selected candidate has a current successful score and resolved parser integrity.",
@@ -63,19 +63,19 @@
       "instructions": [
         "Load ceaia-spec-review only now. For each review use a fresh read-only subagent through the platform agent capability; provide actual original sources, active templates, plan, state, Story, full score response, tests, every SPEC and update baseline/manifest/attachments. Never replace independent review with generator self-approval.",
         "Reviewer checks SCORE including parser integrity, STRUCTURE, COVERAGE/INVEST, STORY, TESTS, SPEC and UPDATE. It must not invoke scoring, edit artifacts, ask the user or write Jira.",
-        "Persist only the latest review.md per candidate and compact aggregate status. Keep monotonic reviewAttempt and cumulative aiSelfRepairCount counters, not numbered full historical review documents.",
+        "Persist every completed review in a monotonically numbered .ceaia-work file such as review-attempt-001.md or the same attempt's post-repair verification record. Never overwrite an earlier review. Keep compact aggregate state pointing to the latest applicable record, plus reviewAttempt and cumulative aiSelfRepairCount counters.",
         "Classify owner and smallest affected file set. SPEC-only problems repair SPEC; test-only problems repair tests and SPEC embedding; only changed Story content need a new score. Missing business facts require immediate focused ask_user_question.",
         "Generation owns all repairs. Score-driven and review-driven content repair share three rounds per candidate/current evidence revision. Each round is one consolidated edit then affected verification; no second edit inside post-repair verification. A failed review does not restart the whole task.",
         "After two consecutive no-progress repair verifications or exhaustion of three rounds, stop automatic editing. At most one useful read-only diagnosis may follow. Ask for evidence, correction, environment fix, explicit finite extra rounds, defer or stop. Cosmetic edits never reset budget; substantive new evidence resets only affected candidates with a recorded reason.",
         "Perform one bounded read-based formatting/check cycle before review when needed. Fix platform-owned formatting, names, exact embedding and accidental internal leakage without presenting them as missing business facts. Repeated mechanical failure requires technical diagnosis.",
         "Every finding uses a complete workspace-relative path and actual line when known, evidence, impact and targeted action. Preserve compatibility report fields, sizing decision, source coverage and each SPEC's reviewed binding.",
-        "On PASS synchronize only each SPEC's review header and read back final file content and record fileRevision; header synchronization alone requires no new Story score or substantive review. Verify global coverage from original evidence across all selected candidates.",
+        "On PASS synchronize only the Result and Reviewer Notes header in every intended SPEC, identify the latest review attempt in Reviewer Notes, then immediately read back each complete file. Compare both fields to the numbered PASS report, confirm the body is unchanged, record fileRevision and specHeaderSync=verified. One targeted header-only retry is allowed after a write/read mismatch; a second mismatch is WAITING_TOOL and blocks jiraReady. Header synchronization alone requires no new Story score or substantive review. Verify global coverage from original evidence across all selected candidates.",
         "Proceed automatically to Jira preparation only after all selected candidates have current independent PASS and global coverage passes. No continue prompt; no Jira approval inferred from review. Explicit stop is unresolved termination, not successful delivery."
       ],
       "completion_criteria": [
         "Every selected artifact set and every intended replacement SPEC has a current independent PASS.",
         "Current score/parser evidence, source coverage, baseline preservation and complete mapping agree.",
-        "Repair counters and exceptions are recorded without historical document copies.",
+        "Repair counters and exceptions are compact in state, while numbered score/review/diagnostic records are retained without historical Story/Test Case/SPEC copies.",
         "All headers and final upload bindings are current and the original requirement set has no unsupported omissions."
       ],
       "depends_on": [
@@ -87,13 +87,14 @@
       "content": "Prepare and execute the explicitly approved Jira operation",
       "active_form": "Preparing exact Jira payloads and obtaining final authorization",
       "instructions": [
-        "Load ceaia-sdlc-only-jira-push-content. Select ceaia_story_spec_export for new reviewed Stories or ceaia_story_spec_update for existing tickets. Do not route to jira-createissue-helper; its future migration is outside this task.",
-        "Validate actual current score/parser, review, global coverage and every final upload binding. Do not rewrite approved business content inside export; return affected defects to generation and then required review.",
+        "Load jira-createissue-helper and enter its dedicated sdlc-gateway.md before any generic create, update or batch route. Require handoffType=ceaia-sdlc-validated. A failed SDLC gate must not fall back to another helper flow.",
+        "Validate the actual current Markdown score record and raw JSON block, latest numbered review, verified SPEC-header synchronization, global coverage and every final upload binding. Do not rewrite approved business content inside export; return affected defects to generation and then required review.",
         "Collect missing mode-specific destination and supported fields, reuse confirmed sources and resolve attachment ambiguity. New Stories include their matching SPEC. Explicit new Epic-plus-Stories requests use the preserved combined branch; never create an Epic implicitly.",
         "Existing updates change only supported description, expressly supported replacement summary and selected attachment replacements. Description-only/zero-attachment none is valid. Multiple selected attachments may map to distinct reviewed files in one ticket's attachments.replace array; do not collapse them.",
-        "Show exact per-target preview, full description, metadata/links, readable attachment changes and original→replacement mappings. Exclude standalone TEST_CASE.md, internal score JSON, planning/state/review files and diagnostics from Jira payloads.",
-        "Serialize complete actual payloads once. Obtain request_user_approval bound to every exact requestJson and final upload bytes in execution order. ask_user_question or ordinary chat is not final approval. Any approved-content change invalidates approval.",
-        "Use java-base-mcp.pushJiraContent for creation or java-base-mcp.updateJiraTicket for updates, with exactly one top-level requestJson string argument. Await asynchronous approval by yielding; act only on the actual approved decision.",
+        "Create a transport-only Jira-wiki rendering of each exact reviewed STORY.md. Preserve business text and ordering, but convert Markdown headings such as ## Title to h2. Title, list markers, fenced code and inline code according to the SDLC gateway. Never edit STORY.md. Block if raw Markdown headings remain outside code blocks or if rendering changes meaning.",
+        "Show the exact per-target preview, full Jira-wiki rendered description, metadata/links, conversion validation, readable attachment changes and original→replacement mappings. Exclude standalone TEST_CASE.md, internal score records, planning/state/review files and diagnostics from Jira payloads.",
+        "Serialize complete actual exportJiraByDynamicFields payloads once. Obtain request_user_approval bound to every exact payload and final upload bytes in execution order. ask_user_question or ordinary chat is not final approval. Any approved-content or rendering change invalidates approval. Preserve each numbered approval-attempt record in .ceaia-work while jira-preview.md remains the single current preview.",
+        "After actual approval, re-read the exact payload and attachments, then use java-base-mcp.exportJiraByDynamicFields with the approved content. Await asynchronous approval by yielding; act only on the actual approved decision.",
         "Execute updates one ticket at a time. At a failed/partial/unknown result pause remaining writes, record known issue-vs-attachment outcomes and reconcile remote state before offering a supported, newly approved recovery. Never replay successful creation or upload to fix only an unfinished step.",
         "Rejected/unavailable approval, failures and partial/unknown outcomes remain resumable waiting states. Ask focused correction/recovery/defer/stop choices; do not spin or declare success. Report each actual returned key/URL, attachment outcome and unattempted target separately."
       ],
@@ -108,7 +109,7 @@
       ]
     }
   ],
-  "description": "CEAIA SDLC v3: preserve business capabilities; generate canonical-AC Stories, assess the saved Markdown with the external tool, create executable tests/SPECs, run independent review with bounded targeted repairs, and perform only explicitly approved Jira writes. Store current generated artifacts only. Pure-text instructions and data only; no scripts or hash-computation prerequisite.",
+  "description": "CEAIA SDLC v4: preserve business capabilities; generate canonical-AC Stories; save each external score as readable Markdown with complete raw JSON; retain numbered .ceaia-work audit records while outputs stay latest-only; create executable tests/SPECs; enforce verified SPEC review-header synchronization; then use jira-createissue-helper's dedicated SDLC gateway for Jira-wiki rendering and explicitly approved Jira writes. Pure-text instructions and data only; no scripts or hash-computation prerequisite.",
   "skills": [
     {
       "skill_id": "96c6bb68-ab4c-4a34-a634-3fb5c66c96d8",
@@ -119,17 +120,21 @@
       "skill_name": "ceaia-spec-review"
     },
     {
-      "skill_id": "9ab0d7ef-4696-4a92-a43d-ab64ee7639e0",
-      "skill_name": "ceaia-sdlc-only-jira-push-content"
+      "skill_id": "REPLACE_WITH_PLATFORM_JIRA_CREATEISSUE_HELPER_SKILL_ID",
+      "skill_name": "jira-createissue-helper"
     }
   ],
   "tools": [
-    "java-base-mcp.pushJiraContent",
+    "java-base-mcp.queryJiraProjectsByName",
+    "java-base-mcp.queryJiraIssueTypesByProject",
+    "java-base-mcp.queryJiraCreateMetaFields",
+    "java-base-mcp.exportJiraByDynamicFields",
     "java-base-mcp.getJiraInfos",
     "java-base-mcp.fetchConfluenceContent",
     "java-base-mcp.fuzzyMatchingConfluence",
     "java-base-mcp.readJiraAttachments",
-    "java-base-mcp.updateJiraTicket",
+    "ask_user_question",
+    "request_user_approval",
     "nodejs-base-mcp.score_requirement_markdown"
   ]
 }

@@ -1,6 +1,6 @@
 # SDLC Handoff Validation
 
-Reference version: 1.1.0
+Reference version: 1.2.0
 
 Used by: `flow-sdlc-validated-handoff.md`
 
@@ -32,11 +32,13 @@ Validate the following logical fields before Jira payload assembly. The fields m
 | `storyPath` | Yes | Yes | Must point to reviewed `STORY.md`. |
 | `storyContent` | Yes | Yes | Must exactly equal the reviewed `STORY.md` content after line-ending normalization only. |
 | `testCasePath` | Yes | Yes | Must point to `TEST_CASE.md`; audit only, never exported. |
-| `specPath` | Yes | Yes | Must point to exactly one reviewed story-named SPEC. |
-| `specFileName` | Yes | Yes | Must match `specPath`, use lowercase kebab-case, and be consistent with Story/review evidence. |
+| `specPath` | Yes | Conditional | Create: exactly one reviewed story-named SPEC. Update: primary reviewed SPEC when the manifest has an add/replace operation; optional for `attachmentAction=none`. |
+| `specFileName` | Yes | Conditional | Must match `specPath`, use lowercase kebab-case unless an explicit safe filename exception was reviewed, and agree with Story/review evidence. |
+| `specArtifacts` | Optional | Yes | Complete current reviewed SPEC register. Updates may contain multiple distinct replacement SPECs only when each has an explicit original-to-output mapping and independent PASS binding. |
 | `reviewResult` | Yes | Yes | Must equal `PASS`. |
 | `jiraReady` | Yes | Yes | Must be `true`. |
 | `testCaseTitleValidation` | Yes | Yes | Must equal `manual-pass`. |
+| `specHeaderSync` | Yes | Yes | Must show every intended SPEC synchronized to the latest PASS review attempt and successfully read back. |
 | `ticketKey` | No | Yes | Must exactly identify the requested current Jira ticket. |
 | `updateReady` | No | Yes | Must be `true`. |
 | `attachmentOperations` | Optional | Optional | Must comply with Section 6. |
@@ -45,13 +47,14 @@ Validate the following logical fields before Jira payload assembly. The fields m
 
 Before querying create metadata or constructing an update payload, validate all of the following:
 
-1. Exactly one `STORY.md`, one `TEST_CASE.md`, and one reviewed story-named SPEC are present for each handoff item.
+1. Exactly one `STORY.md` and one `TEST_CASE.md` are present for each handoff item. A create has exactly one reviewed story-named SPEC. An update has the complete current SPEC register: zero uploads for `attachmentAction=none`, or every explicitly mapped add/replace SPEC; distinct reviewed replacement contents remain distinct files.
 2. The Story, Test Case, SPEC, review report, and update manifest, when applicable, agree on the exact SPEC filename.
 3. The review report contains a clean `PASS`, `jiraReady: true`, and `testCaseTitleValidation: manual-pass` for the same artefact paths.
 4. For update items, the review report contains `updateReady: true`, the exact ticket key, the exact title, and the applicable attachment replacement mapping.
 5. `TEST_CASE.md`, planning, scoring, review reports, and manifests are internal/audit artefacts only. They must not become Jira attachments or be inserted into Jira Description.
-6. The SPEC is the only standard SDLC attachment. A handoff with multiple proposed SPEC files for one Story is invalid.
+6. SPEC files are the only standard SDLC attachments. Multiple SPECs for one update are valid only when the approved update manifest maps each selected original attachment to a distinct reviewed output where required; unselected local SPECs are not uploaded. A new Story still has exactly one matching SPEC.
 7. The Story must not contain workspace paths, source IDs, URLs, planning references, review operations, or `TEST_CASE.md` attachment/reference in Jira-visible content.
+8. Every final SPEC's first two review-header fields match the latest PASS and reviewer notes, identify the latest review attempt where the active template records it, and have a successful post-synchronization read-back. A PASS report or `jiraReady` flag alone cannot waive this check.
 
 Any failed item blocks that item. In an integrated batch, report the blocked items and do not build a write payload until all selected items pass the relevant gate.
 
@@ -59,7 +62,7 @@ Any failed item blocks that item. In an integrated batch, report the blocked ite
 
 ### 4.1 Description
 
-Use the reviewed `STORY.md` content as Jira Description. Do not summarise, regenerate, paraphrase, or append a second Acceptance Criteria section. Only transport-safe line-ending normalisation is permitted.
+Use the reviewed `STORY.md` as the sole semantic source for Jira Description. Create a transport-only Jira-wiki rendering according to `sdlc-gateway.md`: convert presentation syntax, including Markdown headings to `h1.` through `h6.`, without summarising, regenerating, paraphrasing, reordering or changing criteria. Do not modify `STORY.md` and do not append a second Acceptance Criteria section.
 
 ### 4.2 Summary
 
@@ -139,15 +142,18 @@ Block the SDLC payload and export when any of the following applies:
 - review result is not `PASS`;
 - `jiraReady` is not `true`;
 - `testCaseTitleValidation` is not `manual-pass`;
+- any intended SPEC lacks verified synchronization to the latest PASS review attempt;
 - an update item lacks `updateReady: true`;
 - a required artefact is missing, inconsistent, or not reviewed;
 - Story content does not match the reviewed Story artefact;
-- there is zero or more than one SPEC for a Story;
+- a create has zero or more than one SPEC, or an update's selected attachment mappings and complete reviewed `specArtifacts` register disagree;
 - the Jira Acceptance Criteria field is absent, non-writable, hidden, disabled, or ambiguous;
 - any required Jira field cannot be safely resolved and the user has not provided a valid value;
 - an attachment add/delete/replace operation lacks valid path, mapping, or authorisation;
 - an upload path is missing, unreadable, changed, inconsistent with the reviewed SPEC, or not confirmed in the applicable Workspace scope;
 - `attachmentsJson` is not a string containing the validated serialized attachment plan; or
 - Jira metadata or existing-ticket information cannot be confirmed.
+
+Also block if the Jira-bound Description still contains raw Markdown headings outside code blocks, if a Jira-wiki conversion changes business meaning, or if the current preview/approval is bound to a different rendered Description.
 
 Never downgrade a blocked SDLC handoff to generic create, update, or batch export.

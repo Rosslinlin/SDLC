@@ -8,6 +8,7 @@ Also load:
 
 - `common-tools-and-inputs.md`
 - `common-state-and-user-info.md`
+- `common-project-issue-type-validation.md`
 - `common-field-assembly.md`
 - `common-preview-confirm-export.md`
 - `common-guardrails.md`

@@ -1,6 +1,6 @@
 # Review input, ownership and verdict contract
 
-Shared workflow-contract.md owns current-only paths, read-back/revision checks, invalidation and repair budget. Do not duplicate or override that policy here.
+Shared workflow-contract.md owns latest-output paths, retained numbered internal records, read-back/revision checks, invalidation and repair budget. Do not duplicate or override that policy here.
 
 ## Inputs
 
@@ -23,7 +23,7 @@ FAIL is a gate result, never the overall reviewResult.
 
 Classify each finding by owner: generation, technical or user; affected artifact; evidence; business impact; concrete fix; storyChangeRequired; invalidated gates. A SPEC-only defect must not prescribe Story rewrite/rescoring. Harmless preference changes are not blockers.
 
-Parent persists only latest report and updates compact current state. Reviewer never writes even in a standalone review invocation; return the report to the caller.
+Parent persists every completed report at a new monotonically numbered path and updates compact current state to reference the latest applicable report. Reviewer never writes even in a standalone review invocation; return the report to the caller.
 
 ## Repair eligibility
 
@@ -37,4 +37,4 @@ Do not recommend more identical retries, lower the score threshold, discard ACs 
 
 Return reviewResult, mode, identity, artifact paths, gateResults, scoreGate, reviewedBindings, findings, repair scope, title validation, jiraReady/updateReady, attachmentAction/mapping, userActionRequired/userRequestedEvidence and recommendedNextAction as specified by report template.
 
-Score facts stay in this internal report/state, not SPEC notes or update manifest. Parent synchronizes verdict header and reads back the final attachment and records its fileRevision. Candidate PASS does not claim Jira approval, export, or whole-batch completion.
+Score facts stay in this internal report/state, not SPEC notes or update manifest. Parent synchronizes the verdict header in every intended SPEC, immediately reads back the complete files, records the review attempt and each fileRevision, and keeps jiraReady=false until all header checks are verified. Candidate PASS does not claim Jira approval, export, or whole-batch completion.
