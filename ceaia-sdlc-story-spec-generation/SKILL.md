@@ -5,7 +5,7 @@ description: Generate or update evidence-backed CEAIA Stories, apply the Story s
 
 # CEAIA Story and SPEC Generation
 
-Bundle revision: 4.1.0 text-only — 2026-09-21.
+Bundle revision: 4.2.0 text-only — 2026-09-22.
 
 Own intake, planning, generation, current-state persistence and evidence-supported repairs. The independent reviewer is `ceaia-spec-review`; Jira writes belong to the dedicated SDLC gateway in `jira-createissue-helper`.
 
@@ -17,7 +17,7 @@ This Skill is the mandatory first Skill for the bundled SDLC workflow. At entry,
 2. `ceaia-spec-review` performs the independent read-only review only after the candidate artifact set is complete.
 3. `jira-createissue-helper` runs only after every selected candidate has current PASS and verified SPEC-header synchronization, and only through its dedicated SDLC gateway.
 
-If the user's initial request ends with “push to Jira”, “export to Jira” or equivalent, treat that as the requested final outcome of this sequence. Do not load the helper, search Jira projects, query issue types, or ask destination-field questions during initial intake. Record `jiraExportRequested: true` in workflow state and defer Jira destination resolution until the reviewed handoff reaches step 3. A preparation-only caller may still stop before Jira as described below.
+The bundled SDLC workflow is end-to-end by default. Whether or not the user's initial input says “push to Jira”, “export to Jira” or equivalent, set `jiraExportRequested: true` and continue through Jira create/update after every selected candidate passes review and SPEC-header synchronization. Do not load the helper, search Jira projects, query issue types, ask for Epic Link, or ask other destination-field questions during initial intake; defer all Jira destination resolution until the reviewed handoff reaches step 3. Stop after workspace artefacts only when the user explicitly requests preparation-only/no-Jira output, explicitly stops, or the caller explicitly declares the whole workflow preparation-only. A task's internal generation-only stage partition does not change `jiraExportRequested` and does not opt the whole workflow out of its later Jira stage.
 
 ## Load for the current phase
 
@@ -44,7 +44,7 @@ For each candidate:
 6. Run mechanical checks and independent read-only `ceaia-spec-review` against actual evidence. A fresh read-only subagent or task-provided independent reviewer satisfies this; do not duplicate it or substitute generator self-approval. If no independent review capability is available, return WAITING_TOOL.
 7. Persist every review in the next unused numbered `.ceaia-work` record, point state to the latest review, classify repairs by affected file, and apply the shared budget. Story changes require a new numbered score record; unchanged Story does not.
 8. Synchronize every intended SPEC review header after the verdict, immediately read back and verify the header against the latest PASS, then check global source coverage across the selected batch. A failed header sync blocks jiraReady.
-9. When all selected targets have current PASS, continue to `jira-createissue-helper`'s dedicated SDLC gateway for Jira-wiki rendering, final preview/preflight and direct Jira export, unless assigned a preparation-only stage.
+9. When all selected targets have current PASS, continue automatically to `jira-createissue-helper`'s dedicated SDLC gateway for Jira-wiki rendering, SDLC destination confirmation, final preview/preflight and direct Jira export. Absence of Jira-export wording is not a stopping condition. Stop before Jira only for an explicit preparation-only/no-Jira request, explicit stop, or whole-workflow preparation-only assignment; an internal task stage boundary is not such an assignment.
 
 ## Invocation boundary
 
@@ -56,6 +56,6 @@ Resume from validated current state on every entry; do not unconditionally repea
 
 Return current artifact paths, candidate statuses, blockers and one concrete next action. Findings use complete workspace-relative paths and known lines. Source paths, scores and workflow state stay out of Jira-facing content.
 
-Use `ask_user_question` only for missing business facts, unresolved Jira selections or supported recovery choices. If that tool is unavailable, explain once and return the exact question with a waiting state; do not loop. The validated SDLC gateway has no separate approval-tool step: after its final preview, payload/read-back checks and attachment preflight pass, it calls the Jira export tool directly.
+Use `ask_user_question` only for missing business facts, unresolved Jira selections, the SDLC defaults confirmation or supported recovery choices. If that tool is unavailable, explain once and return the exact question with a waiting state; do not loop. The validated SDLC gateway has no separate approval-tool step: after its final preview, payload/read-back checks and attachment preflight pass, it calls the Jira export tool directly.
 
 Preparation completion is distinct from whole-workflow success. Whole-workflow success requires all intended writes confirmed, or explicit user stop. Waiting is a resumable pause.

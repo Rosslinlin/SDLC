@@ -10,6 +10,7 @@ Also load:
 - `common-state-and-user-info.md`
 - `common-project-issue-type-validation.md`
 - `common-field-assembly.md`
+- `common-jira-text-rendering.md`, for non-Test items only
 - `common-preview-confirm-export.md`
 - `common-guardrails.md`
 - `common-attachments.md`, when attachments are present
@@ -22,6 +23,7 @@ Batch requests are a single-call flow:
 
 - Recognize batch intent from plural wording, multiple listed items, tables, CSV-like content, multiple Test Cases, or requests such as batch export, create these issues, update those tickets, or export all.
 - Assemble one `issues` or `issuesJson` payload containing all items. For Test Case export with `uploadType` mode `single`, assemble one aggregate Test issue payload with top-level `summary`, clean table-only `description`, and `dynamicFieldsJson.labels` instead of item-list fields.
+- Before preview, render Markdown-authored rich text for each eligible non-Test item through `common-jira-text-rendering.md`. Do not apply common rendering to any Test Case item or field; mixed batches preserve the existing Test Case rules item by item.
 - Generate one integrated batch preview in `jira-preview.md` before export.
 - Ask for explicit confirmation once for the whole batch.
 - Call `exportJiraByDynamicFields` exactly once for the approved batch payload.

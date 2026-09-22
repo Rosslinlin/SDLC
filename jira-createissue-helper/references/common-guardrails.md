@@ -30,19 +30,22 @@
 - **Jira update metadata:** If the project key, issue type, or field rule cannot be confirmed, block the update and do not call `exportJiraByDynamicFields`.
 - **Association update:** Do not call `exportJiraByDynamicFields` before source Jira is read, metadata validation is complete, and association payload is shown.
 - **Batch export:** Do not call `exportJiraByDynamicFields` once per item. Assemble one `issues` or `issuesJson` payload, preview the whole batch, confirm once, and call the tool once.
+- **Non-Test text rendering:** For generic create, update and batch items, do not submit recognized Markdown presentation syntax in eligible Jira rich-text fields. Apply `common-jira-text-rendering.md`, preview the exact Jira-wiki transport value, and verify meaning is unchanged. Never apply this rule to Test Case routes/items/fields.
 - Do not skip user confirmation when user information is obvious.
 - **Validated SDLC exception:** The two confirmation rules above do not add a confirmation step to `ceaia-sdlc-validated`. That route follows `sdlc-gateway.md`: complete the final preview/read-back/preflight and call `exportJiraByDynamicFields` directly. This exception does not alter generic or Test Case behavior.
 - When Jira/tool returns an error, show only the sanitized error and ask whether to revise.
 
-## User Info Persistence Guardrails
+## SDLC-Only User Info Persistence Guardrails
 
-- Persist reusable user info only after a successful Jira create/export/update response.
-- Store only non-secret values such as `staffId`, `almType`, project key/name, issue type name/id, latest operation type, and successful ticket keys.
-- Do not store Jira tokens, passwords, authentication headers, full issue descriptions, or raw sensitive payloads in `jira-user-info.md`.
-- Do not update persisted user info after a failed Jira write unless the values were already validated and the user explicitly asks to save them.
+- Only the validated SDLC route may read or write `jira-user-info.md`. Generic create, update, association, batch and Test Case routes must not use it.
+- Persist SDLC defaults only after a successful SDLC Jira create/export/update response.
+- Store only the non-secret SDLC values allowed by `common-state-and-user-info.md`, including the validated Epic Link or explicit no-Epic decision.
+- Do not store Jira tokens, passwords, authentication headers, full issue descriptions, or raw sensitive payloads.
+- Do not write new persisted values after a failed, partial or unknown Jira result.
 
 ## Test Case Guardrails
 
+- Do not load or apply `common-jira-text-rendering.md` to Test Case routes, Test issue items, Test Case table descriptions or execution fields. The Test Case rules below remain the sole transport authority.
 - When the user asks to export Test Cases to Jira, execute `flow-testcase-source-export.md` as the authoritative workflow. Do not route source-based Test Case export through generic create or batch payload assembly.
 - Require a user-selected `uploadType` mode for Test Case export. Valid mode values are only `single` and `multiple`.
 - Do not collect `uploadType` as free text. Use constrained labels: **Group into a single ticket** -> `single`, and **Create individual tickets** -> `multiple`.

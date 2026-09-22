@@ -1,4 +1,4 @@
-# CEAIA SDLC v4.1
+# CEAIA SDLC v4.2
 
 本目录是 v4 独立版本，不覆盖 v3。
 
@@ -16,6 +16,8 @@
 4. 导入 task，确认 tools 列表中的评分工具位于最后。
 5. 按 `PLATFORM-TEST-CHECKLIST.md` 先跑一个新 Story 和一个现有 Jira 更新场景。
 
-SDLC 路由在最终 `jira-preview.md`、payload read-back 和附件 preflight 通过后直接调用 `exportJiraByDynamicFields`，不依赖额外审批工具。普通 Helper 与 Test Case 路由仍保留各自原有确认流程。
+SDLC 默认执行完整 generation → score → review → Jira create/update 链路，即使初始输入没有写 push/export。`jira-user-info.md` 仅供 SDLC 使用：首次创建主动收集 Epic Link/明确无 Epic，后续运行先复验并确认配置。最终 `jira-preview.md`、payload read-back 和附件 preflight 通过后直接调用 `exportJiraByDynamicFields`，不依赖额外审批工具。
+
+普通非 Test Jira create/update/batch 会把 Markdown rich text 转换为 Jira wiki transport syntax；Test Case 路由完全保留其原有专用格式、换行与 payload 规则。
 
 详细变化见 `RELEASE-NOTES.md`。

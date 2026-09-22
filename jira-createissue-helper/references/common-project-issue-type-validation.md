@@ -2,7 +2,7 @@
 
 ## Project Lookup
 
-When collecting or validating a project, first load reusable values from conversation context, user workspace context, and `jira-user-info.md`.
+When collecting or validating a project, first load reusable values from conversation context and ordinary user-workspace context. Load `jira-user-info.md` only when the active route is the validated SDLC gateway; generic create, update, batch, association and Test Case routes must not read it.
 
 If the user already provided a project name, project key, or project keyword, still call `queryJiraProjectsByName` first to validate that the project exists unless an already selected project remains valid and the user did not ask to change it.
 
@@ -23,7 +23,7 @@ After project query results return:
 - If the user's provided project clearly matches one returned project, store that project and continue without asking for a project popup again.
 - If multiple returned projects could match the user's provided project, generate a dynamic project popup from the actual returned results. Do not ask the user to choose by replying in normal chat.
 - If there are zero results, collect another `projectName` search keyword through the allowed popup input and do not continue to issue type lookup.
-- If there is exactly one result and no explicit or stored exact project was supplied, confirm it through a project popup before continuing. If a current user request or validated `jira-user-info.md` SDLC default already names that exact returned key/name, store it and continue without another popup.
+- If there is exactly one result and no explicit or stored exact project was supplied, confirm it through a project popup before continuing. If a current user request names that exact returned key/name, store it and continue without another project-selection popup. A validated `jira-user-info.md` exact match may provide the same shortcut only inside the SDLC route, but the later-run SDLC defaults confirmation remains mandatory before preview.
 - When selection or confirmation is needed, each popup option must include at least project key and project name.
 
 Any project popup must:

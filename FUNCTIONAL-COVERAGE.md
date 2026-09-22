@@ -14,9 +14,13 @@
 | Jira metadata / project / issue type | helper common modules | 动态 popup、不得 chat 替代所需选择 |
 | Jira final preview / preflight | helper SDLC gateway | `jira-preview.md` 当前版；完整 payload/附件复读后直接导出 |
 | Jira routing state | generation + helper | `handoffType` 仅内部路由，禁止发送到 Jira MCP |
-| Jira user defaults | helper | 成功后更新 user workspace 的 `jira-user-info.md`，下次先复用再询问 |
+| Jira user defaults | helper SDLC gateway | 成功后更新 SDLC-only `jira-user-info.md`，下次复验并要求一次配置确认 |
+| SDLC 默认完整链路 | generation + task | 没有 push/export 字样也在 review PASS 后自动进入 Jira create/update |
+| Generic Jira rich text | helper common rendering | 非 Test Markdown 生成 Jira wiki transport copy；源文档不修改 |
+| SDLC user defaults boundary | helper SDLC gateway | `jira-user-info.md` 仅 SDLC 读写；首次问 Epic，后续复验并确认 |
 | Jira write | helper | `exportJiraByDynamicFields`，失败/partial/unknown 可恢复但不自动重试 |
-| Generic helper flows | helper original modules | 不被 SDLC gateway 改写 |
+| Generic helper flows | helper original modules | 仅增加非 Test rich-text transport rendering；原确认与业务路由不变 |
+| Test Case flows | helper Test Case modules | 不读取 SDLC user info，不应用通用转换，专用 payload/换行规则不变 |
 
 ## Active package contents
 

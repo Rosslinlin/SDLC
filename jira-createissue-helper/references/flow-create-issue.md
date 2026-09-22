@@ -10,6 +10,7 @@ Also load:
 - `common-state-and-user-info.md`
 - `common-project-issue-type-validation.md`
 - `common-field-assembly.md`
+- `common-jira-text-rendering.md`
 - `common-preview-confirm-export.md`
 - `common-guardrails.md`
 
@@ -42,7 +43,8 @@ Follow `common-state-and-user-info.md` before any popup.
 3. Query and select issue type according to `common-project-issue-type-validation.md`.
 4. Call `queryJiraCreateMetaFields` with `staffId`, `almType`, selected `projectKey`, and selected `issueType` or `issueTypeId`.
 5. Assemble required fields, optional fields, summary, description, labels, and `dynamicFieldsJson` according to `common-field-assembly.md`.
-6. Write `jira-preview.md`, show the conversational preview, ask for confirmation, submit, and handle results according to `common-preview-confirm-export.md`.
+6. For a non-Test issue, render Markdown-authored Jira-visible rich text according to `common-jira-text-rendering.md`. Do not apply that module to Test Case content or fields.
+7. Write `jira-preview.md`, show the exact transport-rendered values in the conversational preview, ask for confirmation, submit, and handle results according to `common-preview-confirm-export.md`.
 
 ## User Story Generation Requirements
 

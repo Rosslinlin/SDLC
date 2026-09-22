@@ -9,6 +9,7 @@
 
 ## 场景 A：新 Story 正常链路
 
+- [ ] 初始输入不包含 push/export 字样时，review PASS 后仍自动进入 Jira create/update 阶段。
 - [ ] Story 只有一个 `## Acceptance Criteria`，AC 使用稳定编号和 Given/When/Then。
 - [ ] 评分后产生 `story-quality-score-attempt-001.md`，可读摘要与 raw JSON 一致。
 - [ ] score PASS 后才生成 Test Case 和 SPEC。
@@ -40,6 +41,8 @@
 - [ ] 有序/无序列表层级保持。
 - [ ] AC IDs、Given/When/Then 和业务文案没有改写或重排。
 - [ ] Workspace `STORY.md` 未因 Jira rendering 被修改。
+- [ ] 普通非 Test create/update/batch 的 Markdown rich text 也转换为 Jira wiki，并在 preview 展示准确 outgoing value。
+- [ ] 普通 update 只转换本次请求修改的字段，不重排未修改的现有字段。
 
 ## 场景 E：现有 Jira 更新
 
@@ -53,10 +56,13 @@
 - [ ] 普通 create/update/association/batch 不进入 SDLC gateway。
 - [ ] project/issue type 需要选择时使用 popup，而不是普通 chat。
 - [ ] Test Case Jira-visible 换行使用 newline，不出现 `<br>` 或 escaped equivalents。
+- [ ] Test Case route/item/table/Test Details 未加载或应用通用 Jira text rendering，现有 payload shape 与字段内容保持不变。
+- [ ] 普通 create/update/association/batch/Test Case 均不读取、创建或更新 `jira-user-info.md`。
 
 ## 场景 G：首次请求与用户工作区复用
 
-- [ ] 初次输入末尾包含 “push to Jira” 时，先运行 generation/score/review，不在 intake 阶段询问 project 或 Epic Link。
+- [ ] 无论初次输入是否包含 “push to Jira”，都先运行 generation/score/review，不在 intake 阶段询问 project 或 Epic Link，并在 PASS 后进入 Jira。
+- [ ] 第一次 SDLC create 在 Jira 阶段主动询问可验证的 Epic Link或明确的 no-Epic 选择。
 - [ ] 首次成功 SDLC 导出后，user workspace 的 `jira-user-info.md` 只有一个 CEAIA SDLC 默认配置区。
-- [ ] 下一次 SDLC 导出先读取并验证保存的 source、project、Story type、Epic/Parent Link；有效时不重复询问。
+- [ ] 下一次 SDLC 导出先读取并验证保存的 source、project、Story type、Epic/Parent Link，然后显示全部设置并要求一次 Use/Change 确认。
 - [ ] 保存值失效或用户明确变更时，只询问受影响字段并重新验证。

@@ -1,6 +1,6 @@
-# CEAIA SDLC Skill Bundle v4.1.0
+# CEAIA SDLC Skill Bundle v4.2.0
 
-发布日期：2026-09-21
+发布日期：2026-09-22
 
 ## 版本定位
 
@@ -68,9 +68,18 @@ v4 以 v3 为基线，将最后的 Jira 写入阶段从 `ceaia-sdlc-only-jira-pu
 - `jira-user-info.md` 增加 CEAIA SDLC 默认配置，可复用已验证的 source、project、Story type、Epic Link 和 Parent Link。
 - 初次请求即使包含“push to Jira”，仍先执行 generation → score → review，直到 Jira 阶段才读取或询问目的地字段。
 
+### 8. v4.2 默认全流程、通用文本转换与 SDLC 用户配置
+
+- SDLC 默认继续到 Jira create/update；初始输入没有 push/export 字样也不会在 review PASS 后停止。只有用户明确要求 preparation-only/no-Jira、明确停止或存在阻塞时才不进入 Jira 阶段。
+- 新增 `common-jira-text-rendering.md`，供普通非 Test create/update/batch 和 SDLC transport rendering 使用。Workspace 源文件不修改，preview 展示即将发送的 Jira wiki 文本。
+- Test Case 专用路由、Test issue item、表格、步骤、数据和预期结果明确排除在通用转换之外；`flow-testcase-source-export.md` 保持字节不变。
+- `jira-user-info.md` 改为 SDLC 专属。普通 create/update/association/batch/Test Case 不读取、不创建、也不更新该文件。
+- 首次 SDLC create 在 Jira 阶段主动询问并验证 Epic Link，或记录用户明确选择无 Epic；不会在 generation intake 提前询问。
+- 后续 SDLC 运行会先重新验证保存的 source/project/Story type/Epic/Parent，再要求一次“使用这些设置/修改设置”的配置确认。该确认不是最终写入审批，最终 preview/preflight 后仍直接导出。
+
 ## 未修改或保留的范围
 
-- `flow-create-issue.md`、`flow-update-issue.md`、`flow-associate-issue.md`、`common-attachments.md` 和 Test Case 专用资源未改写业务流程。共享工具契约只做了当前参数 schema 与 SDLC 分支边界修正。
+- `flow-create-issue.md`、`flow-update-issue.md` 和 `flow-batch-export.md` 只接入非 Test rich-text transport rendering；它们的业务路由、metadata、preview/confirmation 和写入规则不变。`flow-associate-issue.md`、`common-attachments.md` 和 Test Case 专用资源未改写业务流程。
 - 原始 `flow-testcase-source-export.md` 实际是 WPS/OLE 二进制文档而不是纯文本 Markdown。根据“不修改别人的 Test Case 流程”的要求，v4 中保持其字节和 SHA-256 不变；跨流程的换行保护已放到共享文本规则中。该遗留文件是否能被纯文本平台读取，需要在平台测试中单独确认。
 - 评分阈值仍为 `ok === true` 且 `finalScore >= 76`，并要求 AC/parser 完整性。
 - 三轮自动修复预算、无进展提前停止和用户授权额外有限轮次逻辑保持不变。

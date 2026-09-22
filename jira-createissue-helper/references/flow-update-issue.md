@@ -9,6 +9,7 @@ Also load:
 - `common-tools-and-inputs.md`
 - `common-state-and-user-info.md`
 - `common-field-assembly.md`
+- `common-jira-text-rendering.md`
 - `common-preview-confirm-export.md`
 - `common-guardrails.md`
 
@@ -57,10 +58,11 @@ After `getJiraInfos` succeeds:
 2. Summarize the proposed changes.
 3. Confirm the update field rules with `queryJiraCreateMetaFields` as described above.
 4. Assemble only fields that need changes and conform to the confirmed metadata rules.
-5. Include `CEAIA_GEN` according to `common-field-assembly.md`.
-6. Write or overwrite `jira-preview.md`.
-7. Wait for explicit user confirmation.
-8. Call `exportJiraByDynamicFields` only after both metadata confirmation and explicit user confirmation.
+5. For requested non-Test rich-text replacements authored in Markdown, create a Jira-wiki transport rendering according to `common-jira-text-rendering.md`. Do not reformat untouched fields and do not apply the module to Test Case content.
+6. Include `CEAIA_GEN` according to `common-field-assembly.md`.
+7. Write or overwrite `jira-preview.md` with both the source-to-transport conversion status and exact outgoing values.
+8. Wait for explicit user confirmation.
+9. Call `exportJiraByDynamicFields` only after both metadata confirmation and explicit user confirmation.
 
 Update intent itself is not submission confirmation.
 

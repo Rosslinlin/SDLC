@@ -12,6 +12,7 @@ The preview stage must include:
 - required-field status
 - optional fields
 - labels, including `CEAIA_GEN` when labels are included or changed
+- for every non-Test Markdown-authored rich-text value, the exact Jira-wiki transport rendering and conversion-validation status from `common-jira-text-rendering.md`
 
 Overwrite the same `jira-preview.md` whenever the preview changes. Do not create scattered preview Markdown files. Do not replace the payload JSON block with a separate payload file.
 
@@ -53,6 +54,7 @@ For new Jira issues, include:
 - issue type
 - generated `summary`
 - generated `description`
+- source-to-Jira rendering status for eligible non-Test rich-text fields
 - acceptance criteria, when applicable
 - required-field status
 - optional fields
@@ -64,6 +66,7 @@ For Jira updates, include:
 
 - current Jira information summary
 - proposed changes
+- source-to-Jira rendering status for each requested non-Test rich-text replacement; untouched fields are not reformatted
 - fields to update
 - labels
 - attachment preflight status, when `attachmentsJson` is used
@@ -83,6 +86,7 @@ For batch exports, include:
 - top-level defaults
 - item count
 - per-item summary, target project/type or `issueIdOrKey`, required-field status, labels, Test Details summary, and attachment operation summary
+- per-item rendering status for eligible non-Test rich text, with an explicit statement that Test Case items were excluded from common rendering
 - per-item attachment preflight status when attachments are used
 - complete batch `exportJiraByDynamicFields` payload with `issues` or `issuesJson` as a valid JSON code block
 - a clear note that the export tool will be called once for the whole batch after confirmation
@@ -195,7 +199,7 @@ For batch responses, show per-item `index`, `status`, `ticketKey`, `ticketUrl`, 
 
 For Test Case batch responses, preserve the selected Test Case to Jira issue mapping. For `uploadType: "multiple"`, show one result line per selected Test Case when a returned item has a Test Case ID and a Jira key or URL. For `uploadType: "single"`, show the selected Test Case ID list or aggregate identifier with the single returned Jira issue key or URL. Do not collapse sequential Jira keys into ranges or shorthand.
 
-After a successful create/export/update response, write or update the user info Markdown file described in `common-state-and-user-info.md`. The persistence must happen after the Jira write response succeeds, not before generic confirmation or before SDLC submission.
+After a successful validated SDLC create/export/update response, write or update the SDLC-only `jira-user-info.md` section described in `common-state-and-user-info.md`. Generic create, update, association, batch and Test Case routes must not read, create or update that file. SDLC persistence happens only after the Jira write succeeds, never before the SDLC defaults confirmation or submission.
 
 For attachment operations, report the Jira issue result and attachment result independently. Include the confirmed Workspace-relative path and filename used for each upload. Preserve the exact returned attachment transport error where safe to display.
 
@@ -204,4 +208,4 @@ On failure:
 - Show the sanitized Jira/tool error.
 - Ask whether the user wants to revise inputs or fields.
 - Do not resubmit the same payload unless the user explicitly requests a retry.
-- Do not update the user info Markdown file for a failed Jira write unless the values were already validated and the user explicitly asks to save them.
+- Do not update the SDLC user info Markdown file for a failed Jira write. Generic and Test Case failures have no `jira-user-info.md` persistence behavior.

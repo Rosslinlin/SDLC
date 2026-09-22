@@ -1,6 +1,6 @@
 # Flow SDLC Validated Handoff Export
 
-Flow version: 1.3.0
+Flow version: 1.4.0
 
 Applies to: reviewed CEAIA SDLC Story/SPEC handoffs
 
@@ -10,7 +10,7 @@ Required companion: `sdlc-handoff-validation.md`
 
 ## 1. Scope and priority
 
-Use this flow for an explicit reviewed CEAIA SDLC handoff that creates or updates Jira Stories and manages their approved attachments. This flow supports one item or multiple independent items.
+Use this flow for a reviewed CEAIA SDLC handoff that creates or updates Jira Stories and manages their approved attachments. In the bundled SDLC workflow the handoff is automatic after review PASS even when the opening user input did not mention Jira export. This flow supports one item or multiple independent items.
 
 This flow has priority over generic create, update and batch flows. It does not replace the dedicated Test Case source-export flow. If the SDLC validation gate fails, report the exact blocker and stop; do not regenerate content or route the request through a generic flow.
 
@@ -35,6 +35,7 @@ Read and apply:
 - `common-state-and-user-info.md`
 - `common-project-issue-type-validation.md` for creates
 - `common-field-assembly.md`
+- `common-jira-text-rendering.md`
 - `common-preview-confirm-export.md`
 - `common-guardrails.md`
 - `common-attachments.md`
@@ -44,9 +45,9 @@ Read and apply:
 
 ### Stage A — Identify and validate the SDLC handoff
 
-1. Confirm explicit SDLC handoff intent and identify all selected items.
+1. Confirm the internal validated SDLC handoff and identify all selected items. Do not require export wording or a second continue request; an explicit preparation-only/no-Jira instruction is the only normal opt-out.
 2. Classify each item as `create` or `update`; preserve item order and independent identity.
-3. Inspect conversation context, user workspace context and `jira-user-info.md` before asking for reusable staff ID, source, project, Story issue type, Epic Link or Parent Link. Prefer the validated `## CEAIA SDLC Jira Defaults` section and ask only for missing/stale values.
+3. Inspect conversation context and user workspace context. Because this is the validated SDLC route, also inspect `jira-user-info.md` before asking for reusable staff ID, source, project, Story issue type, Epic Link or Parent Link. No other helper route may read this file.
 4. Validate artifact/review gates using `sdlc-handoff-validation.md`. Destination fields marked “At export” are resolved in Stage B from user-workspace defaults or focused final-stage selection; their absence must not send the workflow back to initial generation intake.
 5. If any selected item fails validation, show the item-specific blocker. Do not construct a partial integrated batch payload unless the user explicitly removes the blocked item(s).
 
@@ -58,6 +59,7 @@ Read and apply:
 2. Otherwise validate project using `queryJiraProjectsByName` with direct `staffId`, `almType`, and `projectName` arguments; never invent a project key.
 3. Query issue types using `queryJiraIssueTypesByProject` with direct `staffId`, `almType`, and `projectKey` arguments, then select or validate the Jira-returned Story type required by the handoff.
 4. Retrieve create metadata using `queryJiraCreateMetaFields` with direct `staffId`, `almType`, `projectKey`, plus `issueType` or `issueTypeId`.
+5. If no SDLC defaults section existed before this run, proactively collect and validate an Epic Link or the explicit no-Epic decision. If a defaults section existed, revalidate its current values and obtain the one SDLC defaults confirmation defined in `common-state-and-user-info.md`. Do this before payload preview, not during generation intake.
 
 #### Update items
 
@@ -66,6 +68,7 @@ Read and apply:
 3. Verify the returned ticket identifier exactly matches the requested `ticketKey`.
 4. Obtain project and issue type from the returned current issue. Do not perform project search or issue-type discovery for an update.
 5. Retrieve current metadata using `queryJiraCreateMetaFields` and validate the proposed changed fields.
+6. If an SDLC defaults section existed before this run, revalidate and confirm the routing values relevant to this update. Preserve the ticket's current Epic/Parent fields unless the reviewed update explicitly authorises changing them; never apply the saved create default implicitly.
 
 ### Stage C — Build Story field mappings
 
@@ -129,6 +132,7 @@ Create or overwrite the sole preview file: `jira-preview.md`. It must include:
 - exact ticket key for update items;
 - artefact validation status: Story, Test Case audit-only status, one SPEC, review PASS, `jiraReady`, title validation and update readiness where applicable;
 - field provenance for every required field;
+- SDLC defaults status: first-run Epic Link/no-Epic decision or later-run validated user confirmation, including the exact project/type/Epic/Parent values used;
 - a clear statement that reviewed Story content is used as Description and approved ACs are mapped to the Acceptance Criteria field;
 - the full Jira-wiki rendered Description plus conversion validation confirming no raw Markdown heading markers remain outside code blocks;
 - a clear statement that `TEST_CASE.md`, planning, scoring, review reports and manifests are not exported;
@@ -173,7 +177,7 @@ These are structural examples only. Use actual validated metadata field IDs and 
 1. After the final preview/read-back/preflight passes, call `exportJiraByDynamicFields` immediately with exactly the displayed direct arguments.
 2. Do not automatically retry a failed call.
 3. For each successful item, repeat the path/filename consistency check if the Workspace artefact or plan changed after preview, then run its validated attachment operations after the Issue write result is known.
-4. On success, update the canonical `## CEAIA SDLC Jira Defaults` section in `jira-user-info.md` with allowed non-secret reusable values, including validated source, project, Story issue type and explicitly selected Epic/Parent Link defaults.
+4. On success, update the canonical SDLC-only `## CEAIA SDLC Jira Defaults` section in `jira-user-info.md` with allowed non-secret reusable values, including validated source, project, Story issue type and explicitly selected Epic/Parent Link defaults or the explicit no-Epic decision. No generic or Test Case route may perform this persistence.
 5. Report each item separately: handoff item identifier, operation, Jira key/URL, Issue-write status, attachment operation status and sanitised errors.
 6. For uploads, report the confirmed Workspace-relative path and filename used in the final plan.
 7. Never compress returned Jira keys into ranges.

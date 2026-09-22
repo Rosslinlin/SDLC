@@ -1,6 +1,6 @@
 # SDLC Handoff Validation
 
-Reference version: 1.3.0
+Reference version: 1.4.0
 
 Used by: `flow-sdlc-validated-handoff.md`
 
@@ -8,7 +8,7 @@ Purpose: Validate a reviewed CEAIA SDLC artifact set before Jira metadata assemb
 
 ## 1. Accepted Handoff Scope
 
-Accept this flow only for an explicit CEAIA SDLC validated handoff. A handoff may represent:
+Accept this flow only for a CEAIA SDLC validated handoff. The bundled end-to-end workflow produces it automatically after review PASS unless the user explicitly requests preparation-only/no-Jira output or stops. A handoff may represent:
 
 - one new Story;
 - multiple new Stories;
@@ -25,10 +25,11 @@ Validate the following logical fields before Jira payload assembly. The fields m
 | --- | --- | --- | --- |
 | `handoffType` | Yes | Yes | Set automatically by the bundled workflow. Internal routing metadata only; must equal `ceaia-sdlc-validated` and must be removed before every Jira MCP call. |
 | `operation` | Yes | Yes | Must equal `create` or `update`. |
-| `staffId` | At export | At export | Resolve in the helper from current context or `jira-user-info.md`; do not require generation intake to collect it. |
+| `staffId` | At export | At export | Resolve in the helper from current context or, only for this SDLC route, `jira-user-info.md`; do not require generation intake to collect it. |
 | `source` / `almType` | At export | Yes | Create may resolve it from validated SDLC defaults or final helper selection. Updates retain the explicitly confirmed ticket source from intake. Never infer it. |
 | `projectKey` / project selection | At export | From current issue | Create resolves and validates project in the helper; update obtains project from `getJiraInfos`. |
 | `issueType` | At export | From current issue | Create validates the saved/default Story type in the helper; update obtains current type and confirms metadata. |
+| `epicLinkDecision` | At export | Preserve current unless authorised | First SDLC create collection requires a validated Epic key or explicit no-Epic decision. Later SDLC runs require confirmation of the revalidated saved decision before preview. A saved default never changes an update target implicitly. |
 | `storyPath` | Yes | Yes | Must point to reviewed `STORY.md`. |
 | `storyContent` | Yes | Yes | Must exactly equal the reviewed `STORY.md` content after line-ending normalization only. |
 | `testCasePath` | Yes | Yes | Must point to `TEST_CASE.md`; audit only, never exported. |

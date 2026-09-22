@@ -20,6 +20,8 @@ Use this module for Jira MCP tool responsibilities, required base inputs, and Ji
 
 Do not start the full creation flow only to explain static Jira fields unless the user explicitly wants to create, export, update, or generate a payload afterward.
 
+For generic non-Test create, update and batch writes, render Markdown-authored Jira-visible rich text through `common-jira-text-rendering.md` before preview and export. This requirement does not apply to Test Case routes/items/fields, which retain their dedicated source and newline/table contracts.
+
 ## Base Inputs
 
 All Jira write operations require at least:

@@ -65,7 +65,7 @@
   },
   "jiraReady": false,
   "updateReady": false,
-  "jiraExportRequested": false,
+  "jiraExportRequested": true,
   "exportPreparation": {
     "status": "not-prepared",
     "exportAttempt": 0,

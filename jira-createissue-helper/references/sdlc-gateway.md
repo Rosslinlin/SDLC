@@ -1,12 +1,12 @@
 # CEAIA SDLC Jira Gateway
 
-Gateway version: 1.1.0 — v4
+Gateway version: 1.2.0 — v4
 
 This is the controlling entry point for a `ceaia-sdlc-validated` handoff. It adds SDLC-specific validation, Jira rendering, preview, direct export and recovery rules without changing the helper's generic create, update, batch, association or Test Case flows.
 
 ## 1. Routing boundary
 
-Enter this gateway only when the user explicitly requests Jira export/update of reviewed CEAIA SDLC artifacts, or the handoff declares `handoffType: ceaia-sdlc-validated`.
+Enter this gateway when the handoff declares `handoffType: ceaia-sdlc-validated`. The bundled SDLC workflow creates that handoff automatically after review PASS whether or not the user's opening input mentioned Jira export. An explicit preparation-only/no-Jira request or explicit stop suppresses the handoff.
 
 `handoffType` is an internal routing discriminator. Retain it in workflow state/handoff validation, but strip it before every Jira MCP call. It is not exposed by the Jira tool schema and must never appear in tool arguments, `dynamicFieldsJson`, `attachmentsJson`, or `issuesJson`.
 
@@ -48,6 +48,8 @@ Any failure blocks only the affected item unless an integrated batch cannot safe
 
 Build a separate Jira-bound Description from the exact reviewed Story. Preserve section order, text, AC IDs, Given/When/Then wording, lists, links and meaning. Keep `STORY.md` unchanged.
 
+Apply the non-Test transport rules in `common-jira-text-rendering.md` plus the stricter SDLC rules in this section. If they overlap, this gateway's reviewed-Story preservation and Acceptance Criteria mapping rules control. The common module's Test Case exclusion remains absolute.
+
 Outside fenced code blocks, convert Markdown presentation syntax deterministically:
 
 | Workspace Markdown | Jira wiki payload |
@@ -61,6 +63,9 @@ Outside fenced code blocks, convert Markdown presentation syntax deterministical
 | nested ordered list | repeat `#` for the nesting level |
 | fenced code block | `{code}` block, preserving its body exactly |
 | inline code `` `value` `` | `{{value}}` |
+| `[label](https://example)` | `[label|https://example]` |
+| Markdown block quote | `bq. ` line |
+| Markdown table header/body | Jira `|| header ||` and `| cell |` rows; omit the Markdown separator row |
 
 Additional rules:
 
@@ -110,7 +115,9 @@ Write or replace the single current `jira-preview.md`. Include:
 - complete final `exportJiraByDynamicFields` payload;
 - a statement that the displayed payload and final attachment bytes are the exact content that will be submitted.
 
-No approval capability is part of this workflow. Do not replace it with a final `ask_user_question` popup. The user's SDLC export intent was captured by the bundled workflow, and the reviewed handoff plus this final preflight authorise the direct tool call within that requested scope. `ask_user_question` remains available only for missing required values, ambiguity and recovery choices.
+No approval capability is part of this workflow. Do not replace it with a final `ask_user_question` popup. The user's SDLC export intent is established by the bundled end-to-end workflow, and the reviewed handoff plus this final preflight authorise the direct tool call within that requested scope. `ask_user_question` remains available only for missing required values, the SDLC defaults confirmation, ambiguity and recovery choices.
+
+The SDLC defaults confirmation required for a later run is not a final-write approval popup. Complete it before generating the final preview. After that routing confirmation and final preview/read-back succeed, call Jira directly without another confirmation.
 
 Before export, save a numbered internal record such as `.ceaia-work/jira/jira-export-attempt-001.md` containing the preview binding, exact tool arguments, serialized payload values, attachment revisions, preflight result and eventual Jira response. Never overwrite a completed export-attempt record. `jira-preview.md` remains the single current user preview; the numbered record is internal audit history and is never sent to Jira.
 

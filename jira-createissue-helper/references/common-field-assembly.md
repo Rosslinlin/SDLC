@@ -114,6 +114,8 @@ If the user provides additional labels, merge and de-duplicate them while always
 
 ## JSON Structure Mapping
 
+Before mapping Jira-visible text into direct parameters or `dynamicFieldsJson`, apply `common-jira-text-rendering.md` to Markdown-authored rich text in generic non-Test create, update and batch routes. Keep source and rendered values separate and map only the previewed rendered transport value. Never apply common rendering to a Test Case route, Test issue item, Test Case table, or Test Details/execution field; the existing Test Case modules remain authoritative.
+
 Direct parameters:
 
 - `project` / `projectKey` -> `projectKey`
@@ -140,6 +142,7 @@ For batch create/update, apply the same field assembly rules to each item, then 
 - For update items, validate the effective payload after inheritance against the Mandatory Empty-Value Contract. Do not let defaults modify unrequested fields; relocate such defaults to the intended items instead.
 - Unknown item fields such as `labels`, `components`, `fixVersions`, and `customfield_xxxxx` are treated as dynamic Jira fields for that item.
 - Item-level attachments or attachment operations must not be merged into Jira dynamic fields.
+- Apply common Jira text rendering independently to eligible non-Test items only. In a mixed batch, do not inherit a rendered non-Test description into a Test Case item and do not transform any Test Case field.
 - Use `testDetailsJson` per item for Test Case steps.
 - Do not call `exportJiraByDynamicFields` once per item; assemble all item fields into one batch payload.
 
