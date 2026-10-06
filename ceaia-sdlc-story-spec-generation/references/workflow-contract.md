@@ -15,7 +15,7 @@ Each new candidate owns one Story, Test Case and SPEC. Each update ticket owns o
 | planningPath | <internalRoot>/plan-revision-<nnn>.md | <internalRoot>/plan-revision-<nnn>.md |
 | storyPath | <outputRoot>/STORY.md | <outputRoot>/STORY.md |
 | testCasePath | <outputRoot>/TEST_CASE.md | <outputRoot>/TEST_CASE.md |
-| specPath | <outputRoot>/<final-spec-name>.md | <outputRoot>/<final-spec-name>.md |
+| specPath | <outputRoot>/<name>-spec.md | <outputRoot>/<name>-spec.md |
 | scoreRecordPath | <internalRoot>/story-quality-score-attempt-<nnn>.md | <internalRoot>/story-quality-score-attempt-<nnn>.md |
 | reviewPath | <internalRoot>/review-attempt-<nnn>.md | <internalRoot>/review-attempt-<nnn>.md |
 | statePath | <internalRoot>/state.json | <internalRoot>/state.json |
@@ -23,7 +23,9 @@ Each new candidate owns one Story, Test Case and SPEC. Each update ticket owns o
 
 Determine final SPEC name before Story scoring. Internal references use complete workspace-relative paths. Jira-facing Story names only the intended uploaded SPEC, or explicitly states no attachment change.
 
-Default SPEC basename is short lowercase kebab-case. An explicit user-requested safe .md basename may override that default; retain the actual confirmation and exact name in explicitSpecFileNames. This exception does not allow unsafe paths or invented filenames.
+Every generated SPEC, including a workspace-only SPEC for an update with attachmentAction=none, must have the exact basename `<name>-spec.md`. `<name>` is a non-empty reviewed Story/business-function name in lowercase kebab-case; validate the complete basename against `^[a-z0-9]+(?:-[a-z0-9]+)*-spec\.md$`. Multiple distinct SPECs for one update need distinct evidenced business-function names before the fixed suffix. There is no filename exception for `SPEC.md` or another `.md` basename. If an explicitly requested filename conflicts, resolve a compliant name before Story scoring rather than silently creating or uploading an alias.
+
+The actual Workspace filename is canonical. Keep paths.specPath, every specArtifacts.path/fileName, the SPEC File Name field, planning, Story attachment names when uploaded, standalone Test Case Related SPEC path, update manifest/replacement mappings, review bindings, and upload plan consistent with that file. Final user-facing messages must read back and report the same actual filename/path; never display a planned or shortened name as if it were the saved file.
 
 Jira source is WPB, ALM, DATA, FCR or GO, explicitly confirmed per target. Validate safe path components; reject separators/traversal in ticket/slug components. Do not silently relocate older workspace artifacts: explicitly map and revalidate earlier work when adopting it.
 
@@ -81,6 +83,7 @@ Normalized workflow facts are separate from the complete current score response;
 | Any Story content | score, tests/SPEC alignment, review, readiness, preview/export binding | score current Story; repair affected downstream |
 | Test Case content | SPEC test embedding, review, readiness, export binding | fix tests; synchronize SPEC; review |
 | Any primary/additional SPEC body | affected SPEC review, cross-artifact review, readiness, export binding | affected SPEC checks and review |
+| SPEC filename/path or reference change | affected artifact references, review/readiness and export binding; score if STORY.md text changes | synchronize actual file and every reference, then revalidate affected gates |
 | Accurate review-header synchronization only | final SPEC file revision and export binding | bind final file; no score or review rerun |
 | Business source/scope or attachment selection | affected planning/content/preservation review/readiness/export binding | impact analysis; rescore only if Story changes |
 | Jira routing-only field | destination compatibility and export binding | destination checks/preview; review if business/mapping changes |

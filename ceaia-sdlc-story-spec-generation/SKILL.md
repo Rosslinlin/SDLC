@@ -5,7 +5,7 @@ description: Generate or update evidence-backed CEAIA Stories, apply the Story s
 
 # CEAIA Story and SPEC Generation
 
-Bundle revision: 4.2.0 text-only — 2026-09-22.
+Bundle revision: 4.2.1 text-only — 2026-10-06.
 
 Own intake, planning, generation, current-state persistence and evidence-supported repairs. The independent reviewer is `ceaia-spec-review`; Jira writes belong to the dedicated SDLC gateway in `jira-createissue-helper`.
 
@@ -37,7 +37,7 @@ If a ticket to be read lacks an explicitly confirmed source, the next interactio
 
 For each candidate:
 1. Inventory evidence, resolve material gaps and create planning trace. Updates preserve original ticket baseline and complete attachment intake.
-2. Determine identity, exact paths, final SPEC filename and attachment action before writing Story. Naming a future file is allowed; creating Test Case/SPEC before the first passing Story score is not.
+2. Determine identity, exact paths, a compliant `<name>-spec.md` filename for every intended SPEC and attachment action before writing Story. Naming a future file is allowed; creating Test Case/SPEC before the first passing Story score is not.
 3. Write the complete Story with exactly `## Acceptance Criteria` and stable AC IDs containing Given/When/Then. Invoke `nodejs-base-mcp.score_requirement_markdown` with its workspace-relative path; omit optional force_review for documented cache behavior.
 4. Only a complete current score with boolean `ok: true`, numeric `finalScore >= 76` and no unresolved parser/AC-recognition blocker opens Test Case generation. A 36 score with ok=true is not PASS.
 5. Generate Test Case, validate titles and executable coverage, then assemble SPEC from current sibling content. Updates may require multiple distinctly reviewed replacement SPECs; preserve each explicit attachment mapping.
@@ -54,7 +54,7 @@ Resume from validated current state on every entry; do not unconditionally repea
 
 ## Output and waiting
 
-Return current artifact paths, candidate statuses, blockers and one concrete next action. Findings use complete workspace-relative paths and known lines. Source paths, scores and workflow state stay out of Jira-facing content.
+Return current artifact paths, candidate statuses, blockers and one concrete next action. For every SPEC mentioned in the final conversation, read back the actual saved file and use its exact basename and Workspace path; the displayed name must match the saved SPEC, its internal File Name field and current state. Do not show a planned, abbreviated or old name as the final artifact. Findings use complete workspace-relative paths and known lines. Source paths, scores and workflow state stay out of Jira-facing content.
 
 Use `ask_user_question` only for missing business facts, unresolved Jira selections, the SDLC defaults confirmation or supported recovery choices. If that tool is unavailable, explain once and return the exact question with a waiting state; do not loop. The validated SDLC gateway has no separate approval-tool step: after its final preview, payload/read-back checks and attachment preflight pass, it calls the Jira export tool directly.
 

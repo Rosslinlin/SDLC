@@ -3,7 +3,7 @@
 Use core-review-gates.md as the authority for definitions. Every row must have current evidence in the report, not a copied tick.
 
 - [ ] SCORE: complete genuine persisted response, correct current Story/response binding, boolean ok=true and numeric finalScore>=76; no AC recognition/parser blocker; optional service checksum interpreted correctly.
-- [ ] STRUCTURE: mode-specific planning and current files present; templates, names, attachment action and metadata valid.
+- [ ] STRUCTURE: mode-specific planning and current files present; every actual generated SPEC uses `<name>-spec.md` (including update/none), has a matching internal File Name and current references/mappings; templates, attachment action and metadata valid.
 - [ ] COVERAGE: original evidence checked, candidate SR trace complete, supported decomposition/preservation, honest coverage layers, global omissions surfaced.
 - [ ] STORY: exactly ## Acceptance Criteria with inline BDD, supported actor/value/scope, stable AC IDs, no invented rules or internal leakage.
 - [ ] TESTS: every AC/FR executable, accurate types/priorities, one negative disposition per AC, no unresolved To Confirm, no material duplicates.

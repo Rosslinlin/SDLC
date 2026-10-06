@@ -6,7 +6,7 @@ Use this checklist with the actual saved files and the platform's existing tools
 
 1. Confirm candidate identity and full workspace-relative paths; reject absolute paths, URL schemes and traversal.
 2. Read the complete saved Story. Check exactly one heading `## Acceptance Criteria`, distinct AC-001-style IDs and Given/When/Then for every criterion. Count the declared criteria by reading them, not by counting cross-references.
-3. Check source support, scope, final SPEC filename and attachment action. Record the observed storyRevision; invalidate any result associated with changed content.
+3. Check source support, scope, every planned SPEC filename against the mandatory `<name>-spec.md` rule, and attachment action. Record the observed storyRevision; invalidate any result associated with changed content.
 4. Submit this saved Story using the real scoring tool. Keep it unchanged during the call.
 
 ## After the score call
@@ -18,7 +18,7 @@ Use this checklist with the actual saved files and the platform's existing tools
 
 ## Before independent review
 
-1. Read Story, Test Case and every primary/additional SPEC using their full paths. Confirm the intended inventory and per-original replacement mapping.
+1. Read Story, Test Case and every primary/additional SPEC using their full paths. Confirm every actual saved basename ends in the required `-spec.md` form, is unique where content differs, and matches the SPEC File Name field, state, planning, sibling references, intended upload plan and per-original replacement mapping. This also applies to a workspace-only update SPEC with no attachment change.
 2. Check active template headings and supplied metadata. Compare embedded Story and test table with the saved sibling text section-by-section/row-by-row, not just by filename.
 3. Check SR→AC→FR→TC references, missing requirements, duplicate IDs and unsupported additions. Validate original 11 test columns, scenario types and priorities against the template.
 4. Read every title for standalone “or” and semantic alternatives. Split only supported distinct executable combinations. Give each AC exactly one negative disposition; unresolved To Confirm blocks readiness.
@@ -31,6 +31,6 @@ Use this checklist with the actual saved files and the platform's existing tools
 2. After substantive PASS, synchronize only the first two review-header fields in every intended SPEC, then immediately re-read each complete SPEC. Verify the Result and Reviewer Notes match the latest report, the body is unchanged, advance fileRevision, and record `specHeaderSync.status=verified` plus the review attempt and current full upload path. One targeted header-only retry is allowed after a write/read mismatch; a second mismatch is WAITING_TOOL and blocks jiraReady.
 3. Reconcile all selected candidates against original global source coverage. Never treat a missing candidate as implicitly excluded.
 4. Apply the shared workflow's final preview/read-back procedure to the complete request and every attachment immediately before sending. A content change invalidates affected gates and the export binding.
-5. If content cannot be read or safely associated, pause with the precise missing item; lack of a script engine or hash is not a blocker.
+5. If content cannot be read or safely associated, pause with the precise missing item; lack of a script engine or hash is not a blocker. Before the final user-facing response, read back each current SPEC path and display exactly that saved basename/path, with no stale planned filename.
 
 Independent source review, real score provenance, final export preflight and confirmed Jira outcomes remain separate requirements. Manual/read-based checks have weaker change-detection guarantees than an immutable platform version binding; never describe them as cryptographic verification.

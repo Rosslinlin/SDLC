@@ -78,3 +78,12 @@
 - [ ] 首次成功 SDLC 导出后，user workspace 的 `jira-user-info.md` 只有一个 CEAIA SDLC 默认配置区。
 - [ ] 下一次 SDLC 导出先读取并验证保存的 source、project、Story type、Epic/Parent Link，然后显示全部设置并要求一次 Use/Change 确认。
 - [ ] 保存值失效或用户明确变更时，只询问受影响字段并重新验证。
+
+## 场景 H：SPEC 文件名与对话一致
+
+- [ ] 新 Story 的实际 Workspace SPEC 文件名是 `<name>-spec.md`；SPEC 内的 File Name、Story 附件名、Test Case Related SPEC 和最终对话显示同一个真实文件。
+- [ ] 多个不同的更新替换 SPEC 使用不同的业务功能 `<name>`，每个文件都以 `-spec.md` 结尾，且与原附件到新文件的 mapping 一一对应。
+- [ ] `attachmentAction=none` 时，本地生成但不上传的 SPEC 仍使用 `<name>-spec.md`；Story 不误称它已上传。
+- [ ] 用户提出 `SPEC.md` 或 `<name>.md` 时，在评分前确定符合规则的名称；不生成不合规文件，也不靠上传时改显示名掩盖实际文件名。
+- [ ] 修复旧文件名时同步实际文件、内部 File Name、状态、Story/Test Case 引用、更新 manifest 和审查绑定；如 Story 内容变化则重新评分，并重新审查受影响内容。
+- [ ] 最终回复在读回实际 SPEC 后列出相同的文件名和路径，没有计划名、旧名或简称。

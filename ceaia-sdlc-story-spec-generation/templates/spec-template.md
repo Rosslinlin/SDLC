@@ -7,7 +7,7 @@
 
 # Feature Specification: [Story Title]
 
-- **SPEC File Name**: `final-story-name.md`
+- **SPEC File Name**: `final-story-name-spec.md`
 - **Branch**: [supplied branch; omit if unknown]
 - **Author**: [supplied author; omit if unknown]
 - **Date**: [actual date]
@@ -55,6 +55,7 @@
 The first standalone --- separates the review header from reviewed business content.
 Only Result and Reviewer Notes go above it. Reviewer Notes must identify the latest review attempt. Valid verdicts: Not Reviewed, PASS,
 NEEDS_REVISION, NEEDS_HUMAN_CLARIFICATION, FINAL_WITH_UNRESOLVED.
+The SPEC File Name value must equal the actual saved basename and follow <name>-spec.md for every generated SPEC.
 Copy Story and table rather than using separate embedded examples.
 Retain applicable supplied metadata; never fabricate values or silently omit supplied fields.
 Only the two approved design-link fields above may include intended business references.
