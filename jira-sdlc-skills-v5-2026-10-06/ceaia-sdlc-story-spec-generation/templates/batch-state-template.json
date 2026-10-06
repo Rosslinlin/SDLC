@@ -1,0 +1,17 @@
+{
+  "contractVersion": 4,
+  "selectedCandidateIds": [],
+  "candidates": [],
+  "globalCoverage": {
+    "status": "pending",
+    "inScopeSRIds": [],
+    "coveredSRIds": [],
+    "pendingSRIds": [],
+    "supportedExclusions": [],
+    "evidenceRevisionBindings": []
+  },
+  "jiraPreviewPath": "jira-preview.md",
+  "latestJiraExportRecordPath": null,
+  "executionOrder": [],
+  "writeResults": []
+}

@@ -1,5 +1,7 @@
 # CEAIA SDLC v4.2
 
+最新的独立版本：[CEAIA SDLC v5](jira-sdlc-skills-v5-2026-10-06/README.md)。以下内容说明仓库根目录保留的 v4.2 版本。
+
 本目录是 v4 独立版本，不覆盖 v3。
 
 活动 Skill：
