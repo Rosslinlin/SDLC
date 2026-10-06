@@ -1,8 +1,8 @@
 # CEAIA SDLC Jira Gateway
 
-Gateway version: 1.2.0 — v4
+Gateway version: 1.3.0 — v5
 
-This is the controlling entry point for a `ceaia-sdlc-validated` handoff. It adds SDLC-specific validation, Jira rendering, preview, direct export and recovery rules without changing the helper's generic create, update, batch, association or Test Case flows.
+This is the controlling entry point for a `ceaia-sdlc-validated` handoff. It adds SDLC-specific validation, Jira rendering, preview, direct export, post-write Markdown review ticket binding and recovery rules without changing the helper's generic create, update, batch, association or Test Case flows.
 
 ## 1. Routing boundary
 
@@ -28,6 +28,8 @@ The current reviewed workspace artifacts are authoritative:
 - `TEST_CASE.md`, plans, score records, review records, state and manifests never become Jira attachments;
 - Jira preparation must not repair, regenerate, summarize or silently omit approved business content.
 
+Every intended SPEC upload must already be named `<name>-spec.md`, with the reviewed lowercase kebab-case Story/business-function name and fixed suffix defined in `sdlc-handoff-validation.md` Section 2.1. This is a mandatory handoff condition, not an upload-time display-name transformation. A noncompliant name or stale filename mapping blocks export and must return to upstream preparation and independent review; do not silently rename the file or change only `fileName` in Jira arguments.
+
 If Story/SPEC content, attachment selection, ticket mapping, or a business-bearing Jira field must change, invalidate the current preview/export binding and return the affected artifact to generation and independent review. Jira-wiki rendering described below is a transport transformation and must not modify the workspace source files.
 
 ## 3. Pre-export gate
@@ -41,6 +43,7 @@ For every item, validate all of the following from actual current files and stat
 5. the first two SPEC header fields are synchronized to the latest PASS and the current review attempt, and the post-write read-back is recorded as successful;
 6. global source coverage for the selected batch is PASS;
 7. Story, SPEC filenames, operation, Jira source, ticket mapping and attachment mapping agree.
+8. every `add` or replacement upload satisfies the mandatory `<name>-spec.md` contract in `sdlc-handoff-validation.md` Section 2.1, with identical actual filename, reviewed path and upload `fileName`. Existing retained/deleted/replaced source attachments are not renamed by this check.
 
 Any failure blocks only the affected item unless an integrated batch cannot safely exclude it. Do not manufacture a PASS from a header or a state flag.
 
@@ -99,9 +102,9 @@ Call tools with direct named arguments, never a `requestJson` wrapper:
 - `queryJiraProjectsByName`: `staffId`, `almType`, `projectName`.
 - `queryJiraIssueTypesByProject`: `staffId`, `almType`, `projectKey`.
 - `queryJiraCreateMetaFields`: `staffId`, `almType`, `projectKey`, plus at least one of `issueType` or `issueTypeId`.
-- `exportJiraByDynamicFields`: `staffId` and `almType`, plus only the applicable exposed fields such as `projectKey`, `summary`, `issueType`, `description`, `projectName`, `epicName`, `epicLink`, `parentLink`, `dynamicFieldsJson`, `testDetailsJson`, `issueIdOrKey`, `conversationId`, `attachmentsJson`, `linkedIssueKeys`, `linkType`, or `issuesJson`.
+- `exportJiraByDynamicFields`: applicable exposed fields such as `staffId`, `almType`, `projectKey`, `summary`, `issueType`, `description`, `projectName`, `epicName`, `epicLink`, `parentLink`, `dynamicFieldsJson`, `testDetailsJson`, `issueIdOrKey`, `conversationId`, `attachmentsJson`, `linkedIssueKeys`, `linkType`, `issuesJson`, or `markdownReviewRelativePath`. The five-field SDLC binding call in Section 7 requires real values for all five of its fields regardless of generic optionality.
 
-For a single create, use direct create fields and a once-serialized `dynamicFieldsJson`; add the reviewed SPEC through a once-serialized `attachmentsJson`. For a single update, send `issueIdOrKey` plus only authorised changed fields. For multiple SDLC items, use one once-serialized JSON array string in `issuesJson`; do not send an `issues` argument that the exposed tool does not provide. Batch attachment operations stay inside their corresponding item. Never include `handoffType`, workflow status, score, review data or preview metadata in the export arguments.
+For a single create, use direct create fields and a once-serialized `dynamicFieldsJson`; add the reviewed SPEC through a once-serialized `attachmentsJson`. For a single update, send `issueIdOrKey` plus only authorised changed fields. For multiple SDLC items, use one once-serialized JSON array string in `issuesJson`; do not send an `issues` argument that the exposed tool does not provide. Batch attachment operations stay inside their corresponding item. The first create/update call must omit `markdownReviewRelativePath`: this v5 route explicitly waits for the returned ticket key and then makes a separate per-ticket binding call. Never include `handoffType`, workflow status, score, review data or preview metadata in either call's arguments.
 
 ## 6. Final preview and export binding
 
@@ -112,6 +115,7 @@ Write or replace the single current `jira-preview.md`. Include:
 - full Jira-rendered Summary, Description and Acceptance Criteria;
 - a Markdown-to-Jira-wiki conversion status with any syntax changes listed by type;
 - exact attachment add/replace/delete plan and preflight status;
+- for every upload, the exact `<name>-spec.md` filename and passing filename-contract/path/review consistency status;
 - complete final `exportJiraByDynamicFields` payload;
 - a statement that the displayed payload and final attachment bytes are the exact content that will be submitted.
 
@@ -123,10 +127,18 @@ Before export, save a numbered internal record such as `.ceaia-work/jira/jira-ex
 
 Immediately before the tool call, re-read the payload and every upload artifact. Any change to the rendered Description, metadata value, attachment mapping/path/content, operation order or target invalidates the preview binding. Regenerate `jira-preview.md`, repeat all affected checks and allocate the next export-attempt record before calling Jira.
 
-## 7. Write and recovery
+## 7. Jira write, second binding call and recovery
 
-After the final read-back/preflight succeeds, call `exportJiraByDynamicFields` immediately with the exact direct arguments shown in `jira-preview.md`. Do not add `handoffType`, do not wrap the arguments, and do not add omitted optional parameters after preview.
+After the final read-back/preflight succeeds, call `exportJiraByDynamicFields` immediately with the exact direct Jira-write arguments shown in `jira-preview.md`. Do not add `handoffType` or `markdownReviewRelativePath`, do not wrap the arguments, and do not add omitted optional parameters after preview.
+
+For each item whose Jira issue write and requested attachment operations are confirmed successful, read the actual returned `ticketKey` and bind it to that item's current scored Story in a second, separate `exportJiraByDynamicFields` call. For an update, verify the returned key equals the intended update ticket key. A missing, numeric-only, ambiguous or mismatched key blocks binding; do not guess from a URL or use a batch index as a key. For a batch, use each successful resource's own returned key and Story path; call separately for each eligible item, never use a top-level batch path or associate another item's result.
+
+The second call has **exactly five direct string arguments**, all non-empty and validated: `staffId`, `almType`, `issueIdOrKey` (the confirmed returned Jira ticket key), `conversationId` (the current conversation identity), and `markdownReviewRelativePath` (the same Workspace-relative `STORY.md` path submitted to `score_requirement_markdown` for this candidate's current passing score). Match the path against the current score record/raw response, candidate state and reviewed Story. Use the actual current conversation identity; request conversation headers may take precedence inside the tool, so do not invent an ID from a path or ticket. Do not pass `summary`, `description`, `dynamicFieldsJson`, `attachmentsJson`, `issuesJson`, links or any other Jira-change field. Omit unused arguments rather than filling them with empty placeholders. This five-field call is exclusive to the validated SDLC route.
+
+Once the first result supplies the key, replace the single current `jira-preview.md` with the exact five-field binding payload and its candidate/key/path association. Preserve the original Jira-write preview and result in its numbered internal export-attempt record, allocate a separate numbered record for the binding attempt, read back the binding preview, and then make the second call directly. Do not request another final confirmation popup. Store Jira-write/attachment and Markdown-review-binding outcomes separately in `writeResults`; never overwrite the original successful Jira response.
+
+Treat a binding response as successful only when its `markdownReview` result confirms the association. A `partial`, failed, malformed or unknown binding result leaves the already-created/updated Jira ticket intact and the candidate pending. Preserve its key/URL and exact binding attempt; never replay the first Jira write or attachment upload to repair only the binding. Do not automatically retry an uncertain second call. Reconcile the binding state, correct a documented validation error, and use a newly previewed binding-only attempt only after a supported recovery decision. A numeric `status=400` is a business validation failure even if the MCP envelope does not set `isError`.
 
 For multiple update targets, execute in the exact order shown in the final preview and pause after the first failed, partial or unknown result before attempting later targets. Record known issue-field and attachment outcomes separately. Do not automatically retry, replay a successful create, or delete an old attachment after a failed replacement upload.
 
-Whole-workflow success requires every intended operation to be confirmed successful by the Jira tool result, or the user to explicitly stop the remainder. Waiting, failed, partial and unknown outcomes are resumable states, not success.
+Whole-workflow success requires every intended Jira issue/attachment operation and every corresponding Markdown review ticket binding to be confirmed successful, or the user to explicitly stop the remainder. Waiting, failed, partial and unknown outcomes are resumable states, not success. Report the Jira key/URL and the two result categories separately for each item.

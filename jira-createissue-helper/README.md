@@ -13,6 +13,7 @@ A modular skill for create, update, batch, association, Test Case and validated 
 - Route validated CEAIA SDLC handoffs through a dedicated gateway without changing the generic business flows.
 - Render Markdown-authored Jira-visible rich text to Jira wiki syntax for non-Test create, update and batch items while leaving Workspace sources unchanged.
 - Keep `jira-user-info.md` exclusive to the validated SDLC route; first-run SDLC create collects Epic Link/no-Epic intent, and later runs confirm revalidated defaults.
+- For validated SDLC only, bind each confirmed Jira ticket to its scored Story Markdown with a separate five-field `exportJiraByDynamicFields` call after the Jira and requested attachment operations succeed. Preserve the Jira key if binding fails.
 
 ## Usage
 

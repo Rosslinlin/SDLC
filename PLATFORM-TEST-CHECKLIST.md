@@ -1,4 +1,4 @@
-# v4 Platform Test Checklist
+# v5 Platform Test Checklist
 
 ## 安装前
 
@@ -19,6 +19,9 @@
 - [ ] 最终 preview/read-back/preflight 通过后直接调用 `exportJiraByDynamicFields`，不出现额外批准等待。
 - [ ] 外层参数、`dynamicFieldsJson`、`attachmentsJson` 和 `issuesJson` 中均不存在 `handoffType`。
 - [ ] 批量 SDLC 使用 `issuesJson`，不发送未暴露的 `issues` 参数或 `requestJson` wrapper。
+- [ ] 第一次 Jira create 调用不包含 `markdownReviewRelativePath`；成功返回真实 Ticket Key 且要求的附件操作成功后，第二次才调用关联。
+- [ ] 第二次调用恰好包含非空 `staffId`、`almType`、`issueIdOrKey`、`conversationId`、`markdownReviewRelativePath` 五个直接参数；`issueIdOrKey` 等于第一次实际返回的 Ticket Key，路径等于本次 PASS 评分提交的 `STORY.md` 路径。
+- [ ] 第二次调用不含 Summary、Description、dynamicFieldsJson、attachmentsJson、issuesJson 或其他 Jira 变更字段；只在 `markdownReview` 返回确认成功后才将该项标记为完整成功。
 
 ## 场景 B：评分或 review 修复
 
@@ -50,6 +53,15 @@
 - [ ] 多个不同 replacement SPEC 保持独立 mapping，均有独立 review/header binding。
 - [ ] preview 显示 original→replacement mapping。
 - [ ] 第一个失败/partial/unknown 后暂停剩余更新，不重放已成功操作。
+- [ ] 更新成功后第二次调用使用返回且与目标一致的 Ticket Key；数据库关联失败时保留 Jira 已更新状态，不重发第一次更新。
+
+## 场景 E2：绑定、批量与恢复
+
+- [ ] 批量首次调用的成功项逐项用各自返回的 Key 和对应评分 Story 路径进行第二次调用；失败项不绑定，不交叉关联。
+- [ ] 首次 Jira 或附件操作失败/partial/unknown 的项目不进入绑定步骤。
+- [ ] 绑定返回 partial、失败、未知或业务 `status=400` 时分别记录 Jira/附件和绑定结果；保留 Key/URL，不重建 Ticket、不自动重试不确定的绑定、不宣布整体成功。
+- [ ] 首次写入预览和结果保留在编号内部记录；取得 Key 后，当前 `jira-preview.md` 展示并复读第二次调用的精确五字段 payload。
+- [ ] 普通 create/update/batch/association 和 Test Case 导出没有第二次评分关联调用。
 
 ## 场景 F：Helper 通用流程回归
 

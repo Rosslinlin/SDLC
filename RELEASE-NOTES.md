@@ -1,10 +1,18 @@
-# CEAIA SDLC Skill Bundle v4.2.0
+# CEAIA SDLC Skill Bundle v5.0.0
 
-发布日期：2026-09-22
+发布日期：2026-10-06
 
-## 版本定位
+## v5：Jira Ticket 与 Story 评分记录关联
 
-v4 以 v3 为基线，将最后的 Jira 写入阶段从 `ceaia-sdlc-only-jira-push-content` 替换为 `jira-createissue-helper` 的独立 SDLC gateway。活动链路为：
+在 v4.2 的 Jira create/update 调用及要求的附件操作确认成功、取得该项返回的 Ticket Key 后，`jira-createissue-helper` 的 SDLC gateway 才对该项执行第二次 `exportJiraByDynamicFields` 调用。第二次调用恰好使用五个真实非空字段：`staffId`、`almType`、`issueIdOrKey`（返回的 Ticket Key）、`conversationId`、`markdownReviewRelativePath`（本次 PASS 评分所用的 `STORY.md` 工作区相对路径）。第一次调用不带 `markdownReviewRelativePath`；第二次调用不带 Jira 内容、附件或批量字段。
+
+批量 Jira 返回按每项结果和路径分别关联。Jira 写入、附件、`markdownReview` 绑定结果分别留痕和报告；绑定失败或未知时保留已成功的 Ticket Key，不重建 Ticket、不重放已成功的 Jira 写入。所有绑定完成前不宣布整条流程成功。普通 Jira 和 Test Case 路由保持 v4.2 行为。
+
+v5 的 task 文件是 `SDLC-workflow-v5.task.json`。其 helper skill ID 仍须替换为平台上传后返回的实际 ID。
+
+## 继承的 v4.2 行为
+
+v4 以 v3 为基线，将最后的 Jira 写入阶段从 `ceaia-sdlc-only-jira-push-content` 替换为 `jira-createissue-helper` 的独立 SDLC gateway；v5 保留这条链路并增加上述第二次关联调用。活动链路为：
 
 1. `ceaia-sdlc-story-spec-generation`
 2. `ceaia-spec-review`
@@ -86,7 +94,7 @@ v4 以 v3 为基线，将最后的 Jira 写入阶段从 `ceaia-sdlc-only-jira-pu
 
 ## Task 使用前需要填写的值
 
-`SDLC-workflow-v4.task.json` 中 helper 的平台 skill ID 使用占位值：
+`SDLC-workflow-v5.task.json` 中 helper 的平台 skill ID 使用占位值：
 
 `REPLACE_WITH_PLATFORM_JIRA_CREATEISSUE_HELPER_SKILL_ID`
 

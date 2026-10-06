@@ -1,6 +1,6 @@
 {
-  "bundleVersion": "4.2.0",
-  "releaseDate": "2026-09-22",
+  "bundleVersion": "5.0.0",
+  "releaseDate": "2026-10-06",
   "executionProfile": "text-only",
   "activeSkills": [
     "ceaia-sdlc-story-spec-generation",
@@ -9,7 +9,7 @@
   ],
   "replacedSkill": "ceaia-sdlc-only-jira-push-content",
   "jiraGateway": "jira-createissue-helper/references/sdlc-gateway.md",
-  "taskFile": "SDLC-workflow-v4.task.json",
+  "taskFile": "SDLC-workflow-v5.task.json",
   "taskHelperSkillId": "REPLACE_WITH_PLATFORM_JIRA_CREATEISSUE_HELPER_SKILL_ID",
   "scoreRecordFormat": "numbered-markdown-with-complete-raw-json",
   "outputPolicy": "latest-deliverables",
@@ -17,9 +17,11 @@
   "specHeaderPolicy": "synchronize-readback-verify-before-jira-ready",
   "jiraDescriptionFormat": "jira-wiki-transport-rendering-for-sdlc-and-generic-non-test-rich-text",
   "jiraWritePolicy": "validated-sdlc-direct-export-after-final-preview-readback-preflight",
+  "markdownReviewBindingPolicy": "second-export-call-after-confirmed-jira-and-attachment-success-with-five-required-fields-per-ticket",
   "jiraRoutingProfile": "sdlc-only-user-workspace-jira-user-info.md-with-confirmation",
   "notes": [
     "No executable scripts are included.",
+    "v5 changes only the validated SDLC route and task contract; generic Jira and Test Case routes are preserved.",
     "The inherited flow-testcase-source-export.md is a byte-preserved WPS/OLE resource and requires a platform compatibility check."
   ]
 }

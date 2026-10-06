@@ -22,6 +22,7 @@
 - Do not duplicate required fields in `dynamicFieldsJson` when they are already covered by direct parameters.
 - Never submit `"."` or any fabricated placeholder for a missing parameter. Enforce the Mandatory Empty-Value Contract in `common-field-assembly.md` for top-level inputs, effective batch items/defaults, and dynamic fields before preview and immediately before submission; block export if unresolved placeholders remain.
 - Empty optional parameters must match the active schema and selected flow. Do not bypass required values, attachment plans, batch items, or Test Case steps with empties, or modify unrequested update fields. Preserve actual punctuation and periods in source evidence.
+- Do not rewrite export-ready Jira-visible business content. Apart from allowed transport formatting, schema mapping, JSON escaping and safe newline normalization, preserve source/user-approved wording, order, identifiers, table cells, steps, expected results and acceptance criteria. Generated content is allowed only in flows that create content from a raw request and must be previewed as generated.
 
 ## Export Guardrails
 

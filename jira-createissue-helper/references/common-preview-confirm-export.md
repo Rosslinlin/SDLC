@@ -12,6 +12,7 @@ The preview stage must include:
 - required-field status
 - optional fields
 - labels, including `CEAIA_GEN` when labels are included or changed
+- content provenance for Jira-visible fields: generated, source-preserved, transport-rendered, metadata-selected, user-provided, or unchanged
 - for every non-Test Markdown-authored rich-text value, the exact Jira-wiki transport rendering and conversion-validation status from `common-jira-text-rendering.md`
 
 Overwrite the same `jira-preview.md` whenever the preview changes. Do not create scattered preview Markdown files. Do not replace the payload JSON block with a separate payload file.
@@ -27,6 +28,18 @@ Before preview and again immediately before `exportJiraByDynamicFields`:
 5. Show intentional empty values, omitted unused parameters, and explicitly requested field clears in the preview. Submit exactly the normalized values that were approved; do not insert placeholders afterward.
 
 Block submission on any failed check. In a generic route, if a correction changes a confirmed payload, regenerate `jira-preview.md` and obtain fresh explicit confirmation using that route's confirmation mechanism. For SDLC, `sdlc-gateway.md` controls the stricter preview and direct-export preflight; regenerate the preview and repeat final read-back instead of invoking an approval tool.
+
+## Jira-Visible Content Integrity Preflight
+
+Before preview and again immediately before `exportJiraByDynamicFields`:
+
+1. Apply `common-field-assembly.md`'s Jira-Visible Content Preservation Contract to direct fields, `dynamicFieldsJson`, parsed `issuesJson`, parsed active `attachmentsJson` descriptions if any, and `testDetailsJson`.
+2. Verify source-derived or user-approved content has not been summarized, paraphrased, shortened, expanded, reordered, renumbered, merged, split, or replaced by a pointer.
+3. Verify all changes are limited to allowed transport formatting, field mapping, JSON serialization/escaping, schema formatting, and safe line-break normalization.
+4. Verify generated content is used only when the selected flow permits generation from a raw business request or unresolved required metadata, and that the generated value is shown in preview.
+5. Block export if any Jira-visible field contains unapproved rewritten business content or a placeholder/reference instead of the actual content.
+
+If this preflight changes any payload value, regenerate `jira-preview.md` and repeat the route's confirmation or SDLC read-back procedure before export.
 
 ## Attachment Payload Preflight in the Preview Gate
 
@@ -54,6 +67,7 @@ For new Jira issues, include:
 - issue type
 - generated `summary`
 - generated `description`
+- content provenance and whether the values are generated from a raw request or source-preserved
 - source-to-Jira rendering status for eligible non-Test rich-text fields
 - acceptance criteria, when applicable
 - required-field status
@@ -66,6 +80,7 @@ For Jira updates, include:
 
 - current Jira information summary
 - proposed changes
+- content provenance for each changed Jira-visible field and confirmation that untouched fields are unchanged
 - source-to-Jira rendering status for each requested non-Test rich-text replacement; untouched fields are not reformatted
 - fields to update
 - labels
@@ -86,6 +101,7 @@ For batch exports, include:
 - top-level defaults
 - item count
 - per-item summary, target project/type or `issueIdOrKey`, required-field status, labels, Test Details summary, and attachment operation summary
+- per-item content provenance and preservation status for Jira-visible fields
 - per-item rendering status for eligible non-Test rich text, with an explicit statement that Test Case items were excluded from common rendering
 - per-item attachment preflight status when attachments are used
 - complete batch `exportJiraByDynamicFields` payload with `issues` or `issuesJson` as a valid JSON code block

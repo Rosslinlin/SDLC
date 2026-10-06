@@ -19,6 +19,8 @@ Every attachment `add` or replacement upload must identify a Workspace-relative 
 5. For an SDLC handoff, also confirm that the path and filename exactly match the single reviewed SPEC and any applicable update manifest.
 6. Repeat the path/filename consistency check immediately before export if the attachment Workspace artifact changed since preview.
 
+The `<name>-spec.md` naming rule applies only to validated SDLC SPEC uploads. It does not restrict ordinary non-SLattachment names or rename existing Jira attachments retained or targeted for delete/replace. SLfilename corrections must follow the upstream preparation/review recovery in Section 2.1 of `sdlc-handoff-validation.md` before export resumes.
+
 Do not infer, normalize, relocate, or substitute an attachment path. A missing, unreadable, changed, inconsistent, or unconfirmed path blocks the attachment operation. Report the exact Workspace-relative path and the available failure detail, then request correction, a newly supplied path, or an explicit stop decision.
 
 Workspace readability is a mandatory local preflight. It does not guarantee that a later external Jira transport cannot fail, but it prevents submission of an attachment path that was not confirmed available in the Workspace.

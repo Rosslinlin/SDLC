@@ -1,4 +1,4 @@
-# v4 Functional Coverage
+# v5 Functional Coverage
 
 | 能力 | v4 归属 | 关键约束 |
 | --- | --- | --- |
@@ -19,6 +19,7 @@
 | Generic Jira rich text | helper common rendering | 非 Test Markdown 生成 Jira wiki transport copy；源文档不修改 |
 | SDLC user defaults boundary | helper SDLC gateway | `jira-user-info.md` 仅 SDLC 读写；首次问 Epic，后续复验并确认 |
 | Jira write | helper | `exportJiraByDynamicFields`，失败/partial/unknown 可恢复但不自动重试 |
+| Jira Ticket ↔ Story 评分记录关联 | helper SDLC gateway + task | 每个 Jira/附件操作成功并返回真实 Ticket Key 后，第二次仅用 staffId、almType、issueIdOrKey、conversationId、markdownReviewRelativePath 调用；单独记录 markdownReview 结果，失败不重建 Ticket |
 | Generic helper flows | helper original modules | 仅增加非 Test rich-text transport rendering；原确认与业务路由不变 |
 | Test Case flows | helper Test Case modules | 不读取 SDLC user info，不应用通用转换，专用 payload/换行规则不变 |
 
@@ -27,6 +28,6 @@
 - `ceaia-sdlc-story-spec-generation/`
 - `ceaia-spec-review/`
 - `jira-createissue-helper/`
-- `SDLC-workflow-v4.task.json`
+- `SDLC-workflow-v5.task.json`
 
 `ceaia-sdlc-only-jira-push-content` 不再是 v4 活动组件；回滚时使用 v3 包。

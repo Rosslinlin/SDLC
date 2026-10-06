@@ -1,6 +1,6 @@
 # Flow SDLC Validated Handoff Export
 
-Flow version: 1.4.0
+Flow version: 1.5.0
 
 Applies to: reviewed CEAIA SDLC Story/SPEC handoffs
 
@@ -137,6 +137,7 @@ Create or overwrite the sole preview file: `jira-preview.md`. It must include:
 - the full Jira-wiki rendered Description plus conversion validation confirming no raw Markdown heading markers remain outside code blocks;
 - a clear statement that `TEST_CASE.md`, planning, scoring, review reports and manifests are not exported;
 - attachment add/replace/delete plans with confirmed paths or filenames as appropriate;
+- each upload's exact `<name>-spec.md` filename and passing filename-contract status, including consistency with the actual Workspace file, handoff, latest review and applicable update manifest;
 - attachment preflight status, including confirmation that `attachmentsJson` is a serialized JSON string and parses to the displayed plan;
 - full valid JSON payload; and
 - for batch, the one-call export statement and per-item identifiers.
@@ -174,13 +175,14 @@ These are structural examples only. Use actual validated metadata field IDs and 
 
 ### Stage G — Export and report
 
-1. After the final preview/read-back/preflight passes, call `exportJiraByDynamicFields` immediately with exactly the displayed direct arguments.
+1. After the final preview/read-back/preflight passes, call `exportJiraByDynamicFields` immediately with exactly the displayed direct Jira create/update arguments, omitting `markdownReviewRelativePath` on this first call.
 2. Do not automatically retry a failed call.
 3. For each successful item, repeat the path/filename consistency check if the Workspace artefact or plan changed after preview, then run its validated attachment operations after the Issue write result is known.
-4. On success, update the canonical SDLC-only `## CEAIA SDLC Jira Defaults` section in `jira-user-info.md` with allowed non-secret reusable values, including validated source, project, Story issue type and explicitly selected Epic/Parent Link defaults or the explicit no-Epic decision. No generic or Test Case route may perform this persistence.
-5. Report each item separately: handoff item identifier, operation, Jira key/URL, Issue-write status, attachment operation status and sanitised errors.
-6. For uploads, report the confirmed Workspace-relative path and filename used in the final plan.
-7. Never compress returned Jira keys into ranges.
+4. After an item's issue write and requested attachments are confirmed successful, read that item's returned `ticketKey`; for an update verify it matches the intended key. Then follow `sdlc-gateway.md` Section 7: preview and read back a separate call containing exactly `staffId`, `almType`, `issueIdOrKey`, `conversationId`, and `markdownReviewRelativePath`, and call `exportJiraByDynamicFields` again. Use the candidate's current scored `STORY.md` path, not the internal score-record Markdown path. For a batch, make this second call once per successful item with that item's returned key and path.
+5. Record the Jira write/attachment outcome and the returned `markdownReview` binding outcome separately. If binding fails or is unknown, keep the successful Ticket Key and do not recreate/update the Jira content merely to retry the association. Do not mark the whole item complete until both required stages pass.
+6. On a confirmed successful Jira write, update the canonical SDLC-only `## CEAIA SDLC Jira Defaults` section in `jira-user-info.md` with allowed non-secret reusable values, including validated source, project, Story issue type and explicitly selected Epic/Parent Link defaults or the explicit no-Epic decision. No generic or Test Case route may perform this persistence.
+7. Report each item separately: handoff item identifier, operation, Jira key/URL, issue-write status, attachment operation status, Markdown review binding status and sanitised errors.
+8. For uploads, report the confirmed Workspace-relative path and filename used in the final plan. Never compress returned Jira keys into ranges.
 
 ## 5. Required-field user interaction
 

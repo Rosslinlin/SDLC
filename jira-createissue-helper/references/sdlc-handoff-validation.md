@@ -1,6 +1,6 @@
 # SDLC Handoff Validation
 
-Reference version: 1.4.0
+Reference version: 1.5.0
 
 Used by: `flow-sdlc-validated-handoff.md`
 
@@ -43,6 +43,18 @@ Validate the following logical fields before Jira payload assembly. The fields m
 | `ticketKey` | No | Yes | Must exactly identify the requested current Jira ticket. |
 | `updateReady` | No | Yes | Must be `true`. |
 | `attachmentOperations` | Optional | Optional | Must comply with Section 6. |
+
+### 2.1 Mandatory SPEC Upload Filename Contract
+
+This section is the authoritative filename rule for every SPEC uploaded through the validated SDLC route: new Story attachments, update `add` operations, and the new-file component of every `replace`, including each item in a batch or multi-SPEC update.
+
+- The actual deliverable filename must be `<name>-spec.md`. `<name>` is a non-empty, reviewed Story/business-function name in lowercase kebab-case: lowercase ASCII letters and digits separated by single hyphens. The suffix is exactly lowercase `-spec.md` and cannot be omitted or replaced.
+- Validate the entire filename case-sensitively against `^[a-z0-9]+(?:-[a-z0-9]+)*-spec\.md$`; do not trim or normalize a failing filename to make it pass. Regex shape alone is insufficient: `<name>` must also agree with the reviewed Story/business-function evidence.
+- For example, `mobile-registration-entry-spec.md` is valid; `mobile-registration-entry.md`, `SPEC.md`, `-spec.md`, `Mobile-Registration-Entry-spec.md`, and `mobile_registration_entry-spec.md` are invalid. A prior PASS or a previously reviewed safe-filename exception does not waive this rule.
+- The actual Workspace filename, `specPath`, `specFileName`, selected `specArtifacts` entry, latest review's `reviewedSpecArtifacts`, any Story/Test Case filename references, applicable update manifest output mapping, and upload plan `relativePath`/`fileName` must identify the same exact file. Show and submit that same filename in `jira-preview.md` and `attachmentsJson`.
+- Multiple distinct replacement SPECs must retain distinct reviewed names and original-to-output mappings. A distinguishing business-function qualifier belongs in `<name>` before `-spec.md`; do not merge files or invent new names at export time.
+- If any intended upload fails the naming or consistency checks, block before payload/preview/export. Report the offending path/name and required format. Return the affected artifact and filename references/mappings to the upstream preparation and independent review process, preserving business content. Resume only after a corrected handoff has current PASS and SPEC-header read-back evidence for the exact corrected paths, then rebuild the preview and repeat preflight. Do not silently rename/copy a reviewed file, alter only the upload `fileName`, or reuse a PASS bound to the old path.
+- This rule does not rename existing Jira attachments used as source, retained attachments, or old targets of authorised `delete`/`replace` operations. Their exact original names/IDs remain in the mapping; only newly uploaded files must comply. An update with no uploads does not need a new SPEC solely for naming compliance. Ordinary non-SDLC attachments are unaffected.
 
 ## 3. Artefact And Review Gate
 
@@ -147,6 +159,7 @@ Block the SDLC payload and export when any of the following applies:
 - an update item lacks `updateReady: true`;
 - a required artefact is missing, inconsistent, or not reviewed;
 - Story content does not match the reviewed Story artefact;
+- any intended SPEC upload violates Section 2.1's `<name>-spec.md` contract, including an upload alias that differs from the actual file or review mapping;
 - a create has zero or more than one SPEC, or an update's selected attachment mappings and complete reviewed `specArtifacts` register disagree;
 - the Jira Acceptance Criteria field is absent, non-writable, hidden, disabled, or ambiguous;
 - any required Jira field cannot be safely resolved and the user has not provided a valid value;
@@ -158,3 +171,24 @@ Block the SDLC payload and export when any of the following applies:
 Also block if the Jira-bound Description still contains raw Markdown headings outside code blocks, if a Jira-wiki conversion changes business meaning, if `handoffType` appears anywhere in Jira tool arguments or serialized Jira data, or if the current preview/export binding contains a different rendered Description.
 
 Never downgrade a blocked SDLC handoff to generic create, update, or batch export.
+
+## 7.1 Post-write Markdown review binding
+
+The v5 SDLC route performs Markdown review ticket binding only after a separate, successful Jira create/update call returns that item's ticket key and all requested attachment operations succeed. It never adds `markdownReviewRelativePath` to the first Jira-write payload. Before the second call, verify that the five required non-empty values are available: real `staffId`, supported `almType`, confirmed returned ticket key as `issueIdOrKey`, actual current `conversationId`, and the Workspace-relative `STORY.md` path used by this candidate's current passing scoring invocation as `markdownReviewRelativePath`. The score-record Markdown file itself is not this path. Check the candidate/state/score/review binding and, for updates, exact key equality. A failed check blocks only the binding stage and preserves the successful Jira result. Do not add other Jira mutation fields to the second call.
+
+## 8. SPEC Filename Regression Checks
+
+All other review, metadata and authorisation gates still apply to cases marked as passing the filename gate.
+
+| Scenario | Expected result |
+| --- | --- |
+| Create with reviewed `mobile-registration-entry-spec.md`, matching actual path, handoff, review and upload plan | Pass filename gate; upload exactly that name. |
+| Create or update upload of `mobile-registration-entry.md` or `SPEC.md`, even with PASS | Block before preview/export; fixed suffix is mandatory. |
+| Upload of `-spec.md`, `Mobile-Registration-Entry-spec.md`, `mobile_registration_entry-spec.md`, `mobile--registration-spec.md`, or `mobile-registration-spec.MD` | Block for empty name, uppercase or invalid kebab-case/extension. |
+| Plan uses `mobile-registration-entry-spec.md` but actual file or reviewed mapping still uses `mobile-registration-entry.md` | Block; an upload-only alias is not a valid correction. |
+| File renamed to a compliant name after PASS or preview, without updated review binding | Block; require corrected reviewed handoff, fresh preview and preflight. |
+| Replace existing Jira `legacy-design.md` with reviewed `mobile-registration-entry-spec.md` | Pass filename gate for the new file; retain the exact old target mapping and upload before deletion. |
+| Multi-SPEC update with distinct reviewed `mobile-registration-entry-spec.md` and `mobile-registration-validation-spec.md` | Validate every new file and mapping independently; never collapse the outputs. |
+| Integrated batch contains one noncompliant SPEC upload | Block the integrated payload unless the user explicitly removes the blocked item. |
+| Authorised delete-only update or `attachmentAction=none`, with legacy attachment names | Do not require renaming or fabricate a new upload. |
+| Ordinary non-SDLC attachment named `design.md` | Do not apply the SDLC suffix rule; use the ordinary attachment checks. |

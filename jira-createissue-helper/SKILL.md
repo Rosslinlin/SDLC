@@ -5,7 +5,7 @@ description: Jira issue export and write helper for create, update, batch export
 
 # Jira Create Issue Helper
 
-Version: 2.4.0-sdlc-v4
+Version: 2.5.0-sdlc-v5
 
 This skill separates reusable Jira helper capabilities from business flows. Read this entry file first, then load the common and flow modules required by the selected route.
 
@@ -21,8 +21,8 @@ This skill separates reusable Jira helper capabilities from business flows. Read
 8. Updates require metadata confirmation for the current project and issue type.
 9. Associations are dedicated flows: no project or issue-type discovery.
 10. Use one export call for a batch unless split explicitly by the user.
-11. `jira-user-info.md` is SDLC-only state. Only the validated SDLC route may read or write it, and only after applying the SDLC confirmation/persistence rules in `common-state-and-user-info.md`. Generic create, update, association, batch and Test Case routes must neither read nor create that file.
-12. Generic routes may reuse current conversation context and ordinary user-workspace context, but never `jira-user-info.md`.
+11. Persist reusable, non-secret user information only after success.
+12. Check conversation context, `user-info.md`, and `jira-user-info.md` before asking reusable basics.
 13. For missing, ambiguous, stale, or user-changed allowed input values, follow the popup / selection UI contract in `common-state-and-user-info.md`; do not terminate the flow with normal chat asking for those values.
 14. Preserve Test Case execution fields exactly apart from transport-safe line-break normalisation. For all Test Case export modes, keep required line breaks as newline characters in Jira-visible payload values and never submit literal HTML break tags such as `<br>`.
 15. Test Case source export must use `flow-testcase-source-export.md` and its two forced payload shapes.
@@ -33,15 +33,13 @@ This skill separates reusable Jira helper capabilities from business flows. Read
 20. An SDLC handoff is exportable only when its review result is `PASS`, `jiraReady` is `true`, `testCaseTitleValidation` is `manual-pass`, and every final SPEC review header has been synchronized and read back against that PASS.
 21. SDLC Story Description is a Jira-wiki transport rendering of the reviewed `STORY.md` content. Preserve meaning and ordering while converting Markdown presentation syntax such as `## Heading` to Jira wiki syntax such as `h2. Heading`; never edit the workspace Story to perform this conversion.
 22. Extract approved Acceptance Criteria into the metadata-confirmed writable Jira Acceptance Criteria field; do not append another AC section to Description.
-23. SDLC export includes exactly one reviewed SPEC attachment per new Story unless an approved update manifest explicitly maps multiple distinct replacement SPECs. Do not export `TEST_CASE.md`, planning, scoring, review, state or manifest artefacts.
+23. SDLC export includes exactly one reviewed SPEC attachment per new Story unless an approved update manifest explicitly maps multiple distinct replacement SPECs. Every SPEC uploaded by SDLC create or update (`add` or replacement upload) must be named `<name>-spec.md`, where `<name>` is the reviewed lowercase kebab-case Story/business-function name and `-spec.md` is a mandatory fixed suffix, with no filename exceptions. Enforce `sdlc-handoff-validation.md` Section 2.1 across the actual file, handoff, review, manifest and upload plan; block noncompliant names rather than changing only the upload `fileName`. Do not export `TEST_CASE.md`, planning, scoring, review, state or manifest artefacts.
 24. SDLC update exports are restricted to authorised Summary changes, reviewed Story Description replacement, Acceptance Criteria mapping, metadata-required fields, and explicitly authorised attachment add/replace/delete operations.
 25. For SDLC exports, inspect current Jira metadata and resolve required fields from visible defaults, safe evidence-based inference, or a focused user question only when no safe value is available.
-26. The SDLC route has no approval-tool step and must not wait for a final write-confirmation popup. After the SDLC defaults confirmation (when required), `jira-preview.md`, exact payload and attachment plan pass final read-back/preflight, call `exportJiraByDynamicFields` directly. Use `ask_user_question` only for unresolved required input, the SDLC defaults confirmation, ambiguity or recovery decisions.
+26. For a validated SDLC handoff, use the gateway's direct-export rule after its final preview/read-back/preflight. After each confirmed successful Jira create/update, call `exportJiraByDynamicFields` a second time with exactly the five real values `staffId`, `almType`, returned `issueIdOrKey` ticket key, `conversationId`, and the scored `STORY.md` path as `markdownReviewRelativePath` to bind the Jira ticket to its Markdown review. Do not add this path to the first Jira-write call or apply the second-call rule to generic or Test Case routes. The SDLC gateway controls separate preview, outcome tracking, and recovery for this binding call; generic routes retain their confirmation contract.
 27. Never place `linkedIssueKeys` or `linkType` in `dynamicFieldsJson`; pass them as dedicated top-level parameters to `exportJiraByDynamicFields` for association operations.
-28. Never use `""` or other fabricated placeholders for missing parameter values. Apply the Mandatory Empty-Value Contract in `common-field-assembly.md` before preview and export: unused optional strings are `""` when passed and supported, otherwise omitted; preserve array/object types, block missing required values, and never turn an unspecified update into a field-clear operation.
-29. `handoffType: ceaia-sdlc-validated` is internal routing/state metadata only. It is never an argument to `queryJiraProjectsByName`, `queryJiraIssueTypesByProject`, `queryJiraCreateMetaFields`, or `exportJiraByDynamicFields`, and it must not appear inside `dynamicFieldsJson`, `attachmentsJson`, or `issuesJson`.
-30. The bundled SDLC workflow proceeds to this gateway after review PASS by default even when the opening request does not mention Jira export. Stop before Jira only for an explicit preparation-only/no-Jira request, explicit stop, or a recorded blocker.
-31. On the first SDLC create run with no reusable defaults, proactively collect an Epic Link or an explicit no-Epic decision at the Jira stage. On later SDLC runs, validate the persisted defaults and obtain one focused confirmation of the displayed source/project/Story type/Epic/Parent values before preview and direct export. This confirms routing defaults, not final write approval.
+28. Never use `"."` or other fabricated placeholders for missing parameter values. Apply the Mandatory Empty-Value Contract in `common-field-assembly.md` before preview and export: unused optional strings are `""` when passed and supported, otherwise omitted; preserve array/object types, block missing required values, and never turn an unspecified update into a field-clear operation.
+29. For export-ready Jira-visible content, do not let the LLM rewrite business meaning. Apart from required Jira transport formatting, field mapping, JSON escaping, and safe line-break normalization, preserve supplied source wording, order, identifiers, table cells, steps, expected results, acceptance criteria, Story/SPEC content, and user-approved replacement text exactly. If content must be generated from a raw business request, mark it as generated and require preview confirmation before export.
 
 ## Module index
 
@@ -51,7 +49,6 @@ This skill separates reusable Jira helper capabilities from business flows. Read
 - [common-state-and-user-info.md](references/common-state-and-user-info.md)
 - [common-project-issue-type-validation.md](references/common-project-issue-type-validation.md)
 - [common-field-assembly.md](references/common-field-assembly.md)
-- [common-jira-text-rendering.md](references/common-jira-text-rendering.md)
 - [common-preview-confirm-export.md](references/common-preview-confirm-export.md)
 - [common-guardrails.md](references/common-guardrails.md)
 - [common-attachments.md](references/common-attachments.md)

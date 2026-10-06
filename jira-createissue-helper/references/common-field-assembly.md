@@ -58,6 +58,19 @@ Add `required = false` fields to the payload only when:
 
 Omitted optional fields must not block creation.
 
+## Jira-Visible Content Preservation Contract
+
+Apply this contract to all exported Jira-visible fields, including direct fields and values nested in `dynamicFieldsJson`, `issuesJson`, and `testDetailsJson`.
+
+- If the current task is exporting, migrating, updating from, or attaching already-authored business content, preserve that content's wording, order, identifiers, table cells, examples, acceptance criteria, Test Case steps/data/results, and user-approved replacement text.
+- The LLM may perform only required transport changes: Jira wiki syntax conversion, field mapping, JSON serialization/escaping, supported date/option formatting, and safe line-break normalization. These changes must not alter business meaning.
+- Do not summarize, paraphrase, polish, shorten, expand, reorder, renumber, merge, split, or regenerate export-ready source content unless the user explicitly asks for a rewritten version and confirms it in preview.
+- Do not replace content with a file path, attachment reference, source pointer, preview pointer, example value, or statement such as `see source`.
+- For a new Jira issue created from a raw business request where no export-ready wording exists, generate `summary`, `description`, and required metadata-derived content as usual, mark those values as generated in preview, and require confirmation before export.
+- For updates, change only fields explicitly requested or authorised by the selected flow; untouched Jira fields remain unchanged.
+
+Before preview and export, verify that every Jira-visible payload string is either generated content that was previewed for approval, source-derived content preserved under this contract, or a metadata/user-selected value formatted according to schema.
+
 ## Mandatory Empty-Value Contract
 
 Apply this contract to every export flow, top-level parameter, batch item, inherited default, and generated dynamic field before preview and again before submission.
@@ -79,6 +92,45 @@ Apply this contract to every export flow, top-level parameter, batch item, inher
 | `dynamicFieldsJson` | Preserve actual validated fields. If none exist, omit or use `{}` for an object parameter / `"{}"` for a serialized-object parameter when accepted. Never insert dummy fields or replace real fields with an empty object. |
 
 Required values such as `staffId`, `almType`, and operation-specific `projectKey`, `issueType`, `summary`, or required metadata values must be resolved using existing input/metadata rules; block export if unresolved. Do not bypass non-empty requirements with empty values. A required key whose schema explicitly allows an empty value, such as absent Test Data mapped to `data: ""`, remains allowed.
+
+Before preview and before the final `exportJiraByDynamicFields` call, run this export-argument checklist:
+
+1. Build the tool call as direct named arguments only; never wrap them in `requestJson`.
+2. Confirm every route-required argument has a real value. At minimum Jira writes require `staffId` and `almType`; create, update, association, batch, Test Case, and SDLC routes add their own required fields.
+3. For each included optional string argument, preserve an actual empty value as `""` when no value is provided and the active tool accepts an inactive empty string. Otherwise omit the argument. Never coerce empty optional values to `"."`.
+4. If a generated payload has `"."` for an optional missing value, normalize it to `""` or omit it according to this contract. If `"."` appears where a real required value is needed, block export and resolve the required value.
+5. Re-read the preview payload and submit exactly those normalized arguments. Do not fill omitted or empty optional parameters after preview.
+
+Example optional/direct-field normalization for a non-batch, non-association payload subset:
+
+```json
+{
+  "epicLink": "EPIC-123",
+  "epicName": "",
+  "linkType": "",
+  "issuesJson": "",
+  "parentLink": "",
+  "projectName": "AIWPB",
+  "issueIdOrKey": "",
+  "testDetailsJson": ""
+}
+```
+
+The same subset must never be converted to:
+
+```json
+{
+  "epicLink": ".",
+  "epicName": ".",
+  "linkType": ".",
+  "issuesJson": ".",
+  "parentLink": ".",
+  "projectName": ".",
+  "issueIdOrKey": ".",
+  "attachmentsJson": ".",
+  "testDetailsJson": "."
+}
+```
 
 For updates, missing means unchanged: omit unrequested fields rather than populating them with empty values, inferred values, or defaults. Clearing an existing Jira field requires explicit user intent, metadata/tool support for the clear representation, and a preview identifying the clear operation. Inspect effective batch defaults too; remove or relocate defaults that would modify unrequested fields on update items. This update protection takes precedence over generic optional-field inference and value-generation strategies.
 
