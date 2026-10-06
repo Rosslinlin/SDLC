@@ -1,10 +1,10 @@
-# CEAIA SDLC Skill Bundle v5.0.1
+# CEAIA SDLC Skill Bundle v5.0.0
 
 发布日期：2026-10-06
 
-## v5.0.1：统一 SPEC 文件名
+## 补充：统一 SPEC 文件名
 
-所有新生成的 SPEC，包括不上传的更新用本地 SPEC，都必须使用与 Story/业务功能对应的 `<name>-spec.md`。生成阶段不再允许 `SPEC.md` 或普通 `<name>.md` 的文件名例外；多个不同替换 SPEC 使用不同的业务功能名称。独立审查核对实际文件、SPEC 内 File Name、Story/Test Case 引用、状态和更新映射；最终对话从实际 Workspace 文件读回并显示相同名称。此次未修改 `jira-createissue-helper`。
+所有新生成的 SPEC，包括不上传的更新用本地 SPEC，都必须使用与 Story/业务功能对应的 `<name>-spec.md`。生成阶段不再允许 `SPEC.md` 或普通 `<name>.md` 的文件名例外；多个不同替换 SPEC 使用不同的业务功能名称。独立审查核对实际文件、SPEC 内 File Name、Story/Test Case 引用、状态和更新映射；最终对话从实际 Workspace 文件读回并显示相同名称。此次未修改任务 JSON、`VERSION.json` 或 `jira-createissue-helper`。
 
 ## v5：Jira Ticket 与 Story 评分记录关联
 
