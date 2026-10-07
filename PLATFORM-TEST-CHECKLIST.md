@@ -87,3 +87,11 @@
 - [ ] 用户提出 `SPEC.md` 或 `<name>.md` 时，在评分前确定符合规则的名称；不生成不合规文件，也不靠上传时改显示名掩盖实际文件名。
 - [ ] 修复旧文件名时同步实际文件、内部 File Name、状态、Story/Test Case 引用、更新 manifest 和审查绑定；如 Story 内容变化则重新评分，并重新审查受影响内容。
 - [ ] 最终回复在读回实际 SPEC 后列出相同的文件名和路径，没有计划名、旧名或简称。
+
+## 场景 I：SDLC Story 的 Description / AC 字段分配
+
+- [ ] Task 模式和普通对话模式的新建 Story：`STORY.md` 保持完整且不被改动；首次 Jira payload 的 Description 包含 AC 节以外的所有 Story 内容（包括 AC 后的章节），独立 AC 字段包含每个 AC 一次，Description 中没有 AC 声明或正文。
+- [ ] 更新 Story：当前 Jira AC 字段与已审查 Story 的 AC 相同时可保持 Description-only/零附件更新；不同时仅将审查过的 AC 写入元数据确认的字段，原有未授权字段保持不变。
+- [ ] 批量导出：逐项解码 `issuesJson` 与各项的 `dynamicFieldsJson`，确认每个 Story 的 Description/AC 独立配对，没有继承其他项目的 AC 或遗漏 AC 字段。
+- [ ] 将实际 `STORY.md`、首次调用的 `jira-preview.md` payload 和 Jira 读取到的 Description/Acceptance Criteria 分别比较；只接受 Markdown→Jira wiki 的展示语法变化，以及 AC 从 Story 节迁移到独立字段。若 Jira 读取结果与预览值不符，记录具体字段，不重复创建或更新 Ticket。
+- [ ] 普通非 SDLC create/update/batch 和 Test Case 的字段映射与原有流程一致。

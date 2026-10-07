@@ -64,7 +64,7 @@ Read and apply:
 #### Update items
 
 1. Use the exact supplied `ticketKey` as `issueIdOrKey`.
-2. Call `getJiraInfos` before generating any payload.
+2. Call `getJiraInfos` before generating any payload. Retrieve the current Description and Acceptance Criteria separately; the AC value is needed to decide whether a reviewed AC replacement is required.
 3. Verify the returned ticket identifier exactly matches the requested `ticketKey`.
 4. Obtain project and issue type from the returned current issue. Do not perform project search or issue-type discovery for an update.
 5. Retrieve current metadata using `queryJiraCreateMetaFields` and validate the proposed changed fields.
@@ -75,8 +75,8 @@ Read and apply:
 For every item:
 
 1. Map reviewed Story title to Summary under the summary rule in `sdlc-handoff-validation.md`.
-2. Render the exact reviewed `STORY.md` content into a Jira-wiki transport copy using `sdlc-gateway.md`, then map that copy to Description. Preserve meaning and order; do not edit the workspace Story. In particular, convert Markdown headings such as `## Title` to `h2. Title` before payload assembly.
-3. Extract the approved `AC-###` Given/When/Then content from Story and map it to the metadata-confirmed writable Jira Acceptance Criteria field.
+2. Apply `sdlc-gateway.md` Section 4's single partition to the exact reviewed `STORY.md`. Render every non-AC section in its original order to Jira wiki and map only that result to Description. Do not edit the Workspace Story or include its `## Acceptance Criteria` section in Description.
+3. Render the extracted AC section body separately and map it to the metadata-confirmed writable Jira Acceptance Criteria field. Preserve each `AC-###` declaration and its Given/When/Then wording exactly once; verify that neither an AC declaration nor its body was also sent in Description. For an update, omit an AC replacement only after the retrieved current field is verified to match the reviewed value.
 4. Process all other required metadata fields using this strict order: current preserved value for updates; visible metadata default; safe evidence-based allowed option; focused user question.
 5. Add optional fields only where user-provided, safely inferred, useful by default or directly relevant to the reviewed handoff.
 6. Keep direct fields out of `dynamicFieldsJson`; place only other validated custom/system fields in `dynamicFieldsJson`.
@@ -86,15 +86,15 @@ For every item:
 
 #### One create
 
-Build a create payload with validated project key, Story issue type, reviewed Summary, reviewed Description, Acceptance Criteria field mapping, metadata-required fields and label rules.
+Build a create payload with validated project key, Story issue type, reviewed Summary, partitioned non-AC Description, separate Acceptance Criteria field mapping, metadata-required fields and label rules.
 
 #### One update
 
 Build an update payload containing only:
 
 - Summary, only when an explicit reviewed/evidence-supported replacement is authorised;
-- reviewed Description replacement;
-- validated Acceptance Criteria field replacement;
+- reviewed non-AC Description replacement;
+- validated Acceptance Criteria field replacement from the same reviewed Story when its current value differs; leave a verified matching current field untouched;
 - metadata-required changed values; and
 - label changes when applicable.
 
@@ -102,7 +102,7 @@ Do not update unsupported fields. Preserve current values for all other fields.
 
 #### Multiple creates or updates
 
-Use one `issuesJson` JSON-array string and one export call by default. Every item must retain its own project/type where required, item-specific Description, Acceptance Criteria mapping, required-field values and attachment plan. Do not send an `issues` argument because it is not exposed by the active export tool.
+Use one `issuesJson` JSON-array string and one export call by default. Partition each item's own reviewed Story independently. Every item must retain its own project/type where required, non-AC Description, separately mapped Acceptance Criteria in that item's `dynamicFieldsJson` when creating or changing AC, required-field values and attachment plan. A verified matching current AC field may remain untouched on an update. Do not inherit another item's AC through top-level defaults. Do not send an `issues` argument because it is not exposed by the active export tool.
 
 For mixed create/update work, use one integrated payload only when the user explicitly requests a mixed batch. Otherwise produce separate operation previews to avoid accidental combined writes.
 
@@ -133,8 +133,8 @@ Create or overwrite the sole preview file: `jira-preview.md`. It must include:
 - artefact validation status: Story, Test Case audit-only status, one SPEC, review PASS, `jiraReady`, title validation and update readiness where applicable;
 - field provenance for every required field;
 - SDLC defaults status: first-run Epic Link/no-Epic decision or later-run validated user confirmation, including the exact project/type/Epic/Parent values used;
-- a clear statement that reviewed Story content is used as Description and approved ACs are mapped to the Acceptance Criteria field;
-- the full Jira-wiki rendered Description plus conversion validation confirming no raw Markdown heading markers remain outside code blocks;
+- a clear statement that the reviewed Story was partitioned once, with every non-AC section mapped to Description and only the approved AC section body mapped to the Acceptance Criteria field;
+- the full Jira-wiki rendered Description and AC field, their source-to-field coverage check, and conversion validation confirming no raw Markdown heading markers remain outside code blocks;
 - a clear statement that `TEST_CASE.md`, planning, scoring, review reports and manifests are not exported;
 - attachment add/replace/delete plans with confirmed paths or filenames as appropriate;
 - each upload's exact `<name>-spec.md` filename and passing filename-contract status, including consistency with the actual Workspace file, handoff, latest review and applicable update manifest;
@@ -142,7 +142,7 @@ Create or overwrite the sole preview file: `jira-preview.md`. It must include:
 - full valid JSON payload; and
 - for batch, the one-call export statement and per-item identifiers.
 
-The JSON block must represent the direct named arguments to `exportJiraByDynamicFields`; never wrap them in `requestJson`. Remove `handoffType` before producing that block and verify it is absent from the outer arguments, `dynamicFieldsJson`, `attachmentsJson`, and `issuesJson`.
+The JSON block must represent the direct named arguments to `exportJiraByDynamicFields`; never wrap them in `requestJson`. Remove `handoffType` before producing that block and verify it is absent from the outer arguments, `dynamicFieldsJson`, `attachmentsJson`, and `issuesJson`. Check the decoded effective payload for each item: direct `description` contains only non-AC Story sections, and the metadata-confirmed AC field occurs in that item's `dynamicFieldsJson` with the complete extracted criteria for creates or changed ACs. An update may omit that field only with a documented comparison to the matching current Jira AC. Do not treat a prose preview statement as proof that the serialized arguments obey the partition.
 
 No approval tool or final confirmation popup exists in this route. After the complete preview is written, allocate the next `.ceaia-work/.../jira-export-attempt-<nnn>.md`, re-read the exact tool arguments and every upload file, and compare them with the preview. Any payload-affecting change requires a regenerated preview and repeated preflight before direct export.
 
@@ -155,8 +155,8 @@ Example single-create argument shape:
   "projectKey": "AIWPB",
   "summary": "Reviewed Story title",
   "issueType": "Story",
-  "description": "h1. Reviewed Story title\n\nh2. User Story\n...",
-  "dynamicFieldsJson": "{\"fields\":{\"labels\":[\"CEAIA_GEN\"],\"customfield_12345\":\"approved AC content\"}}",
+  "description": "h1. Reviewed Story title\n\nh2. User Story\nAs a member, I want to view my status, so that I can track progress.",
+  "dynamicFieldsJson": "{\"fields\":{\"labels\":[\"CEAIA_GEN\"],\"customfield_12345\":\"AC-001: Given a saved status, when I open the status page, then I see that status.\"}}",
   "attachmentsJson": "{\"add\":[{\"relativePath\":\"outputs/ceaia/example/example-spec.md\",\"fileName\":\"example-spec.md\"}]}"
 }
 ```
@@ -167,7 +167,7 @@ Example batch argument shape:
 {
   "staffId": "12345678",
   "almType": "wpb",
-  "issuesJson": "[{\"projectKey\":\"AIWPB\",\"summary\":\"Story 1\",\"issueType\":\"Story\",\"description\":\"h1. Story 1\",\"dynamicFieldsJson\":\"{\\\"fields\\\":{\\\"labels\\\":[\\\"CEAIA_GEN\\\"]}}\",\"attachmentsJson\":\"{\\\"add\\\":[{\\\"relativePath\\\":\\\"outputs/ceaia/story-1/story-1-spec.md\\\",\\\"fileName\\\":\\\"story-1-spec.md\\\"}]}\"}]"
+  "issuesJson": "[{\"projectKey\":\"AIWPB\",\"summary\":\"Story 1\",\"issueType\":\"Story\",\"description\":\"h1. Story 1\",\"dynamicFieldsJson\":\"{\\\"fields\\\":{\\\"labels\\\":[\\\"CEAIA_GEN\\\"],\\\"customfield_12345\\\":\\\"AC-001: Given a saved status, when I open the status page, then I see that status.\\\"}}\",\"attachmentsJson\":\"{\\\"add\\\":[{\\\"relativePath\\\":\\\"outputs/ceaia/story-1/story-1-spec.md\\\",\\\"fileName\\\":\\\"story-1-spec.md\\\"}]}\"}]"
 }
 ```
 
@@ -181,7 +181,7 @@ These are structural examples only. Use actual validated metadata field IDs and 
 4. After an item's issue write and requested attachments are confirmed successful, read that item's returned `ticketKey`; for an update verify it matches the intended key. Then follow `sdlc-gateway.md` Section 7: preview and read back a separate call containing exactly `staffId`, `almType`, `issueIdOrKey`, `conversationId`, and `markdownReviewRelativePath`, and call `exportJiraByDynamicFields` again. Use the candidate's current scored `STORY.md` path, not the internal score-record Markdown path. For a batch, make this second call once per successful item with that item's returned key and path.
 5. Record the Jira write/attachment outcome and the returned `markdownReview` binding outcome separately. If binding fails or is unknown, keep the successful Ticket Key and do not recreate/update the Jira content merely to retry the association. Do not mark the whole item complete until both required stages pass.
 6. On a confirmed successful Jira write, update the canonical SDLC-only `## CEAIA SDLC Jira Defaults` section in `jira-user-info.md` with allowed non-secret reusable values, including validated source, project, Story issue type and explicitly selected Epic/Parent Link defaults or the explicit no-Epic decision. No generic or Test Case route may perform this persistence.
-7. Report each item separately: handoff item identifier, operation, Jira key/URL, issue-write status, attachment operation status, Markdown review binding status and sanitised errors.
+7. Report each item separately: handoff item identifier, operation, Jira key/URL, issue-write status, attachment operation status, Markdown review binding status and sanitised errors. When describing content parity, compare `STORY.md` with Jira Description plus the separate AC field; raw Markdown and Jira-wiki syntax may differ, but business wording and order within each field must match the reviewed source partition.
 8. For uploads, report the confirmed Workspace-relative path and filename used in the final plan. Never compress returned Jira keys into ranges.
 
 ## 5. Required-field user interaction

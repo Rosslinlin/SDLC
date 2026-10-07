@@ -47,9 +47,11 @@ For every item, validate all of the following from actual current files and stat
 
 Any failure blocks only the affected item unless an integrated batch cannot safely exclude it. Do not manufacture a PASS from a header or a state flag.
 
-## 4. Jira-wiki transport rendering
+## 4. Story field partition and Jira-wiki transport rendering
 
-Build a separate Jira-bound Description from the exact reviewed Story. Preserve section order, text, AC IDs, Given/When/Then wording, lists, links and meaning. Keep `STORY.md` unchanged.
+Read the exact current reviewed `STORY.md`; keep it unchanged. Its single standalone `## Acceptance Criteria` heading starts the AC section, which ends immediately before the next `# ` or `## ` heading outside a code fence, or at end of file. Lower-level headings within that section remain with the ACs. If this boundary or the approved `AC-###` declarations are ambiguous, block export instead of guessing.
+
+Partition the Story once before rendering: Description source is every section outside that AC section in original order, including any sections after it; Acceptance Criteria source is only the AC section body, without its heading. The Jira field label supplies the removed heading. Preserve all business wording, AC IDs, Given/When/Then text, lists and links in their assigned fields. Do not add, omit, reorder or paraphrase content. This partition applies equally to SDLC create, update and each batch item in Task mode and the normal conversation route.
 
 Apply the non-Test transport rules in `common-jira-text-rendering.md` plus the stricter SDLC rules in this section. If they overlap, this gateway's reviewed-Story preservation and Acceptance Criteria mapping rules control. The common module's Test Case exclusion remains absolute.
 
@@ -78,17 +80,18 @@ Additional rules:
 - Preserve intentional newlines as newline characters; never insert literal `<br>` tags.
 - Do not send Markdown heading markers such as `## ` in the Jira-bound Description.
 - Do not prefix an already converted heading again. The rendering must be idempotent for lines beginning `h1.` through `h6.`.
-- Map the Acceptance Criteria field from the same reviewed AC source and metadata-confirmed field. Do not append a second AC section to the Description.
+- Render the Description source and AC source independently. Map the latter to the metadata-confirmed writable Acceptance Criteria field through `dynamicFieldsJson`; never put that field in the direct `description` argument.
+- Description must contain neither the extracted AC section heading nor its AC declarations or Given/When/Then bodies. The AC field must contain every extracted declaration exactly once and no non-AC Story section. A reference to an AC ID elsewhere in the Story is not an AC declaration to remove.
 
-Before preview, compare the rendered Description with the Story section-by-section and confirm that only presentation syntax changed. If a construct cannot be converted without changing meaning, stop and report the exact line instead of guessing.
+Before preview, compare both rendered fields with their respective Story sources section-by-section. Confirm that the two fields jointly account for the full reviewed Story, with only the AC heading represented by the Jira field label and presentation syntax converted. If a construct cannot be converted without changing meaning, stop and report the exact line instead of guessing.
 
 ## 5. Payload and attachment assembly
 
 Use `flow-sdlc-validated-handoff.md` and metadata returned by Jira. For each item:
 
 - Summary comes from the reviewed title unless an update explicitly preserves or authorizes another reviewed Summary;
-- Description is the Jira-wiki transport rendering from Section 4;
-- Acceptance Criteria uses the confirmed writable Jira field and exact stable AC order;
+- Description is the Jira-wiki rendering of the non-AC Story sections from Section 4;
+- Acceptance Criteria is the Jira-wiki rendering of only the AC section body in the confirmed writable Jira field, in exact stable AC order. On an update, an existing AC field may remain untouched only when its separately retrieved current value matches the reviewed AC IDs, wording and order after allowed presentation normalization; otherwise include the field replacement;
 - required metadata follows the helper's current-value/default/evidence/user-selection order;
 - attachments follow the validated reviewed mapping and `common-attachments.md` serialization contract;
 - labels include `CEAIA_GEN` whenever labels are included or changed.
@@ -112,7 +115,7 @@ Write or replace the single current `jira-preview.md`. Include:
 
 - item operation and destination;
 - current PASS and SPEC-header synchronization evidence;
-- full Jira-rendered Summary, Description and Acceptance Criteria;
+- full Jira-rendered Summary, non-AC Description and separate Acceptance Criteria, plus the section-to-field partition check;
 - a Markdown-to-Jira-wiki conversion status with any syntax changes listed by type;
 - exact attachment add/replace/delete plan and preflight status;
 - for every upload, the exact `<name>-spec.md` filename and passing filename-contract/path/review consistency status;
@@ -138,6 +141,8 @@ The second call has **exactly five direct string arguments**, all non-empty and 
 Once the first result supplies the key, replace the single current `jira-preview.md` with the exact five-field binding payload and its candidate/key/path association. Preserve the original Jira-write preview and result in its numbered internal export-attempt record, allocate a separate numbered record for the binding attempt, read back the binding preview, and then make the second call directly. Do not request another final confirmation popup. Store Jira-write/attachment and Markdown-review-binding outcomes separately in `writeResults`; never overwrite the original successful Jira response.
 
 Treat a binding response as successful only when its `markdownReview` result confirms the association. A `partial`, failed, malformed or unknown binding result leaves the already-created/updated Jira ticket intact and the candidate pending. Preserve its key/URL and exact binding attempt; never replay the first Jira write or attachment upload to repair only the binding. Do not automatically retry an uncertain second call. Reconcile the binding state, correct a documented validation error, and use a newly previewed binding-only attempt only after a supported recovery decision. A numeric `status=400` is a business validation failure even if the MCP envelope does not set `isError`.
+
+If a user reports that Jira displays different Story content, compare three read-only sources for that ticket: the current reviewed `STORY.md`, the preserved first-call Description/AC payload, and separately retrieved Jira Description/Acceptance Criteria values from `getJiraInfos`. Compare the combined Jira fields with the source partition, allowing only Markdown-to-Jira presentation differences. A source-to-payload difference is an SDLC assembly defect; a payload-to-Jira difference needs tool/Jira investigation. Report the exact field and difference. Preserve the existing ticket and do not replay a successful create/update as a diagnostic step.
 
 For multiple update targets, execute in the exact order shown in the final preview and pause after the first failed, partial or unknown result before attempting later targets. Record known issue-field and attachment outcomes separately. Do not automatically retry, replay a successful create, or delete an old attachment after a failed replacement upload.
 

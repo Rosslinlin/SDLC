@@ -75,7 +75,7 @@ Any failed item blocks that item. In an integrated batch, report the blocked ite
 
 ### 4.1 Description
 
-Use the reviewed `STORY.md` as the sole semantic source for Jira Description. Create a transport-only Jira-wiki rendering according to `sdlc-gateway.md`: convert presentation syntax, including Markdown headings to `h1.` through `h6.`, without summarising, regenerating, paraphrasing, reordering or changing criteria. Do not modify `STORY.md` and do not append a second Acceptance Criteria section.
+Use the reviewed `STORY.md` as the sole semantic source for the two Jira text fields. Apply `sdlc-gateway.md` Section 4's single canonical partition: remove the complete `## Acceptance Criteria` section from the Description source while retaining every other section in order, including sections following AC. Render that non-AC source to Jira wiki without summarising, regenerating, paraphrasing or changing business wording. Do not modify `STORY.md`. Description must contain no extracted AC heading, declaration or Given/When/Then body.
 
 ### 4.2 Summary
 
@@ -85,9 +85,9 @@ For a create, use the reviewed Story title as the generated Summary unless a rev
 
 After `queryJiraCreateMetaFields`, inspect the visible writable fields for an Acceptance Criteria field. Identify it using returned field ID, name, schema, and operations; never invent a field ID.
 
-Extract the approved Acceptance Criteria from the reviewed Story in their exact stable `AC-###` order, retaining their Given/When/Then wording. Place this content in the metadata-confirmed Jira Acceptance Criteria field.
+Use only the body of the approved Acceptance Criteria section extracted by the same partition, in exact stable `AC-###` order with unchanged Given/When/Then wording. Render its Markdown presentation syntax to Jira wiki and place it in the metadata-confirmed Jira Acceptance Criteria field. The field label represents the source heading. On an update, a Description-only change remains valid when the separately retrieved current AC field matches the reviewed AC IDs, wording and order after allowed presentation normalization; leave that field untouched and record the comparison. Otherwise include the AC field replacement. Never treat an empty, unavailable or uncertain current AC value as a match.
 
-- Do not place extracted Acceptance Criteria in Description as a duplicate export representation.
+- Confirm that each approved AC declaration appears exactly once in that field and never in Description; preserve non-AC sections in Description without loss or reordering.
 - Do not send a similarly named non-writable, hidden, or disabled field.
 - If a writable Acceptance Criteria field cannot be confirmed from metadata, block the SDLC export and explain the field-mapping limitation.
 - If the Story has no extractable approved Acceptance Criteria, block the handoff because it cannot satisfy the SDLC review contract.
@@ -96,7 +96,7 @@ Extract the approved Acceptance Criteria from the reviewed Story in their exact 
 
 For each create or update item, query current Jira metadata and process required fields in this order:
 
-1. **Direct SDLC mapping:** use validated project, type, reviewed Summary, reviewed Story Description, and extracted Acceptance Criteria.
+1. **Direct SDLC mapping:** use validated project, type, reviewed Summary, partitioned non-AC Story Description, and extracted Acceptance Criteria or a verified matching current AC field on update.
 2. **Current issue preservation:** for an update, preserve current values unless an explicitly authorised change is required.
 3. **Visible metadata default:** use a visible, non-disabled default where it satisfies the field schema and does not conflict with handoff evidence.
 4. **Safe evidence-based inference:** use a value only where the handoff/reviewed Story directly supports it and it is an allowed visible option.
@@ -158,7 +158,7 @@ Block the SDLC payload and export when any of the following applies:
 - any intended SPEC lacks verified synchronization to the latest PASS review attempt;
 - an update item lacks `updateReady: true`;
 - a required artefact is missing, inconsistent, or not reviewed;
-- Story content does not match the reviewed Story artefact;
+- Story content does not match the reviewed Story artefact, or the two Jira text fields fail the Section 4 partition and source-to-payload comparison;
 - any intended SPEC upload violates Section 2.1's `<name>-spec.md` contract, including an upload alias that differs from the actual file or review mapping;
 - a create has zero or more than one SPEC, or an update's selected attachment mappings and complete reviewed `specArtifacts` register disagree;
 - the Jira Acceptance Criteria field is absent, non-writable, hidden, disabled, or ambiguous;
