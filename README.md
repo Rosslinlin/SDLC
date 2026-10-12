@@ -10,7 +10,7 @@
 
 独立评分 Skill：
 
-- `user-story-reviewer`：供非 SDLC 的 Story 生成后或单独评分时使用。逐条保留原文、制作仅规范明确 AC 标题的工作区评分副本，调用平台评分工具并向用户展示完整结果；有明确对应的现有 Jira Ticket 时，用独立五字段调用关联评分。它不参与下方 SDLC task 的三 Skill 安装顺序，也不替代 SDLC 的 76 分放行规则。
+- `user-story-reviewer`：供非 SDLC 的 Story 生成后或单独评分时使用。每条 Story 的当前版本只生成 `score-input.md` 和 `score-result.md`；输入文件按 Summary、Description、Acceptance Criteria 和其他原字段排版，不改业务内容。上传 Skill 时须同时配置评分工具和 Jira Ticket 绑定工具。有明确对应的现有 Ticket 时由本 Skill 关联；以后导出新 Ticket 时可由导出 Skill 关联。它不参与下方 SDLC task 的三 Skill 安装顺序，也不替代 SDLC 的 76 分放行规则。
 
 推荐安装顺序：
 
