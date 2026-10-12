@@ -10,7 +10,7 @@
 
 独立评分 Skill：
 
-- `user-story-reviewer`：供非 SDLC 的 Story 生成后或单独评分时使用。文件直接放在 `outputs/user-story-reviews/`：已知 Ticket 时用 `AIWPB-123-score-input.md` / `AIWPB-123-score-result.md`，未知时用 `story-001` 前缀，再次评估在前缀后加 `-v2` 等版本号。先写输入，评分工具返回后才生成结果。每个字段都用 `##` 标题，每条完整 AC 占一个列表项，只转换排版。入口 Skill 按阶段加载三个 references 文件。上传时须同时配置评分工具、Ticket 绑定工具及 conversation/user workspace 读写能力。有明确现有 Ticket 时，复用 `jira-user-info.md` 的 Staff ID/Jira source，首次缺信息才收集；资料齐全直接关联，不再弹出确认，失败后再处理。成功后用 SDLC 相同的文件结构保存身份信息，保留既有 SDLC 目标配置和导出历史。它不参与下方三 Skill 安装顺序，也不替代 SDLC 的 76 分放行规则。
+- `user-story-reviewer`：供非 SDLC 的 Story 生成后或单独评分时使用。每条 Story 在 `outputs/user-story-reviews/` 下独立建一层文件夹：已知 Ticket 时用 `aiwpb-123/AIWPB-123-score-input.md` / `aiwpb-123/AIWPB-123-score-result.md`，未知时用 `story-001/` 文件夹和 `story-001` 文件名前缀。再次评估仍放在同一文件夹，文件名前缀后加 `-v2` 等版本号，不再增加目录层级。先写输入，评分工具返回后才生成结果。每个字段都用 `##` 标题，每条完整 AC 占一个列表项，只转换排版。入口 Skill 按阶段加载三个 references 文件。上传时须同时配置评分工具、Ticket 绑定工具及 conversation/user workspace 读写能力。有明确现有 Ticket 时，复用 `jira-user-info.md` 的 Staff ID/Jira source，首次缺信息才收集；资料齐全直接关联，不再弹出确认，失败后再处理。成功后用 SDLC 相同的文件结构保存身份信息，保留既有 SDLC 目标配置和导出历史。它不参与下方三 Skill 安装顺序，也不替代 SDLC 的 76 分放行规则。
 
 推荐安装顺序：
 

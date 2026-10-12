@@ -18,23 +18,25 @@ Expose the scoring and binding tools when installing this skill. Instructions al
 
 ## Workspace layout
 
-Use a flat folder in the active conversation workspace:
+Use one folder per Story in the active conversation workspace:
 
 ```text
 outputs/user-story-reviews/
-  AIWPB-123-score-input.md
-  AIWPB-123-score-result.md
-  story-001-score-input.md
-  story-001-score-result.md
+  aiwpb-123/
+    AIWPB-123-score-input.md
+    AIWPB-123-score-result.md
+  story-001/
+    story-001-score-input.md
+    story-001-score-result.md
 ```
 
-Choose the prefix before writing input: the full own Jira ticket key when already known; otherwise the next unused `story-001`, `story-002`, etc. A referenced parent/dependency key is not the Story's own key. Keep each Story's source identity, input path, score and ticket together in batch state.
+Choose the folder and filename prefix before writing input. When the full own Jira ticket key is already known, use its lowercase form as the folder name (`aiwpb-123/`) and the actual key as the filename prefix (`AIWPB-123`). Otherwise use the next unused `story-001`, `story-002`, etc. for both the folder and prefix. A referenced parent/dependency key is not the Story's own key. Keep each Story's source identity, folder, input path, score and ticket together in batch state.
 
-For a changed Story or an explicitly requested fresh assessment, use the next unused suffix in the prefix, such as `AIWPB-123-v2-score-input.md` / `AIWPB-123-v2-score-result.md`. Check both names before allocating a pair. Do not reuse a different Story's files merely because ticket keys match across Jira sources.
+For a changed Story or an explicitly requested fresh assessment, keep its existing Story folder and use the next unused suffix in the filename prefix, such as `aiwpb-123/AIWPB-123-v2-score-input.md` / `aiwpb-123/AIWPB-123-v2-score-result.md`. Check both names before allocating a pair. Do not reuse a different Story's folder/files merely because ticket keys match across Jira sources; disambiguate a collision with the known source in the folder name.
 
-Do not add review, Story or revision subfolders. Keep at most two files per assessment: input first, result only after the scoring call returns or fails. Keep preparation notes in conversation state until then. Do not create an empty result, original copy, manifest or handoff file.
+Add only this one Story folder beneath `outputs/user-story-reviews/`; do not add review or revision subfolders. Keep at most two files per assessment in that Story folder: input first, result only after the scoring call returns or fails. Keep preparation notes in conversation state until then. Do not create an empty result, original copy, manifest or handoff file.
 
-A scored input path and its bytes stay fixed. If a ticket becomes known later, bind the original input path and record the new key in its result; do not rename the scored files. Existing records in older layouts remain usable at their original paths.
+A scored input path and its bytes stay fixed. If a ticket becomes known later, bind the original input path and record the new key in its result; do not rename the scored files or their folder. Existing records in older layouts remain usable at their original paths.
 
 ## Follow this sequence for each Story
 

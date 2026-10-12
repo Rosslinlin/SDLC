@@ -39,7 +39,7 @@ After a completed numeric assessment of the unchanged input, with a clear target
   "almType": "verified or applicable saved Jira source",
   "issueIdOrKey": "AIWPB-123",
   "conversationId": "actual active conversation ID",
-  "markdownReviewRelativePath": "outputs/user-story-reviews/AIWPB-123-score-input.md"
+  "markdownReviewRelativePath": "outputs/user-story-reviews/aiwpb-123/AIWPB-123-score-input.md"
 }
 ```
 

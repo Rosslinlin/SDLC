@@ -1,13 +1,13 @@
 # Scoring call and result record
 
-Read this after preparing a verified input file. The output prefix and flat paths come from SKILL.md.
+Read this after preparing a verified input file. The Story folder and filename prefix come from SKILL.md.
 
 ## Call the scoring tool
 
 Use the actual saved input path, for example:
 
 ```json
-{"relativePath":"outputs/user-story-reviews/AIWPB-123-score-input.md"}
+{"relativePath":"outputs/user-story-reviews/aiwpb-123/AIWPB-123-score-input.md"}
 ```
 
 Call `nodejs-base-mcp.score_requirement_markdown` with the workspace-relative Markdown path, not pasted content, a URL, an absolute path or the result path. Workspace identity comes from trusted platform context; do not add a conversationId argument to this call.
@@ -16,7 +16,7 @@ Normally omit `force_review` and `metadata`. A cache hit is valid. Only explicit
 
 ## Create the result only after the call
 
-Before invocation there is only the input file. Once the call returns success, returns an error, or ends in an observed failure/timeout, create the paired `<prefix>-score-result.md`. Do not pre-create a skeleton or claim a score while the call is still running. If the scoring tool was never invoked, do not generate a score-result file.
+Before invocation there is only the input file for this assessment. Once the call returns success, returns an error, or ends in an observed failure/timeout, create the paired `<prefix>-score-result.md` beside that input in the same Story folder. Do not pre-create a skeleton or claim a score while the call is still running. If the scoring tool was never invoked, do not generate a score-result file.
 
 Decode the documented JSON text content block. If the runtime exposes a wrapper with an unambiguous `result` object, use that object for evaluation and retain the complete wrapper separately in the same result file. Preserve raw JSON text verbatim when available; otherwise serialize the complete object without claiming byte-for-byte preservation. Do not omit unknown fields, truncate arrays, select a favorable nested object, or calculate finalScore from sub-scores.
 
