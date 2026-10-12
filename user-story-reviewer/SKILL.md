@@ -1,113 +1,55 @@
 ---
 name: user-story-reviewer
-description: Score one or more user stories with the platform Markdown scoring tool, show the complete scoring results, and bind each score to its verified existing Jira ticket when one is known. Use for standalone scoring or after a story-generation skill; do not create or edit Jira Story content.
+description: Score one or more user stories with the platform Markdown scoring tool, show the complete scoring results, and bind each score to its own existing Jira ticket when known. Use for standalone scoring or after a story-generation skill; do not create or edit Jira Story content.
 ---
 
 # User Story Reviewer
 
-Score each Story separately, save the tool response, and show it to the user. If the Story has a verified existing Jira ticket, associate that score with that ticket. Accept a direct user request or a handoff from a team-specific Story generation skill.
+Read the original Story, normalize presentation without rewriting requirements, score the saved input, then save and explain the tool result. Bind a completed score to the Story's own existing Jira ticket when known. A low score does not block binding or impose an export threshold.
 
-Follow this order for **each** Story: read the source → create and verify `score-input.md` → score that file → save `score-result.md` → bind an existing ticket if verified → report score and binding status. Never mix paths, scores, or tickets across batch items.
+## Tools
 
-| Situation | Action after scoring |
-| --- | --- |
-| No ticket, or only a ticket mentioned as a dependency/reference | Keep the score; do not bind. |
-| Clearly identified own Jira ticket | Bind this Story's scored path to that ticket. |
-| Possible own ticket, but ownership or Jira source is unclear | Keep the score; report binding pending and the exact missing fact. |
-| Score call failed or has no usable numeric score | Report the failure; do not claim a saved score or perform binding. |
+- `nodejs-base-mcp.score_requirement_markdown`: reads a saved workspace Markdown path and saves the service score/audit record.
+- `java-base-mcp.exportJiraByDynamicFields`: use only the five-argument ticket-binding call in the binding reference.
+- Workspace read/write tools for the conversation workspace and user workspace; a Jira read tool such as `java-base-mcp.getJiraInfos` for ticket-only input or ambiguous ticket ownership.
+- `ask_user_question`, or the platform's available input UI, to collect genuinely missing identity/source information or resolve a failure.
 
-## Required tools and boundaries
+Expose the scoring and binding tools when installing this skill. Instructions alone do not grant access. Follow live tool schemas; if a capability is unavailable, finish the available work and report the remaining step.
 
-- `nodejs-base-mcp.score_requirement_markdown`: score a saved workspace Markdown Story; the tool saves a service score/audit record.
-- `java-base-mcp.exportJiraByDynamicFields`: make only the five-field **binding call** below for a verified existing ticket.
-- Workspace read/write tools: read the original Story, create the scoring file, and save the complete result. Use `java-base-mcp.getJiraInfos` or another available Jira read tool if Story or ticket facts must be retrieved.
+## Workspace layout
 
-When installing this skill on the platform, expose **both** `nodejs-base-mcp.score_requirement_markdown` and `java-base-mcp.exportJiraByDynamicFields` to it; listing a tool in the instructions does not grant access. Provide a Jira read tool if ticket-only requests are supported. Use the live tool schemas. If a tool or required binding identity is unavailable, complete the scoring work that is possible and report the remaining step as pending. This skill does not create or edit Jira Story content.
-
-## Identify each Story and ticket
-
-1. Give every Story, including each batch item, a stable label. Keep its content, paths, tool response, and optional ticket together.
-2. Read the actual source file when one exists. For pasted text, use the user's message as the source; for a Jira-only request, retrieve the Story with an available Jira read tool or ask for its content. Prepare the scoring file below without changing business wording. Never pass pasted text directly as the score tool argument.
-3. Identify the Story's **own ticket** from an explicit target key/link or a clearly labeled own-ticket field. Check ambiguous embedded keys against Jira when possible. A dependency, parent, example, or unrelated key is not the target ticket.
-4. Before binding, obtain the full issue key, actual `almType` (`wpb`, `alm`, `data`, `fcr`, or `go`), real `staffId`, and current `conversationId` from trusted context or confirmed input. Do not infer `almType` solely from a key prefix or invent identity values.
-
-## Prepare the two workspace files
-
-Keep **exactly two files per scored Story version** in the active conversation workspace:
+Use a flat folder in the active conversation workspace:
 
 ```text
-outputs/user-story-reviews/review-001/story-001/revision-001/
-  score-input.md   the only file sent to the scoring tool
-  score-result.md  complete tool result, source/field mapping, and ticket binding status
+outputs/user-story-reviews/
+  AIWPB-123-score-input.md
+  AIWPB-123-score-result.md
+  story-001-score-input.md
+  story-001-score-result.md
 ```
 
-Use the next unused `review-<nnn>` and `story-<nnn>` names. A new assessment after Story content changes, or an explicitly requested fresh assessment, gets a new `revision-<nnn>` directory with the same two filenames. Do not overwrite a scoring file already used by the tool: the database binding depends on that exact path and content. Do not create `original.md`, `original.json`, `handoff.json`, or separate attempt files. Keep the original source file untouched, and record its actual path, Jira key, or message reference in `score-result.md`.
+Choose the prefix before writing input: the full own Jira ticket key when already known; otherwise the next unused `story-001`, `story-002`, etc. A referenced parent/dependency key is not the Story's own key. Keep each Story's source identity, input path, score and ticket together in batch state.
 
-Build `score-input.md` from identified source fields in this order. The angle-bracket lines below describe where original values go; never send the placeholders to the scoring tool:
+For a changed Story or an explicitly requested fresh assessment, use the next unused suffix in the prefix, such as `AIWPB-123-v2-score-input.md` / `AIWPB-123-v2-score-result.md`. Check both names before allocating a pair. Do not reuse a different Story's files merely because ticket keys match across Jira sources.
 
-```markdown
-# <actual Summary value>
+Do not add review, Story or revision subfolders. Keep at most two files per assessment: input first, result only after the scoring call returns or fails. Keep preparation notes in conversation state until then. Do not create an empty result, original copy, manifest or handoff file.
 
-## Description
-<actual Description text>
+A scored input path and its bytes stay fixed. If a ticket becomes known later, bind the original input path and record the new key in its result; do not rename the scored files. Existing records in older layouts remain usable at their original paths.
 
-## Acceptance Criteria
-<actual AC text>
+## Follow this sequence for each Story
 
-## Other Fields
-### <actual field name>
-<actual field value>
-```
+1. **Read and identify.** Read the original file, pasted text or retrieved Jira fields. Determine the Story's own ticket from its explicit target or own-ticket field. Use Jira lookup for ambiguity; never select a dependency/example key as the target.
+2. **Prepare input.** Read [input format and conversion](references/input-format.md). Map fields, keep each complete AC together, write only the input file, and read it back against the source. Every field has a `## Field name` heading; there is no catch-all field section.
+3. **Score and save.** Read [scoring and results](references/scoring-and-results.md). Call the score tool with that actual relative input path. Only after the call completes, create the matching result file with the full return, source mapping and recognition checks.
+4. **Bind when a ticket is known.** Read [Jira binding and reusable identity](references/jira-binding.md). Reuse current identity/source information or user-workspace `jira-user-info.md`; ask once for genuinely missing values. With the five arguments available, call directly without a settings confirmation or a binding approval popup. Ask for correction/recovery only if needed.
+5. **Report.** Explain the returned score and all substantive scoring details, provide the complete result, and state the actual ticket-binding outcome. Read the saved result back before reporting success.
 
-Use the actual Summary as the `#` title, not `# Summary` followed by its value. If Summary is absent, do not invent a title; record the missing field in `score-result.md`. Use exactly one standalone `## Acceptance Criteria` heading. Map a clearly identified source heading or field named `AC`, `Acceptance Criteria`, `Acceptance Criteria 1`, `验收标准`, or a confirmed Jira wiki equivalent to that heading. If AC text is embedded in Description, move that section once into the AC section; do not duplicate its text. Preserve the original field name or heading in `score-result.md`. When several AC fields exist, combine them only when their identity and order are clear; otherwise report the ambiguity rather than silently picking one.
+No own ticket: finish after saving/reporting the score and provide the same input/result paths for any later export. Failed scoring or no usable numeric score: report the failure and skip binding. An unchanged Story with an existing complete result does not need another score call merely to bind or report it.
 
-Include `## Other Fields` only when other fields are present. Give each one its own `###` heading and keep its value separate from the heading. This section must start at `##` level so it cannot be mistaken for part of the AC section. Preserve every source value's wording, identifiers, Given/When/Then, lists, links, and order within its section. Convert only presentation syntax, such as Jira wiki headings or color tags, and restore paragraph/field boundaries without joining words (`BackgroundThe` is invalid). Do not invent ACs, IDs, BDD steps, business facts, or a missing Summary. If the original Story is already Markdown, use its existing content and change only the headings/boundaries needed for this structure.
+## Boundaries
 
-Before scoring, read back `score-input.md` and compare it with the source file, Jira fields, or pasted text. Confirm that every source value appears unchanged and exactly once, with only headings, field separators, and presentation markup changed. Record that field mapping and any presentation-only changes in `score-result.md`. If a field's identity is unclear or a lossless conversion cannot be verified, stop before scoring and explain what needs clarification.
+Preserve original business wording, missing information, identifiers and criterion membership. Formatting conversion must not invent Given/When/Then steps, add business value, interpret an unseen image or repair requirements to raise a score.
 
-## Score and retain the result
+The result must distinguish a completed numerical assessment from recognition reliability. Expose AC-count mismatches and returned parser diagnostics; never replace the tool's score with an estimate.
 
-For each candidate, call `nodejs-base-mcp.score_requirement_markdown` with its verified workspace-relative **`score-input.md`** path. The tool reads that file directly:
-
-```json
-{"relativePath":"outputs/user-story-reviews/review-001/story-001/revision-001/score-input.md"}
-```
-
-Omit `force_review` and `metadata` normally. A cache hit is valid. Set `force_review` only if the user explicitly requests a fresh assessment of unchanged content, using the live schema's type. Within the same workflow, reuse a complete response for an unchanged Story; saving a record or binding a ticket must not trigger another score call. Score changed content separately.
-
-Parse the documented single JSON text content block, not the outer MCP wrapper. If only a decoded scoring object is available, serialize the entire object once without claiming it is byte-identical to the server text. Preserve unknown fields. Never calculate `finalScore` from sub-scores or substitute `finalStatus` for it.
-
-Write `score-result.md` with the Story label, source reference, actual `score-input.md` path, source-to-section mapping, normalization status, tool status, and **complete JSON scoring object** in a fenced block. Preserve raw JSON text verbatim when available. If the runtime returns a wrapper with a clear `result` object, use that object as the score and preserve the wrapper separately within the same file. Read back both files and the supplied upstream file when there is one. If the source or scoring file changed during scoring, mark the result stale and prepare a new revision. Never use `score-result.md` as the binding path.
-
-`ok === true` plus a finite numeric `finalScore` means a completed numerical assessment. A score below 75 is still saved and may be bound. Surface `parseErrors`, warnings, missing Acceptance Criteria recognition, and returned AC counts. If the tool still reports a missing AC section for a verified canonical heading, report a parser issue; do not repeatedly rewrite the Story or force a fresh review to seek a higher score. For malformed or failed results, report the failure and do not invent a score. Reconcile an unknown timeout if possible; do not blindly replay it.
-
-## Bind a verified existing Jira ticket
-
-After a completed assessment, if this candidate has its own verified Jira ticket, make a **separate** `java-base-mcp.exportJiraByDynamicFields` call with exactly these five non-empty direct string arguments:
-
-```json
-{
-  "staffId": "actual staff ID",
-  "almType": "verified Jira source",
-  "issueIdOrKey": "FULL-123",
-  "conversationId": "actual current conversation ID",
-  "markdownReviewRelativePath": "the same workspace-relative score-input.md path that was scored"
-}
-```
-
-Use the full Ticket **Key**, never a numeric-only ID. `markdownReviewRelativePath` must equal this Story's `score-input.md` path recorded in `score-result.md` and passed to the score tool. Pass no `description`, `summary`, `dynamicFieldsJson`, `attachmentsJson`, `issuesJson`, or other Jira-change fields. Do not wrap the call in `request` or `requestJson`. For a batch, make one binding call per Story; never use one shared path for multiple tickets.
-
-Confirm binding from the returned `markdownReview` result. Transport success alone is insufficient; numeric `status=400`, partial, missing, or unknown results are not success. Keep the saved score and ticket key, then add the actual binding result to `score-result.md` without altering its raw scoring JSON. Report binding as pending or failed, and do not automatically replay an uncertain call. If Jira export creates a ticket later, give the export skill the `score-input.md` and `score-result.md` paths; it can bind the new key after Jira creation succeeds. Do not repeat an already confirmed binding to the same ticket.
-
-## Tell the user the actual scoring details
-
-For each Story, report these in this order:
-
-1. Story label, source reference, scoring file path, and own Jira key if known. State how source field headings were normalized.
-2. Database scoring status and exact returned `finalScore`, `finalStatus`, `qualityBand`, and `summary` when present.
-3. Every returned section/dimension/breakdown score, strengths, critical issues, warnings, evidence gaps, parse errors, AC counts, and other scoring diagnostics. Preserve tool wording and labels; never fill in missing fields.
-4. Ticket binding status: **bound**, **pending** (with reason), **failed** (with actual error), or **no ticket**.
-
-Also give the user the **complete scoring-tool result**: show its full decoded JSON for each Story when practical; for a large batch, link each complete, untruncated record and summarize every substantive returned field per Story. Never present the outer MCP envelope as the scoring object. Keep scoring JSON, audit identifiers, and internal paths out of Jira-visible Story fields.
-
-This standalone review has no 75- or 76-point export gate. Any separate SDLC workflow keeps its own scoring and review rules; this skill's result does not silently override them.
+This standalone route has no 75/76-point export gate. It does not invoke the SDLC export workflow, change Jira content, or write future Jira score/spec custom fields. It reuses the existing user-info file through its own binding reference; SDLC and generic export workflows retain their own behavior.
