@@ -1,4 +1,14 @@
-# CEAIA SDLC Skill Bundle v5.0.0
+# CEAIA SDLC Skill Bundle v5.1
+
+更新日期：2026-10-23
+
+本次调整 SDLC Task 与三个活动 Skill 的顺序：先生成 Story、Test Case、SPEC，再进行独立内容审查；同步并读回 SPEC `Review Result` / `Result` 后，使用 Workspace `STORY.md` 路径及主 SPEC 状态/路径调用更新后的评分工具。新建与更新均走 Workspace 评分，只有最终真实分数通过才进入 Jira。工具正常复用缓存分数时仍保存本次 SPEC 状态/路径，后续五字段 Jira 绑定关联本次最终通过的评分记录。数据库现阶段只要求最终 SPEC 状态。独立 `user-story-reviewer` 的 Jira 直评分路由保持独立。
+
+独立审查报告中的 SCORE 改为 DEFERRED；内容 PASS 不直接代表 Jira 可写。评分或审查失败均按受影响文件局部修复，修复后重新执行必要内容审查与最终评分，共用原三轮预算。评分记录的人类摘要缩短，完整原始 JSON 仍保留。SDLC 导出只读取当前操作相关的通用说明，Task 更新逐票执行；首次导出调用已成功处理的附件不再次上传。此次规则按 GPT-6 Luna 后续运行保持简明的阶段边界，未改变评分阈值及原 Jira 字段映射。
+
+本次纯文本审计将此前误以 `.md` 命名的 WPS/OLE 二进制 Test Case 引用改为真正的 Markdown，按原有共享规则写明 individual/single 两种导出形态及字段保真要求。修正通用 Helper 文档中未暴露的 `issues` 参数、Test Details JSON 字符串类型、SDLC 与普通流程的确认边界，以及附件示例文件名。Task 中 Jira Helper 的平台 skill ID 仍是安装时填写的配置值，不是运行脚本。
+
+## 历史发布说明：v5.0.0
 
 发布日期：2026-10-06
 
@@ -82,7 +92,7 @@ v4 以 v3 为基线，将最后的 Jira 写入阶段从 `ceaia-sdlc-only-jira-pu
 - SDLC 批量导出使用工具实际暴露的 `issuesJson`；所有参数直接传递，不使用 `requestJson` wrapper。
 - 项目、issue type 和 metadata 查询参数与当前工具契约对齐。
 - `jira-user-info.md` 增加 CEAIA SDLC 默认配置，可复用已验证的 source、project、Story type、Epic Link 和 Parent Link。
-- 初次请求即使包含“push to Jira”，仍先执行 generation → score → review，直到 Jira 阶段才读取或询问目的地字段。
+- 当时的 v4.1 顺序是 generation → score → review；当前 v5.1 顺序以本文顶部和 Task 为准。
 
 ### 8. v4.2 默认全流程、通用文本转换与 SDLC 用户配置
 
@@ -95,8 +105,8 @@ v4 以 v3 为基线，将最后的 Jira 写入阶段从 `ceaia-sdlc-only-jira-pu
 
 ## 未修改或保留的范围
 
-- `flow-create-issue.md`、`flow-update-issue.md` 和 `flow-batch-export.md` 只接入非 Test rich-text transport rendering；它们的业务路由、metadata、preview/confirmation 和写入规则不变。`flow-associate-issue.md`、`common-attachments.md` 和 Test Case 专用资源未改写业务流程。
-- 原始 `flow-testcase-source-export.md` 实际是 WPS/OLE 二进制文档而不是纯文本 Markdown。根据“不修改别人的 Test Case 流程”的要求，v4 中保持其字节和 SHA-256 不变；跨流程的换行保护已放到共享文本规则中。该遗留文件是否能被纯文本平台读取，需要在平台测试中单独确认。
+- v4 阶段 `flow-create-issue.md`、`flow-update-issue.md` 和 `flow-batch-export.md` 主要接入非 Test rich-text transport rendering；它们的业务路由、metadata、preview/confirmation 和写入规则在当前版本继续保留。v5.1 另修正旧工具参数示例与文本引用格式。
+- v4 时 `flow-testcase-source-export.md` 实际是 WPS/OLE 二进制文档，曾为避免改变旧流程而保留原字节；v5.1 已将它替换为纯文本 Markdown，并依据现有通用 Test Case 规则明确两种 payload 形态。平台仍需按清单做真实导出回归测试。
 - 评分阈值仍为 `ok === true` 且 `finalScore >= 76`，并要求 AC/parser 完整性。
 - 三轮自动修复预算、无进展提前停止和用户授权额外有限轮次逻辑保持不变。
 

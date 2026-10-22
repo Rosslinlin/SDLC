@@ -31,7 +31,7 @@ If conversation state already has `staffId`, `almType`, and selected `projectKey
 
 1. Do not ask for source or project keyword again.
 2. Do not call `queryJiraProjectsByName` again.
-3. Directly call `queryJiraIssueTypesByProject` with only the selected `projectKey`.
+3. Directly call `queryJiraIssueTypesByProject` with `staffId`, `almType`, and the selected `projectKey`.
 4. Continue with issue type selection, metadata, field assembly, preview, and confirmation.
 
 Follow `common-state-and-user-info.md` before any popup.

@@ -104,7 +104,7 @@ For batch exports, include:
 - per-item content provenance and preservation status for Jira-visible fields
 - per-item rendering status for eligible non-Test rich text, with an explicit statement that Test Case items were excluded from common rendering
 - per-item attachment preflight status when attachments are used
-- complete batch `exportJiraByDynamicFields` payload with `issues` or `issuesJson` as a valid JSON code block
+- complete batch `exportJiraByDynamicFields` payload with `issuesJson` as a valid JSON code block
 - a clear note that the export tool will be called once for the whole batch after confirmation
 
 For Test Case source exports, also include:
@@ -196,11 +196,10 @@ Batch parameters may include:
 - `staffId`
 - `almType`
 - top-level defaults such as `projectKey`, `issueType`, `description`, `dynamicFieldsJson`, and `conversationId`
-- `issues`
 - `issuesJson`
-- `attachmentsJson`, only as a validated serialized JSON string when attachments are authorised
+- item-level `attachmentsJson` inside `issuesJson` when attachments are authorised; top-level attachments are not inherited by batch items
 
-For Test Case export, `uploadType` must be collected before preview, but it is not submitted as a final `exportJiraByDynamicFields` parameter. Use it only to choose between the `multiple` payload shape with `issuesJson` and the `single` payload shape with top-level `summary`, `description`, and `dynamicFieldsJson`. In `single` mode, the submitted `dynamicFieldsJson` object must contain `labels` with `CEAIA_GEN`.
+For Test Case export, `uploadType` must be collected before preview, but it is not submitted as a final `exportJiraByDynamicFields` parameter. Use it only to choose between the `multiple` payload shape with `issuesJson` and the `single` payload shape with top-level `summary`, `description`, and JSON-encoded `dynamicFieldsJson`. In `single` mode, that encoded object must contain `labels` with `CEAIA_GEN`.
 
 For Test Case export, the submitted payload must be self-contained. Preview text may identify the source artifact, but the final payload JSON block must not place source-file references, preview-file references, attachment references, generated-document references, or other file pointers inside Jira-visible fields instead of the complete Test Case content.
 

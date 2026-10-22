@@ -1,4 +1,4 @@
-# CEAIA workflow contract v4
+# CEAIA workflow contract v5
 
 This file owns shared state, invalidation and repair policy. Generation, review and the `jira-createissue-helper` SDLC gateway load it. It defines local workflow metadata, not a scoring rubric or remote tool schema.
 
@@ -21,7 +21,7 @@ Each new candidate owns one Story, Test Case and SPEC. Each update ticket owns o
 | statePath | <internalRoot>/state.json | <internalRoot>/state.json |
 | updateManifestPath | not applicable | <internalRoot>/update-manifest.md |
 
-Determine final SPEC name before Story scoring. Internal references use complete workspace-relative paths. Jira-facing Story names only the intended uploaded SPEC, or explicitly states no attachment change.
+Determine final SPEC name before Story generation. Internal references use complete workspace-relative paths. Jira-facing Story names only the intended uploaded SPEC, or explicitly states no attachment change.
 
 Every generated SPEC, including a workspace-only SPEC for an update with attachmentAction=none, must have the exact basename `<name>-spec.md`. `<name>` is a non-empty reviewed Story/business-function name in lowercase kebab-case; validate the complete basename against `^[a-z0-9]+(?:-[a-z0-9]+)*-spec\.md$`. Multiple distinct SPECs for one update need distinct evidenced business-function names before the fixed suffix. There is no filename exception for `SPEC.md` or another `.md` basename. If an explicitly requested filename conflicts, resolve a compliant name before Story scoring rather than silently creating or uploading an alias.
 
@@ -47,9 +47,9 @@ This platform does not execute code. Never generate or run Python, shell, JavaSc
 
 Set executionProfile=text-only and bindingMethod=readback-and-revision. Maintain workflow-owned integer revisions, initially 0 for unwritten files: storyRevision, testCaseRevision, and each SPEC's bodyRevision/fileRevision. Advance the affected revision after a real edit and successful read-back. SPEC body edits advance both revisions; header-only synchronization advances fileRevision only. These counters describe observed workflow edits, not cryptographic fingerprints or platform version IDs.
 
-Before scoring read the saved Story in full, record its path and storyRevision, and invalidate the old score. Do not edit that Story during the call. Allocate the next unused score attempt path, save/read back the complete Markdown score record, and record assessmentOrdinal plus actual invocation/review IDs if returned. Confirm the current Story still matches the submitted content using available file reads and the observed edit sequence. Never fabricate checksums or invocation IDs; preserve a service content_checksum only as returned.
+After independent content-review PASS, synchronize and read back the primary SPEC Review Result/Result and full file. Before scoring read the saved Story in full and reuse the just-verified complete SPEC read-back when no intervening write occurred; otherwise re-read that SPEC. Record storyRevision, primary SPEC fileRevision/path, reviewAttempt and the exact string Result. Call the scorer with the Story relativePath plus specFileStatus and specFilePath for this verified SPEC. Do not edit either file during the call. Allocate the next unused score attempt path, save/read back the complete Markdown response, and record assessmentOrdinal plus actual invocation/review IDs if returned. Confirm current files still match the submitted content using available reads and the observed edit sequence. Never fabricate checksums or invocation IDs; preserve a service content_checksum only as returned. A cache hit can reuse the Story score while persisting the new SPEC metadata.
 
-Reviewer reads actual current source and artifact text, compares it with the current score association, and records the revisions it actually reviewed. Only the two-field Review Result header is excluded from substantive SPEC body review. A currentness label or matching counter alone never proves unchanged content.
+Reviewer reads actual current source and artifact text and records the revisions it reviewed. It does not require or invoke a score before content-review PASS. Only the two-field Review Result header is excluded from substantive SPEC body review. A currentness label or matching counter alone never proves unchanged content. Review PASS is a content verdict; final Jira readiness additionally requires a passing current Story score bound to that verified SPEC status/path.
 
 Before Jira export, read the complete current request and intended attachment text, record requestRevision and per-file revisions, and show the exact final preview. Immediately before sending, re-read the request and attachments and compare them with that preview. Any difference invalidates the export binding and affected gates; regenerate the preview and repeat the preflight. Do not claim this procedure provides atomic or cryptographic immutability.
 
@@ -62,11 +62,11 @@ At intake check file reading/writing, the scoring tool and independent-review ca
 Initialize from [state template](../templates/state-template.json) and [batch-state template](../templates/batch-state-template.json). Replace example identity/paths, derive update paths from the table and add updateManifestPath for updates. Templates create metadata only, not future Test Case/SPEC files. Unknown values remain null or pending; never copy a ready/pass assertion from a prior candidate.
 
 Valid JSON, real booleans/numbers, null for unavailable values, no secrets:
-- `contractVersion: 4`, `candidateId`, `mode`, `source`, `ticketKey`, `attachmentAction`.
+- `contractVersion: 5`, `candidateId`, `mode`, `source`, `ticketKey`, `attachmentAction`.
 - `evidenceRevision`: changes only for substantive supported source/decision changes, with a short reason.
 - `paths`: latest planningPath, storyPath, testCasePath, specPath, latest scoreRecordPath, latest reviewPath; updateManifestPath for updates. Add `historyRoot` for the candidate's retained internal records.
 - `status`: IN_PROGRESS / READY / WAITING_USER / WAITING_TOOL / STOPPED / COMPLETE; `nextAction`. Initialize IN_PROGRESS, never READY before all gates.
-- `score`: status (missing/pending/pass/fail/unknown), storyRevision, scoreAttempt, assessmentOrdinal, responseReadBack, persistenceMode, invocationRef, ok, finalScore.
+- `score`: status (missing/pending/pass/fail/unknown), storyRevision, scoreAttempt, assessmentOrdinal, responseReadBack, persistenceMode, invocationRef, ok, finalScore, inputMode=workspace, specFileStatus, specFilePath, specFileRevision and reviewAttempt. Store the actual call inputs separately from the untouched raw response. A pre-change score without verified SPEC metadata is not the final-score handoff.
 - `review`: result (Not Reviewed/PASS/NEEDS_REVISION/NEEDS_HUMAN_CLARIFICATION/FINAL_WITH_UNRESOLVED), reviewAttempt, recordPath, storyRevision, testCaseRevision, specBodyRevision, contentReadBack, testCaseTitleValidation, unresolvedIssueIds, specHeaderSync.
 - `repair`: round (0–3 by default), usedInRound, stagnantRounds, lastBlockingIssueIds, diagnosticUsed, reasonForBudgetReset, extraRoundsAuthorized (default 0).
 - `technicalRecovery`: operation, attempts, outcome.
@@ -80,20 +80,20 @@ Normalized workflow facts are separate from the complete current score response;
 
 | Change | Invalidated | Return point |
 |---|---|---|
-| Any Story content | score, tests/SPEC alignment, review, readiness, preview/export binding | score current Story; repair affected downstream |
-| Test Case content | SPEC test embedding, review, readiness, export binding | fix tests; synchronize SPEC; review |
-| Any primary/additional SPEC body | affected SPEC review, cross-artifact review, readiness, export binding | affected SPEC checks and review |
-| SPEC filename/path or reference change | affected artifact references, review/readiness and export binding; score if STORY.md text changes | synchronize actual file and every reference, then revalidate affected gates |
-| Accurate review-header synchronization only | final SPEC file revision and export binding | bind final file; no score or review rerun |
-| Business source/scope or attachment selection | affected planning/content/preservation review/readiness/export binding | impact analysis; rescore only if Story changes |
+| Any Story content | score, tests/SPEC alignment, content review, readiness, preview/export binding | repair dependent artifacts, review current content, synchronize SPEC, then score final Story |
+| Test Case content | SPEC test embedding, affected content review, final SPEC score-metadata binding, readiness, export binding | fix tests and SPEC; review, synchronize SPEC and submit current score metadata |
+| Any primary/additional SPEC body | affected SPEC/cross-artifact review, final SPEC score-metadata binding, readiness, export binding | affected content review, synchronize SPEC and submit current score metadata |
+| SPEC filename/path or reference change | affected artifact references, review/readiness, score metadata and export binding; Story score content if STORY.md changes | synchronize actual file/references, review affected content and submit final score metadata |
+| Accurate review-header synchronization only | final SPEC file revision, score metadata and export binding | read back header, then score/submit final metadata; no substantive review rerun |
+| Business source/scope or attachment selection | affected planning/content/preservation review/readiness/score metadata/export binding | impact analysis; review affected content and submit final metadata after stabilization |
 | Jira routing-only field | destination compatibility and export binding | destination checks/preview; review if business/mapping changes |
 | External change to original ticket | preservation review and export binding | reconcile baseline with requested delta |
 
-Existence is not currentness. Never carry a score to changed Story content. Low score does not authorize altering source requirements.
+Existence is not currentness. Never carry a score to changed Story content or an old SPEC-status binding to changed SPEC content/status/path. A revised SPEC with unchanged Story may use the scorer's normal cache while saving current SPEC metadata; do not force_review merely to refresh metadata. Low score does not authorize altering source requirements.
 
 ## Repair budget and transitions
 
-A repair round is one consolidated content-edit batch followed by affected scoring and independent verification. Initial generation/review is round 0. Score-driven and review-driven repairs share three rounds per candidate per evidenceRevision.
+A repair round is one consolidated content-edit batch followed by affected independent verification, SPEC header synchronization and final Story scoring where eligible. Initial generation/review is round 0. Score-driven and review-driven repairs share three rounds per candidate per evidenceRevision. A post-score content repair returns to the affected content gates before a new final scoring call; never accept the earlier content-review PASS for changed material.
 
 Before editing increment round, set usedInRound=true, record affected files and supporting evidence. Post-repair verification cannot edit again in that round. Another batch starts the next round only if budget remains. aiSelfRepairAllowed is false during post-repair-verification; returning a non-PASS report does not authorize another edit until the parent starts a permitted next round.
 
@@ -111,7 +111,7 @@ Substantive new evidence/decisions may start a new evidenceRevision with its thr
 
 ## Handoff, batch and internal boundaries
 
-Reviewer reads actual sources/artifacts, not generator summaries. All selected candidates need current PASS and batch-level source coverage before Jira preparation. After those gates pass, the bundled workflow proceeds automatically to Jira create/update; it does not require export wording in the initial request or a continue prompt. Record globalCoverage.status=pass only after reconciling original inScopeSRIds with coveredSRIds, explicitly supported exclusions and zero pendingSRIds. Bind that conclusion to current evidence revisions; do not silently remove an SR to make counts match. A blocked candidate does not prevent independent work on unrelated candidates. Removing it from the selected Jira batch requires user direction.
+Reviewer reads actual sources/artifacts, not generator summaries. All selected candidates need current independent content-review PASS, verified SPEC header/status/path, passing final workspace Story score with that SPEC metadata, and batch-level source coverage before Jira preparation. After those gates pass, the bundled workflow proceeds automatically to Jira create/update; it does not require export wording in the initial request or a continue prompt. Record globalCoverage.status=pass only after reconciling original inScopeSRIds with coveredSRIds, explicitly supported exclusions and zero pendingSRIds. Bind that conclusion to current evidence revisions; do not silently remove an SR to make counts match. A blocked candidate does not prevent independent work on unrelated candidates. Removing it from the selected Jira batch requires user direction.
 
 Handoff contains statePath, actual source/planning paths, identity, artifact paths and updateManifestPath where applicable. Receiving Skill validates state before resuming, not repeating calls unconditionally.
 

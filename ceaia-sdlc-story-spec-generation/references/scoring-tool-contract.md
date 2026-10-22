@@ -1,28 +1,30 @@
 # Scoring tool contract — supplied platform documentation
 
-Source: user-supplied Tool details screenshot and response screenshots, 2026-09-20. These describe the external service; they are not a local evaluator or permission to alter scoring weights. The response screenshots crop some long strings, so no reconstructed "complete real response" is supplied here.
+Source: user-supplied Tool details/response screenshots, 2026-09-20, plus the 2026-10-23 Story scoring tool handoff describing Workspace/Jira modes and SPEC metadata. These describe the external service; they are not a local evaluator or permission to alter scoring weights. Follow the live callable schema if it differs. No reconstructed "complete real response" is supplied here.
 
 ## Input and identity
 
 Tool ID: `nodejs-base-mcp.score_requirement_markdown`.
 
-The only required input is the actual workspace-relative path to a fully written .md or .markdown file:
+The SDLC route uses Workspace mode. Its required input is the actual workspace-relative path to the final fully written Story `.md`/`.markdown` file. After independent content-review PASS and verified SPEC header synchronization, also provide the current primary SPEC review Result string and its workspace-relative path:
 
 ```json
 {
-  "relativePath": "outputs/ceaia/example-story/STORY.md"
+  "relativePath": "outputs/ceaia/example-story/STORY.md",
+  "specFileStatus": "PASS",
+  "specFilePath": "outputs/ceaia/example-story/example-story-spec.md"
 }
 ```
 
-Normal calls omit optional force_review and metadata. The documented default reuses a successful cached review for the same Markdown content checksum. This omission avoids a discrepancy in the screenshot: the parameter table labels force_review/metadata as String while the prose example uses boolean/object values. If either parameter is used, follow the live callable schema's type, not a guessed coercion.
+The `PASS` example is the actual string in the SPEC's `Review Result` / `Result`, not its document lifecycle `Status: Draft` or the scorer's finalStatus. `specFileStatus` and `specFilePath` are saved with the completed score; they do not affect the Story scoring calculation. The user confirmed that a normal cache hit may reuse the score while persisting the newly supplied SPEC metadata, and the later Jira ticket binding associates the final passing score record. The normal SDLC call omits optional force_review and metadata. The documented default may reuse a successful cached review for unchanged Markdown; do not force a new evaluation merely to refresh SPEC metadata. The screenshots label force_review/metadata types inconsistently; if used, follow the live callable schema rather than guessed coercion.
 
 A normal assessment must never force a fresh review. Only explicit user intent to refresh the same content authorizes force_review=true in the actual schema's type. Record that exceptional direction; do not interpret a low score, cache hit, automatic repair or generic retry request as fresh-review authorization.
 
-Workspace identity comes from trusted X-AF-Conversation-ID request header. Do not send conversationId or fabricate a header. A returned conversationId is optional internal evidence, never a required caller input.
+Workspace identity comes from trusted X-AF-Conversation-ID request header. Do not send conversationId or fabricate a header. A returned conversationId is optional internal evidence, never a required caller input. SDLC updates also score their current Workspace STORY.md through relativePath even when a Jira ticket key exists; do not mix relativePath with jira_number/source. The standalone user-story-reviewer has its own Jira mode and does not change this route.
 
 Reject URL/URI, absolute path, artifact ID, data/blob/file URL, null byte and '..' traversal. Use actual workspace path from tools. The documented UI form documents/<active-conversation-id>/name.md may be accepted along with equivalent workspace-relative forms; do not manufacture that prefix or strip a real directory by guesswork.
 
-Optional metadata is audit-only and contains no secrets or copied source bodies. Every invocation writes an immutable service audit row, including cache hits. Local numbered Markdown score records supplement that service history and are never overwritten.
+Optional metadata is audit-only and contains no secrets or copied source bodies. Every invocation writes an immutable service audit row, including cache hits. Local numbered Markdown score records supplement that service history and are never overwritten. Record the three submitted scoring inputs, reviewAttempt and observed Story/SPEC revisions in the local score record outside the untouched raw response; do not claim the service echoed fields it did not return.
 
 ## Extract and preserve the response
 
@@ -59,8 +61,8 @@ Preserve service content_checksum exactly when returned; it is service metadata,
 
 ## Owner and recovery
 
-Generation owns invocation, response preservation and evidence-backed Story repair. Review only inspects current persisted evidence; it never invokes or refreshes the tool. Each candidate owns its own result; no averaging or cross-candidate reuse.
+Generation owns the post-review invocation, response preservation and evidence-backed Story repair. Independent content review comes before this call and never invokes or refreshes the scorer. Each candidate owns its own result; no averaging or cross-candidate reuse.
 
-No repeated call for an unchanged current version in normal operation. An explicitly authorized fresh review is the sole freshness exception; invalidate downstream readiness first and assess its new returned evidence. At most one supported technical retry after a confirmed pre-evaluation failure; an unknown timeout must be reconciled, not blindly replayed. Saving an already received response can be retried without another score call, using the same reserved attempt path when no complete record was committed. Never overwrite a completed earlier attempt.
+No repeated call for unchanged current Story plus unchanged verified SPEC status/path/revision in normal operation. Changed SPEC metadata requires a new normal invocation even if Story bytes are unchanged; the content score may be cached. An explicitly authorized fresh assessment is the sole force_review exception; invalidate downstream readiness first. At most one supported technical retry after a confirmed pre-evaluation failure; an unknown timeout must be reconciled, not blindly replayed. Saving an already received response can be retried without another score call, using the same reserved attempt path when no complete record was committed. Never overwrite a completed earlier attempt.
 
 Scores, audit IDs, checksums, conversation identity and diagnostic data stay internal. Never include them in Story, Test Case, SPEC, update manifest, Jira preview or payload.

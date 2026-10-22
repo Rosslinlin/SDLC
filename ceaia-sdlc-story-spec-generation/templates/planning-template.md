@@ -1,6 +1,6 @@
 # CEAIA Internal Planning
 
-Internal only. Replace example cells; use mode-specific planningPath from workflow-contract.md.
+Internal only. Replace example cells; use mode-specific planningPath from workflow-contract.md. Keep facts and traceability compact: use evidence/SR/AC/FR/TC IDs across tables rather than repeating complete Story text or test steps. Preserve every material requirement and exact source location.
 
 ## Source Evidence Register
 | Evidence ID | Class | Exact source / section / location | Supported fact | Limitation | Used by SR |

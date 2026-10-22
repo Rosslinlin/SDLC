@@ -2,7 +2,7 @@
 
 Use core-review-gates.md as the authority for definitions. Every row must have current evidence in the report, not a copied tick.
 
-- [ ] SCORE: complete genuine persisted response, correct current Story/response binding, boolean ok=true and numeric finalScore>=76; no AC recognition/parser blocker; optional service checksum interpreted correctly.
+- [ ] SCORE is DEFERRED to the parent after content PASS and verified SPEC header synchronization; no score response is required or invented in this independent review.
 - [ ] STRUCTURE: mode-specific planning and current files present; every actual generated SPEC uses `<name>-spec.md` (including update/none), has a matching internal File Name and current references/mappings; templates, attachment action and metadata valid.
 - [ ] COVERAGE: original evidence checked, candidate SR trace complete, supported decomposition/preservation, honest coverage layers, global omissions surfaced.
 - [ ] STORY: exactly ## Acceptance Criteria with inline BDD, supported actor/value/scope, stable AC IDs, no invented rules or internal leakage.
@@ -14,6 +14,6 @@ Use core-review-gates.md as the authority for definitions. Every row must have c
 - [ ] Every finding identifies full path, evidence, owner, impact and smallest supported repair.
 - [ ] storyChangeRequired reflects actual cause, not blanket restart.
 - [ ] Repair eligibility accounts for phase, consumed rounds, stagnation and user evidence; no second edit within the same round.
-- [ ] Reviewed content revisions and actual read-back findings and SCORE gate appear in structured conclusion.
+- [ ] Reviewed content revisions, actual read-back findings and SCORE=DEFERRED appear in structured conclusion.
 - [ ] Verdict/header synchronization and final-file read-back are assigned to parent.
-- [ ] No Jira readiness on non-PASS and no export-readiness or write-success claims from review.
+- [ ] jiraReady/updateReady remain false even on content PASS until the parent confirms the later score with current SPEC status/path and global coverage.

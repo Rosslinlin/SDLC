@@ -65,11 +65,11 @@ Existing issue updates also require:
 
 Batch create/update also requires:
 
-- `issues` or `issuesJson`: A single batch item list used for one `exportJiraByDynamicFields` call.
+- `issuesJson`: One JSON-encoded, non-empty batch item array string used for one `exportJiraByDynamicFields` call. The current interface does not expose `issues`.
 - Per-item `summary`, `issueIdOrKey`, `testDetailsJson`, dynamic fields, or attachments as required by the operation.
 - One integrated batch preview before the entire batch. Generic batch routes also require confirmation; the validated SDLC route follows its gateway's direct-export rule.
 
-For Test Case source export with `uploadType` mode `single`, do not use `issues` or `issuesJson`; assemble one aggregate Test issue with top-level `summary`, clean table-only `description`, and `dynamicFieldsJson.labels` containing `CEAIA_GEN`.
+For Test Case source export with `uploadType` mode `single`, do not use `issuesJson`; assemble one aggregate Test issue with top-level `summary`, clean table-only `description`, and a JSON-encoded `dynamicFieldsJson` object containing `labels` with `CEAIA_GEN`.
 
 ## Test Case Source Inputs
 

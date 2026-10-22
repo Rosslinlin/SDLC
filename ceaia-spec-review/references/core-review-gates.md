@@ -1,16 +1,14 @@
 # Mandatory review gates
 
-Each gate has PASS/FAIL; UPDATE may be N/A only for new_story. Return evidence for every gate, including SCORE. Score PASS alone never substitutes for other gates.
+Content gates have PASS/FAIL; UPDATE may be N/A only for new_story. SCORE is `DEFERRED` during independent content review because the real scoring call occurs after the reviewed SPEC status has been synchronized. Return evidence for every applicable content gate. A content PASS is not final Jira readiness.
 
-## SCORE — Current audited Story assessment
+## SCORE — Deferred to the parent after content review
 
-Verify the complete persisted Markdown evaluation record and persistenceMode (`verbatim-json-in-markdown` or `complete-object-json-in-markdown`), genuine invocation provenance, candidate association and current exact Story bytes. The readable summary must agree with the complete raw JSON block, but only the raw block is evaluator evidence. Read the complete record and Story, verify the actual invocation association and observed storyRevision, and apply the shared text-only currentness checks. Service checksum is preserved if returned; no local hash calculation is required.
-
-Require boolean ok=true and finite numeric finalScore>=76 within 0–100. Also require parser integrity: no missing-AC-section warning, unresolved parseErrors or disagreement between returned AC counts and declared Story ACs. Optional diagnostic fields may differ between documented and observed response versions; never require absent diagnostics or substitute section scores. Strings, stale results, malformed/partial response, unknown provenance and fabricated records fail. Optional audit/review IDs are reported only when returned. Never rescore or calculate a replacement.
+The independent reviewer marks SCORE=`DEFERRED` and does not invoke or verify a score response. It checks the Story's actual canonical AC heading and declarations under STORY/STRUCTURE so the parent can safely submit the final file. After content PASS, the parent synchronizes the SPEC header, scores the final Story with verified SPEC metadata, preserves the complete raw response and verifies boolean ok=true, finite numeric finalScore>=76, AC/parser integrity and current Story/SPEC binding. A pre-change score without current SPEC metadata cannot satisfy this later gate. No score is invented or inferred from content review.
 
 ## STRUCTURE — Current artifacts and template integrity
 
-Use state paths, including source-qualified update directories. Require planning, state, score response, Story, Test Case and every current named SPEC, including additional distinct update replacements. Required headings/table columns match active templates, no unresolved placeholders or duplicated test tables. Review header contains Result and Reviewer Notes and a supported status. Stale/Not Reviewed header alone does not fail current substantive review.
+Use state paths, including source-qualified update directories. Require planning, state, Story, Test Case and every current named SPEC, including additional distinct update replacements; a score response is not required before content-review PASS. Required headings/table columns match active templates, no unresolved placeholders or duplicated test tables. Review header contains Result and Reviewer Notes and a supported status. Stale/Not Reviewed header alone does not fail current substantive review.
 
 Check every generated SPEC's actual basename against the mandatory `<name>-spec.md` rule, with no safe-filename exception, including a local update/none SPEC that is not uploaded. The `<name>` portion must agree with the reviewed Story/business function; distinct replacement contents need distinct names. Compare each actual path and basename with its SPEC File Name field, state.specArtifacts, planning, standalone Test Case Related SPEC path, review binding, applicable update manifest and attachment mapping, and intended upload plan. In update/none, Story must not claim the local SPEC is uploaded. In add/replace, Story references only intended matching SPEC basenames. Any mismatch fails STRUCTURE and blocks PASS/Jira readiness; do not accept an upload-only alias. Internal source/audit paths never leak into business artifacts.
 
@@ -36,7 +34,7 @@ Manually inspect every Test Case Description; no standalone case-insensitive or.
 
 Every SPEC embeds current sibling Story and executable Test Case table exactly. FR/SC references resolve, success criteria are measurable without invented SLAs, and Mermaid matches evidenced behavior. Preserve supplied template metadata and explicitly approved design-reference fields. No unresolved promises, generic diagram, internal provenance/audit leakage or undocumented integration branches.
 
-Only the two-field review header is excluded from body binding. Parent synchronizes it after verdict, re-reads every complete intended SPEC, compares both fields with the latest numbered review record, and records the final fileRevision plus `specHeaderSync`. Any other change requires affected review. A stale, mismatched or unreadable header blocks jiraReady even when the substantive verdict is PASS.
+Only the two-field review header is excluded from body binding. Parent synchronizes it after the content verdict, re-reads every complete intended SPEC, compares both fields with the latest numbered review record, and records the final fileRevision plus `specHeaderSync`. The primary SPEC's exact Result string and workspace-relative path then accompany the final Story score. Any other change requires affected review. A stale, mismatched or unreadable header blocks scoring and jiraReady even when the substantive verdict is PASS.
 
 ## UPDATE — Preservation and supported write scope
 

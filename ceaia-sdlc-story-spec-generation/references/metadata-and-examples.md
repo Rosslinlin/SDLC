@@ -57,9 +57,9 @@ This is not a default diagram to paste into other Stories. Add error, empty, per
 
 ## Recovery examples
 
-- Correct Story, incorrect SPEC diagram: repair diagram, review affected consistency; reuse current Story score.
-- Correct AC, missing test: repair tests and embedded SPEC tables; reuse score.
-- Wrong Story requirement: repair from evidence, assess changed Story, update impacted tests/SPEC and review.
-- "No Acceptance Criteria section found." with combined heading: correct to canonical heading, preserve business meaning, assess changed bytes.
+- Correct Story, incorrect SPEC diagram: repair diagram, independently review affected consistency, synchronize SPEC Result, then submit final Story plus current SPEC metadata. If Story is unchanged, the scorer may reuse its cached content score.
+- Correct AC, missing test: repair tests and embedded SPEC tables, independently review affected consistency, then submit final Story plus current SPEC metadata; unchanged Story content may use normal cache.
+- Wrong Story requirement: repair from evidence, update impacted tests/SPEC, independently review current content, then score the final Story.
+- "No Acceptance Criteria section found." with combined heading: correct to canonical heading, preserve business meaning, recheck impacted content and assess the changed final Story after content review.
 - Canonical heading still unrecognized: technical recovery, not endless business rewrites.
 - Missing approved design: ask for the design or a supported scope decision, not invented UI details.

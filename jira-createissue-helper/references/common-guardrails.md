@@ -30,7 +30,7 @@
 - **Jira update:** Do not call `exportJiraByDynamicFields` before `getJiraInfos` is called, the current project and issue type are used to confirm update field rules through `queryJiraCreateMetaFields`, current information is shown, proposed changes conform to those rules, and the changes are explicitly confirmed.
 - **Jira update metadata:** If the project key, issue type, or field rule cannot be confirmed, block the update and do not call `exportJiraByDynamicFields`.
 - **Association update:** Do not call `exportJiraByDynamicFields` before source Jira is read, metadata validation is complete, and association payload is shown.
-- **Batch export:** Do not call `exportJiraByDynamicFields` once per item. Assemble one `issues` or `issuesJson` payload, preview the whole batch, confirm once, and call the tool once.
+- **Generic batch export:** Assemble one `issuesJson` payload, preview the whole batch, confirm once, and call the tool once. The validated SDLC gateway separately permits per-ticket update execution and post-write binding calls.
 - **Non-Test text rendering:** For generic create, update and batch items, do not submit recognized Markdown presentation syntax in eligible Jira rich-text fields. Apply `common-jira-text-rendering.md`, preview the exact Jira-wiki transport value, and verify meaning is unchanged. Never apply this rule to Test Case routes/items/fields.
 - Do not skip user confirmation when user information is obvious.
 - **Validated SDLC exception:** The two confirmation rules above do not add a confirmation step to `ceaia-sdlc-validated`. That route follows `sdlc-gateway.md`: complete the final preview/read-back/preflight and call `exportJiraByDynamicFields` directly. This exception does not alter generic or Test Case behavior.

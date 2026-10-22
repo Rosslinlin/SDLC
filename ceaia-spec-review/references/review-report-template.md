@@ -1,18 +1,18 @@
 # CEAIA Current Review: [Candidate]
 
-Internal report only; parent saves this at the next unused numbered reviewPath and never overwrites an earlier completed report. Replace placeholders with observed values. Structured conclusion is valid JSON, not prose masquerading as booleans.
+Internal report only; parent saves this at the next unused numbered reviewPath and never overwrites an earlier completed report. Replace placeholders with observed values. Structured conclusion is valid JSON, not prose masquerading as booleans. Keep PASS gate evidence concise and link it to actual source paths/IDs. Describe each real defect once in Findings and its structured issue entry; do not repeat the full defect narrative in every section. Preserve all required fields.
 
 ## Context
 - Mode / candidate / source / ticket: [identity]
 - Evidence revision / repair round / phase: [current values]
 - Sources actually read: [precise paths/locations]
-- Planning / state / Story / score / Test Case / SPEC / manifest paths: [complete workspace-relative paths]
+- Planning / state / Story / Test Case / SPEC / manifest paths: [complete workspace-relative paths; score record pending until after content PASS]
 - Original ticket baseline and attachment inventory: [update only]
 
 ## Gate Results
 | Gate | Result | Current evidence / finding IDs |
 |---|---|---|
-| SCORE | [PASS/FAIL] | [response path, currentness, provenance, actual ok/finalScore] |
+| SCORE | DEFERRED | Final Workspace Story score is submitted after content PASS and verified SPEC Result/path |
 | STRUCTURE | [PASS/FAIL] | [files/template/names/action] |
 | COVERAGE | [PASS/FAIL] | [SR coverage, original evidence and layers] |
 | STORY | [PASS/FAIL] | [AC/BDD/support] |
@@ -48,7 +48,7 @@ Internal report only; parent saves this at the next unused numbered reviewPath a
 Required fields; use actual values and arrays/objects. This illustration is a non-PASS report, not a default to copy unchanged.
 ```json
 {
-  "contractVersion": 4,
+  "contractVersion": 5,
   "candidateId": "example-story",
   "mode": "new_story",
   "source": null,
@@ -65,11 +65,12 @@ Required fields; use actual values and arrays/objects. This illustration is a no
   "specPath": "outputs/ceaia/example-story/example-story-spec.md",
   "specFileName": "example-story-spec.md",
   "gateResults": {
-    "SCORE": "FAIL", "STRUCTURE": "FAIL", "COVERAGE": "FAIL",
+    "SCORE": "DEFERRED", "STRUCTURE": "FAIL", "COVERAGE": "FAIL",
     "STORY": "FAIL", "TESTS": "FAIL", "SPEC": "FAIL", "UPDATE": "N/A"
   },
   "scoreGate": {
-    "scoreRecordPath": ".ceaia-work/stories/example-story/story-quality-score-attempt-001.md",
+    "scoreRecordPath": null,
+    "status": "DEFERRED",
     "recordComplete": false, "recordCurrent": false,
     "provenanceVerified": false, "ok": null, "finalScore": null,
     "passed": false
@@ -119,8 +120,9 @@ reviewAttempt is the monotonic review count. aiSelfRepairCount is cumulative act
 
 reviewedSpecArtifacts lists every state.specArtifacts path with the observed bodyRevision, contentReadBack, result and preservation conclusion. Header synchronization happens later; parent records final fileRevision and the final export-preflight read-back. Revision numbers describe observed edits, not computed fingerprints.
 
-automaticPostReviewJiraHandoffRequired is true only when the parent supplies verified all-target PASS, current global coverage and export availability. Otherwise false for this per-candidate review; parent sets the aggregate handoff flag after all reviews. False does not authorize an unnecessary "continue?" prompt.
+automaticPostReviewJiraHandoffRequired remains false for this per-candidate content review. The parent may set the aggregate handoff only after every candidate has content-review PASS, verified SPEC status/path, a current passing final Story score, global coverage and export availability. False does not authorize an unnecessary "continue?" prompt.
 
-PASS requires all gates PASS except UPDATE=N/A for new_story, scoreGate.passed=true with verified completeness/currentness/provenance, all reviewed revisions recorded with actual current-content checks, manual-pass titles and zero unresolved material issues. The reviewer returns substantive PASS with `reviewStatusSynchronizationRequired=true`; the parent sets jiraReady/updateReady only after every intended SPEC header is synchronized and verified. Post-repair-verification always returns aiSelfRepairAllowed=false for that same round. UserActionRequired covers missing evidence and required recovery/budget decisions.
+Content-review PASS requires all content gates PASS except UPDATE=N/A for new_story, SCORE=DEFERRED, all reviewed revisions recorded with actual current-content checks, manual-pass titles and zero unresolved material issues. `scoreGate.status=DEFERRED` and `scoreGate.passed=false` are accurate at this stage and do not negate content PASS. The reviewer returns substantive PASS with `reviewStatusSynchronizationRequired=true`; the parent synchronizes every intended SPEC header, then submits the final Story for scoring with the primary SPEC Result/path. Post-repair-verification always returns aiSelfRepairAllowed=false for that same round. UserActionRequired covers missing evidence and required recovery/budget decisions.
 
-Parent copies verified gate state, not merely a PASS string, into current state and synchronizes only the SPEC review header. jiraReady becomes true only after every intended SPEC header has been read back and verified against this numbered review record.
+Parent copies verified content-gate state, not merely a PASS string, into current state and synchronizes only the SPEC review header. jiraReady becomes true only after every intended SPEC header has been read back, the final workspace Story score passes with current primary SPEC status/path, and global coverage passes.
+For content PASS, set recommendedNextAction to synchronize-spec-and-score; for non-PASS, identify the smallest repair or clarification action. Never recommend immediate Jira export from the independent report.

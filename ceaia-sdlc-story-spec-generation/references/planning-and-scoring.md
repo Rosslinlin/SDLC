@@ -1,6 +1,6 @@
 # Planning and scoring
 
-Read workflow-contract.md for latest-output paths, retained internal history, invalidation and repair budget. Read [business-planning-checklist.md](business-planning-checklist.md) before planning and [scoring-tool-contract.md](scoring-tool-contract.md) before invoking or interpreting the evaluator.
+Read workflow-contract.md for latest-output paths, retained internal history, invalidation and repair budget. Read [business-planning-checklist.md](business-planning-checklist.md) before planning and [scoring-tool-contract.md](scoring-tool-contract.md) only at the post-review scoring step.
 
 ## P1 — Evidence-backed planning
 
@@ -16,23 +16,17 @@ Before generation actor, trigger, primary outcome and material rules must suppor
 
 Complete source→SR→candidate mapping before generation, extending to AC→FR→TC after artifacts exist. Reconcile the original evidence against this register across the final batch; per-Story PASS alone does not establish global coverage.
 
-## S1 — Invoke current Story evaluator
+## S1 — Invoke evaluator after independent content review
 
 Only `nodejs-base-mcp.score_requirement_markdown` evaluates quality. No local rubric, evaluator adapter, scoring model or manual score. Read-based interface checks and observed revision tracking do not replace scoring.
 
-```json
-{
-  "relativePath": "outputs/ceaia/example-story/STORY.md"
-}
-```
-
-Use the actual full workspace-relative STORY.md path; no URL, absolute root, traversal, conversation ID or copied body. Omit optional force_review and metadata by default. Follow scoring-tool-contract.md for the screenshot type discrepancy, documented single JSON text block and explicit user-authorized freshness exception.
+Call the tool in Workspace mode with three actual values: `relativePath` is the full workspace-relative final `STORY.md` path; `specFileStatus` is the string in the verified primary SPEC `Review Result` / `Result` field; `specFilePath` is that SPEC's full workspace-relative path. For updates, use the modified Workspace Story even though a Jira key is known. Never combine relativePath with jira_number/source. Omit optional force_review and metadata by default. Follow scoring-tool-contract.md for the live schema, documented single JSON text block and explicit user-authorized freshness exception.
 
 Before invocation:
-1. Story is complete/readable; final filenames and attachment action are resolved. Exactly one standalone `## Acceptance Criteria` heading contains all distinct declared ACs with Given/When/Then. Combined AC/BDD headings are not canonical.
-2. Read back saved Story, record its observed storyRevision and invalidate old score/readiness.
-3. First generation has no Test Case/SPEC yet. During repair existing files may remain stale; do not delete them just to score.
-4. Resume from a current complete response already associated with unchanged Story content within this candidate. Do not duplicate its call or copy a sibling's result. Real Story changes require a new assessment; cache_hit is a valid result of that invocation.
+1. Story, Test Case and every intended SPEC are complete. Current independent content-review PASS has no unresolved finding; the primary SPEC Result header is synchronized to that review and its complete file has been read back. Global coverage and filename/attachment mappings are current.
+2. Read back the saved Story and primary SPEC; record storyRevision, primary SPEC fileRevision, reviewAttempt, exact `Result` string and both paths. Check exactly one standalone `## Acceptance Criteria` heading with distinct evidenced Given/When/Then declarations. A combined AC/BDD heading is not canonical.
+3. Resume from a current complete score only if it is associated with this exact Story and verified current SPEC status/path/revision. A pre-change score without final SPEC metadata does not qualify; make one metadata-bearing call and allow normal cache reuse. Do not copy a sibling's result.
+4. During the call keep the submitted Story and SPEC unchanged. Real Story changes require a new assessment. A SPEC-only change may reuse the content score but needs a new invocation with current SPEC metadata; never use force_review to refresh metadata.
 
 ## S2 — Persist complete response and bind currentness
 
@@ -42,7 +36,7 @@ Allocate one new monotonically numbered Markdown scoreRecordPath for every actua
 - Only a parsed object available: serialize the complete designated evaluation object once inside the Markdown raw-response block; set persistenceMode=complete-object-json-in-markdown. Do not claim server-byte preservation.
 - Follow the tool's documented evaluation channel. Conflicting envelopes or undocumented wrapping mean WAITING_TOOL; do not pick a favorable nested score or reconstruct from partial logs.
 
-Record the input storyRevision, assessmentOrdinal, responseReadBack and actual invocation reference when exposed. Read back the saved response and confirm Story remained unchanged during the call using the shared text-only procedure. Preserve returned service checksums without calculating replacements. No checksum is required locally; unknown actual invocation provenance still requires recovery.
+Record the input storyRevision, primary SPEC path/fileRevision/status, reviewAttempt, assessmentOrdinal, responseReadBack and actual invocation reference when exposed. Read back the saved response and confirm Story and SPEC remained unchanged during the call using the shared text-only procedure. Preserve returned service checksums without calculating replacements. No checksum is required locally; unknown actual invocation provenance still requires recovery.
 
 The record's readable summary must agree with the raw JSON but is not evaluator evidence by itself. State metadata is separate from the raw response. Score records, audit IDs and diagnostics never enter Story, Test Case, SPEC, update manifest, Jira preview or payload.
 
@@ -52,11 +46,11 @@ Pass requires a parseable complete current response, successful persistence, boo
 
 | Outcome | Action |
 |---|---|
-| Pass | Mark score current; generate/revalidate this candidate's downstream |
-| Valid non-pass; supported writing defect | Repair from existing evidence within shared budget; score changed Story |
-| Missing AC section warning/count mismatch | Check canonical heading and declared IDs; repair format only if wrong, otherwise technical recovery; no downstream artifacts |
+| Pass | Mark score current only if SPEC metadata and content-review binding are current; then enter Jira preparation when all candidates pass |
+| Valid non-pass; supported writing defect | Repair from existing evidence within shared budget; independently recheck affected content, synchronize SPEC and score final Story |
+| Missing AC section warning/count mismatch | Check canonical heading and declared IDs; repair format only if wrong, otherwise technical recovery; no Jira readiness |
 | Missing/conflicting business fact | WAITING_USER; do not invent scope |
-| Non-pass with no supported correction | Pause for evidence/decision; no unchanged rescore |
+| Non-pass with no supported correction | Pause for evidence/decision; no unchanged rescore or premature Jira write |
 | Complete response but save failed | Retry saving that response, not scoring |
 | Failure confirmed before evaluation started | At most one technical retry after correction, recorded in state |
 | Timeout/disconnect with unknown result | Recover/query existing result only if live API supports it; otherwise WAITING_TOOL, no blind replay |

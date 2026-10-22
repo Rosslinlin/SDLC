@@ -1,6 +1,6 @@
 # Artifact production and targeted repair
 
-Read workflow-contract.md for versions and budget; planning-and-scoring.md owns scoring. Read only the current artifact template.
+Read workflow-contract.md for versions and budget; planning-and-scoring.md owns post-review scoring. Read only the current artifact template.
 
 ## A1 — Story
 
@@ -8,14 +8,14 @@ Generate from supported planning SR rows, never from a score response alone. Req
 
 Assign stable unique AC-### IDs and observable Given/When/Then behavior. Cover supported positive, negative/error, validation, boundary, dependency, empty and permission behavior; no requirement to invent every category. Explicit in-scope requirements must be covered or clarified, never hidden in Out of Scope.
 
-Before scoring check supported actor/trigger/rules/outcomes, no placeholders, exact planned filename and correct attachmentAction:
+Before generating dependent artifacts check supported actor/trigger/rules/outcomes, no placeholders, exact planned filename and correct attachmentAction:
 - new_story/add: exactly its matching final SPEC basename; update/replace: each selected reviewed replacement SPEC basename, no unselected local files;
 - update/none: explicit no-attachment-change statement, no link to workspace-only SPEC.
 No internal paths, evidence IDs, provenance URLs, score/audit information or TEST_CASE.md reference in Story. Approved business design links belong only in the SPEC fields defined in metadata-and-examples.md.
 
 ## A2 — Test design
 
-Generate only after current Story scoring passes. For every AC record internal test intent: precondition, trigger/data, outcome, observation point, type, priority and negative coverage disposition. Verification location must be concrete in steps/results; do not invent endpoints, tables or logs.
+Generate from the complete, read-back Story and supported source evidence before scoring. For every AC record internal test intent: precondition, trigger/data, outcome, observation point, type, priority and negative coverage disposition. Verification location must be concrete in steps/results; do not invent endpoints, tables or logs.
 
 At this design step assign the supported FR identifiers in the internal planning trace, then reference those IDs in tests and later declare the same FRs in SPEC. This reserves identifiers only; it does not create a SPEC before the Test Case title gate. Reconcile all final FR declarations against test references before review.
 
@@ -55,16 +55,16 @@ For multiple update replacements, write one distinct final SPEC per selected map
 
 ## A5 — Review and repair
 
-Before review validate current score binding, structure, references, exact embedding and titles. Send actual files, original evidence, planning and state to independent review. Parent saves each returned report at the next unused `review-attempt-<nnn>.md` path (or the same attempt's `-post-repair.md` verification path) and points state to the latest applicable report; never overwrite a completed review record.
+Before independent content review validate structure, references, exact embedding and titles in one read-based pass. Send actual files, original evidence, planning and state to the reviewer without requiring a score record. Parent saves each returned report at the next unused `review-attempt-<nnn>.md` path (or the same attempt's `-post-repair.md` verification path) and points state to the latest applicable report; never overwrite a completed review record.
 
 Classify affected layer before editing:
 - SPEC formatting/diagram/embedding defect → SPEC only.
 - Missing/incorrect test for existing correct AC → Test Case and embedded SPEC table.
-- Missing/wrong Story requirement supported by source → Story and affected downstream, with new score.
+- Missing/wrong Story requirement supported by source → Story and affected downstream, then independent review and final score.
 - Missing source fact → clarification, not guessed repair.
 
-Run shared bounded repair policy. After fixes recheck changed gates and cross-artifact relationships; never blindly regenerate unchanged Story or rescore it. Independent verifier confirms fixes plus affected consistency gates.
+Run shared bounded repair policy. After fixes recheck changed gates and cross-artifact relationships; never blindly regenerate unchanged Story. Independent verifier confirms fixes plus affected consistency gates before the final score call. Keep PASS evidence for unchanged gates only when its bindings remain current.
 
 Review header is output of review, not evidence for that same review. Parent writes actual verdict/brief notes after the reviewer returns; header-only synchronization does not trigger another substantive review. Immediately re-read every intended SPEC and compare its Result and Reviewer Notes to the latest review. Record `specHeaderSync` with the review attempt, path, expected values and verified read-back. If the first header-only write/read check fails, retry that header synchronization once; a second mismatch is WAITING_TOOL and jiraReady remains false. Notes must contain no internal paths/score data in Jira-facing SPEC.
 
-After all selected candidates have PASS and verified SPEC-header synchronization, verify global source coverage, current content, observed revisions, and the final actual basename/path of every SPEC. Use these read-back paths verbatim in the user-facing artifact list and handoff to the `jira-createissue-helper` SDLC gateway. If export capability is missing, return WAITING_TOOL with artifacts prepared, not fictional Jira success.
+After independent content-review PASS and verified SPEC-header synchronization, verify global source coverage, current content, observed revisions, and the final actual basename/path of every SPEC. Use the primary SPEC's verified `Review Result` / `Result` string and workspace-relative path when scoring the final Story. Only a current passing score bound to that SPEC metadata opens the `jira-createissue-helper` SDLC handoff. Use read-back paths verbatim in the user-facing artifact list. If export capability is missing, return WAITING_TOOL with artifacts prepared, not fictional Jira success.

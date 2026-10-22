@@ -1,5 +1,5 @@
 {
-  "contractVersion": 4,
+  "contractVersion": 5,
   "candidateId": "example-story",
   "mode": "new_story",
   "source": null,
@@ -24,6 +24,11 @@
     "invocationRef": null,
     "ok": null,
     "finalScore": null,
+    "inputMode": null,
+    "specFileStatus": null,
+    "specFilePath": null,
+    "specFileRevision": null,
+    "reviewAttempt": null,
     "storyRevision": null,
     "scoreAttempt": 0,
     "assessmentOrdinal": 0,

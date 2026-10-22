@@ -8,7 +8,7 @@ Purpose: Validate a reviewed CEAIA SDLC artifact set before Jira metadata assemb
 
 ## 1. Accepted Handoff Scope
 
-Accept this flow only for a CEAIA SDLC validated handoff. The bundled end-to-end workflow produces it automatically after review PASS unless the user explicitly requests preparation-only/no-Jira output or stops. A handoff may represent:
+Accept this flow only for a CEAIA SDLC validated handoff. The bundled end-to-end workflow produces it automatically after content-review PASS, verified SPEC status synchronization and final Workspace Story score PASS unless the user explicitly requests preparation-only/no-Jira output or stops. A handoff may represent:
 
 - one new Story;
 - multiple new Stories;
@@ -33,10 +33,11 @@ Validate the following logical fields before Jira payload assembly. The fields m
 | `storyPath` | Yes | Yes | Must point to reviewed `STORY.md`. |
 | `storyContent` | Yes | Yes | Must exactly equal the reviewed `STORY.md` content after line-ending normalization only. |
 | `testCasePath` | Yes | Yes | Must point to `TEST_CASE.md`; audit only, never exported. |
-| `specPath` | Yes | Conditional | Create: exactly one reviewed story-named SPEC. Update: primary reviewed SPEC when the manifest has an add/replace operation; optional for `attachmentAction=none`. |
-| `specFileName` | Yes | Conditional | Must match `specPath`, use lowercase kebab-case unless an explicit safe filename exception was reviewed, and agree with Story/review evidence. |
+| `specPath` | Yes | Yes | Primary reviewed story-named SPEC used for the final score metadata in both create and update, including `attachmentAction=none`. Its upload remains conditional on the attachment action. |
+| `specFileName` | Yes | Yes | Must match the primary `specPath`, follow the mandatory lowercase kebab-case `<name>-spec.md` rule without filename exceptions, and agree with Story/review evidence. |
 | `specArtifacts` | Optional | Yes | Complete current reviewed SPEC register. Updates may contain multiple distinct replacement SPECs only when each has an explicit original-to-output mapping and independent PASS binding. |
 | `reviewResult` | Yes | Yes | Must equal `PASS`. |
+| `scoreRecordPath` / `score` | Yes | Yes | Latest final Workspace score record has passing raw response and actual submitted `relativePath`, `specFileStatus`, `specFilePath`; bind its Story and primary SPEC revisions plus independent review attempt to current files. An earlier score without final SPEC metadata is insufficient. |
 | `jiraReady` | Yes | Yes | Must be `true`. |
 | `testCaseTitleValidation` | Yes | Yes | Must equal `manual-pass`. |
 | `specHeaderSync` | Yes | Yes | Must show every intended SPEC synchronized to the latest PASS review attempt and successfully read back. |
@@ -62,12 +63,13 @@ Before querying create metadata or constructing an update payload, validate all 
 
 1. Exactly one `STORY.md` and one `TEST_CASE.md` are present for each handoff item. A create has exactly one reviewed story-named SPEC. An update has the complete current SPEC register: zero uploads for `attachmentAction=none`, or every explicitly mapped add/replace SPEC; distinct reviewed replacement contents remain distinct files.
 2. The Story, Test Case, SPEC, review report, and update manifest, when applicable, agree on the exact SPEC filename.
-3. The review report contains a clean `PASS`, `jiraReady: true`, and `testCaseTitleValidation: manual-pass` for the same artefact paths.
-4. For update items, the review report contains `updateReady: true`, the exact ticket key, the exact title, and the applicable attachment replacement mapping.
+3. The independent content-review report contains clean `PASS` and `testCaseTitleValidation: manual-pass` for the same artefact paths. Its SCORE=DEFERRED and jiraReady=false are expected before scoring. Current parent state, not that earlier report, must show jiraReady=true after a passing final score with verified SPEC status/path.
+4. For update items, current parent state contains `updateReady: true`; the review report verifies the exact ticket key, exact title and applicable attachment replacement mapping. The scorer must have used the modified Workspace Story path, not the known ticket number.
 5. `TEST_CASE.md`, planning, scoring, review reports, and manifests are internal/audit artefacts only. They must not become Jira attachments or be inserted into Jira Description.
 6. SPEC files are the only standard SDLC attachments. Multiple SPECs for one update are valid only when the approved update manifest maps each selected original attachment to a distinct reviewed output where required; unselected local SPECs are not uploaded. A new Story still has exactly one matching SPEC.
 7. The Story must not contain workspace paths, source IDs, URLs, planning references, review operations, or `TEST_CASE.md` attachment/reference in Jira-visible content.
 8. Every final SPEC's first two review-header fields match the latest PASS and reviewer notes, identify the latest review attempt where the active template records it, and have a successful post-synchronization read-back. A PASS report or `jiraReady` flag alone cannot waive this check.
+9. The primary SPEC header `Result` and actual workspace-relative path match the final scoring call's `specFileStatus` and `specFilePath`; the score record/state bind that call to the same Story revision, SPEC fileRevision and review attempt. The complete raw score response passes the existing numeric/parser gate. For a cache hit, verify this invocation carried current SPEC metadata; do not require force_review.
 
 Any failed item blocks that item. In an integrated batch, report the blocked items and do not build a write payload until all selected items pass the relevant gate.
 
@@ -174,7 +176,7 @@ Never downgrade a blocked SDLC handoff to generic create, update, or batch expor
 
 ## 7.1 Post-write Markdown review binding
 
-The v5 SDLC route performs Markdown review ticket binding only after a separate, successful Jira create/update call returns that item's ticket key and all requested attachment operations succeed. It never adds `markdownReviewRelativePath` to the first Jira-write payload. Before the second call, verify that the five required non-empty values are available: real `staffId`, supported `almType`, confirmed returned ticket key as `issueIdOrKey`, actual current `conversationId`, and the Workspace-relative `STORY.md` path used by this candidate's current passing scoring invocation as `markdownReviewRelativePath`. The score-record Markdown file itself is not this path. Check the candidate/state/score/review binding and, for updates, exact key equality. A failed check blocks only the binding stage and preserves the successful Jira result. Do not add other Jira mutation fields to the second call.
+The v5 SDLC route performs Markdown review ticket binding only after a separate, successful Jira create/update call returns that item's ticket key and all requested attachment operations succeed. It never adds `markdownReviewRelativePath` to the first Jira-write payload. Before the second call, verify that the five required non-empty values are available: real `staffId`, supported `almType`, confirmed returned ticket key as `issueIdOrKey`, actual current `conversationId`, and the Workspace-relative `STORY.md` path used by this candidate's final passing scoring invocation with current SPEC metadata as `markdownReviewRelativePath`. The score-record Markdown file itself is not this path. Check candidate/state/score/review binding, current SPEC metadata and, for updates, exact key equality. A failed check blocks only the binding stage and preserves the successful Jira result. Do not add other Jira mutation fields to the second call.
 
 ## 8. SPEC Filename Regression Checks
 

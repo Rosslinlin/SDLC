@@ -87,9 +87,9 @@ Apply this contract to every export flow, top-level parameter, batch item, inher
 | `issueIdOrKey` | For a new issue, use `""` if included and supported, otherwise omit. Updates and associations require a real existing issue id/key; never let a missing update target change the operation into a create. |
 | `issuesJson` | For a non-batch flow, use `""` if included and supported, otherwise omit. An active batch requires its valid serialized item array, not an empty sentinel. |
 | `attachmentsJson` | With no planned or required attachment operations, use `""` if included and supported, otherwise omit. Actual operations require the once-serialized validated plan from `common-attachments.md`. |
-| `testDetailsJson` | When no Test Details are needed, use `""` only for a supported optional string parameter; otherwise omit or use `[]` if an optional array is expected and accepted. Required Test Case steps must remain populated and obey the selected flow's array/string contract. |
+| `testDetailsJson` | When no Test Details are needed, omit it or use `""` only when the tool accepts that inactive string. Active Test Details are a once-serialized JSON string of the documented type; required Test Case steps must remain populated. |
 | `linkedIssueKeys` | Use `[]` if included and empty arrays are supported, otherwise omit when no association is requested. Actual associations require real target keys. Keep it outside `dynamicFieldsJson`. |
-| `dynamicFieldsJson` | Preserve actual validated fields. If none exist, omit or use `{}` for an object parameter / `"{}"` for a serialized-object parameter when accepted. Never insert dummy fields or replace real fields with an empty object. |
+| `dynamicFieldsJson` | Preserve actual validated fields. If none exist, omit or use the JSON-encoded string `"{}"` only when accepted. Never send a native object at the tool-call root, insert dummy fields or replace real fields with an empty object. |
 
 Required values such as `staffId`, `almType`, and operation-specific `projectKey`, `issueType`, `summary`, or required metadata values must be resolved using existing input/metadata rules; block export if unresolved. Do not bypass non-empty requirements with empty values. A required key whose schema explicitly allows an empty value, such as absent Test Data mapped to `data: ""`, remains allowed.
 
@@ -187,12 +187,12 @@ Put other fields into `dynamicFieldsJson`:
 
 ## Batch Item Field Assembly
 
-For batch create/update, apply the same field assembly rules to each item, then place the items in one `issues` or `issuesJson` payload.
+For batch create/update, apply the same field assembly rules to each item, then place the items in one `issuesJson` payload.
 
 - Top-level `projectKey`, `issueType`, `description`, `dynamicFieldsJson`, and `conversationId` can act as defaults.
 - Item-level values override top-level defaults.
 - For update items, validate the effective payload after inheritance against the Mandatory Empty-Value Contract. Do not let defaults modify unrequested fields; relocate such defaults to the intended items instead.
-- Unknown item fields such as `labels`, `components`, `fixVersions`, and `customfield_xxxxx` are treated as dynamic Jira fields for that item.
+- Map Jira fields such as `labels`, `components`, `fixVersions`, and `customfield_xxxxx` into the item's JSON-encoded `dynamicFieldsJson`; do not send undocumented batch-item parameters.
 - Item-level attachments or attachment operations must not be merged into Jira dynamic fields.
 - Apply common Jira text rendering independently to eligible non-Test items only. In a mixed batch, do not inherit a rendered non-Test description into a Test Case item and do not transform any Test Case field.
 - Use `testDetailsJson` per item for Test Case steps.
@@ -202,7 +202,7 @@ For batch create/update, apply the same field assembly rules to each item, then 
 
 When Test Case source content contains Test Steps and Expected Results, assemble `testDetailsJson` automatically.
 
-- For source-based Test Case export with `uploadType=multiple`, item-level `testDetailsJson` must remain a JSON array value inside each parsed `issuesJson` item. Do not encode it as a JSON string inside the item.
+- For source-based Test Case export with `uploadType=multiple`, item-level `testDetailsJson` is a JSON-encoded string containing one array of step/data/result objects inside each parsed `issuesJson` item. Serialize the array once; do not double-encode it or send a native array under this `*Json` parameter.
 - For source-based Test Case export with `uploadType=multiple`, use the source Test Case title as the item `description`; do not generate a long description from Requirement, Priority, Preconditions, Test Steps, Expected Results, or Comments.
 - Pair Test Steps and Expected Results by corresponding item number and original order.
 - Create one `testDetailsJson` row for each paired step/result item.

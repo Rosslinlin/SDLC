@@ -1,6 +1,6 @@
 # Common Attachments
 
-Use for add, delete and replace operations. Preview and confirmation are mandatory.
+Use for add, delete and replace operations. Preview is mandatory. Generic routes require explicit confirmation; the validated SDLC gateway uses its final read-back/preflight and direct-export rule.
 
 - Process attachments only after successful issue create/update.
 - Never merge attachment instructions into dynamic fields.
@@ -19,7 +19,7 @@ Every attachment `add` or replacement upload must identify a Workspace-relative 
 5. For an SDLC handoff, also confirm that the path and filename exactly match the single reviewed SPEC and any applicable update manifest.
 6. Repeat the path/filename consistency check immediately before export if the attachment Workspace artifact changed since preview.
 
-The `<name>-spec.md` naming rule applies only to validated SDLC SPEC uploads. It does not restrict ordinary non-SLattachment names or rename existing Jira attachments retained or targeted for delete/replace. SLfilename corrections must follow the upstream preparation/review recovery in Section 2.1 of `sdlc-handoff-validation.md` before export resumes.
+The `<name>-spec.md` naming rule applies only to validated SDLC SPEC uploads. It does not restrict ordinary non-SDLC attachment names or rename existing Jira attachments retained or targeted for delete/replace. SDLC filename corrections must follow the upstream preparation/review recovery in Section 2.1 of `sdlc-handoff-validation.md` before export resumes.
 
 Do not infer, normalize, relocate, or substitute an attachment path. A missing, unreadable, changed, inconsistent, or unconfirmed path blocks the attachment operation. Report the exact Workspace-relative path and the available failure detail, then request correction, a newly supplied path, or an explicit stop decision.
 
@@ -37,20 +37,20 @@ Build the attachment plan as an object internally. The export parameter `attachm
 {
   "add": [
     {
-      "relativePath": "outputs/ceaia/updates/AIWPB-9235/mobile-registration-entry.md",
-      "fileName": "mobile-registration-entry.md"
+      "relativePath": "outputs/ceaia/updates/WPB/AIWPB-9235/mobile-registration-entry-spec.md",
+      "fileName": "mobile-registration-entry-spec.md"
     }
   ]
 }
 ```
 
-The concrete operation keys supported by the export interface may include `add`, `delete`, and `replace`; use only the authorised operation(s) for the current item.
+The current export interface uses `add`, `deleteAttachmentIds`, and `replace`; use only the authorised operation(s) for the current item.
 
 ### Required outer export payload shape
 
 ```json
 {
-  "attachmentsJson": "{\"add\":[{\"relativePath\":\"outputs/ceaia/updates/AIWPB-9235/mobile-registration-entry.md\",\"fileName\":\"mobile-registration-entry.md\"}]}"
+  "attachmentsJson": "{\"add\":[{\"relativePath\":\"outputs/ceaia/updates/WPB/AIWPB-9235/mobile-registration-entry-spec.md\",\"fileName\":\"mobile-registration-entry-spec.md\"}]}"
 }
 ```
 
@@ -61,8 +61,8 @@ The following is invalid and must be blocked before confirmation/export because 
   "attachmentsJson": {
     "add": [
       {
-        "relativePath": "outputs/ceaia/updates/AIWPB-9235/mobile-registration-entry.md",
-        "fileName": "mobile-registration-entry.md"
+        "relativePath": "outputs/ceaia/updates/WPB/AIWPB-9235/mobile-registration-entry-spec.md",
+        "fileName": "mobile-registration-entry-spec.md"
       }
     ]
   }

@@ -1,12 +1,12 @@
 # CEAIA SDLC Jira Gateway
 
-Gateway version: 1.3.0 — v5
+Gateway version: 1.4.0 — v5
 
 This is the controlling entry point for a `ceaia-sdlc-validated` handoff. It adds SDLC-specific validation, Jira rendering, preview, direct export, post-write Markdown review ticket binding and recovery rules without changing the helper's generic create, update, batch, association or Test Case flows.
 
 ## 1. Routing boundary
 
-Enter this gateway when the handoff declares `handoffType: ceaia-sdlc-validated`. The bundled SDLC workflow creates that handoff automatically after review PASS whether or not the user's opening input mentioned Jira export. An explicit preparation-only/no-Jira request or explicit stop suppresses the handoff.
+Enter this gateway when the handoff declares `handoffType: ceaia-sdlc-validated`. The bundled SDLC workflow creates that handoff automatically after independent content-review PASS, verified SPEC synchronization and final Workspace Story score PASS, whether or not the user's opening input mentioned Jira export. An explicit preparation-only/no-Jira request or explicit stop suppresses the handoff.
 
 `handoffType` is an internal routing discriminator. Retain it in workflow state/handoff validation, but strip it before every Jira MCP call. It is not exposed by the Jira tool schema and must never appear in tool arguments, `dynamicFieldsJson`, `attachmentsJson`, or `issuesJson`.
 
@@ -15,7 +15,7 @@ Load in this order:
 1. `sdlc-gateway.md`;
 2. `sdlc-handoff-validation.md`;
 3. `flow-sdlc-validated-handoff.md`;
-4. the reusable common modules named by that flow.
+4. only the reusable common module sections relevant to the current SDLC create/update, metadata, field, preview and attachment operation named by that flow; generic confirmation and Test Case-only sections do not govern this route.
 
 Do not load a generic business flow as a substitute. A failed SDLC gate remains an SDLC blocker; never downgrade it to generic create, update or batch export.
 
@@ -36,8 +36,8 @@ If Story/SPEC content, attachment selection, ticket mapping, or a business-beari
 
 For every item, validate all of the following from actual current files and state:
 
-1. score record is complete and current; `ok` is boolean `true`; `finalScore` is a finite number from 76 through 100; no unresolved AC/parser blocker remains;
-2. independent `reviewResult` is `PASS`, `jiraReady` is `true`, and update items also have `updateReady: true`;
+1. final score record is complete and current, from Workspace `relativePath` pointing to this reviewed `STORY.md` for both create and update; its submitted `specFileStatus` equals the verified primary SPEC `Review Result` / `Result` string and its `specFilePath` equals that SPEC's workspace-relative path. Score record/state bind the same current Story revision, SPEC fileRevision and independent review attempt. A pre-change score without this metadata is insufficient. The complete raw response has boolean `ok=true`, finite numeric `finalScore` from 76 through 100 and no unresolved AC/parser blocker; a cache hit is valid when its current metadata was saved;
+2. independent content `reviewResult` is `PASS`; current parent state has `jiraReady=true`, and update items also have `updateReady=true`. The pre-score reviewer report correctly has readiness false and SCORE=DEFERRED; never demand post-score PASS fields inside that earlier report;
 3. `testCaseTitleValidation` is `manual-pass`;
 4. every intended final SPEC path appears in the latest review's `reviewedSpecArtifacts` with PASS and read-back evidence;
 5. the first two SPEC header fields are synchronized to the latest PASS and the current review attempt, and the post-write read-back is recorded as successful;
@@ -107,14 +107,14 @@ Call tools with direct named arguments, never a `requestJson` wrapper:
 - `queryJiraCreateMetaFields`: `staffId`, `almType`, `projectKey`, plus at least one of `issueType` or `issueTypeId`.
 - `exportJiraByDynamicFields`: applicable exposed fields such as `staffId`, `almType`, `projectKey`, `summary`, `issueType`, `description`, `projectName`, `epicName`, `epicLink`, `parentLink`, `dynamicFieldsJson`, `testDetailsJson`, `issueIdOrKey`, `conversationId`, `attachmentsJson`, `linkedIssueKeys`, `linkType`, `issuesJson`, or `markdownReviewRelativePath`. The five-field SDLC binding call in Section 7 requires real values for all five of its fields regardless of generic optionality.
 
-For a single create, use direct create fields and a once-serialized `dynamicFieldsJson`; add the reviewed SPEC through a once-serialized `attachmentsJson`. For a single update, send `issueIdOrKey` plus only authorised changed fields. For multiple SDLC items, use one once-serialized JSON array string in `issuesJson`; do not send an `issues` argument that the exposed tool does not provide. Batch attachment operations stay inside their corresponding item. The first create/update call must omit `markdownReviewRelativePath`: this v5 route explicitly waits for the returned ticket key and then makes a separate per-ticket binding call. Never include `handoffType`, workflow status, score, review data or preview metadata in either call's arguments.
+For a single create, use direct create fields and a once-serialized `dynamicFieldsJson`; add the reviewed SPEC through a once-serialized `attachmentsJson`. For a single update, send `issueIdOrKey` plus only authorised changed fields. Multiple SDLC creates may use one once-serialized JSON array string in `issuesJson`; bundled Task updates execute one ticket at a time in preview order, pausing on a failed/partial/unknown result. Do not send an `issues` argument that the exposed tool does not provide. Batch attachment operations stay inside their corresponding item. The first create/update call must omit `markdownReviewRelativePath`: this v5 route explicitly waits for the returned ticket key and then makes a separate per-ticket binding call. Never include `handoffType`, workflow status, score, review data or preview metadata in either call's arguments.
 
 ## 6. Final preview and export binding
 
 Write or replace the single current `jira-preview.md`. Include:
 
 - item operation and destination;
-- current PASS and SPEC-header synchronization evidence;
+- current independent content PASS, verified SPEC-header synchronization and later final score PASS with primary SPEC status/path;
 - full Jira-rendered Summary, non-AC Description and separate Acceptance Criteria, plus the section-to-field partition check;
 - a Markdown-to-Jira-wiki conversion status with any syntax changes listed by type;
 - exact attachment add/replace/delete plan and preflight status;
@@ -133,6 +133,8 @@ Immediately before the tool call, re-read the payload and every upload artifact.
 ## 7. Jira write, second binding call and recovery
 
 After the final read-back/preflight succeeds, call `exportJiraByDynamicFields` immediately with the exact direct Jira-write arguments shown in `jira-preview.md`. Do not add `handoffType` or `markdownReviewRelativePath`, do not wrap the arguments, and do not add omitted optional parameters after preview.
+
+The final score used for binding is the latest current passing Workspace scoring invocation for this candidate, including its verified primary SPEC Result/path. In an update, the scorer still receives the modified Workspace `STORY.md` path, not jira_number/source. The user-confirmed binding behavior associates the returned Jira ticket key with that final passing score record. Match candidate, Story path/revision and SPEC status/path/revision in the local score record and state; do not select an earlier score merely because it has the same Story path.
 
 For each item whose Jira issue write and requested attachment operations are confirmed successful, read the actual returned `ticketKey` and bind it to that item's current scored Story in a second, separate `exportJiraByDynamicFields` call. For an update, verify the returned key equals the intended update ticket key. A missing, numeric-only, ambiguous or mismatched key blocks binding; do not guess from a URL or use a batch index as a key. For a batch, use each successful resource's own returned key and Story path; call separately for each eligible item, never use a top-level batch path or associate another item's result.
 

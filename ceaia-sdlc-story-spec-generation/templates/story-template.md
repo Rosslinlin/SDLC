@@ -22,6 +22,6 @@ As a [evidenced role], I want [capability], so that [value].
 Keep exactly one standalone ## Acceptance Criteria heading, without "and BDD Scenarios" or other suffix.
 Use stable unique AC IDs; add as many evidenced ACs as needed, no mandatory filler cases.
 Keep each AC's Given/When/Then BDD in this section. Count declarations, not references.
-Choose each compliant <name>-spec.md final SPEC name before scoring. Story includes only uploaded SPEC basenames for add/replace.
+Choose each compliant <name>-spec.md final SPEC name before generating dependent artifacts. Story includes only uploaded SPEC basenames for add/replace. The final Story is scored after independent content review and SPEC Result synchronization.
 No workspace paths, source IDs/URLs, scores, review operations or TEST_CASE.md reference.
 -->

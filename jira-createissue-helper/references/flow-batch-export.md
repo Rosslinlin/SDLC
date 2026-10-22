@@ -22,7 +22,7 @@ For Test Cases from source artifacts or structured source content, first load `f
 Batch requests are a single-call flow:
 
 - Recognize batch intent from plural wording, multiple listed items, tables, CSV-like content, multiple Test Cases, or requests such as batch export, create these issues, update those tickets, or export all.
-- Assemble one `issues` or `issuesJson` payload containing all items. For Test Case export with `uploadType` mode `single`, assemble one aggregate Test issue payload with top-level `summary`, clean table-only `description`, and `dynamicFieldsJson.labels` instead of item-list fields.
+- Assemble one `issuesJson` payload containing all items. For Test Case export with `uploadType` mode `single`, assemble one aggregate Test issue payload with top-level `summary`, clean table-only `description`, and labels inside the JSON-encoded `dynamicFieldsJson` object instead of item-list fields.
 - Before preview, render Markdown-authored rich text for each eligible non-Test item through `common-jira-text-rendering.md`. Do not apply common rendering to any Test Case item or field; mixed batches preserve the existing Test Case rules item by item.
 - Generate one integrated batch preview in `jira-preview.md` before export.
 - Ask for explicit confirmation once for the whole batch.
@@ -40,9 +40,9 @@ Batch requests are a single-call flow:
 
 ## Batch Mode Trigger
 
-Batch mode uses active item data in `issues` or `issuesJson`, not the mere presence of a parameter key. An explicitly supported inactive `issuesJson: ""` in a non-batch flow does not enable batch mode. A requested batch must provide a valid non-empty item list; missing, malformed, or empty batch data blocks export rather than falling back to a single create. Test Case source export with `uploadType` mode `single` is a single-call export and must not include `issues` or `issuesJson`.
+Batch mode uses active item data in `issuesJson`, not the mere presence of a parameter key. An explicitly supported inactive `issuesJson: ""` in a non-batch flow does not enable batch mode. A requested batch must provide a valid non-empty item list; missing, malformed, or empty batch data blocks export rather than falling back to a single create. Test Case source export with `uploadType` mode `single` is a single-call export and must not include `issuesJson`.
 
-Use `issuesJson` when assembling a JSON array string for the MCP tool. Use `issues` only when the tool runtime supports a typed item list directly.
+The current `exportJiraByDynamicFields` interface exposes `issuesJson` as a JSON-encoded non-empty array string; it does not expose an `issues` argument.
 
 ## Base Request Fields
 
@@ -50,17 +50,16 @@ Top-level fields act as defaults for all items:
 
 - `staffId`: Required. Staff ID used to load the user's Jira token.
 - `almType`: Required. Jira source: `wpb`, `alm`, `data`, `fcr`, or `go`.
-- `uploadType`: Required as a Test Case export mode selection. Valid values are `single` and `multiple`; do not include this control value in the final `exportJiraByDynamicFields` payload.
+- `uploadType`: Required only for Test Case source export as a mode selection. Valid values are `single` and `multiple`; do not include this control value in the final `exportJiraByDynamicFields` payload.
 - `projectKey`: Default project key for create items.
 - `issueType`: Default issue type for create items.
 - `description`: Optional default description.
 - `dynamicFieldsJson`: Optional default dynamic fields.
 - `conversationId`: Optional default conversation id for workspace attachments.
-- `attachmentsJson`: Optional top-level attachment operations for single-item mode; prefer item-level attachments in batch mode.
-- `issues`: Optional typed batch item list.
+- `attachmentsJson`: Optional top-level attachment operations for a separate single-item call; an active batch sets each item's attachment plan inside `issuesJson` because top-level attachments are not inherited.
 - `issuesJson`: Optional JSON array string for batch items.
 
-Item-level fields override top-level defaults. Unknown item fields such as `labels`, `components`, `fixVersions`, and `customfield_xxxxx` are treated as dynamic Jira fields for that item.
+Item-level fields override top-level defaults. Map Jira fields such as `labels`, `components`, `fixVersions`, and `customfield_xxxxx` into that item's JSON-encoded `dynamicFieldsJson`; do not send them as undocumented batch-item parameters.
 
 Validate each effective item after default inheritance using `common-field-assembly.md`'s Mandatory Empty-Value Contract. Update items must not inherit changes to unspecified fields; relocate defaults to the intended items when necessary. A requested update with a missing or empty `issueIdOrKey` must block, not silently become a create.
 
@@ -79,7 +78,7 @@ Validate each effective item after default inheritance using `common-field-assem
   "almType": "wpb",
   "projectKey": "AIWPB",
   "issueType": "Story",
-  "issuesJson": "[{\"summary\":\"Batch story 1\",\"description\":\"Story 1 desc\",\"labels\":[\"CEAIA_GEN\",\"BATCH\"],\"customfield_12345\":{\"value\":\"High\"}},{\"summary\":\"Batch story 2\",\"issueType\":\"Task\",\"labels\":[\"CEAIA_GEN\"],\"customfield_67890\":\"Business value\"}]"
+  "issuesJson": "[{\"summary\":\"Batch story 1\",\"description\":\"Story 1 desc\",\"dynamicFieldsJson\":\"{\\\"fields\\\":{\\\"labels\\\":[\\\"CEAIA_GEN\\\",\\\"BATCH\\\"],\\\"customfield_12345\\\":{\\\"value\\\":\\\"High\\\"}}}\"},{\"summary\":\"Batch story 2\",\"issueType\":\"Task\",\"dynamicFieldsJson\":\"{\\\"fields\\\":{\\\"labels\\\":[\\\"CEAIA_GEN\\\"],\\\"customfield_67890\\\":\\\"Business value\\\"}}\"}]"
 }
 ```
 
@@ -91,7 +90,7 @@ Each item to update must provide its own `issueIdOrKey`.
 {
   "staffId": "12345678",
   "almType": "wpb",
-  "issuesJson": "[{\"issueIdOrKey\":\"AIWPB-101\",\"summary\":\"Updated story summary\",\"labels\":[\"CEAIA_GEN\",\"MCP_BATCH_UPDATE\"]},{\"issueIdOrKey\":\"AIWPB-102\",\"dynamicFieldsJson\":\"{\\\"fields\\\":{\\\"description\\\":\\\"Updated description\\\",\\\"labels\\\":[\\\"CEAIA_GEN\\\"],\\\"customfield_12345\\\":{\\\"value\\\":\\\"Medium\\\"}}}\"}]"
+  "issuesJson": "[{\"issueIdOrKey\":\"AIWPB-101\",\"summary\":\"Updated story summary\"},{\"issueIdOrKey\":\"AIWPB-102\",\"dynamicFieldsJson\":\"{\\\"fields\\\":{\\\"description\\\":\\\"Updated description\\\",\\\"labels\\\":[\\\"CEAIA_GEN\\\"],\\\"customfield_12345\\\":{\\\"value\\\":\\\"Medium\\\"}}}\"}]"
 }
 ```
 
@@ -139,10 +138,9 @@ Report batch results by item index and status. One failed batch item does not st
 
 ## Batch Notes
 
-- `dynamicFieldsJson` must be a JSON object or JSON string representing an object.
+- `dynamicFieldsJson`, when provided, must be a JSON-encoded string representing one object, including inside each `issuesJson` item.
 - For active attachment operations, `attachmentsJson` must be a once-serialized JSON string containing the validated plan from `common-attachments.md`, not an object or array.
 - `issuesJson` must be a JSON array string. For source-based Test Case export, follow `flow-testcase-source-export.md` instead of this generic batch note.
-- `issues` must be a typed item list when supported by the runtime.
-- Never use `""` for unused parameters. Apply the Mandatory Empty-Value Contract to top-level inputs and every item; inactive sentinels cannot substitute for required batch or operation data.
+- Omit unused optional parameters; an actual empty string is allowed only where the active tool accepts it as an inactive sentinel. Apply the Mandatory Empty-Value Contract to top-level inputs and every item; inactive sentinels cannot substitute for required batch or operation data.
 - Do not put attachment operations into Jira dynamic fields.
 - Do not split a batch into repeated single-item tool calls unless explicitly requested.

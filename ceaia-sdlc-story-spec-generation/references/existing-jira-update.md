@@ -34,13 +34,13 @@ Inherited broad baseline scope is not by itself a reason to split into newly cre
 
 ## U3 — Attachment action
 
-Decide before Story scoring:
+Decide before Story generation:
 - `none`: no attachment write intended (including description-only/zero-attachment updates). Record an empty replacement mapping. Story Attachments says no attachment changes; it must not name the generated workspace-only SPEC as an uploaded attachment. Still generate and review the local SPEC and tests.
 - `replace`: replace each explicitly selected existing SPEC using its corresponding reviewed output SPEC. Propose a uniquely evidenced target; when ambiguous show filenames, MIME and purpose in a selector, keeping returned IDs internal. Final preview and export preflight confirm each selection.
 
 One ticket has one current Story and Test Case set, with a primary SPEC and additional distinct replacement SPECs when requested. Do not ask the user to discard a requested replacement merely to fit a single-SPEC assumption. Different content requires separate reviewed files, not separate Jira tickets.
 
-Before Story scoring, establish all intended final basenames and explicit original attachment ID → replacement relativePath/fileName mappings. No future SPEC file is created yet. Story Attachments lists only the intended uploads. Use unique filenames under the same outputRoot.
+Before Story generation, establish all intended final basenames and explicit original attachment ID → replacement relativePath/fileName mappings. The planned SPEC files are created before independent content review and final Story scoring. Story Attachments lists only the intended uploads. Use unique filenames under the same outputRoot.
 
 Record every current SPEC in state.specArtifacts (including the primary paths.specPath) with path, fileName, uploaded, bodyRevision, fileRevision. Keep attachmentReplacementMapping entries with attachmentId, relativePath, fileName. IDs come only from the reader. If multiple originals intentionally receive one file, require explicit many-to-one confirmation; otherwise mappings are one-to-one. Document per-original baseline preservation.
 
@@ -52,7 +52,7 @@ Reader evidence is immutable; write replacement content under outputRoot. Upload
 
 ## U4 — Generation, review, handoff
 
-Use normal planning, Story scoring and repair gates. Story changes preserve baseline and update only supported behavior. Review checks original description, available AC, every relevant readable attachment, preservation matrix and action-specific mapping.
+Use normal planning, artifact generation, independent content review, SPEC status synchronization, final Workspace Story scoring and repair gates in that order. Story changes preserve baseline and update only supported behavior. Review checks original description, available AC, every relevant readable attachment, preservation matrix and action-specific mapping.
 
 A none mapping is resolved and can yield updateReady=true. A replace mapping must be fully resolved before PASS. Send statePath and reviewed manifest to the `jira-createissue-helper` SDLC gateway; generation never calls the Jira export tool directly.
 

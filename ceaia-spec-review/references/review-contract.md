@@ -7,7 +7,7 @@ Shared workflow-contract.md owns latest-output paths, retained numbered internal
 Parent supplies statePath and actual:
 - original requirement/design/FSD/API material, user clarifications and source locations;
 - mode-specific planningPath (mandatory);
-- storyPath, scoreRecordPath, testCasePath and specPath;
+- storyPath, testCasePath and specPath; the scoreRecordPath is normally still pending at this content-review stage;
 - updateManifestPath, original Jira baseline, separate AC result and every applicable imported attachment for updates;
 - repair round/phase and latest unresolved issues for focused verification.
 
@@ -15,7 +15,7 @@ Missing evidence is reported precisely, not replaced by prior generator assertio
 
 ## Verdict
 
-PASS: all required gates pass and no material blocker remains.
+PASS: all required content gates pass and no material blocker remains; SCORE remains DEFERRED and parent must still score before Jira readiness.
 NEEDS_REVISION: supported content/mechanical correction or technical execution problem.
 NEEDS_HUMAN_CLARIFICATION: actual missing/conflicting business evidence/decision.
 FINAL_WITH_UNRESOLVED: explicit user stop before PASS only.
@@ -31,10 +31,10 @@ Initial review does not consume a repair. Parent applies the shared candidate bu
 
 Missing business evidence sets userActionRequired immediately. Exhausted budget/stagnation also requires a decision unless the one bounded read-only diagnosis remains useful. Technical recovery needs technical information, not invented business requirements. UserActionRequired includes business input, correction, additional bounded authorization, defer or stop decisions; it is not limited to new requirements.
 
-Do not recommend more identical retries, lower the score threshold, discard ACs or accept a conditional PASS.
+Do not recommend more identical retries, lower the later score threshold, discard ACs or accept a conditional content PASS.
 
 ## Handoff
 
-Return reviewResult, mode, identity, artifact paths, gateResults, scoreGate, reviewedBindings, findings, repair scope, title validation, jiraReady/updateReady, attachmentAction/mapping, userActionRequired/userRequestedEvidence and recommendedNextAction as specified by report template.
+Return reviewResult, mode, identity, artifact paths, gateResults including SCORE=DEFERRED, a deferred scoreGate compatibility object, reviewedBindings, findings, repair scope, title validation, jiraReady/updateReady, attachmentAction/mapping, userActionRequired/userRequestedEvidence and recommendedNextAction as specified by report template.
 
-Score facts stay in this internal report/state, not SPEC notes or update manifest. Parent synchronizes the verdict header in every intended SPEC, immediately reads back the complete files, records the review attempt and each fileRevision, and keeps jiraReady=false until all header checks are verified. Candidate PASS does not claim final export readiness, Jira write success, or whole-batch completion.
+The content-review report contains no invented score facts. Parent synchronizes the verdict header in every intended SPEC, immediately reads back the complete files, records the review attempt and each fileRevision, then calls the scorer with the unchanged final Story and primary SPEC status/path. jiraReady/updateReady stay false until the final score, header checks and global coverage pass. Candidate content PASS does not claim final export readiness, Jira write success, or whole-batch completion.

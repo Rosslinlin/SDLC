@@ -1,11 +1,11 @@
 ---
 name: ceaia-sdlc-story-spec-generation
-description: Generate or update evidence-backed CEAIA Stories, apply the Story scoring tool, produce executable Test Cases and matching SPECs, repair affected content, and hand independently reviewed artifacts to the Jira write gate.
+description: Generate or update evidence-backed CEAIA Stories, executable Test Cases and matching SPECs; independently review the content, score the final Story with its SPEC review status, and hand validated artifacts to the Jira write gate.
 ---
 
 # CEAIA Story and SPEC Generation
 
-Bundle revision: 4.2.1 text-only — 2026-10-06.
+Bundle revision: 5.1 text-only — 2026-10-23.
 
 Own intake, planning, generation, current-state persistence and evidence-supported repairs. The independent reviewer is `ceaia-spec-review`; Jira writes belong to the dedicated SDLC gateway in `jira-createissue-helper`.
 
@@ -13,17 +13,17 @@ Own intake, planning, generation, current-state persistence and evidence-support
 
 This Skill is the mandatory first Skill for the bundled SDLC workflow. At entry, lock the route and planned Skill sequence before performing Jira-export discovery:
 
-1. `ceaia-sdlc-story-spec-generation` owns intake, planning, Story generation, scoring, Test Case/SPEC generation and repairs.
-2. `ceaia-spec-review` performs the independent read-only review only after the candidate artifact set is complete.
-3. `jira-createissue-helper` runs only after every selected candidate has current PASS and verified SPEC-header synchronization, and only through its dedicated SDLC gateway.
+1. `ceaia-sdlc-story-spec-generation` owns intake, planning, Story/Test Case/SPEC generation, targeted repairs, and the final workspace Story scoring call after review.
+2. `ceaia-spec-review` performs the independent read-only content review after the candidate artifact set is complete and before the final scoring call.
+3. `jira-createissue-helper` runs only after every selected candidate has current content-review PASS, verified SPEC-header synchronization and a passing final Story score, and only through its dedicated SDLC gateway.
 
-The bundled SDLC workflow is end-to-end by default. Whether or not the user's initial input says “push to Jira”, “export to Jira” or equivalent, set `jiraExportRequested: true` and continue through Jira create/update after every selected candidate passes review and SPEC-header synchronization. Do not load the helper, search Jira projects, query issue types, ask for Epic Link, or ask other destination-field questions during initial intake; defer all Jira destination resolution until the reviewed handoff reaches step 3. Stop after workspace artefacts only when the user explicitly requests preparation-only/no-Jira output, explicitly stops, or the caller explicitly declares the whole workflow preparation-only. A task's internal generation-only stage partition does not change `jiraExportRequested` and does not opt the whole workflow out of its later Jira stage.
+The bundled SDLC workflow is end-to-end by default. Whether or not the user's initial input says “push to Jira”, “export to Jira” or equivalent, set `jiraExportRequested: true` and continue through Jira create/update after every selected candidate passes content review, SPEC-header synchronization and final Story scoring. Do not load the helper, search Jira projects, query issue types, ask for Epic Link, or ask other destination-field questions during initial intake; defer all Jira destination resolution until the scored handoff reaches step 3. Stop after workspace artefacts only when the user explicitly requests preparation-only/no-Jira output, explicitly stops, or the caller explicitly declares the whole workflow preparation-only. A task's internal generation-only stage partition does not change `jiraExportRequested` and does not opt the whole workflow out of its later Jira stage.
 
 ## Load for the current phase
 
 1. Always read [workflow-contract](references/workflow-contract.md), the single authority for paths, current versions, invalidation, repair budget and handoff.
 2. Intake: [source-enrichment](references/source-enrichment.md); for updates also [existing-jira-update](references/existing-jira-update.md).
-3. Planning: [planning-and-scoring](references/planning-and-scoring.md), [business preservation checklist](references/business-planning-checklist.md) and [planning template](templates/planning-template.md). Before scoring additionally read the [supplied scoring-tool contract](references/scoring-tool-contract.md).
+3. Planning: [planning-and-scoring](references/planning-and-scoring.md), [business preservation checklist](references/business-planning-checklist.md) and [planning template](templates/planning-template.md). Read the [scoring-tool contract](references/scoring-tool-contract.md) at the post-review scoring step, not during intake.
 4. Generation/repair: [artifact-generation-rules](references/artifact-generation-rules.md), [metadata and worked examples](references/metadata-and-examples.md), plus the relevant [Story](templates/story-template.md), [Test Case](templates/test-case-template.md) or [SPEC](templates/spec-template.md) template.
 5. Text-only checks: read and perform the [verification checklist](references/validation.md) using existing platform tools. Do not generate or execute scripts.
 
@@ -37,20 +37,20 @@ If a ticket to be read lacks an explicitly confirmed source, the next interactio
 
 For each candidate:
 1. Inventory evidence, resolve material gaps and create planning trace. Updates preserve original ticket baseline and complete attachment intake.
-2. Determine identity, exact paths, a compliant `<name>-spec.md` filename for every intended SPEC and attachment action before writing Story. Naming a future file is allowed; creating Test Case/SPEC before the first passing Story score is not.
-3. Write the complete Story with exactly `## Acceptance Criteria` and stable AC IDs containing Given/When/Then. Invoke `nodejs-base-mcp.score_requirement_markdown` with its workspace-relative path; omit optional force_review for documented cache behavior.
-4. Only a complete current score with boolean `ok: true`, numeric `finalScore >= 76` and no unresolved parser/AC-recognition blocker opens Test Case generation. A 36 score with ok=true is not PASS.
-5. Generate Test Case, validate titles and executable coverage, then assemble SPEC from current sibling content. Updates may require multiple distinctly reviewed replacement SPECs; preserve each explicit attachment mapping.
-6. Run mechanical checks and independent read-only `ceaia-spec-review` against actual evidence. A fresh read-only subagent or task-provided independent reviewer satisfies this; do not duplicate it or substitute generator self-approval. If no independent review capability is available, return WAITING_TOOL.
-7. Persist every review in the next unused numbered `.ceaia-work` record, point state to the latest review, classify repairs by affected file, and apply the shared budget. Story changes require a new numbered score record; unchanged Story does not.
-8. Synchronize every intended SPEC review header after the verdict, immediately read back and verify the header against the latest PASS, then check global source coverage across the selected batch. A failed header sync blocks jiraReady.
-9. When all selected targets have current PASS, continue automatically to `jira-createissue-helper`'s dedicated SDLC gateway for Jira-wiki rendering, SDLC destination confirmation, final preview/preflight and direct Jira export. Absence of Jira-export wording is not a stopping condition. Stop before Jira only for an explicit preparation-only/no-Jira request, explicit stop, or whole-workflow preparation-only assignment; an internal task stage boundary is not such an assignment.
+2. Determine identity, exact paths, a compliant `<name>-spec.md` filename for every intended SPEC and attachment action before writing Story.
+3. Write the complete Story with exactly `## Acceptance Criteria` and stable AC IDs containing Given/When/Then. Perform source-backed completeness and parser-shape checks without inventing a score or calling the scoring tool yet.
+4. Generate Test Case, validate titles and executable coverage, then assemble SPEC from current sibling content. Updates retain every distinct reviewed replacement and explicit attachment mapping.
+5. Run one same-stage mechanical check and independent read-only `ceaia-spec-review` against actual evidence. A fresh read-only subagent or task-provided independent reviewer satisfies this; do not substitute generator self-approval. If unavailable, return WAITING_TOOL.
+6. Persist each review in a numbered `.ceaia-work` record. Repair only affected files under the shared budget; a Story repair also refreshes its dependent Test Case/SPEC and requires a new independent review. SPEC-only and test-only repairs do not rewrite Story.
+7. After current content-review PASS, synchronize every intended SPEC `Review Result` header and read back the complete files. Check global source coverage. The verified primary SPEC `Result` and current workspace-relative path are the scoring metadata; a failed synchronization blocks scoring and jiraReady.
+8. Read back the unchanged final `STORY.md` and primary SPEC, then call `nodejs-base-mcp.score_requirement_markdown` in workspace mode with `relativePath` for Story and `specFileStatus`/`specFilePath` for that SPEC. This applies to both new Stories and existing-ticket updates; a known Jira key is not the scoring input. Omit optional force_review/metadata. Save the complete response in a numbered record. A cache hit may reuse the score while storing this invocation's SPEC metadata. Require boolean `ok: true`, numeric `finalScore >= 76` and intact AC/parser recognition. If scoring reveals a supported content defect, repair the affected files and repeat the required independent review before scoring the revised current Story.
+9. Set jiraReady for all candidates, and updateReady only for valid updates, when the current review, synchronized SPEC, final score metadata and global coverage all agree. Then continue automatically to `jira-createissue-helper`'s dedicated SDLC gateway for Jira-wiki rendering, destination confirmation, final preview/preflight and direct export. Absence of Jira-export wording is not a stopping condition.
 
 ## Invocation boundary
 
 Default is bundled generation, review and validated Jira handoff. If the caller explicitly assigns only generation and separate later review/push steps, return `nextAction: independent-review` after generation and prechecks. Do not also execute those later steps. No task JSON redesign is required.
 
-Resume from validated current state on every entry; do not unconditionally repeat scoring, review or writes. Generation owns content repair even when a later stage reports the problem.
+Resume from validated current state on every entry; do not unconditionally repeat scoring, review or writes. A pre-change score without the verified final SPEC metadata is not a complete final-score handoff; invoke the tool once with current metadata and allow its normal cache. Generation owns content repair even when a later stage reports the problem.
 
 ## Output and waiting
 

@@ -1,6 +1,6 @@
 # Flow SDLC Validated Handoff Export
 
-Flow version: 1.5.0
+Flow version: 1.6.0
 
 Applies to: reviewed CEAIA SDLC Story/SPEC handoffs
 
@@ -10,7 +10,7 @@ Required companion: `sdlc-handoff-validation.md`
 
 ## 1. Scope and priority
 
-Use this flow for a reviewed CEAIA SDLC handoff that creates or updates Jira Stories and manages their approved attachments. In the bundled SDLC workflow the handoff is automatic after review PASS even when the opening user input did not mention Jira export. This flow supports one item or multiple independent items.
+Use this flow for a reviewed CEAIA SDLC handoff that creates or updates Jira Stories and manages their approved attachments. In the bundled SDLC workflow the handoff is automatic after content-review PASS, verified SPEC status synchronization and final Story score PASS, even when the opening user input did not mention Jira export. This flow supports one item or multiple independent items.
 
 This flow has priority over generic create, update and batch flows. It does not replace the dedicated Test Case source-export flow. If the SDLC validation gate fails, report the exact blocker and stop; do not regenerate content or route the request through a generic flow.
 
@@ -28,18 +28,20 @@ Execute `sdlc-gateway.md` before this procedure. The gateway controls SDLC eligi
 
 ## 3. Required modules
 
-Read and apply:
+Read `sdlc-gateway.md`, this flow and `sdlc-handoff-validation.md` once. These three control the SDLC gates. Consult common modules only at the operation that needs their mechanics; do not load the entire common set during route selection or repeat a validated gate solely because another module restates it:
 
-- `sdlc-gateway.md`
-- `common-tools-and-inputs.md`
-- `common-state-and-user-info.md`
-- `common-project-issue-type-validation.md` for creates
-- `common-field-assembly.md`
-- `common-jira-text-rendering.md`
-- `common-preview-confirm-export.md`
-- `common-guardrails.md`
-- `common-attachments.md`
-- `sdlc-handoff-validation.md`
+| Current need | Common reference to consult |
+| --- | --- |
+| Jira tool contract or missing input detail | `common-tools-and-inputs.md` relevant Tool Responsibilities/Base Inputs |
+| SDLC saved defaults, selection UI or current-stage metadata reuse | `common-state-and-user-info.md` SDLC Defaults/De-Duplication/Popup sections |
+| Create project/type discovery or changed destination | `common-project-issue-type-validation.md`; reuse current validated project/type for matching items |
+| Required Jira fields, dynamic JSON, empty-value rules | `common-field-assembly.md` relevant metadata, field-mapping and empty-value sections |
+| Markdown-to-Jira-wiki transport | `common-jira-text-rendering.md` non-Test sections |
+| Exact preview, payload serialization and result handling | `common-preview-confirm-export.md` relevant preview/preflight/submission sections; generic final-confirmation section does not apply |
+| Ambiguous metadata, validation failure or SDLC user-info persistence | `common-guardrails.md` shared/SDLC sections; Test Case-only sections do not apply |
+| An actual add/replace/delete attachment action | `common-attachments.md`; update/none does not load attachment mechanics merely to prove there is no upload |
+
+Reuse the same validated candidate evidence and Jira metadata across this handoff. New evidence, changed identity/destination or remote reconciliation requires affected checks again.
 
 ## 4. End-to-end procedure
 
@@ -102,7 +104,7 @@ Do not update unsupported fields. Preserve current values for all other fields.
 
 #### Multiple creates or updates
 
-Use one `issuesJson` JSON-array string and one export call by default. Partition each item's own reviewed Story independently. Every item must retain its own project/type where required, non-AC Description, separately mapped Acceptance Criteria in that item's `dynamicFieldsJson` when creating or changing AC, required-field values and attachment plan. A verified matching current AC field may remain untouched on an update. Do not inherit another item's AC through top-level defaults. Do not send an `issues` argument because it is not exposed by the active export tool.
+For multiple creates, use one `issuesJson` JSON-array string and one export call by default. For multiple updates in the bundled SDLC Task, execute one ticket at a time in preview order and pause after the first failed/partial/unknown result; do not replace that order with a single batch write. Partition each item's own reviewed Story independently. Every item must retain its own project/type where required, non-AC Description, separately mapped Acceptance Criteria in that item's `dynamicFieldsJson` when creating or changing AC, required-field values and attachment plan. A verified matching current AC field may remain untouched on an update. Do not inherit another item's AC through top-level defaults. Do not send an `issues` argument because it is not exposed by the active export tool.
 
 For mixed create/update work, use one integrated payload only when the user explicitly requests a mixed batch. Otherwise produce separate operation previews to avoid accidental combined writes.
 
@@ -130,7 +132,7 @@ Create or overwrite the sole preview file: `jira-preview.md`. It must include:
 - operation and item count;
 - source project/issue type for every item;
 - exact ticket key for update items;
-- artefact validation status: Story, Test Case audit-only status, one SPEC, review PASS, `jiraReady`, title validation and update readiness where applicable;
+- artefact validation status: Story, Test Case audit-only status, primary SPEC, independent content-review PASS, synchronized SPEC Result/path, later final Workspace Story score PASS, current parent `jiraReady`, title validation and update readiness where applicable;
 - field provenance for every required field;
 - SDLC defaults status: first-run Epic Link/no-Epic decision or later-run validated user confirmation, including the exact project/type/Epic/Parent values used;
 - a clear statement that the reviewed Story was partitioned once, with every non-AC section mapped to Description and only the approved AC section body mapped to the Acceptance Criteria field;
@@ -177,7 +179,7 @@ These are structural examples only. Use actual validated metadata field IDs and 
 
 1. After the final preview/read-back/preflight passes, call `exportJiraByDynamicFields` immediately with exactly the displayed direct Jira create/update arguments, omitting `markdownReviewRelativePath` on this first call.
 2. Do not automatically retry a failed call.
-3. For each successful item, repeat the path/filename consistency check if the Workspace artefact or plan changed after preview, then run its validated attachment operations after the Issue write result is known.
+3. For each successful item, inspect the attachment outcomes already returned by this export call. When `attachmentsJson` was included in the call, do not upload a confirmed successful attachment again. If an attachment result is partial or unknown, preserve the confirmed Jira issue result and reconcile the specific attachment state before any newly previewed recovery; do not replay the whole issue write.
 4. After an item's issue write and requested attachments are confirmed successful, read that item's returned `ticketKey`; for an update verify it matches the intended key. Then follow `sdlc-gateway.md` Section 7: preview and read back a separate call containing exactly `staffId`, `almType`, `issueIdOrKey`, `conversationId`, and `markdownReviewRelativePath`, and call `exportJiraByDynamicFields` again. Use the candidate's current scored `STORY.md` path, not the internal score-record Markdown path. For a batch, make this second call once per successful item with that item's returned key and path.
 5. Record the Jira write/attachment outcome and the returned `markdownReview` binding outcome separately. If binding fails or is unknown, keep the successful Ticket Key and do not recreate/update the Jira content merely to retry the association. Do not mark the whole item complete until both required stages pass.
 6. On a confirmed successful Jira write, update the canonical SDLC-only `## CEAIA SDLC Jira Defaults` section in `jira-user-info.md` with allowed non-secret reusable values, including validated source, project, Story issue type and explicitly selected Epic/Parent Link defaults or the explicit no-Epic decision. No generic or Test Case route may perform this persistence.
