@@ -1,6 +1,6 @@
-# Input format and presentation conversion
+# Workspace input conversion
 
-Read this before writing a scoring input. Use the original Story as evidence; a template supplies structure, never missing business text.
+Read this only for a Story with no Jira ticket number. Jira targets are reviewed directly and must not be converted into local Markdown. For ticketless input, use the original Story as evidence; a template supplies structure, never missing business text.
 
 ## Field contract
 
@@ -26,7 +26,7 @@ Use this shape. Replace all angle-bracket guidance with actual source values; om
 <original field value>
 ```
 
-Every field, including Summary and every additional field, starts with `##`. Keep Summary, Description and Acceptance Criteria in that order, then additional fields in their original order. Do not introduce an `Other Fields`, `Additional Fields` or similar wrapper. For example, source fields Scope, Dependencies and Jira Ticket become `## Scope`, `## Dependencies` and `## Jira Ticket` directly.
+Every field, including Summary and every additional field, starts with `##`. Keep Summary, Description and Acceptance Criteria in that order, then additional fields in their original order. Do not introduce an `Other Fields`, `Additional Fields` or similar wrapper. For example, source fields Scope, Dependencies and Release become `## Scope`, `## Dependencies` and `## Release` directly.
 
 The `#` document title repeats the real Summary for compatibility with the scorer's observed H1 title extraction; it is not another field. This title/Summary repetition is the only deliberate content duplication. If Summary is absent, leave `## Summary` empty and omit the H1; do not invent a title. Keep required Description/Acceptance Criteria sections empty when their source values are missing, without adding fabricated placeholders.
 

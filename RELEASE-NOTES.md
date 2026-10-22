@@ -2,6 +2,10 @@
 
 发布日期：2026-10-06
 
+## 补充：独立 Story Reviewer 使用 Jira 直评分
+
+`user-story-reviewer` 现在按 Ticket Number 路由：任何带 Ticket Number 的 Story 直接使用 `jira_number` 与用户明确提供的 `source` 调用评分工具；多条 Story 缺少 source 时一次性收集，不读取 `jira-user-info.md`，也不从 Ticket 前缀推断。Jira 模式不再生成评分输入 Markdown，不再调用 Jira 读取或独立数据库回写工具；评分工具自行读取 Jira、保存结果并关联 Ticket。只有没有 Ticket Number 的输入继续使用 Workspace Markdown 模式。暂不传递 `specFileStatus` 与 `specFilePath`。
+
 ## 补充：统一 SPEC 文件名
 
 所有新生成的 SPEC，包括不上传的更新用本地 SPEC，都必须使用与 Story/业务功能对应的 `<name>-spec.md`。生成阶段不再允许 `SPEC.md` 或普通 `<name>.md` 的文件名例外；多个不同替换 SPEC 使用不同的业务功能名称。独立审查核对实际文件、SPEC 内 File Name、Story/Test Case 引用、状态和更新映射；最终对话从实际 Workspace 文件读回并显示相同名称。此次未修改任务 JSON、`VERSION.json` 或 `jira-createissue-helper`。

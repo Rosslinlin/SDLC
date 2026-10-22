@@ -1,57 +1,58 @@
 ---
 name: user-story-reviewer
-description: Score one or more user stories with the platform Markdown scoring tool, show the complete scoring results, and bind each score to its own existing Jira ticket when known. Use for standalone scoring or after a story-generation skill; do not create or edit Jira Story content.
+description: Review and score one or more user stories with the platform scoring tool. Send every Story that includes a Jira ticket number through direct Jira review after collecting its Jira source; convert only ticketless Story input to workspace Markdown. Save and explain the complete returned assessment without creating or editing Jira issues.
 ---
 
 # User Story Reviewer
 
-Read the original Story, normalize presentation without rewriting requirements, score the saved input, then save and explain the tool result. Bind a completed score to the Story's own existing Jira ticket when known. A low score does not block binding or impose an export threshold.
+Score each Story through exactly one route:
+
+- **Jira route:** any Story input containing a Jira ticket number, including a ticket supplied alone or inside uploaded JSON/text.
+- **Workspace route:** Story input with no Jira ticket number.
+
+Do not decide that a detected ticket is merely a reference and silently choose workspace mode. If one input contains several distinct ticket numbers, treat each number as a Jira review target. Keep batch items, sources, calls and results separate.
 
 ## Tools
 
-- `nodejs-base-mcp.score_requirement_markdown`: reads a saved workspace Markdown path and saves the service score/audit record.
-- `java-base-mcp.exportJiraByDynamicFields`: use only the five-argument ticket-binding call in the binding reference.
-- Workspace read/write tools for the conversation workspace and user workspace; a Jira read tool such as `java-base-mcp.getJiraInfos` for ticket-only input or ambiguous ticket ownership.
-- `ask_user_question`, or the platform's available input UI, to collect genuinely missing identity/source information or resolve a failure.
+- `nodejs-base-mcp.score_requirement_markdown`: scores either a workspace Markdown file or one Jira issue and persists the service result/audit record.
+- Workspace read/write tools for ticketless input and all local result records.
+- `ask_user_question`, or the platform's available input UI, to collect missing Jira sources in one batch question or recover from an actual failure.
 
-Expose the scoring and binding tools when installing this skill. Instructions alone do not grant access. Follow live tool schemas; if a capability is unavailable, finish the available work and report the remaining step.
+Expose the scoring tool when installing this skill. Do not expose or call a separate Jira read, Jira export, ticket-binding or database-write tool. Direct Jira review retrieves the Jira issue and records its Jira association itself. Workspace review has no Jira ticket to bind.
 
 ## Workspace layout
 
-Use one folder per Story in the active conversation workspace:
+Use one folder per review target:
 
 ```text
 outputs/user-story-reviews/
   aiwpb-123/
-    AIWPB-123-score-input.md
     AIWPB-123-score-result.md
   story-001/
     story-001-score-input.md
     story-001-score-result.md
 ```
 
-Choose the folder and filename prefix before writing input. When the full own Jira ticket key is already known, use its lowercase form as the folder name (`aiwpb-123/`) and the actual key as the filename prefix (`AIWPB-123`). Otherwise use the next unused `story-001`, `story-002`, etc. for both the folder and prefix. A referenced parent/dependency key is not the Story's own key. Keep each Story's source identity, folder, input path, score and ticket together in batch state.
+For a Jira target, use the lowercase ticket key as the folder and the actual key as the filename prefix. If the same key already exists for a different Jira source, prefix the new folder with its lowercase source to prevent a collision. Do not create a score-input file; the scoring tool reads Jira directly.
 
-For a changed Story or an explicitly requested fresh assessment, keep its existing Story folder and use the next unused suffix in the filename prefix, such as `aiwpb-123/AIWPB-123-v2-score-input.md` / `aiwpb-123/AIWPB-123-v2-score-result.md`. Check both names before allocating a pair. Do not reuse a different Story's folder/files merely because ticket keys match across Jira sources; disambiguate a collision with the known source in the folder name.
+For a ticketless Story, use the next unused `story-001`, `story-002`, etc. folder and prefix. Create its input first and its result only after the scoring call returns or fails.
 
-Add only this one Story folder beneath `outputs/user-story-reviews/`; do not add review or revision subfolders. Keep at most two files per assessment in that Story folder: input first, result only after the scoring call returns or fails. Keep preparation notes in conversation state until then. Do not create an empty result, original copy, manifest or handoff file.
+For an explicitly requested fresh assessment, use the next unused `-v2`, `-v3`, etc. suffix for the new result and, for workspace mode, its matching input. Do not overwrite a prior assessment. Keep at most the files required by the selected route; do not add review/revision subfolders, source copies, manifests or handoff files.
 
-A scored input path and its bytes stay fixed. If a ticket becomes known later, bind the original input path and record the new key in its result; do not rename the scored files or their folder. Existing records in older layouts remain usable at their original paths.
+## Review sequence
 
-## Follow this sequence for each Story
+1. **Inventory and route.** Separate the user's input into Story items and detect ticket numbers. Every item with a ticket number uses the Jira route; only items without one use the workspace route. Deduplicate an identical ticket/source pair within the same request.
+2. **Resolve Jira sources once.** Use an explicit source supplied with the current request. For every Jira target whose source is absent or uncertain, ask one combined question listing all affected tickets and request a source for each: `WPB`, `ALM`, `DATA`, `FCR`, or `GO`. Do not infer source from the ticket prefix and do not read `jira-user-info.md` or other saved defaults.
+3. **Prepare ticketless input only.** Before a workspace call, read [workspace input conversion](references/input-format.md), preserve the source wording and verify the saved Markdown. Jira input, including uploaded JSON, is not converted to Markdown.
+4. **Score.** Read [scoring modes and result records](references/scoring-and-results.md). Call the scoring tool once per target with only the parameters for that route. Omit SPEC parameters in this version.
+5. **Save and report.** Create the result only after the call finishes. Preserve the complete return, explain the actual score and diagnostics, and state whether the tool used Jira or workspace mode. Read the saved result back before reporting success.
 
-1. **Read and identify.** Read the original file, pasted text or retrieved Jira fields. Determine the Story's own ticket from its explicit target or own-ticket field. Use Jira lookup for ambiguity; never select a dependency/example key as the target.
-2. **Prepare input.** Read [input format and conversion](references/input-format.md). Map fields, keep each complete AC together, write only the input file, and read it back against the source. Every field has a `## Field name` heading; there is no catch-all field section.
-3. **Score and save.** Read [scoring and results](references/scoring-and-results.md). Call the score tool with that actual relative input path. Only after the call completes, create the matching result file with the full return, source mapping and recognition checks.
-4. **Bind when a ticket is known.** Read [Jira binding and reusable identity](references/jira-binding.md). Reuse current identity/source information or user-workspace `jira-user-info.md`; ask once for genuinely missing values. With the five arguments available, call directly without a settings confirmation or a binding approval popup. Ask for correction/recovery only if needed.
-5. **Report.** Explain the returned score and all substantive scoring details, provide the complete result, and state the actual ticket-binding outcome. Read the saved result back before reporting success.
-
-No own ticket: finish after saving/reporting the score and provide the same input/result paths for any later export. Failed scoring or no usable numeric score: report the failure and skip binding. An unchanged Story with an existing complete result does not need another score call merely to bind or report it.
+For a batch, collect every missing source before starting Jira calls so the user is not questioned one ticket at a time. A failure for one independent target does not block the others.
 
 ## Boundaries
 
-Preserve original business wording, missing information, identifiers and criterion membership. Formatting conversion must not invent Given/When/Then steps, add business value, interpret an unseen image or repair requirements to raise a score.
+Do not create or update Jira content. Do not make a second call to associate a Jira ticket or write the score to another database tool. The Jira route already records the association; the workspace route intentionally has no Jira ticket.
 
-The result must distinguish a completed numerical assessment from recognition reliability. Expose AC-count mismatches and returned parser diagnostics; never replace the tool's score with an estimate.
+Preserve original business wording in ticketless conversion. Do not invent Given/When/Then steps, add business value, interpret unseen images or repair requirements to raise a score.
 
-This standalone route has no 75/76-point export gate. It does not invoke the SDLC export workflow, change Jira content, or write future Jira score/spec custom fields. It reuses the existing user-info file through its own binding reference; SDLC and generic export workflows retain their own behavior.
+Report the returned score separately from recognition reliability. Expose AC-count concerns and parser diagnostics. Never replace the tool's score with an estimate or force a fresh review merely because a cached or low score was returned.
