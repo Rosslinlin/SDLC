@@ -17,7 +17,7 @@ Call `nodejs-base-mcp.score_requirement_markdown` with the ticket and its user-p
 
 Accepted sources are `WPB`, `ALM`, `DATA`, `FCR`, and `GO`. Do not infer one from the issue-key prefix. The tool uses the authenticated user's Jira access, retrieves the issue, uses the latest `*spec.md` attachment when available, and treats Jira fields as supporting context.
 
-Do not include `relativePath`. Omit `specFileStatus` and `specFilePath` in this skill version. Do not call a Jira retrieval tool before scoring and do not call a separate binding/database-write tool afterward. A successful Jira review is stored and associated by the scoring tool itself.
+Do not include `relativePath`. Omit `specFileStatus` and `specFilePath` in this skill version. Do not call a Jira retrieval tool before scoring. A successful Jira review is stored and associated by the scoring tool itself; the optional, user-confirmed four-field Jira score sync is a separate post-scoring action described in [Jira score sync](jira-score-sync.md).
 
 Jira ratings may be reused by source and issue key across conversations. Within the configured cache window the existing rating is reused; an identical versioned fingerprint may also reuse the prior rating afterward. A reused rating is a valid result.
 
@@ -56,7 +56,7 @@ Keep these sections in the result file:
 - **Assessment:** actual tool status and all returned score fields and substantive diagnostics.
 - **Recognition:** returned AC counts, warnings, parse errors and any checkable mismatch or limitation.
 - **Complete tool response:** full scoring JSON plus any transport wrapper or actual error information.
-- **Persistence outcome:** Jira mode records the tool's returned Jira review/cache outcome; workspace mode records that the assessment was saved without a Jira association. Do not claim a separate write or binding call.
+- **Persistence outcome:** Jira mode records the scoring tool's Jira review/cache outcome and the separate Jira sync decision/outcome when applicable; workspace mode records that the assessment was saved without a Jira association. Do not claim a sync call or successful Jira sync without its actual confirmed response.
 
 ## Validate and report
 

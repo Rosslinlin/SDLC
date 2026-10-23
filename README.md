@@ -12,7 +12,7 @@
 
 独立评分 Skill：
 
-- `user-story-reviewer`：供非 SDLC 的 Story 生成后或单独评分时使用。任何带 Ticket Number 的输入（包括上传 JSON）都直接使用评分工具的 Jira 模式；缺少 source 时，按批次一次收集 `WPB`、`ALM`、`DATA`、`FCR` 或 `GO`，不从 Ticket 前缀或 `jira-user-info.md` 推断。Jira 模式只生成 `<TICKET>-score-result.md`，由评分工具自行读取 Jira、保存评分并关联 Ticket，不再配置 Jira 读取或独立数据库回写工具。没有 Ticket Number 的输入才转换为标准 Markdown，生成 `story-001-score-input.md` 和对应结果文件。再次评估仍放在同一文件夹并使用 `-v2` 等版本号。它不参与下方三 Skill 安装顺序，也不替代 SDLC 的 76 分放行规则。
+- `user-story-reviewer`：供非 SDLC 的 Story 生成后或单独评分时使用。任何带 Ticket Number 的输入（包括上传 JSON）都直接使用评分工具的 Jira 模式；缺少 source 时，按批次一次收集 `WPB`、`ALM`、`DATA`、`FCR` 或 `GO`，不从 Ticket 前缀或 `jira-user-info.md` 推断。评分工具自行读取 Jira、保存评分并关联 Ticket；评分完成后仅对用户确认的现有 Ticket，额外通过导出工具的四参数调用同步分数到 Jira。Jira 模式仍只生成 `<TICKET>-score-result.md`。没有 Ticket Number 的输入仍转换为标准 Markdown，生成 `story-001-score-input.md` 和对应结果文件，不触发 Jira 分数同步。再次评估仍放在同一文件夹并使用 `-v2` 等版本号。它不参与下方三 Skill 安装顺序，也不替代 SDLC 的 76 分放行规则。
 
 推荐安装顺序：
 
