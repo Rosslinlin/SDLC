@@ -1,6 +1,6 @@
 # CEAIA SDLC Jira Gateway
 
-Gateway version: 1.4.0 — v5
+Gateway version: 1.4.1 — v5.2
 
 This is the controlling entry point for a `ceaia-sdlc-validated` handoff. It adds SDLC-specific validation, Jira rendering, preview, direct export, post-write Markdown review ticket binding and recovery rules without changing the helper's generic create, update, batch, association or Test Case flows.
 
@@ -36,7 +36,7 @@ If Story/SPEC content, attachment selection, ticket mapping, or a business-beari
 
 For every item, validate all of the following from actual current files and state:
 
-1. final score record is complete and current, from Workspace `relativePath` pointing to this reviewed `STORY.md` for both create and update; its submitted `specFileStatus` equals the verified primary SPEC `Review Result` / `Result` string and its `specFilePath` equals that SPEC's workspace-relative path. Score record/state bind the same current Story revision, SPEC fileRevision and independent review attempt. A pre-change score without this metadata is insufficient. The complete raw response has boolean `ok=true`, finite numeric `finalScore` from 76 through 100 and no unresolved AC/parser blocker; a cache hit is valid when its current metadata was saved;
+1. final score record is complete and current, from Workspace `relativePath` pointing to this reviewed `STORY.md` for both create and update; its submitted `specFileStatus` is exactly `Pass`, mapped from the verified primary SPEC `Review Result` / `Result: PASS` (never raw `PASS` or lowercase `pass`); its `specFilePath` equals that SPEC's workspace-relative path. Score record/state bind the same current Story revision, SPEC fileRevision and independent review attempt. A pre-change score without this metadata is insufficient. The complete raw response has boolean `ok=true`, finite numeric `finalScore` from 76 through 100 and no unresolved AC/parser blocker; a cache hit is valid when its current metadata was saved;
 2. independent content `reviewResult` is `PASS`; current parent state has `jiraReady=true`, and update items also have `updateReady=true`. The pre-score reviewer report correctly has readiness false and SCORE=DEFERRED; never demand post-score PASS fields inside that earlier report;
 3. `testCaseTitleValidation` is `manual-pass`;
 4. every intended final SPEC path appears in the latest review's `reviewedSpecArtifacts` with PASS and read-back evidence;

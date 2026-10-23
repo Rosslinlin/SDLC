@@ -5,7 +5,7 @@ description: Generate or update evidence-backed CEAIA Stories, executable Test C
 
 # CEAIA Story and SPEC Generation
 
-Bundle revision: 5.1 text-only — 2026-10-23.
+Bundle revision: 5.2 text-only — 2026-10-23.
 
 Own intake, planning, generation, current-state persistence and evidence-supported repairs. The independent reviewer is `ceaia-spec-review`; Jira writes belong to the dedicated SDLC gateway in `jira-createissue-helper`.
 
@@ -42,8 +42,8 @@ For each candidate:
 4. Generate Test Case, validate titles and executable coverage, then assemble SPEC from current sibling content. Updates retain every distinct reviewed replacement and explicit attachment mapping.
 5. Run one same-stage mechanical check and independent read-only `ceaia-spec-review` against actual evidence. A fresh read-only subagent or task-provided independent reviewer satisfies this; do not substitute generator self-approval. If unavailable, return WAITING_TOOL.
 6. Persist each review in a numbered `.ceaia-work` record. Repair only affected files under the shared budget; a Story repair also refreshes its dependent Test Case/SPEC and requires a new independent review. SPEC-only and test-only repairs do not rewrite Story.
-7. After current content-review PASS, synchronize every intended SPEC `Review Result` header and read back the complete files. Check global source coverage. The verified primary SPEC `Result` and current workspace-relative path are the scoring metadata; a failed synchronization blocks scoring and jiraReady.
-8. Read back the unchanged final `STORY.md` and primary SPEC, then call `nodejs-base-mcp.score_requirement_markdown` in workspace mode with `relativePath` for Story and `specFileStatus`/`specFilePath` for that SPEC. This applies to both new Stories and existing-ticket updates; a known Jira key is not the scoring input. Omit optional force_review/metadata. Save the complete response in a numbered record. A cache hit may reuse the score while storing this invocation's SPEC metadata. Require boolean `ok: true`, numeric `finalScore >= 76` and intact AC/parser recognition. If scoring reveals a supported content defect, repair the affected files and repeat the required independent review before scoring the revised current Story.
+7. After current content-review PASS, synchronize every intended SPEC `Review Result` header and read back the complete files. Check global source coverage. Map the verified primary SPEC `Result: PASS` to the scorer's exact `specFileStatus: Pass`; its current workspace-relative path is `specFilePath`; a failed synchronization blocks scoring and jiraReady.
+8. Read back the unchanged final `STORY.md` and primary SPEC, then call `nodejs-base-mcp.score_requirement_markdown` in workspace mode with `relativePath` for Story, case-sensitive `specFileStatus: Pass` mapped from the verified SPEC `Result: PASS`, and that SPEC's `specFilePath`. This applies to both new Stories and existing-ticket updates; a known Jira key is not the scoring input. Omit optional force_review/metadata. Save the complete response in a numbered record. A cache hit may reuse the score while storing this invocation's SPEC metadata. Require boolean `ok: true`, numeric `finalScore >= 76` and intact AC/parser recognition. If scoring reveals a supported content defect, repair the affected files and repeat the required independent review before scoring the revised current Story.
 9. Set jiraReady for all candidates, and updateReady only for valid updates, when the current review, synchronized SPEC, final score metadata and global coverage all agree. Then continue automatically to `jira-createissue-helper`'s dedicated SDLC gateway for Jira-wiki rendering, destination confirmation, final preview/preflight and direct export. Absence of Jira-export wording is not a stopping condition.
 
 ## Invocation boundary

@@ -1,6 +1,6 @@
 {
-  "bundleVersion": "5.0.0",
-  "releaseDate": "2026-10-06",
+  "bundleVersion": "5.2.0",
+  "releaseDate": "2026-10-23",
   "executionProfile": "text-only",
   "activeSkills": [
     "ceaia-sdlc-story-spec-generation",
@@ -22,6 +22,6 @@
   "notes": [
     "No executable scripts are included.",
     "v5 changes only the validated SDLC route and task contract; generic Jira and Test Case routes are preserved.",
-    "The inherited flow-testcase-source-export.md is a byte-preserved WPS/OLE resource and requires a platform compatibility check."
+    "The generic Test Case export route is unchanged by the v5.2 Task and scoring-status update."
   ]
 }

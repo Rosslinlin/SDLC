@@ -5,7 +5,7 @@ description: Independently review current CEAIA Story, Test Case and SPEC conten
 
 # CEAIA Independent Review
 
-Bundle revision: 5.1 text-only — 2026-10-23.
+Bundle revision: 5.2 text-only — 2026-10-23.
 
 Review actual files read-only. Do not edit artifacts/state, recalculate scores, invoke the score tool, prepare Jira payloads, run final export preflight or write Jira. Parent generation owns repair, state persistence and user interaction.
 
@@ -34,6 +34,6 @@ The reviewer checks the canonical Acceptance Criteria heading and declared IDs a
 
 Review failure does not automatically mean rewriting Story. Classify exact affected files and whether Story must change. The shared contract controls all repair counts and waiting states; this reviewer does not run its own loop.
 
-On substantive content PASS return its evidence, but keep jiraReady=false and updateReady=false. Parent synchronizes and re-reads every intended SPEC header, then scores the unchanged final Workspace Story with the primary SPEC `Review Result` / `Result` string and workspace-relative path. Header synchronization alone needs no substantive review. Parent may set jiraReady=true (and updateReady=true for a valid update, including attachmentAction=none) only after a current passing score with that SPEC metadata and global coverage PASS. A post-score content repair requires affected independent re-verification before a new final score call.
+On substantive content PASS return its evidence, but keep jiraReady=false and updateReady=false. Parent synchronizes and re-reads every intended SPEC header, then scores the unchanged final Workspace Story with the primary SPEC's verified path and `specFileStatus: Pass` mapped from its `Review Result` / `Result: PASS`. Header synchronization alone needs no substantive review. Parent may set jiraReady=true (and updateReady=true for a valid update, including attachmentAction=none) only after a current passing score with that SPEC metadata and global coverage PASS. A post-score content repair requires affected independent re-verification before a new final score call.
 
 Normal verdicts: PASS, NEEDS_REVISION, NEEDS_HUMAN_CLARIFICATION; FINAL_WITH_UNRESOLVED only after explicit stop. Technical blockers use NEEDS_REVISION with technical ownership and nextAction=technical-recovery, not invented business questions. Return WAITING actions to parent rather than spinning.

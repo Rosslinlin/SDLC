@@ -4,11 +4,11 @@
 | --- | --- | --- |
 | 新 Story / 现有 Jira 更新 intake | generation | 每票独立 source，完整 baseline/attachment intake |
 | Story 规划与拆分 | generation | evidence-backed、INVEST、全局 coverage |
-| Story 评分 | generation + external tool | 独立内容审查与 SPEC Result 同步后，评分最终 Workspace Story；传入主 SPEC 状态/路径，每次保存编号 Markdown、完整 raw JSON，76 分门禁 |
+| Story 评分 | generation + external tool | 独立内容审查与 SPEC Result 同步后，评分最终 Workspace Story；把主 SPEC 审查 `Result: PASS` 映射为精确 `specFileStatus: Pass`，并传入其路径，每次保存编号 Markdown、完整 raw JSON，76 分门禁 |
 | Test Case / SPEC 生成 | generation | Story 完成初步证据/格式检查后生成，先于评分；outputs 仅最新版 |
 | 中间历史 | generation/review/helper | `.ceaia-work` 编号保存 plan/score/review/export-attempt |
 | 独立 review | review | reviewer 只读；检查 STRUCTURE/COVERAGE/STORY/TESTS/SPEC/UPDATE，SCORE 记 DEFERRED；内容 PASS 不直接放行 Jira |
-| SPEC review header | generation parent | 内容 PASS 后回写、完整复读、一次 targeted retry；主 SPEC Result/路径传给评分工具，未验证不得评分或 jiraReady |
+| SPEC review header | generation parent | 内容 PASS 后回写、完整复读、一次 targeted retry；主 SPEC `Result: PASS` 映射为工具值 `Pass`，路径按原规则传入，未验证不得评分或 jiraReady |
 | Jira SDLC routing | helper SDLC gateway | 禁止 generic fallback |
 | Jira wiki rendering | helper SDLC gateway | `##`→`h2.` 等，仅 transport copy |
 | Jira metadata / project / issue type | helper common modules | 动态 popup、不得 chat 替代所需选择 |

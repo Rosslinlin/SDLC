@@ -6,6 +6,7 @@
 - [ ] 替换 task 中的 helper skill ID 占位值。
 - [ ] 确认平台提供 `ask_user_question`、Jira MCP tools 和 `nodejs-base-mcp.score_requirement_markdown`；SDLC 路由不依赖审批工具。
 - [ ] 用实际运行配置的 GPT-6 Luna 跑下面的新建和更新样例；task/Skill 不硬编码旧模型名称。核对实时评分工具 schema 接受 `relativePath`、`specFileStatus`、`specFilePath` 三个参数。
+- [ ] 若平台提供用量明细，记录单 Story 各阶段的 input tokens、工具调用次数及耗时；检查是否重复加载未变的 Skill/证据或重复执行 review/score。Task 精简不保证单独消除异常高用量。
 - [ ] 确认平台能读取全部 Markdown/JSON 文本资源，包括已转换为纯文本的 `flow-testcase-source-export.md`；流程不调用 Python、Shell、JavaScript 或本地校验代码。
 
 ## 场景 A：新 Story 正常链路
@@ -13,7 +14,7 @@
 - [ ] 初始输入不包含 push/export 字样时，内容审查、SPEC 状态同步和最终 Story 评分全部通过后仍自动进入 Jira create/update 阶段。
 - [ ] Story 只有一个 `## Acceptance Criteria`，AC 使用稳定编号和 Given/When/Then。
 - [ ] 先生成 Story、Test Case 和 `<name>-spec.md`，完成独立内容审查；首次审查时无评分记录仍可返回内容 PASS，报告中 SCORE=DEFERRED、jiraReady=false。
-- [ ] 内容 PASS 后先同步 SPEC `Review Result`/`Result` 并完整读回，再调用评分工具。入参为 `relativePath`=最终 STORY.md、`specFileStatus`=已验证的 Result 字符串、`specFilePath`=该 SPEC 的工作区相对路径；不传 Jira key/source。
+- [ ] 内容 PASS 后先同步 SPEC `Review Result`/`Result` 并完整读回，再调用评分工具。入参为 `relativePath`=最终 STORY.md、`specFileStatus`=由已验证 `Result: PASS` 映射的精确字符串 `Pass`（不得传 `PASS`/`pass`）、`specFilePath`=该 SPEC 的工作区相对路径；不传 Jira key/source。
 - [ ] 评分后产生 `story-quality-score-attempt-001.md`，完整 raw JSON 保留；可读摘要简洁且与 raw JSON 一致，记录实际 Story/SPEC 入参与审查 attempt。
 - [ ] review 产生 `review-attempt-001.md`，不是覆盖固定 `review.md`。
 - [ ] SPEC header 显示 PASS 和正确 attempt，完整复读成功且后续最终 Story 评分通过后才 `jiraReady=true`。

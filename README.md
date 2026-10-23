@@ -22,7 +22,7 @@
 4. 导入 task，确认 tools 列表中的评分工具位于最后。
 5. 按 `PLATFORM-TEST-CHECKLIST.md` 先跑一个新 Story 和一个现有 Jira 更新场景。
 
-SDLC 默认执行完整 Story/Test Case/SPEC 生成 → 独立内容审查 → SPEC Result 同步 → 最终 Workspace Story 评分 → Jira create/update → Ticket 关联链路，即使初始输入没有写 push/export。新建和更新都用 `STORY.md` 的工作区相对路径评分，调用时附上主 SPEC 的 `Review Result`/`Result` 字符串及同类相对路径；分数和 SPEC 状态在导出前一起保存。独立 reviewer 的 PASS 只表示内容通过；最终分数也通过后才可导出。评分正常命中缓存时仍保存本次 SPEC 元数据，不为刷新元数据强制重评。GPT-6 Luna 运行时沿用这些明确的阶段门禁和局部修复规则，模型名称不改变评分阈值或工具契约。
+SDLC 默认执行完整 Story/Test Case/SPEC 生成 → 独立内容审查 → SPEC Result 同步 → 最终 Workspace Story 评分 → Jira create/update → Ticket 关联链路，即使初始输入没有写 push/export。新建和更新都用 `STORY.md` 的工作区相对路径评分，调用时把主 SPEC 的 `Review Result`/`Result: PASS` 映射为大小写严格的 `specFileStatus: Pass`，并传入该 SPEC 的工作区相对路径；分数和 SPEC 状态在导出前一起保存。独立 reviewer 的 PASS 只表示内容通过；最终分数也通过后才可导出。评分正常命中缓存时仍保存本次 SPEC 元数据，不为刷新元数据强制重评。GPT-6 Luna 运行时沿用这些明确的阶段门禁和局部修复规则，模型名称不改变评分阈值或工具契约。
 
 在 `jira-createissue-helper` 内，`jira-user-info.md` 仍仅供其 SDLC 路由使用，普通导出/Test Case 路由和独立 `user-story-reviewer` 都不使用。SDLC 首次创建主动收集 Epic Link/明确无 Epic，后续运行先复验并确认配置。最终 `jira-preview.md`、payload read-back 和附件 preflight 通过后直接调用 `exportJiraByDynamicFields`，不依赖额外审批工具。每个 Jira Story 及要求的附件操作成功、返回 Ticket Key 后，再以五个确定字段单独调用同一工具，将 Ticket 与本次最终通过的 Story 评分记录关联；两次调用分别记录结果。
 

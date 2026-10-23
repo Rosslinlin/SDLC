@@ -1,6 +1,10 @@
-# CEAIA SDLC Skill Bundle v5.1
+# CEAIA SDLC Skill Bundle v5.2
 
 更新日期：2026-10-23
+
+本次将 SDLC Task 从约 24 KB 精简至约 12 KB，保留四阶段调度、关键门禁及原有 Skill/工具配置。执行细节仍由各 Skill 负责；不改变 Story、Test Case、SPEC、审查和 Jira 功能。评分工具的 `specFileStatus` 只接受大小写严格的 `Pass`/`Fail`。SPEC 审查结果仍记录 `PASS`，在评分调用边界映射为 `Pass`；非 PASS 审查不会进入评分。普通 Jira 和 Test Case 导出规则未改。
+
+## 历史发布说明：v5.1
 
 本次调整 SDLC Task 与三个活动 Skill 的顺序：先生成 Story、Test Case、SPEC，再进行独立内容审查；同步并读回 SPEC `Review Result` / `Result` 后，使用 Workspace `STORY.md` 路径及主 SPEC 状态/路径调用更新后的评分工具。新建与更新均走 Workspace 评分，只有最终真实分数通过才进入 Jira。工具正常复用缓存分数时仍保存本次 SPEC 状态/路径，后续五字段 Jira 绑定关联本次最终通过的评分记录。数据库现阶段只要求最终 SPEC 状态。独立 `user-story-reviewer` 的 Jira 直评分路由保持独立。
 

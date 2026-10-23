@@ -6,7 +6,8 @@
 - Story path: [complete workspace-relative STORY.md path]
 - Story revision: [observed workflow revision]
 - Scoring mode: Workspace Story (`relativePath`); for updates use this modified Story path, not the Jira ticket
-- Submitted SPEC status: [exact verified primary SPEC Review Result / Result string]
+- Verified primary SPEC Review Result / Result: [source header verdict, normally PASS]
+- Submitted specFileStatus: [exact case-sensitive tool value, normally Pass]
 - Submitted SPEC path: [complete workspace-relative primary <name>-spec.md path]
 - SPEC file revision / content-review attempt: [observed values]
 - Score attempt: [monotonic integer]

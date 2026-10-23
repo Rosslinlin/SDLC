@@ -11,12 +11,14 @@ The SDLC route uses Workspace mode. Its required input is the actual workspace-r
 ```json
 {
   "relativePath": "outputs/ceaia/example-story/STORY.md",
-  "specFileStatus": "PASS",
+  "specFileStatus": "Pass",
   "specFilePath": "outputs/ceaia/example-story/example-story-spec.md"
 }
 ```
 
-The `PASS` example is the actual string in the SPEC's `Review Result` / `Result`, not its document lifecycle `Status: Draft` or the scorer's finalStatus. `specFileStatus` and `specFilePath` are saved with the completed score; they do not affect the Story scoring calculation. The user confirmed that a normal cache hit may reuse the score while persisting the newly supplied SPEC metadata, and the later Jira ticket binding associates the final passing score record. The normal SDLC call omits optional force_review and metadata. The documented default may reuse a successful cached review for unchanged Markdown; do not force a new evaluation merely to refresh SPEC metadata. The screenshots label force_review/metadata types inconsistently; if used, follow the live callable schema rather than guessed coercion.
+The scoring tool accepts `specFileStatus` only as the case-sensitive strings `Pass` or `Fail`. The independent review report and SPEC `Review Result` / `Result` header retain their existing `PASS` verdict; map that verified header value to `Pass` at the tool boundary. Never submit `PASS`, `pass`, or the document lifecycle `Status: Draft`. A failed/non-PASS review blocks SDLC scoring, so `Fail` is not sent in this normal route. Record both the source header verdict and the actual submitted value, and compare the latter with the mapped value during handoff validation.
+
+`specFileStatus` and `specFilePath` are saved with the completed score; they do not affect the Story scoring calculation. The user confirmed that a normal cache hit may reuse the score while persisting the newly supplied SPEC metadata, and the later Jira ticket binding associates the final passing score record. The normal SDLC call omits optional force_review and metadata. The documented default may reuse a successful cached review for unchanged Markdown; do not force a new evaluation merely to refresh SPEC metadata. The screenshots label force_review/metadata types inconsistently; if used, follow the live callable schema rather than guessed coercion.
 
 A normal assessment must never force a fresh review. Only explicit user intent to refresh the same content authorizes force_review=true in the actual schema's type. Record that exceptional direction; do not interpret a low score, cache hit, automatic repair or generic retry request as fresh-review authorization.
 

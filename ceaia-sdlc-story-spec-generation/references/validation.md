@@ -22,7 +22,7 @@ Use this checklist with the actual saved files and the platform's existing tools
 
 1. Read the numbered independent content-review PASS report, verify its current Story, Test Case and primary SPEC bindings, and resolve all findings. Do not require a pre-review score.
 2. Synchronize the primary SPEC Review Result header to PASS and the actual review attempt, then read back the complete file. Verify the body is unchanged and record its fileRevision, exact Result string and workspace-relative path.
-3. Confirm global source coverage and read back the unchanged final Story. Reuse the just-verified complete SPEC read-back if no write intervened; otherwise read it again. Call the scorer with Story `relativePath` plus the verified `specFileStatus` and `specFilePath`; for an update use the modified Workspace Story, not its Jira key. Omit force_review/metadata normally.
+3. Confirm global source coverage and read back the unchanged final Story. Reuse the just-verified complete SPEC read-back if no write intervened; otherwise read it again. Call the scorer with Story `relativePath`, exact `specFileStatus: Pass` mapped from verified SPEC `Result: PASS`, and that SPEC's `specFilePath`; for an update use the modified Workspace Story, not its Jira key. Omit force_review/metadata normally.
 
 ## After the score call
 
