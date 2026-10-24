@@ -6,7 +6,7 @@ The Jira scoring route already persists the assessment and its ticket associatio
 
 ## Confirmation and inputs
 
-Show each eligible ticket, its confirmed source, and its exact returned `finalScore`; ask whether to sync the score to Jira. For a batch, use one question that lets the user choose all, some, or none of the eligible tickets. Do not infer approval from the original scoring request. If the current user's `staffId` is not already reliably available, request it in that same question rather than querying `jira-user-info.md` or inventing an ID. Do not call the sync tool for declined or unanswered tickets.
+First show each eligible ticket, its confirmed source, exact returned `finalScore`, and a brief explanation in a user-visible reply. End that scoring turn with the sync question, then wait for the user's reply; never call the sync tool in the same turn as scoring. For a batch, use one question that lets the user choose all, some, or none of the eligible tickets. Do not infer approval from the original scoring request. If the current user's `staffId` is not already reliably available, request it in that same question rather than querying `jira-user-info.md` or inventing an ID. Do not call the sync tool for declined or unanswered tickets.
 
 Use the current conversation's real ID for `conversationId`; do not derive it from a workspace path or fabricate one. If a required value is unavailable after confirmation, explain what is missing and leave that ticket unsynced. Convert the confirmed scoring `source` to the export tool's lowercase `almType`: `WPB`→`wpb`, `ALM`→`alm`, `DATA`→`data`, `FCR`→`fcr`, `GO`→`go`.
 

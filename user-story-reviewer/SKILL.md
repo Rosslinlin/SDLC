@@ -17,7 +17,7 @@ Do not decide that a detected ticket is merely a reference and silently choose w
 - `nodejs-base-mcp.score_requirement_markdown`: scores either a workspace Markdown file or one Jira issue and persists the service result/audit record.
 - `java-base-mcp.exportJiraByDynamicFields`: for an existing Jira ticket only, synchronizes its completed score to Jira after the user confirms, using the four-field call in [Jira score sync](references/jira-score-sync.md).
 - Workspace read/write tools for ticketless input and all local result records.
-- `ask_user_question`, or the platform's available input UI, to collect missing Jira sources, confirm optional Jira score sync, or recover from an actual failure.
+- `ask_user_question`, or the platform's available input UI, to collect missing Jira sources or recover from an actual failure.
 
 Expose both named tools when installing this skill. Direct Jira review retrieves the Jira issue and already records its Jira association in the scoring service. The optional second call is only for user-confirmed Jira score sync; it is not needed for database association. Do not call a separate Jira read tool. Workspace review has no Jira ticket to sync.
 
@@ -46,8 +46,8 @@ For an explicitly requested fresh assessment, use the next unused `-v2`, `-v3`, 
 2. **Resolve Jira sources once.** Use an explicit source supplied with the current request. For every Jira target whose source is absent or uncertain, ask one combined question listing all affected tickets and request a source for each: `WPB`, `ALM`, `DATA`, `FCR`, or `GO`. Do not infer source from the ticket prefix and do not read `jira-user-info.md` or other saved defaults.
 3. **Prepare ticketless input only.** Before a workspace call, read [workspace input conversion](references/input-format.md), preserve the source wording and verify the saved Markdown. Jira input, including uploaded JSON, is not converted to Markdown.
 4. **Score.** Read [scoring modes and result records](references/scoring-and-results.md). Call the scoring tool once per target with only the parameters for that route. Omit SPEC parameters in this version.
-5. **Save and report the score.** Create the result only after the scoring call finishes. Preserve the complete return, explain the actual score and diagnostics, and state whether the tool used Jira or workspace mode. Read the saved result back before reporting scoring success.
-6. **Offer Jira score sync.** Only for a completed numeric Jira-route assessment, read [Jira score sync](references/jira-score-sync.md), show the ticket/source and exact returned score, and ask whether to synchronize that score to Jira. For a batch, ask once for all eligible tickets. Call the four-field tool only for tickets the user confirms; record and report the separate sync outcome.
+5. **Show the score first.** Create the result only after scoring finishes, preserve the complete return, and read the saved result back. Then send a user-visible reply with the ticket/source, exact `finalScore`, status, a short explanation of the key diagnostics, and a link to the complete result. For a batch, present the scores together. Do not make the Jira sync call in this scoring turn.
+6. **Ask, then wait.** Only for completed numeric Jira-route assessments, ask at the end of that reply whether to sync the displayed score(s) to Jira; for a batch, ask once for all eligible tickets. End the turn and wait for the user's answer. Only in a later turn, for tickets the user confirms, read [Jira score sync](references/jira-score-sync.md), make the four-field call, and report its separate outcome. Workspace assessments finish after reporting the score.
 
 For a batch, collect every missing source before starting Jira calls so the user is not questioned one ticket at a time. A failure for one independent target does not block the others.
 
