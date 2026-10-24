@@ -60,9 +60,10 @@ After `getJiraInfos` succeeds:
 4. Assemble only fields that need changes and conform to the confirmed metadata rules.
 5. For requested non-Test rich-text replacements authored in Markdown, create a Jira-wiki transport rendering according to `common-jira-text-rendering.md`. Do not reformat untouched fields and do not apply the module to Test Case content.
 6. Include `CEAIA_GEN` according to `common-field-assembly.md`.
-7. Write or overwrite `jira-preview.md` with both the source-to-transport conversion status and exact outgoing values.
-8. Wait for explicit user confirmation.
-9. Call `exportJiraByDynamicFields` only after both metadata confirmation and explicit user confirmation.
+7. For a Story with prior Workspace scoring evidence, read [generic Story score binding](generic-story-score-binding.md) before preview and bind only after a successful update.
+8. Write or overwrite `jira-preview.md` with both the source-to-transport conversion status and exact outgoing values.
+9. Wait for explicit user confirmation.
+10. Call `exportJiraByDynamicFields` only after both metadata confirmation and explicit user confirmation.
 
 Update intent itself is not submission confirmation.
 

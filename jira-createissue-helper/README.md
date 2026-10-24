@@ -10,10 +10,10 @@ A modular skill for create, update, batch, association, Test Case and validated 
 - Read current Jira information before an existing-ticket update.
 - Preserve Test Case execution fields during source-to-payload mapping, allowing only Jira-safe line-break normalization with newline characters, not literal `<br>` tags.
 - Keep Jira-visible Test Case fields self-contained.
-- Route validated CEAIA SDLC handoffs through a dedicated gateway without changing the generic business flows.
+- Route validated CEAIA SDLC handoffs through a dedicated gateway with separate validation from generic business flows.
 - Render Markdown-authored Jira-visible rich text to Jira wiki syntax for non-Test create, update and batch items while leaving Workspace sources unchanged.
 - Keep `jira-user-info.md` exclusive to the validated SDLC route; first-run SDLC create collects Epic Link/no-Epic intent, and later runs confirm revalidated defaults.
-- For validated SDLC only, bind each confirmed Jira ticket to its scored Story Markdown with a separate five-field `exportJiraByDynamicFields` call after the Jira and requested attachment operations succeed. Preserve the Jira key if binding fails.
+- After successful export, bind SDLC Stories as required; bind non-SDLC Stories only when a matching Workspace score is verified. Unscored Stories and other issue types keep their original export flow. Preserve the Jira key if binding fails.
 
 ## Usage
 

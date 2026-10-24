@@ -1,9 +1,11 @@
 ---
 name: user-story-reviewer
-description: Review and score user stories through Jira or workspace input. For existing Jira tickets, offer an optional, user-confirmed score sync to Jira after scoring; keep ticketless stories on the workspace Markdown route.
+description: Review and score user stories by always calling the platform scoring tool through Jira or workspace input. For existing Jira tickets, offer an optional, user-confirmed score sync to Jira after scoring; keep ticketless stories on the workspace Markdown route.
 ---
 
 # User Story Reviewer
+
+**Mandatory:** invoke `nodejs-base-mcp.score_requirement_markdown` for every Story requested for review before reporting any score. A saved result or model judgment is never a substitute for this call.
 
 Score each Story through exactly one route:
 
@@ -45,7 +47,7 @@ For an explicitly requested fresh assessment, use the next unused `-v2`, `-v3`, 
 1. **Inventory and route.** Separate the user's input into Story items and detect ticket numbers. Every item with a ticket number uses the Jira route; only items without one use the workspace route. Deduplicate an identical ticket/source pair within the same request.
 2. **Resolve Jira sources once.** Use an explicit source supplied with the current request. For every Jira target whose source is absent or uncertain, ask one combined question listing all affected tickets and request a source for each: `WPB`, `ALM`, `DATA`, `FCR`, or `GO`. Do not infer source from the ticket prefix and do not read `jira-user-info.md` or other saved defaults.
 3. **Prepare ticketless input only.** Before a workspace call, read [workspace input conversion](references/input-format.md), preserve the source wording and verify the saved Markdown. Jira input, including uploaded JSON, is not converted to Markdown.
-4. **Score.** Read [scoring modes and result records](references/scoring-and-results.md). Call the scoring tool once per target with only the parameters for that route. Omit SPEC parameters in this version.
+4. **Score with the tool, without exception.** Read [scoring modes and result records](references/scoring-and-results.md). Call `nodejs-base-mcp.score_requirement_markdown` once per target with only the parameters for that route, even when a prior score file or cached result exists. Omit SPEC parameters in this version. Never substitute the model's own score or a prior file for this call; if the tool cannot be called or returns no valid score, report that scoring could not be completed.
 5. **Show the score first.** Create the result only after scoring finishes, preserve the complete return, and read the saved result back. Send a user-visible *intermediate* message with the ticket/source, exact `finalScore`, status, full returned score breakdown, key diagnostics, and a link to the complete raw result. For a batch, present the scores together. Keep the current run active; do not use a final answer to show the score.
 6. **Ask in a popup, then continue.** Only for completed numeric Jira-route assessments, read [Jira score sync](references/jira-score-sync.md) and call `ask_user_question` (or the platform's popup input UI) after the score message is visible. Ask once for a batch. Wait for the popup answer in this run; call the four-field Jira tool only for tickets the user confirms, then report its separate outcome. Workspace assessments finish after reporting the score.
 
