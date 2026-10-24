@@ -22,13 +22,13 @@ For Test Cases from source artifacts or structured source content, first load `f
 Batch requests are a single-call flow:
 
 - Recognize batch intent from plural wording, multiple listed items, tables, CSV-like content, multiple Test Cases, or requests such as batch export, create these issues, update those tickets, or export all.
-- Assemble one `issuesJson` payload containing all items. For Test Case export with `uploadType` mode `single`, assemble one aggregate Test issue payload with top-level `summary`, clean table-only `description`, and labels inside the JSON-encoded `dynamicFieldsJson` object instead of item-list fields.
+- Assemble one `issuesJson` payload containing all items. For Test Case export with `uploadType` mode `single`, assemble one aggregate Test issue payload with top-level `summary` and clean table-only `description`; include `dynamicFieldsJson` only for other validated fields.
 - Before preview, render Markdown-authored rich text for each eligible non-Test item through `common-jira-text-rendering.md`. Do not apply common rendering to any Test Case item or field; mixed batches preserve the existing Test Case rules item by item.
-- If any Story has prior Workspace scoring evidence, read [generic Story score binding](generic-story-score-binding.md) before preview and plan binding only for eligible items.
+- If any Story has prior Workspace scoring evidence, read [generic Story score binding](generic-story-score-binding.md) before preview and map each eligible item to its score input path.
 - Generate one integrated batch preview in `jira-preview.md` before export.
 - Ask for explicit confirmation once for the whole batch.
 - Call `exportJiraByDynamicFields` exactly once for the approved batch issue-write payload.
-- Never loop through batch items and repeat issue-write calls unless the user explicitly asks to split the batch. Successful scored Story items may receive separate post-write calls under [generic Story score binding](generic-story-score-binding.md).
+- Never loop through batch items and repeat issue-write calls unless the user explicitly asks to split the batch. Every successful eligible scored Story requires its own post-write binding call under [generic Story score binding](generic-story-score-binding.md).
 
 ## Supported Batch Scenarios
 
@@ -137,7 +137,7 @@ Batch responses may include:
 
 Report batch results by item index and status. One failed batch item does not stop later items.
 
-For each successful Story with prior Workspace scoring evidence, apply [generic Story score binding](generic-story-score-binding.md). Do not bind failed or unscored items.
+Match `resources` to the previewed item indexes. For each successful Story with verified Workspace scoring evidence and a returned Ticket Key, call [generic Story score binding](generic-story-score-binding.md) once with that Story's input path. Do not stop at the batch write response or bind failed/unscored items. Report each eligible item's separate binding outcome; missing or ambiguous results remain pending.
 
 ## Batch Notes
 

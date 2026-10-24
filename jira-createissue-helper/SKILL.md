@@ -20,7 +20,7 @@ This skill separates reusable Jira helper capabilities from business flows. Read
 7. Read existing issues through `getJiraInfos` before updates or associations.
 8. Updates require metadata confirmation for the current project and issue type.
 9. Associations are dedicated flows: no project or issue-type discovery.
-10. Generic batches use one Jira issue-write export call unless split explicitly by the user; optional per-Story score bindings occur only after that call succeeds. SDLC multiple creates may use one issuesJson call; bundled Task updates execute one ticket at a time under the SDLC gateway.
+10. Generic batches use one Jira issue-write export call unless split explicitly by the user; after its response, bind every successful Story with verified Workspace scoring evidence separately before marking that item complete. SDLC multiple creates may use one issuesJson call; bundled Task updates execute one ticket at a time under the SDLC gateway.
 11. Persist reusable, non-secret user information only after success.
 12. Check conversation context and ordinary user-workspace context before asking reusable basics. Read `jira-user-info.md` only for the validated SDLC route.
 13. For missing, ambiguous, stale, or user-changed allowed input values, follow the popup / selection UI contract in `common-state-and-user-info.md`; do not terminate the flow with normal chat asking for those values.
@@ -40,7 +40,7 @@ This skill separates reusable Jira helper capabilities from business flows. Read
 27. Never place `linkedIssueKeys` or `linkType` in `dynamicFieldsJson`; pass them as dedicated top-level parameters to `exportJiraByDynamicFields` for association operations.
 28. Never use `"."` or other fabricated placeholders for missing parameter values. Apply the Mandatory Empty-Value Contract in `common-field-assembly.md` before preview and export: unused optional strings are `""` when passed and supported, otherwise omitted; preserve array/object types, block missing required values, and never turn an unspecified update into a field-clear operation.
 29. For export-ready Jira-visible content, do not let the LLM rewrite business meaning. Apart from required Jira transport formatting, field mapping, JSON escaping, and safe line-break normalization, preserve supplied source wording, order, identifiers, table cells, steps, expected results, acceptance criteria, Story/SPEC content, and user-approved replacement text exactly. If content must be generated from a raw business request, mark it as generated and require preview confirmation before export.
-30. For a non-SDLC generic Story create/update/batch item with prior Workspace scoring evidence in context or a supplied result file, read [generic Story score binding](references/generic-story-score-binding.md) to verify it and bind only after that item's Jira write succeeds. Never score as part of export or bind an unscored Story. This conditional step does not apply to other issue types, Test Case, association, or SDLC routes.
+30. For a non-SDLC generic Story create/update/batch item with prior Workspace scoring evidence in context or a known/supplied result file, read [generic Story score binding](references/generic-story-score-binding.md) to verify it and bind after that item's Jira write succeeds. Never score as part of export or bind an unscored Story. This conditional step does not apply to other issue types, Test Case, association, or SDLC routes.
 
 ## Module index
 
