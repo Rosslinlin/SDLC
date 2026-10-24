@@ -55,4 +55,4 @@ When the user asks to create a user story, generate Jira-friendly content:
 - `description`: Use `As a [persona], I want [feature], so that [benefit].`.
 - `acceptance criteria`: Cover key paths while avoiding unsupported business assumptions.
 - metadata-derived fields: Assemble automatically from metadata.
-- labels: Always include `CEAIA_GEN`.
+- labels: Include other requested or required labels only; the backend adds `CEAIA_GEN`.

@@ -25,11 +25,11 @@ Both modes call `java-base-mcp.exportJiraByDynamicFields` with direct named argu
 
 Make one `issuesJson` argument containing a JSON-encoded non-empty array with one item per selected Test Case, in source order. Each item has its own actual `projectKey`, `summary`, `issueType` (Test), and `description` containing only its source Test Case title. Do not build a long description from Requirement, Priority, Preconditions, Test Steps, Expected Results or Comments.
 
-Put `CEAIA_GEN` and any validated additional Jira fields in that item's JSON-encoded `dynamicFieldsJson` object. When the source contains steps/results, the item's `testDetailsJson` is a JSON-encoded string containing its ordered array of `step`, `data` and `result` objects. It is a string inside the decoded `issuesJson` item, not a native array under the `testDetailsJson` key. Keep all selected cases in this one batch call. Never use an unsupported top-level `issues` argument.
+Put other validated Jira fields in that item's JSON-encoded `dynamicFieldsJson` object only when needed; the backend adds `CEAIA_GEN`. When the source contains steps/results, the item's `testDetailsJson` is a JSON-encoded string containing its ordered array of `step`, `data` and `result` objects. It is a string inside the decoded `issuesJson` item, not a native array under the `testDetailsJson` key. Keep all selected cases in this one batch call. Never use an unsupported top-level `issues` argument.
 
 ### Group into a single ticket: `single`
 
-Make one Test issue using top-level `projectKey`, `summary`, `issueType`, `description`, and a JSON-encoded `dynamicFieldsJson` object containing a `labels` array with `CEAIA_GEN`. Do not include `issuesJson`.
+Make one Test issue using top-level `projectKey`, `summary`, `issueType`, and `description`; include JSON-encoded `dynamicFieldsJson` only for other validated fields. The backend adds `CEAIA_GEN`. Do not include `issuesJson`.
 
 The entire `description` is a clean table of the selected source Test Cases in source order, with exactly these five columns: `Test Case Id`, `Test Case Description`, `Preconditions`, `Test Steps`, `Expected Results`. Omit the Markdown separator row and all extra prose or source-only columns, including Test Data. Preserve each cell's full source content and required newline characters; source Test Data remains in the Test Details payload when applicable.
 

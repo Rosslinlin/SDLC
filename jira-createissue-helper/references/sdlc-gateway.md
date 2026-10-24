@@ -94,7 +94,7 @@ Use `flow-sdlc-validated-handoff.md` and metadata returned by Jira. For each ite
 - Acceptance Criteria is the Jira-wiki rendering of only the AC section body in the confirmed writable Jira field, in exact stable AC order. On an update, an existing AC field may remain untouched only when its separately retrieved current value matches the reviewed AC IDs, wording and order after allowed presentation normalization; otherwise include the field replacement;
 - required metadata follows the helper's current-value/default/evidence/user-selection order;
 - attachments follow the validated reviewed mapping and `common-attachments.md` serialization contract;
-- labels include `CEAIA_GEN` whenever labels are included or changed.
+- labels contain only other requested or required values; the backend adds `CEAIA_GEN`.
 
 Never put internal paths, scores, review diagnostics, state, or export-attempt records into Jira-visible fields.
 

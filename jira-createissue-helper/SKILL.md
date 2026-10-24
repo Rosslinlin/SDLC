@@ -15,7 +15,7 @@ This skill separates reusable Jira helper capabilities from business flows. Read
 2. Generate Jira content before export. For generic non-Test create, update and batch routes, render Markdown-authored Jira-visible rich text through `common-jira-text-rendering.md` before preview; keep workspace sources unchanged. Test Case content is explicitly excluded and remains controlled only by its dedicated flow.
 3. Generate summary and description; do not collect them through pop-ups.
 4. Assemble metadata fields after `queryJiraCreateMetaFields`.
-5. Include `CEAIA_GEN` whenever labels are included or changed.
+5. The Jira backend adds `CEAIA_GEN` on export. Never put it in a tool payload; send only other requested or required labels.
 6. Use only one preview file: `jira-preview.md`, with a complete valid JSON payload.
 7. Read existing issues through `getJiraInfos` before updates or associations.
 8. Updates require metadata confirmation for the current project and issue type.

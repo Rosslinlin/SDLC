@@ -82,7 +82,7 @@ For every item:
 4. Process all other required metadata fields using this strict order: current preserved value for updates; visible metadata default; safe evidence-based allowed option; focused user question.
 5. Add optional fields only where user-provided, safely inferred, useful by default or directly relevant to the reviewed handoff.
 6. Keep direct fields out of `dynamicFieldsJson`; place only other validated custom/system fields in `dynamicFieldsJson`.
-7. De-duplicate labels and include `CEAIA_GEN` whenever labels are included or changed.
+7. De-duplicate other requested or required labels when present; omit `CEAIA_GEN` because the backend adds it.
 
 ### Stage D — Build create, update or batch payloads
 
@@ -158,7 +158,7 @@ Example single-create argument shape:
   "summary": "Reviewed Story title",
   "issueType": "Story",
   "description": "h1. Reviewed Story title\n\nh2. User Story\nAs a member, I want to view my status, so that I can track progress.",
-  "dynamicFieldsJson": "{\"fields\":{\"labels\":[\"CEAIA_GEN\"],\"customfield_12345\":\"AC-001: Given a saved status, when I open the status page, then I see that status.\"}}",
+  "dynamicFieldsJson": "{\"fields\":{\"customfield_12345\":\"AC-001: Given a saved status, when I open the status page, then I see that status.\"}}",
   "attachmentsJson": "{\"add\":[{\"relativePath\":\"outputs/ceaia/example/example-spec.md\",\"fileName\":\"example-spec.md\"}]}"
 }
 ```
@@ -169,7 +169,7 @@ Example batch argument shape:
 {
   "staffId": "12345678",
   "almType": "wpb",
-  "issuesJson": "[{\"projectKey\":\"AIWPB\",\"summary\":\"Story 1\",\"issueType\":\"Story\",\"description\":\"h1. Story 1\",\"dynamicFieldsJson\":\"{\\\"fields\\\":{\\\"labels\\\":[\\\"CEAIA_GEN\\\"],\\\"customfield_12345\\\":\\\"AC-001: Given a saved status, when I open the status page, then I see that status.\\\"}}\",\"attachmentsJson\":\"{\\\"add\\\":[{\\\"relativePath\\\":\\\"outputs/ceaia/story-1/story-1-spec.md\\\",\\\"fileName\\\":\\\"story-1-spec.md\\\"}]}\"}]"
+  "issuesJson": "[{\"projectKey\":\"AIWPB\",\"summary\":\"Story 1\",\"issueType\":\"Story\",\"description\":\"h1. Story 1\",\"dynamicFieldsJson\":\"{\\\"fields\\\":{\\\"customfield_12345\\\":\\\"AC-001: Given a saved status, when I open the status page, then I see that status.\\\"}}\",\"attachmentsJson\":\"{\\\"add\\\":[{\\\"relativePath\\\":\\\"outputs/ceaia/story-1/story-1-spec.md\\\",\\\"fileName\\\":\\\"story-1-spec.md\\\"}]}\"}]"
 }
 ```
 

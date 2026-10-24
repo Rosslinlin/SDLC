@@ -11,7 +11,7 @@ The preview stage must include:
 - the complete payload as a valid JSON code block
 - required-field status
 - optional fields
-- labels, including `CEAIA_GEN` when labels are included or changed
+- requested or required labels, if any; `CEAIA_GEN` is added by the backend and omitted from the payload
 - content provenance for Jira-visible fields: generated, source-preserved, transport-rendered, metadata-selected, user-provided, or unchanged
 - for every non-Test Markdown-authored rich-text value, the exact Jira-wiki transport rendering and conversion-validation status from `common-jira-text-rendering.md`
 
@@ -199,7 +199,7 @@ Batch parameters may include:
 - `issuesJson`
 - item-level `attachmentsJson` inside `issuesJson` when attachments are authorised; top-level attachments are not inherited by batch items
 
-For Test Case export, `uploadType` must be collected before preview, but it is not submitted as a final `exportJiraByDynamicFields` parameter. Use it only to choose between the `multiple` payload shape with `issuesJson` and the `single` payload shape with top-level `summary`, `description`, and JSON-encoded `dynamicFieldsJson`. In `single` mode, that encoded object must contain `labels` with `CEAIA_GEN`.
+For Test Case export, `uploadType` must be collected before preview, but it is not submitted as a final `exportJiraByDynamicFields` parameter. Use it only to choose between the `multiple` payload shape with `issuesJson` and the `single` payload shape with top-level `summary` and `description`; include JSON-encoded `dynamicFieldsJson` only when other validated fields are needed. The backend supplies `CEAIA_GEN` in both modes.
 
 For Test Case export, the submitted payload must be self-contained. Preview text may identify the source artifact, but the final payload JSON block must not place source-file references, preview-file references, attachment references, generated-document references, or other file pointers inside Jira-visible fields instead of the complete Test Case content.
 

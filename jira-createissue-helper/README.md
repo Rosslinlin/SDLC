@@ -6,7 +6,7 @@ A modular skill for create, update, batch, association, Test Case and validated 
 
 - Preview every Jira write. Generic routes retain explicit confirmation; the validated CEAIA SDLC gateway performs direct export after its final read-back/preflight and has no approval-tool step.
 - Assemble metadata from current Jira field definitions.
-- Add the default `CEAIA_GEN` label whenever labels are included or changed.
+- Let the Jira backend add `CEAIA_GEN`; omit it from outgoing payloads while preserving other requested labels.
 - Read current Jira information before an existing-ticket update.
 - Preserve Test Case execution fields during source-to-payload mapping, allowing only Jira-safe line-break normalization with newline characters, not literal `<br>` tags.
 - Keep Jira-visible Test Case fields self-contained.

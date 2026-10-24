@@ -28,7 +28,8 @@ All Jira write operations require at least:
 
 - `staffId`: Used to read the user's saved Jira token.
 - `almType`: Jira source. Backend values are limited to `wpb`, `alm`, `fcr`, `go`, and `data`.
-- `CEAIA_GEN`: The default label automatically added to every create or update payload when labels are included or changed.
+
+The Jira backend adds `CEAIA_GEN` automatically on export; it is not a caller-supplied base input.
 
 ## Source Mapping
 
@@ -69,7 +70,7 @@ Batch create/update also requires:
 - Per-item `summary`, `issueIdOrKey`, `testDetailsJson`, dynamic fields, or attachments as required by the operation.
 - One integrated batch preview before the entire batch. Generic batch routes also require confirmation; the validated SDLC route follows its gateway's direct-export rule.
 
-For Test Case source export with `uploadType` mode `single`, do not use `issuesJson`; assemble one aggregate Test issue with top-level `summary`, clean table-only `description`, and a JSON-encoded `dynamicFieldsJson` object containing `labels` with `CEAIA_GEN`.
+For Test Case source export with `uploadType` mode `single`, do not use `issuesJson`; assemble one aggregate Test issue with top-level `summary` and clean table-only `description`. Include JSON-encoded `dynamicFieldsJson` only for other validated fields; the backend adds `CEAIA_GEN`.
 
 ## Test Case Source Inputs
 

@@ -58,7 +58,6 @@ Do not call project search or issue-type discovery for association updates.
   "almType": "wpb",
   "issueIdOrKey": "AIWPB-6705",
   "linkedIssueKeys": ["AIWPB-7799"],
-  "linkType": "Relates",
-  "dynamicFieldsJson": "{\"fields\":{\"labels\":[\"CEAIA_GEN\"]}}"
+  "linkType": "Relates"
 }
 ```

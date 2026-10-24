@@ -143,17 +143,9 @@ Regression checks:
 - An active batch, attachment operation, or required Test Case step export cannot replace its required data with `""` or an empty collection.
 - Literal periods in supplied report text, URLs, decimals, and filenames remain unchanged.
 
-## Default Label
+## Backend-managed label
 
-Every create or update payload must include `CEAIA_GEN` when labels are included or changed.
-
-Use this shape when labels are placed under Jira fields:
-
-```json
-{"fields":{"labels":["CEAIA_GEN"]}}
-```
-
-If the user provides additional labels, merge and de-duplicate them while always preserving `CEAIA_GEN`.
+The Jira backend adds `CEAIA_GEN` automatically on export. Do not include it in `dynamicFieldsJson`, `issuesJson` items, or other outgoing Jira fields. Include `labels` only for other requested or required labels, de-duplicated; omit the field when there are none. An update without a requested label change leaves existing labels untouched. When changing labels, retain existing non-`CEAIA_GEN` labels unless the user asks to remove them.
 
 ## Value Generation Strategy
 
@@ -220,7 +212,7 @@ For source-based Test Case export through `exportJiraByDynamicFields`, do not as
 
 - single-select option: Prefer `{ "id": "..." }`; use visible value/name when no id is available.
 - multi-select / array option: Use `["id", "id"]`.
-- labels: Use a string array and include `CEAIA_GEN`.
+- labels: Use a string array for requested or required values; omit the field when none are needed. Do not send `CEAIA_GEN`.
 - date: Use `YYYY-MM-DD`.
 - number: Use a JSON number, not a quoted string.
 - issue link: Use an explicit issue key; do not invent one.

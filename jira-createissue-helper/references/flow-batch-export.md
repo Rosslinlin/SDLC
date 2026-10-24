@@ -79,7 +79,7 @@ Validate each effective item after default inheritance using `common-field-assem
   "almType": "wpb",
   "projectKey": "AIWPB",
   "issueType": "Story",
-  "issuesJson": "[{\"summary\":\"Batch story 1\",\"description\":\"Story 1 desc\",\"dynamicFieldsJson\":\"{\\\"fields\\\":{\\\"labels\\\":[\\\"CEAIA_GEN\\\",\\\"BATCH\\\"],\\\"customfield_12345\\\":{\\\"value\\\":\\\"High\\\"}}}\"},{\"summary\":\"Batch story 2\",\"issueType\":\"Task\",\"dynamicFieldsJson\":\"{\\\"fields\\\":{\\\"labels\\\":[\\\"CEAIA_GEN\\\"],\\\"customfield_67890\\\":\\\"Business value\\\"}}\"}]"
+  "issuesJson": "[{\"summary\":\"Batch story 1\",\"description\":\"Story 1 desc\",\"dynamicFieldsJson\":\"{\\\"fields\\\":{\\\"labels\\\":[\\\"BATCH\\\"],\\\"customfield_12345\\\":{\\\"value\\\":\\\"High\\\"}}}\"},{\"summary\":\"Batch story 2\",\"issueType\":\"Task\",\"dynamicFieldsJson\":\"{\\\"fields\\\":{\\\"customfield_67890\\\":\\\"Business value\\\"}}\"}]"
 }
 ```
 
@@ -91,7 +91,7 @@ Each item to update must provide its own `issueIdOrKey`.
 {
   "staffId": "12345678",
   "almType": "wpb",
-  "issuesJson": "[{\"issueIdOrKey\":\"AIWPB-101\",\"summary\":\"Updated story summary\"},{\"issueIdOrKey\":\"AIWPB-102\",\"dynamicFieldsJson\":\"{\\\"fields\\\":{\\\"description\\\":\\\"Updated description\\\",\\\"labels\\\":[\\\"CEAIA_GEN\\\"],\\\"customfield_12345\\\":{\\\"value\\\":\\\"Medium\\\"}}}\"}]"
+  "issuesJson": "[{\"issueIdOrKey\":\"AIWPB-101\",\"summary\":\"Updated story summary\"},{\"issueIdOrKey\":\"AIWPB-102\",\"dynamicFieldsJson\":\"{\\\"fields\\\":{\\\"description\\\":\\\"Updated description\\\",\\\"customfield_12345\\\":{\\\"value\\\":\\\"Medium\\\"}}}\"}]"
 }
 ```
 
