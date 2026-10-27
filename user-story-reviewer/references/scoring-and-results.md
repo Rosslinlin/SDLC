@@ -17,7 +17,7 @@ Call `nodejs-base-mcp.score_requirement_markdown` with the ticket and its user-p
 
 Accepted sources are `WPB`, `ALM`, `DATA`, `FCR`, and `GO`. Do not infer one from the issue-key prefix. The tool uses the authenticated user's Jira access, retrieves the issue, uses the latest `*spec.md` attachment when available, and treats Jira fields as supporting context.
 
-Do not include `relativePath`. Omit `specFileStatus` and `specFilePath` in this skill version. Do not call a Jira retrieval tool before scoring. A successful Jira review is stored and associated by the scoring tool itself; the optional, user-confirmed four-field Jira score sync is a separate post-scoring action described in [Jira score sync](jira-score-sync.md).
+Do not include `relativePath`. Omit `specFileStatus` and `specFilePath` in this skill version. Do not call a Jira retrieval tool before scoring. A successful Jira review is stored and associated by the scoring tool itself; then perform the automatic four-field [Jira update trigger](jira-score-sync.md) without a confirmation popup.
 
 Jira ratings may be reused by source and issue key across conversations. Within the configured cache window the existing rating is reused; an identical versioned fingerprint may also reuse the prior rating afterward. A reused rating is a valid result.
 
@@ -33,7 +33,9 @@ Use this route only when the Story contains no Jira ticket number. Prepare and v
 
 Use the actual workspace-relative `.md` or `.markdown` path. Do not pass pasted content, a URL, an absolute path or the result path. Do not include `jira_number` or `source`. Workspace cache identity uses the current conversation, relative path and content checksum when available.
 
-Workspace identity comes from trusted platform context. Do not add a conversation ID to either route.
+This ticketless route never runs the four-field Jira update trigger and never asks for `staffId` or `conversationId` for that trigger.
+
+Workspace identity comes from trusted platform context. Do not add a conversation ID to either scoring call; the separate Jira update trigger uses its own required arguments.
 
 ## Optional parameters
 
@@ -56,7 +58,7 @@ Keep these sections in the result file:
 - **Assessment:** actual tool status and all returned score fields and substantive diagnostics.
 - **Recognition:** returned AC counts, warnings, parse errors and any checkable mismatch or limitation.
 - **Complete tool response:** full scoring JSON plus any transport wrapper or actual error information.
-- **Persistence outcome:** Jira mode records the scoring tool's Jira review/cache outcome and the separate Jira sync decision/outcome when applicable; workspace mode records that the assessment was saved without a Jira association. Do not claim a sync call or successful Jira sync without its actual confirmed response.
+- **Persistence outcome:** Jira mode records the scoring tool's Jira review/cache outcome and the automatic four-field trigger's invocation/response or reason it was not sent. Generic tool success is not proof that Jira score fields were written. Workspace mode records that the assessment was saved without a Jira association and does not run the trigger.
 
 ## Validate and report
 
@@ -66,4 +68,4 @@ For workspace mode, compare returned `acCount` and `dimensions.sizingSplit.acCou
 
 Preserve a completed numeric result even when recognition is suspect. A malformed response or missing usable score must not be reported as a successful assessment. For a timeout, record an unknown outcome and reconcile available service results before retrying. A failed local result-file write can be retried without another score call.
 
-For each target, report its route, saved paths, exact returned score/status/band/summary, all substantive sub-scores and diagnostics, cache outcome, and failure recovery when needed. Provide the complete untruncated JSON through the result link for long results or batches. Distinguish a sub-score of 0 from total score 0 and from a tool error.
+For each target, report its route, saved paths, exact returned score/status/band/summary, all substantive sub-scores and diagnostics, cache outcome, and scoring failure recovery when needed. Routine background update-trigger details stay in the result file as defined in jira-score-sync.md. Provide the complete untruncated JSON through the result link for long results or batches. Distinguish a sub-score of 0 from total score 0 and from a tool error.

@@ -1,6 +1,6 @@
 ---
 name: user-story-reviewer
-description: Review and score user stories by always calling the platform scoring tool through Jira or workspace input. For existing Jira tickets, offer an optional, user-confirmed score sync to Jira after scoring; keep ticketless stories on the workspace Markdown route.
+description: Review and score user stories through Jira or workspace input. After a completed existing-Jira assessment, automatically trigger the four-field Jira update without a sync-confirmation popup; keep ticketless stories on the workspace Markdown route.
 ---
 
 # User Story Reviewer
@@ -17,11 +17,11 @@ Do not decide that a detected ticket is merely a reference and silently choose w
 ## Tools
 
 - `nodejs-base-mcp.score_requirement_markdown`: scores either a workspace Markdown file or one Jira issue and persists the service result/audit record.
-- `java-base-mcp.exportJiraByDynamicFields`: for an existing Jira ticket only, synchronizes its completed score to Jira after the user confirms, using the four-field call in [Jira score sync](references/jira-score-sync.md).
+- `java-base-mcp.exportJiraByDynamicFields`: automatically triggers the existing ticket's update after a completed Jira assessment, using the four-field call in [Jira update trigger](references/jira-score-sync.md).
 - Workspace read/write tools for ticketless input and all local result records.
-- `ask_user_question`, or the platform's available input UI, to collect missing Jira sources, ask whether to sync the displayed score to Jira, or recover from an actual failure.
+- `ask_user_question`, or the platform's available input UI, to collect missing Jira sources or required IDs, or recover from an actual scoring failure. Collecting a missing ID does not ask whether to sync.
 
-Expose both named tools when installing this skill. Direct Jira review retrieves the Jira issue and already records its Jira association in the scoring service. The optional second call is only for user-confirmed Jira score sync; it is not needed for database association. Do not call a separate Jira read tool. Workspace review has no Jira ticket to sync.
+Expose both named tools when installing this skill. Direct Jira review retrieves the issue and records its Jira association in the scoring service. The subsequent four-field call automatically triggers backend update handling; generic tool success does not establish that a project's Jira score fields were written. Do not add a project-availability query, a separate Jira read or a sync confirmation popup. Workspace review does not run this trigger.
 
 ## Workspace layout
 
@@ -48,14 +48,14 @@ For an explicitly requested fresh assessment, use the next unused `-v2`, `-v3`, 
 2. **Resolve Jira sources once.** Use an explicit source supplied with the current request. For every Jira target whose source is absent or uncertain, ask one combined question listing all affected tickets and request a source for each: `WPB`, `ALM`, `DATA`, `FCR`, or `GO`. Do not infer source from the ticket prefix and do not read `jira-user-info.md` or other saved defaults.
 3. **Prepare ticketless input only.** Before a workspace call, read [workspace input conversion](references/input-format.md), preserve the source wording and verify the saved Markdown. Jira input, including uploaded JSON, is not converted to Markdown.
 4. **Score with the tool, without exception.** Read [scoring modes and result records](references/scoring-and-results.md). Call `nodejs-base-mcp.score_requirement_markdown` once per target with only the parameters for that route, even when a prior score file or cached result exists. Omit SPEC parameters in this version. Never substitute the model's own score or a prior file for this call; if the tool cannot be called or returns no valid score, report that scoring could not be completed.
-5. **Show every score, including newly generated Stories.** Create the result only after scoring finishes, preserve the complete return, and read the saved result back. For both routes, send a user-visible message with the Story or ticket/source, exact `finalScore`, status, returned score breakdown, key diagnostics, and a link to the complete raw result. For a batch, present the scores together. If a generation skill called this reviewer for a new ticketless Story, show that Workspace score before returning to the caller; do not leave it only in the result file or tool output. For the Jira route, this must be an intermediate message before the sync popup; keep the run active.
-6. **Ask in a popup, then continue.** Only for completed numeric Jira-route assessments, read [Jira score sync](references/jira-score-sync.md) and call `ask_user_question` (or the platform's popup input UI) after the score message is visible. Ask once for a batch. Wait for the popup answer in this run; call the four-field Jira tool only for tickets the user confirms, then report its separate outcome. Workspace assessments finish after reporting the score; if this is the end of the run, include the exact score in the final answer too.
+5. **Preserve and show every score.** Create the result only after scoring finishes, preserve the complete return, and read the saved result back. Show the Story or ticket/source, exact `finalScore`, status, returned score breakdown, key diagnostics and full-result link. Present batch scores together. A generation caller must also receive the Workspace score. For completed Jira assessments, keep the run active for the automatic trigger below.
+6. **Trigger the existing-ticket update automatically.** For each Jira-route result with `ok === true` and a finite numeric `finalScore`, including 0 or a cache hit, follow [Jira update trigger](references/jira-score-sync.md) once without asking whether to sync/export. Resolve its four actual arguments; if a required ID is missing, ask a focused input question and wait, then continue automatically without a sync confirmation. Record the returned outcome in the same result file. Final conversation output focuses on the assessment; omit routine trigger messages and do not claim Jira score fields were updated. Workspace assessments finish without this call and do not collect IDs for it.
 
 For a batch, collect every missing source before starting Jira calls so the user is not questioned one ticket at a time. A failure for one independent target does not block the others.
 
 ## Boundaries
 
-Do not create Jira issues, edit Story content, or use the SDLC five-field Markdown-review binding call. The Jira scoring route already records the score and ticket association in the scoring service; the optional four-field sync has a distinct backend purpose. Never offer that sync for the workspace route, even if its Story may be exported later.
+Do not create Jira issues, edit Story content, or use the SDLC five-field Markdown-review binding call. The automatic four-field trigger applies only to the existing ticket just scored. Respect an explicit user instruction prohibiting Jira writes; otherwise no additional confirmation is required. If asked about the trigger, explain the actual call and its known outcome accurately.
 
 Preserve original business wording in ticketless conversion. Do not invent Given/When/Then steps, add business value, interpret unseen images or repair requirements to raise a score.
 
