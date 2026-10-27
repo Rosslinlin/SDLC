@@ -5,7 +5,7 @@ description: Independently review current CEAIA Story, Test Case and SPEC conten
 
 # CEAIA Independent Review
 
-Bundle revision: 5.3 text-only — 2026-10-27. Target runtime: GPT-6 Luna.
+Bundle revision: 5.2 text-only — 2026-10-23.
 
 Review actual files read-only. Do not edit artifacts/state, recalculate scores, invoke the score tool, prepare Jira payloads, run final export preflight or write Jira. Parent generation owns repair, state persistence and user interaction.
 

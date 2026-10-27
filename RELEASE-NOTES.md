@@ -1,15 +1,3 @@
-# CEAIA SDLC Skill Bundle v5.3
-
-更新日期：2026-10-27。目标运行模型：GPT-6 Luna。
-
-新增独立 `ceaia-sdlc-jira-export`，仅处理已通过 SDLC 门禁的 Story 创建、更新与批量导出，保留 SPEC 附件及首次 Jira 成功后的逐票五字段数据库评分关联。原 `jira-createissue-helper/` 与独立 `user-story-reviewer/` 原样保留。Task 和 generation handoff 已接入新 exporter；平台导入前须填写新 skill 的实际 ID。
-
-字段配置和默认值成功后保存到真实用户工作区 `ceaia-sdlc-jira/profiles.json`；完整命中跨 session 跳过项目/type/metadata query，不按 TTL 刷新。每次确认实际目标、Ticket Number、Epic/Parent 与字段值。Update 复用生成阶段的 baseline 和完整附件清单，不重复远端 intake。首次 Epic/no-Epic、76 分、独立 PASS、SPEC sync、全局覆盖、内容保真、附件替换顺序和失败恢复门禁保留。
-
-本次只改导出专用化、配置复用及必要接入，不改生成候选串行/阶段依赖或评分阈值。静态和离线验证不能代替 GPT-6 Luna 平台上的真实 Jira/附件/数据库关联回归；实测按 PLATFORM-TEST-CHECKLIST.md 执行。
-
----
-
 # CEAIA SDLC Skill Bundle v5.2
 
 更新日期：2026-10-23

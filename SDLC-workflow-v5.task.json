@@ -7,12 +7,11 @@
       "content": "Classify the request and complete source intake",
       "active_form": "Classifying the request and reading required evidence",
       "instructions": [
-        "Load ceaia-sdlc-story-spec-generation and only the references needed for intake. This Task coordinates four stages: generation, independent content review and SPEC header sync, final Workspace Story scoring, then ceaia-sdlc-jira-export. Do not execute a later stage during intake. Reuse current completed reads; do not reload unchanged references or evidence without a reason.",
+        "Load ceaia-sdlc-story-spec-generation and only the references needed for intake. This Task coordinates four stages: generation, independent content review and SPEC header sync, final Workspace Story scoring, then the jira-createissue-helper SDLC gateway. Do not execute a later stage during intake. Reuse current completed reads; do not reload unchanged references or evidence without a reason.",
         "The bundled workflow is end-to-end by default: jiraExportRequested=true even without push/export wording. Only an explicit preparation-only/no-Jira request or stop changes this. Defer Jira destination, project/type and Epic Link questions until the validated export stage.",
         "Classify new_story versus existing_ticket_update. A ticket cited only as evidence is not an update target; an explicit update never becomes a new ticket. Before any Jira read, confirm WPB, ALM, DATA, FCR or GO for each target separately; use ask_user_question for missing sources and never infer from ticket keys.",
         "Inventory all supplied requirements, UX, design, Jira, Confluence and Workspace evidence. For each update, read Description and Acceptance Criteria separately with getJiraInfos and finish readJiraAttachments inventory before planning. A usable Description with empty/unavailable separate AC can proceed after recording that condition and checking embedded criteria. Unusable Description, incomplete attachment inventory or material unreadable evidence blocks only that target.",
-        "Use platform read/write and tool capabilities only; the delivered workflow is text-only and executes no local scripts or code. Record each selected target as intake-ready or with its exact WAITING input/tool blocker. Ready independent targets may continue while blocked targets remain selected and pending. UAT-only requests use the dedicated workflow, not this SDLC route.",
-        "Preserve exportContext pointers to completed update Description/AC and attachment inventory plus actual available project/Story type/current field facts and explicit unavailable markers. Do not fabricate unsupported Jira fields. The later exporter reuses this intake and does not routinely retrieve it again."
+        "Use platform read/write and tool capabilities only; the delivered workflow is text-only and executes no local scripts or code. Record each selected target as intake-ready or with its exact WAITING input/tool blocker. Ready independent targets may continue while blocked targets remain selected and pending. UAT-only requests use the dedicated workflow, not this SDLC route."
       ],
       "completion_criteria": [
         "Request mode, selected targets and per-ticket Jira sources are explicit before Jira access.",
@@ -34,9 +33,7 @@
         "Every selected candidate has current artifacts ready for independent content review, or the user explicitly changes/stops its scope. Blocked candidates remain selected and pending; they do not make this stage fully complete.",
         "Current Story, executable Test Case and all intended SPECs preserve source coverage and update mappings; no review, score or Jira write is claimed here."
       ],
-      "depends_on": [
-        "classify-and-complete-intake"
-      ]
+      "depends_on": ["classify-and-complete-intake"]
     },
     {
       "id": "review-and-resolve-artifacts",
@@ -54,45 +51,32 @@
         "Every selected final Workspace Story has a current passing score invocation with exact specFileStatus='Pass' and the verified primary SPEC path, plus passing global coverage.",
         "Numbered review/score evidence and repair state are retained; stale or blocked candidates are not declared Jira-ready."
       ],
-      "depends_on": [
-        "plan-and-generate-artifacts"
-      ]
+      "depends_on": ["plan-and-generate-artifacts"]
     },
     {
       "id": "prepare-and-execute-jira-operation",
       "content": "Prepare and execute the validated Jira operation",
       "active_form": "Preparing exact Jira payloads and executing the validated export",
       "instructions": [
-        "Load ceaia-sdlc-jira-export, the Story-only exporter; do not load jira-createissue-helper or any generic/Test Case export flow. Keep handoffType=ceaia-sdlc-validated only in internal state, never in Jira arguments. Validate current reviewed artifacts, independent PASS, SPEC sync, final score with exact specFileStatus='Pass', global coverage and attachment mapping. Return content defects upstream. Use GPT-6 Luna as the deployment runtime.",
-        "Load only the matching complete field profile from the real cross-session user workspace ceaia-sdlc-jira/profiles.json. A hit skips project/type/metadata queries and cached-Epic reads; a new session or elapsed time never forces refresh. Query only missing/inapplicable configuration, explicit user change/refresh or supported schema-error recovery. Legacy jira-user-info.md provides routing defaults only. Reuse upstream update baseline and attachment inventory without routine remote reads. Confirm actual destination, Story type, update Ticket Number(s), Epic/Parent decision and field values through one Use/Change settings interaction on every export; resolve a missing create Epic/no-Epic choice first. Resolve the real staffId and current conversation identity for database binding.",
-        "Partition each reviewed STORY.md at its canonical Acceptance Criteria section. Put non-AC Story content only in Jira Description and AC only in the profile/metadata-confirmed writable AC field, preserving wording/order through Jira wiki rendering. Preview and read back exact direct exportJiraByDynamicFields arguments, metadata values, links and attachments. The first call omits markdownReviewRelativePath. Multiple creates use issuesJson; ordinary updates execute one ticket at a time and stop on failure/partial/unknown. Preserve the explicitly requested mixed-batch branch. Final preflight calls Jira directly without another approval popup.",
-        "For each item whose Jira issue write AND all requested attachment operations are confirmed successful, use its returned ticketKey and the same final scored STORY.md path to preview/read back and make a second direct exportJiraByDynamicFields call containing exactly five nonempty strings: staffId, almType, issueIdOrKey, conversationId and markdownReviewRelativePath. Verify markdownReview binding separately; keep each attempt in numbered internal history. Batch items bind separately. Never repeat a successful first Jira write or attachment upload to repair only a binding failure.",
-        "On failed, partial or unknown results, preserve known ticket/attachment/binding outcomes, pause affected or later writes as specified by the new exporter and use its reconciliation/recovery path. Numeric status=400 is a business validation failure even when isError=false. Report individual ticket keys/URLs and all operation outcomes; incomplete binding is not whole-workflow success. Persist compact field rules/IDs and confirmed defaults only from successful issue-plus-required-attachment operations; binding pending does not erase that success. Never claim profile persistence without a real user-workspace write."
+        "Load jira-createissue-helper through its dedicated sdlc-gateway.md, not a generic/Test Case route. Keep handoffType=ceaia-sdlc-validated only in internal state, never in Jira arguments. Revalidate current reviewed artifacts, independent PASS, SPEC sync, final score with normalized specFileStatus='Pass', global coverage and attachment mapping; return defects upstream rather than editing approved content during export.",
+        "Only the SDLC gateway uses jira-user-info.md defaults. Revalidate saved destination values and confirm them once on later runs; first SDLC create must resolve a valid Epic Link or explicit no-Epic choice. Resolve the real staffId needed for the later binding call. Keep explicit Epic-plus-Stories, existing-ticket update and no-attachment branches from the gateway.",
+        "Partition each reviewed STORY.md at its canonical Acceptance Criteria section. Put only non-AC Story content in Jira Description and only AC content in the metadata-confirmed AC field, preserving wording/order through Jira wiki rendering. Preview and read back exact fields, metadata, links, attachments and complete direct exportJiraByDynamicFields arguments. The first call omits markdownReviewRelativePath; batches use issuesJson and updates execute one ticket at a time. After final preflight, call Jira directly without an extra approval popup.",
+        "For each confirmed successful Jira issue/attachment operation, use its returned ticketKey and the same final scored STORY.md path to preview/read back and make a second direct exportJiraByDynamicFields call containing exactly five nonempty strings: staffId, almType, issueIdOrKey, conversationId and markdownReviewRelativePath. Verify markdownReview binding separately; keep each attempt in numbered internal history. Batch items bind separately. Never repeat a successful first Jira write or attachment upload to repair only a binding failure.",
+        "On failed, partial or unknown results, preserve known ticket/attachment/binding outcomes, pause affected or later writes as specified by the gateway and use its reconciliation/recovery path. Numeric status=400 is a business validation failure even when isError=false. Report individual ticket keys/URLs and all operation outcomes; incomplete binding is not whole-workflow success."
       ],
       "completion_criteria": [
-        "Each Story operation used the confirmed settings, reviewed exact preview, applicable saved field profile or fresh metadata and local attachment preflight; no handoffType reached the Jira tool. Normal profile-hit and update-handoff paths did not repeat discovery or baseline reads.",
-        "Every item whose issue write and all requested attachments are confirmed successful has a separately confirmed five-field Markdown review database binding, or remains explicitly binding-pending after failure/unknown outcome. No item with a failed/partial/unknown required attachment proceeds to binding.",
+        "Each Jira operation used the reviewed exact preview, current metadata and attachment preflight; no handoffType reached the Jira tool.",
+        "Every successful issue/attachment operation has a separately confirmed five-field Markdown review binding, or remains explicitly pending after failure/unknown outcome.",
         "Final result lists per-ticket Jira, attachment and binding outcomes; blocked, partial and unknown states are not marked complete."
       ],
-      "depends_on": [
-        "review-and-resolve-artifacts"
-      ]
+      "depends_on": ["review-and-resolve-artifacts"]
     }
   ],
-  "description": "CEAIA SDLC for GPT-6 Luna: generate Story/Test Case/SPEC, independently review, synchronize SPEC Result, score final Workspace Story with exact specFileStatus='Pass', then use ceaia-sdlc-jira-export to confirm cached user-workspace settings, export Story/SPEC and bind every returned ticket through its separate five-field database call. Preserve upstream intake and all read-back/repair gates.",
+  "description": "CEAIA SDLC: generate current Story/Test Case/SPEC artifacts, independently review content, synchronize SPEC Result, score the final Workspace Story using case-sensitive specFileStatus='Pass' and the primary SPEC path, then export Jira and bind the returned ticket through the separate five-field call. Task controls stage boundaries; phase Skills own detailed rules. Reuse unchanged evidence and references while preserving required read-backs and targeted repairs.",
   "skills": [
-    {
-      "skill_id": "96c6bb68-ab4c-4a34-a634-3fb5c66c96d8",
-      "skill_name": "ceaia-sdlc-story-spec-generation"
-    },
-    {
-      "skill_id": "670e4bce-cfcd-4883-824d-2fdfc9092d76",
-      "skill_name": "ceaia-spec-review"
-    },
-    {
-      "skill_id": "REPLACE_WITH_PLATFORM_CEAIA_SDLC_JIRA_EXPORT_SKILL_ID",
-      "skill_name": "ceaia-sdlc-jira-export"
-    }
+    {"skill_id": "96c6bb68-ab4c-4a34-a634-3fb5c66c96d8", "skill_name": "ceaia-sdlc-story-spec-generation"},
+    {"skill_id": "670e4bce-cfcd-4883-824d-2fdfc9092d76", "skill_name": "ceaia-spec-review"},
+    {"skill_id": "REPLACE_WITH_PLATFORM_JIRA_CREATEISSUE_HELPER_SKILL_ID", "skill_name": "jira-createissue-helper"}
   ],
   "tools": [
     "java-base-mcp.queryJiraProjectsByName",

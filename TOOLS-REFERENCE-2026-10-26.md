@@ -1,6 +1,6 @@
 # SDLC 与 Story/Jira 工具说明
 
-整理日期：2026-10-26；v5.3 接入更新：2026-10-27。适用于本仓库当前的 SDLC Task、三个活动 Skill，以及独立的 `user-story-reviewer`。这是配置和排查用的工具速查；实际调用仍须核对平台当时暴露的工具 schema。
+整理日期：2026-10-26。适用于本仓库当前的 SDLC Task、三个活动 Skill，以及独立的 `user-story-reviewer`。这是配置和排查用的工具速查；实际调用仍须核对平台当时暴露的工具 schema。
 
 ## 资料与边界
 
@@ -14,7 +14,7 @@
 | 工具或平台能力 | 主要用途 | 使用位置 |
 | --- | --- | --- |
 | `nodejs-base-mcp.score_requirement_markdown` | 读取 Workspace Story 或 Jira Issue、评分并保存评分/审计记录 | SDLC 最终 Story 评分；独立 `user-story-reviewer` |
-| `java-base-mcp.exportJiraByDynamicFields` | Jira 创建、更新、批量、附件、Issue 关联，以及评分记录与 Ticket 的关联/同步 | `ceaia-sdlc-jira-export`（SDLC）；`jira-createissue-helper`（原通用）；独立 reviewer 的可选分数同步 |
+| `java-base-mcp.exportJiraByDynamicFields` | Jira 创建、更新、批量、附件、Issue 关联，以及评分记录与 Ticket 的关联/同步 | `jira-createissue-helper`；独立 reviewer 的可选分数同步 |
 | `java-base-mcp.queryJiraProjectsByName` | 按来源和项目名检索、验证 Jira 项目 | Jira 导出准备 |
 | `java-base-mcp.queryJiraIssueTypesByProject` | 获取选定项目可用的 Issue 类型 | Jira 导出准备 |
 | `java-base-mcp.queryJiraCreateMetaFields` | 获取项目/类型的字段元数据，确认 AC 等字段可写及其 ID | Jira 创建/更新字段组装 |
@@ -100,7 +100,7 @@ SDLC 第一次 Jira 写入不带 `markdownReviewRelativePath`，因为新建时�
 | `queryJiraProjectsByName` | `staffId`、`almType`、`projectName` |
 | `queryJiraIssueTypesByProject` | `staffId`、`almType`、`projectKey` |
 | `queryJiraCreateMetaFields` | `staffId`、`almType`、`projectKey`，再加 `issueType` 或 `issueTypeId` 中至少一个 |
-| `getJiraInfos` | SDLC generation intake 分别读取原 Description 与 AC；新导出复用结果，不例行重读。导出新选 Epic 可验证一次；异常核对按需读取。完整参数 schema 未在本对话给出。 |
+| `getJiraInfos` | 更新前读取当前 Jira 内容；SDLC 分别读取 Description 与 Acceptance Criteria。完整参数 schema 未在本对话给出。 |
 | `readJiraAttachments` | SDLC 更新在规划前完成附件清单 intake，并保留原附件、ID、可读内容及无法读取的原因。完整参数 schema 未在本对话给出。 |
 | `fetchConfluenceContent` / `fuzzyMatchingConfluence` | 只用于获取相关需求证据；完整参数 schema 未在本对话给出。 |
 
@@ -110,10 +110,7 @@ SDLC 第一次 Jira 写入不带 `markdownReviewRelativePath`，因为新建时�
 | --- | --- |
 | `ceaia-sdlc-story-spec-generation` | Workspace 文件读写；`getJiraInfos`、`readJiraAttachments`（现有 Ticket 更新）；`fetchConfluenceContent`、`fuzzyMatchingConfluence`（涉及 Confluence 证据时）；`ask_user_question`；最终 `score_requirement_markdown`；独立 reviewer 的平台调用能力 |
 | `ceaia-spec-review` | 独立只读审查和 Workspace/证据读取；不调用评分或 Jira 写入工具 |
-| `ceaia-sdlc-jira-export` | 正常命中：用户/对话 Workspace、`ask_user_question`、`exportJiraByDynamicFields`；缺配置/变更/恢复时三种查询工具；新 Epic 或异常核对时 `getJiraInfos`，不例行重复 intake |
-| `jira-createissue-helper`（原通用，独立保留） | 三个 Jira 项目/类型/字段查询工具、`getJiraInfos`、`exportJiraByDynamicFields`、`ask_user_question` 与 Workspace 预览/复读能力；旧路由规则不变 |
+| `jira-createissue-helper` | 三个 Jira 项目/类型/字段查询工具、`getJiraInfos`、`exportJiraByDynamicFields`、`ask_user_question` 与 Workspace 预览/复读能力 |
 | `user-story-reviewer`（非 SDLC） | `score_requirement_markdown`；经用户确认的 Jira 分数同步用 `exportJiraByDynamicFields`；Workspace 读写；`ask_user_question` |
 
-本仓库 [Task JSON](SDLC-workflow-v5.task.json) 的 `tools` 列表列出 SDLC 所需的 10 个命名工具；Workspace 文件操作和独立 reviewer 能力由平台另行提供，不在该列表中。Skill 的具体路由和字段规则见各自 `SKILL.md`，尤其是 [独立 SDLC Story export](ceaia-sdlc-jira-export/SKILL.md)。
-
-新 SDLC exporter 的字段 profile 位于真实用户工作区 `ceaia-sdlc-jira/profiles.json`，跨 session 复用精简规则与默认值。正常命中跳过三个 query；保留首次 Jira 写入后逐票五字段 `exportJiraByDynamicFields` 数据库关联。原 helper 的既有 metadata 复验/确认规则保留在其独立目录，不用于新的 SDLC 路径。
+本仓库 [Task JSON](SDLC-workflow-v5.task.json) 的 `tools` 列表列出 SDLC 所需的 10 个命名工具；Workspace 文件操作和独立 reviewer 能力由平台另行提供，不在该列表中。Skill 的具体路由和字段规则见各自 `SKILL.md`，尤其是 [SDLC Jira gateway](jira-createissue-helper/references/sdlc-gateway.md)。

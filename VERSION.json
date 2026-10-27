@@ -1,16 +1,16 @@
 {
-  "bundleVersion": "5.3.0",
-  "releaseDate": "2026-10-27",
+  "bundleVersion": "5.2.0",
+  "releaseDate": "2026-10-23",
   "executionProfile": "text-only",
   "activeSkills": [
     "ceaia-sdlc-story-spec-generation",
     "ceaia-spec-review",
-    "ceaia-sdlc-jira-export"
+    "jira-createissue-helper"
   ],
   "replacedSkill": "ceaia-sdlc-only-jira-push-content",
-  "jiraGateway": "ceaia-sdlc-jira-export/SKILL.md",
+  "jiraGateway": "jira-createissue-helper/references/sdlc-gateway.md",
   "taskFile": "SDLC-workflow-v5.task.json",
-  "taskHelperSkillId": "REPLACE_WITH_PLATFORM_CEAIA_SDLC_JIRA_EXPORT_SKILL_ID",
+  "taskHelperSkillId": "REPLACE_WITH_PLATFORM_JIRA_CREATEISSUE_HELPER_SKILL_ID",
   "scoreRecordFormat": "numbered-markdown-with-complete-raw-json",
   "outputPolicy": "latest-deliverables",
   "internalHistoryPolicy": "numbered-and-retained",
@@ -18,13 +18,10 @@
   "jiraDescriptionFormat": "jira-wiki-transport-rendering-for-sdlc-and-generic-non-test-rich-text",
   "jiraWritePolicy": "validated-sdlc-direct-export-after-final-preview-readback-preflight",
   "markdownReviewBindingPolicy": "second-export-call-after-confirmed-jira-and-attachment-success-with-five-required-fields-per-ticket",
-  "jiraRoutingProfile": "persistent-user-workspace-ceaia-sdlc-jira/profiles.json-with-per-export-settings-confirmation",
+  "jiraRoutingProfile": "sdlc-only-user-workspace-jira-user-info.md-with-confirmation",
   "notes": [
     "No executable scripts are included.",
     "v5 changes only the validated SDLC route and task contract; generic Jira and Test Case routes are preserved.",
-    "The generic Test Case export route is unchanged by the v5.2 Task and scoring-status update.",
-    "v5.3 separates Story-only SDLC export; the original generic helper directory is preserved unchanged. Matching field profiles skip query tools across sessions; updates reuse upstream baseline/inventory. Separate five-field database bindings remain mandatory."
-  ],
-  "runtimeModel": "gpt-6-luna",
-  "preservedGenericSkill": "jira-createissue-helper"
+    "The generic Test Case export route is unchanged by the v5.2 Task and scoring-status update."
+  ]
 }
