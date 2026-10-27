@@ -3,7 +3,7 @@
 ## 安装前
 
 - [ ] 上传三个活动 Skill，并记录平台返回的 skill IDs。
-- [ ] 替换 task 中的 helper skill ID 占位值。
+- [ ] 替换 task 中的新 ceaia-sdlc-jira-export skill ID 占位值；不可使用原 helper ID。
 - [ ] 确认平台提供 `ask_user_question`、Jira MCP tools 和 `nodejs-base-mcp.score_requirement_markdown`；SDLC 路由不依赖审批工具。
 - [ ] 用实际运行配置的 GPT-6 Luna 跑下面的新建和更新样例；task/Skill 不硬编码旧模型名称。核对实时评分工具 schema 接受 `relativePath`、`specFileStatus`、`specFilePath` 三个参数。
 - [ ] 若平台提供用量明细，记录单 Story 各阶段的 input tokens、工具调用次数及耗时；检查是否重复加载未变的 Skill/证据或重复执行 review/score。Task 精简不保证单独消除异常高用量。
@@ -41,7 +41,7 @@
 
 - [ ] 首次 mismatch 只执行一次 header-only retry。
 - [ ] 第二次 mismatch 进入 WAITING_TOOL。
-- [ ] helper gateway 拒绝未验证的 SPEC，即使 review report 为 PASS。
+- [ ] 新的 SDLC exporter 拒绝未验证的 SPEC，即使 review report 为 PASS。
 
 ## 场景 D：Jira wiki 转换
 
@@ -84,9 +84,9 @@
 
 - [ ] 无论初次输入是否包含 “push to Jira”，都先运行 generation → independent content review → SPEC 状态同步 → final Workspace Story scoring，不在 intake 阶段询问 project 或 Epic Link；全部放行后进入 Jira。
 - [ ] 第一次 SDLC create 在 Jira 阶段主动询问可验证的 Epic Link或明确的 no-Epic 选择。
-- [ ] 首次成功 SDLC 导出后，user workspace 的 `jira-user-info.md` 只有一个 CEAIA SDLC 默认配置区。
-- [ ] 下一次 SDLC 导出先读取并验证保存的 source、project、Story type、Epic/Parent Link，然后显示全部设置并要求一次 Use/Change 确认。
-- [ ] 保存值失效或用户明确变更时，只询问受影响字段并重新验证。
+- [ ] 首次成功 SDLC issue/所需附件操作后，真实 user workspace 的 `ceaia-sdlc-jira/profiles.json` 保存对应身份/来源/项目/Story 类型/操作能力的精简字段 schema、字段 ID 和默认值；不能只保存最终 payload。
+- [ ] 跨 session 再次导出命中完整配置时不调用项目/类型/metadata query，也不重读已确认 Epic；显示本次 source/project/Story type/Ticket Number/Epic/Parent/字段值并要求一次 Use/Change 确认。
+- [ ] 只有缺失/不适用配置、用户明确变更/刷新或实际字段校验失败时查询受影响部分；不因 session 或时间经过强制刷新。
 
 ## 场景 H：SPEC 文件名与对话一致
 
@@ -104,3 +104,36 @@
 - [ ] 批量导出：逐项解码 `issuesJson` 与各项的 `dynamicFieldsJson`，确认每个 Story 的 Description/AC 独立配对，没有继承其他项目的 AC 或遗漏 AC 字段。
 - [ ] 将实际 `STORY.md`、首次调用的 `jira-preview.md` payload 和 Jira 读取到的 Description/Acceptance Criteria 分别比较；只接受 Markdown→Jira wiki 的展示语法变化，以及 AC 从 Story 节迁移到独立字段。若 Jira 读取结果与预览值不符，记录具体字段，不重复创建或更新 Ticket。
 - [ ] 普通非 SDLC create/update/batch 和 Test Case 的字段映射与原有流程一致。
+
+
+## 场景 J：跨 session 字段配置与身份范围
+
+- [ ] 首次未命中时按需查询项目、Story 类型、metadata；只支持 Story，缺 Story 类型明确阻断，不提供 Task/Bug/Test fallback。
+- [ ] Profile 保存所有 required 字段规则（含后端默认未显式提交的字段）、AC 映射、已选 optional 字段/option ID 与传输格式；不保存全 raw metadata、全 allowedValues、Story/AC 正文或会话文件路径。
+- [ ] 只缺字段 schema 时不重新查询已确认的项目和 Story 类型；同批同配置只解析一次。
+- [ ] 新 session 命中时三个 query 调用数均为 0；配置老旧本身不触发刷新。
+- [ ] 当前用户/来源/项目/type 不匹配不能串用；JWT 身份优先，不能仅凭另一个 staffId 借用他人的配置。
+- [ ] 旧 jira-user-info.md 仅迁移路由，不伪装成有完整字段 schema 的命中。
+- [ ] 当前用户明确值覆盖适用默认值，但不能扩大 reviewed update scope；历史 Ticket Number 不能替代本次更新目标。
+- [ ] 只有 issue 和全部所需附件成功的项可更新对应 profile；binding 失败时保留该成功配置，记录 binding pending，不宣布全流程成功。
+- [ ] 配置写入失败不回滚成功 Jira，不重放 Jira 写入；明确报告没有跨 session 保存。
+- [ ] 未暴露真实 user-workspace 能力时不把对话目录当作持久化；metadata 分页不完整时不声称缓存完整，不臆造工具参数。
+
+## 场景 K：导出接入与读取去重
+
+- [ ] Task、generation handoff 与活动 skill 列表均调用 ceaia-sdlc-jira-export，不加载通用 helper 或其公共模块。
+- [ ] Update 正常路径从 upstream 已保存的 Description/AC 和附件 inventory 比对，不新增 getJiraInfos/readJiraAttachments；缺失、已知外部变更和不确定写入恢复分别处理。
+- [ ] 首次 create 必须有 Epic 或明确 no-Epic；新的 Epic key 只读验证一次，命中保存的 Epic 不重复查询。
+- [ ] 每次设置确认都展示更新 target key 与所有实际字段值；确认不要求用户重填 Story/AC，也不让用户挑哪些字段算必填。
+- [ ] 原 generic helper 与 standalone reviewer 的全部文件与本次修改前完全一致。
+
+## 场景 L：数据库回写与恢复
+
+- [ ] 一条 Story 正常成功有 A（内容/附件）和 B（数据库关联）两次调用；B 恰好五个非空字符串且路径是评分输入 STORY.md。
+- [ ] 多条 Story 首次 batch write 后，每个符合条件的成功 resource 单独 B，不丢关联，不交叉路径；首次 payload/各项均不带 markdownReviewRelativePath。
+- [ ] B 的 status=400 即使 isError=false，也保留成功票号、标记 binding pending，不重建票、不重复上传、不自动重试。
+- [ ] 附件失败或 unknown 的项不进入 B，原已成功 issue 保留；替换新文件未成功前不删除旧文件。
+- [ ] update-only 列表按预览顺序逐票，第一个失败/partial/unknown 后不发后续 update；显式 mixed batch 才允许 integrated issuesJson。
+- [ ] 内容/附件/关联各编号 attempt 不覆盖；当前 binding 预览覆盖 jira-preview.md 后，原 first-write payload 与结果仍可核查。
+
+记录 GPT-6 Luna 实测的导出阶段耗时、三种 query 调用数、工具返回输入量、数据库 B 调用数及重复读取数。静态验证/离线场景通过不等于真实 Jira 集成通过。
