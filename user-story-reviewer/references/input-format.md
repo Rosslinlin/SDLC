@@ -1,6 +1,8 @@
 # Workspace input conversion
 
-Read this only for a Story with no Jira ticket number. Jira targets are reviewed directly and must not be converted into local Markdown. For ticketless input, use the original Story as evidence; a template supplies structure, never missing business text.
+Read this for a selected Workspace assessment: ticketless input or the current local Story revision, including continued local edits after the Story was exported to Jira. The mapped Ticket Key is an export/update target, not a reason to read Jira for this assessment. Use the selected actual Story as evidence; a template supplies structure, never missing business text. Jira-mode assessments do not use this conversion.
+
+Read the current local Markdown first. If it already has the supported field/AC structure, score its actual path without making another input copy. If presentation conversion is required, preserve business wording and record the exact converted input path; that path is the later export binding path. Missing/ambiguous local content requires clarification, not a fallback to Jira's older content.
 
 ## Field contract
 
@@ -69,7 +71,7 @@ Independent requirement bullets stay independent; do not merge them just to obta
 1. Hold a field map and original criterion count in conversation state. Count complete source criteria, not headings plus their individual BDD steps.
 2. Normalize known presentation syntax: Jira wiki headings, emphasis, lists, color wrappers, paragraph breaks and links. Preserve displayed wording, identifiers and link targets. Do not globally remove asterisks or punctuation from code/data.
 3. Preserve image/attachment references and filenames. Do not invent attachment URLs or describe unread images. An unresolved image-only requirement remains an evidence gap. Leave an unsupported reference intact and note the limitation in the later result.
-4. Write the input and read it back against the actual source. Check fields, all criterion text, original grouping/order, links and additional values. Every value occurs once, except the intentional H1/Summary repetition.
+4. If conversion is needed, write the input and read it back against the actual source. For an already suitable local Markdown input, use its complete current read-back without rewriting it. Check fields, all criterion text, original grouping/order, links and additional values. Every value occurs once, except the intentional H1/Summary repetition.
 5. Count the rendered top-level AC items. They must equal the unambiguous source criterion count, including incomplete criteria such as TBC; incompleteness is scored, not repaired. Confirm one exact `## Acceptance Criteria` heading and that the next `##` starts a different field.
 6. Keep the verified field map, count and presentation changes in state until the score call returns. Do not create the result file during preparation.
 

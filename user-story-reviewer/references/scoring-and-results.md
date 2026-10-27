@@ -1,10 +1,10 @@
 # Scoring modes and result records
 
-Read this after routing every Story and collecting all missing Jira sources.
+Read this only for assessment requests after selecting the content source. Explicit update-only requests bypass this reference and the scorer. Collect missing Jira sources only for Jira-mode scoring.
 
 ## Jira route
 
-Use this route whenever the Story input contains a Jira ticket number. Uploaded JSON or pasted Story content with a ticket number selects this route; do not rewrite that content into a workspace Markdown file.
+Use this route when the user selects Jira's current content, or supplies a Ticket Key/incoming JSON with no selected current local revision. A ticket mapped to a locally revised Story does not override the Workspace route. Do not convert Jira-mode inputs into Workspace Markdown.
 
 Call `nodejs-base-mcp.score_requirement_markdown` with the ticket and its user-provided source:
 
@@ -23,7 +23,7 @@ Jira ratings may be reused by source and issue key across conversations. Within 
 
 ## Workspace route
 
-Use this route only when the Story contains no Jira ticket number. Prepare and verify the Markdown input according to [workspace input conversion](input-format.md), then call:
+Use this route for ticketless content and selected current local Story revisions, including a Story created, scored and exported earlier in this conversation. Read and verify the actual edited Markdown according to [workspace input conversion](input-format.md); reuse its suitable current path, then call:
 
 ```json
 {
@@ -33,7 +33,7 @@ Use this route only when the Story contains no Jira ticket number. Prepare and v
 
 Use the actual workspace-relative `.md` or `.markdown` path. Do not pass pasted content, a URL, an absolute path or the result path. Do not include `jira_number` or `source`. Workspace cache identity uses the current conversation, relative path and content checksum when available.
 
-This ticketless route never runs the four-field Jira update trigger and never asks for `staffId` or `conversationId` for that trigger.
+Workspace assessment does not automatically run the reviewer's four-field trigger, even when the Story has an exported Ticket Key. Carry the current score input/result and known Ticket/source mapping back to the caller. When content export/update is requested, the existing helper updates the current local content to that Ticket and then performs its five-field binding with the exact scored `relativePath`. This assessment step does not collect IDs for a four-field call.
 
 Workspace identity comes from trusted platform context. Do not add a conversation ID to either scoring call; the separate Jira update trigger uses its own required arguments.
 
@@ -47,18 +47,18 @@ The two route inputs are mutually exclusive: use either `relativePath` or the co
 
 ## Create the result only after the call
 
-For Jira mode, create `<TICKET>-score-result.md` after the call; there is no local score-input file. For workspace mode, create the paired `<prefix>-score-result.md` beside its verified input only after success, returned error, timeout or other observed completion. If the scoring tool was never invoked, do not create a result file.
+For Jira mode, initially create `<TICKET>-score-result.md` after the call; there is no local score-input file. For Workspace mode, save the result in its established candidate folder after success, returned error, timeout or other observed completion. For either scoring mode, use the next unused `-v2`, `-v3`, etc. result version for every later assessment and preserve prior records. Existing suitable local Markdown needs no duplicate input file. If the scoring tool was never invoked, do not create a score-result file.
 
 Decode the documented single JSON text content block. If the runtime exposes an unambiguous wrapper and nested result, use the result for evaluation and retain the complete wrapper. Preserve raw JSON text verbatim when available; otherwise serialize the complete object without claiming byte-for-byte preservation. Do not omit unknown fields, truncate arrays, select a favorable nested object or recalculate `finalScore`.
 
 Keep these sections in the result file:
 
-- **Target and route:** Jira ticket/source or original ticketless source, actual invocation parameters excluding secrets, and assessment version.
+- **Target and route:** actual selected content source, invocation parameters excluding secrets and assessment version. For Workspace content with an exported target, retain its verified Ticket/source mapping separately from scorer arguments; record the current scored input path and known content revision.
 - **Input conversion:** workspace field mapping, presentation changes, expected AC count and read-back result; for Jira mode state that the tool read Jira directly and no local conversion was used.
 - **Assessment:** actual tool status and all returned score fields and substantive diagnostics.
 - **Recognition:** returned AC counts, warnings, parse errors and any checkable mismatch or limitation.
 - **Complete tool response:** full scoring JSON plus any transport wrapper or actual error information.
-- **Persistence outcome:** Jira mode records the scoring tool's Jira review/cache outcome and the automatic four-field trigger's invocation/response or reason it was not sent. Generic tool success is not proof that Jira score fields were written. Workspace mode records that the assessment was saved without a Jira association and does not run the trigger.
+- **Persistence outcome:** Jira mode records the scoring tool's Jira review/cache outcome and the automatic four-field trigger's invocation/response or reason it was not sent. Generic tool success is not proof that Jira score fields were written. Workspace mode records its completed assessment and any pending export/update handoff; scoring itself does not bind the revised Workspace record to Jira. The helper owns the subsequent content write and path-based binding.
 
 ## Validate and report
 
