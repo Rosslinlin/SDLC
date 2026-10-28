@@ -100,5 +100,14 @@
   "artifactRevisions": {
     "storyRevision": 0,
     "testCaseRevision": 0
+  },
+  "specScoreDisplay": {
+    "status": "pending",
+    "storyRevision": null,
+    "finalScore": null,
+    "scoreRecordPath": null,
+    "verifiedSpecPaths": [],
+    "primarySpecFileRevision": null,
+    "metadataFinalized": false
   }
 }

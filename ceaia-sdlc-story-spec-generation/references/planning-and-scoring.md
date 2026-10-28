@@ -38,7 +38,7 @@ Allocate one new monotonically numbered Markdown scoreRecordPath for every actua
 
 Record the input storyRevision, primary SPEC path/fileRevision/status, reviewAttempt, assessmentOrdinal, responseReadBack and actual invocation reference when exposed. Read back the saved response and confirm Story and SPEC remained unchanged during the call using the shared text-only procedure. Preserve returned service checksums without calculating replacements. No checksum is required locally; unknown actual invocation provenance still requires recovery.
 
-The record's readable summary must agree with the raw JSON but is not evaluator evidence by itself. State metadata is separate from the raw response. Score records, audit IDs and diagnostics never enter Story, Test Case, SPEC, update manifest, Jira preview or payload.
+The record's readable summary must agree with the raw JSON but is not evaluator evidence by itself. State metadata is separate from the raw response. Score records, audit IDs and diagnostics never enter Story, Test Case, SPEC, update manifest, Jira preview or payload. The sole public score exception is the actual numeric total in the designated SPEC header; finalize it and the primary SPEC revision under [SPEC score display](spec-score-display.md) before readiness. Never copy the raw response or score-record path into that header.
 
 ## S3 — Gate and recovery
 

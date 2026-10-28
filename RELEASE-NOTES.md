@@ -2,6 +2,8 @@
 
 更新日期：2026-10-23
 
+
+2026-10-28 小改动：SPEC 的 Review Result 区新增第三字段 `Story Score`，显示当前 Story 的真实评分（`<number> / 100`）；首次评分前显示 `Not scored`。生成阶段负责后置回写、全文读回和必要的正常缓存 metadata 绑定；业务正文、76 分门槛、导出工具参数及逐票数据库关联不变。
 本次将 SDLC Task 从约 24 KB 精简至约 12 KB，保留四阶段调度、关键门禁及原有 Skill/工具配置。执行细节仍由各 Skill 负责；不改变 Story、Test Case、SPEC、审查和 Jira 功能。评分工具的 `specFileStatus` 只接受大小写严格的 `Pass`/`Fail`。SPEC 审查结果仍记录 `PASS`，在评分调用边界映射为 `Pass`；非 PASS 审查不会进入评分。普通 Jira 和 Test Case 导出规则未改。
 
 ## 历史发布说明：v5.1

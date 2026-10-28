@@ -30,11 +30,13 @@ Use this checklist with the actual saved files and the platform's existing tools
 2. Check genuine invocation association, candidate, Story and SPEC paths/revisions, review attempt, boolean ok=true and numeric finalScore from 76 through 100. Do not coerce a numeric string or infer a score from labels.
 3. Inspect parseErrors and missing-AC warnings. Compare any returned top-level/legacy AC counts with the declared criteria. Missing optional counts alone are not failure.
 4. A cache hit can reuse the score while storing the current SPEC metadata. Record actual result/currentness in state. Unsupported envelopes, incomplete response or uncertain association require recovery, not invented PASS. Content repair returns through affected independent review before another final score call.
+5. Apply [SPEC score display](spec-score-display.md): populate each current SPEC's third header field from this Story's actual numeric result, keep the reviewed body/first two fields unchanged, and read back the complete files. A changed primary fileRevision needs the normal metadata-bearing cache call before readiness; its latest raw finalScore, displayed value and final revision must agree. Never repeatedly rewrite an unchanged value or rescore just to display it.
 
 ## Before Jira preparation and sending
 
 1. Read the latest independent content-review report and the later final score record: identity, all content gates, score result, exact submitted SPEC status/path, unresolved issues, preservation conclusions and reviewed revisions must agree with current files.
 2. Confirm every intended SPEC header is still synchronized with the latest content-review PASS. The synchronization and full read-back occurred before the score call; a later body/status/path change invalidates final score metadata and Jira readiness. One targeted header-only retry is allowed after a write/read mismatch; a second mismatch is WAITING_TOOL.
+   Also confirm the post-score Story Score display was verified and its final primary SPEC revision was bound under spec-score-display.md; the earlier pre-score header read is not the final display check.
 3. Reconcile all selected candidates against original global source coverage. Never treat a missing candidate as implicitly excluded.
 4. Apply the shared workflow's final preview/read-back procedure to the complete request and every attachment immediately before sending. A content change invalidates affected gates and the export binding.
 5. If content cannot be read or safely associated, pause with the precise missing item; lack of a script engine or hash is not a blocker. Before the final user-facing response, read back each current SPEC path and display exactly that saved basename/path, with no stale planned filename.

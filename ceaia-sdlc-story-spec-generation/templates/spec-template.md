@@ -2,6 +2,7 @@
 
 **Result**: Not Reviewed
 **Reviewer Notes**: Independent review pending. After review, replace with `Attempt <N> — <brief evidence-backed notes>`.
+**Story Score**: Not scored
 
 ---
 
@@ -53,15 +54,14 @@
 
 <!-- Authoring instructions: replace placeholders and remove this comment.
 The first standalone --- separates the review header from reviewed business content.
-Only Result and Reviewer Notes go above it. Reviewer Notes must identify the latest review attempt. Valid verdicts: Not Reviewed, PASS,
+Only Result, Reviewer Notes and Story Score go above it, in that order. Reviewer Notes must identify the latest review attempt. Valid verdicts: Not Reviewed, PASS,
 NEEDS_REVISION, NEEDS_HUMAN_CLARIFICATION, FINAL_WITH_UNRESOLVED.
 The SPEC File Name value must equal the actual saved basename and follow <name>-spec.md for every generated SPEC.
 For SDLC scoring, map the synchronized Review Result / Result of PASS to the tool's exact specFileStatus value Pass; never send PASS/pass or the document lifecycle Status field. specFilePath is this SPEC's actual Workspace-relative path.
 Copy Story and table rather than using separate embedded examples.
 Retain applicable supplied metadata; never fabricate values or silently omit supplied fields.
 Only the two approved design-link fields above may include intended business references.
-No internal source paths/provenance URLs, audit IDs, scores, workflow notes or unresolved promises.
+Story Score is Not scored before assessment; afterward copy only the current Story's actual returned finalScore as <number> / 100, following references/spec-score-display.md. This one header value is the sole score-information exception. No internal source paths/provenance URLs, audit IDs, raw score records/diagnostics, workflow notes or unresolved promises.
 After review, only synchronize the header unless substantive repair is required. Re-read the
-complete file immediately and verify both header fields against the latest numbered review record;
-do not mark jiraReady until state records a successful header read-back.
+complete file immediately and verify Result/Reviewer Notes against the latest numbered review record. Generation owns the later Story Score write/read-back and final metadata binding; it changes fileRevision only. Do not mark jiraReady until the current score, displayed value and final SPEC revision agree.
 -->

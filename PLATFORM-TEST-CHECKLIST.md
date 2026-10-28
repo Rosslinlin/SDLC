@@ -104,3 +104,14 @@
 - [ ] 批量导出：逐项解码 `issuesJson` 与各项的 `dynamicFieldsJson`，确认每个 Story 的 Description/AC 独立配对，没有继承其他项目的 AC 或遗漏 AC 字段。
 - [ ] 将实际 `STORY.md`、首次调用的 `jira-preview.md` payload 和 Jira 读取到的 Description/Acceptance Criteria 分别比较；只接受 Markdown→Jira wiki 的展示语法变化，以及 AC 从 Story 节迁移到独立字段。若 Jira 读取结果与预览值不符，记录具体字段，不重复创建或更新 Ticket。
 - [ ] 普通非 SDLC create/update/batch 和 Test Case 的字段映射与原有流程一致。
+
+
+## SPEC Story Score display (2026-10-28)
+
+- [ ] SPEC starts with Result, Reviewer Notes, then Story Score before the first `---`; before real scoring the third field is `Not scored`, which does not block content review.
+- [ ] A persisted `ok=true` finite numeric finalScore is copied exactly as `<number> / 100` to all current SPECs for that Story; decimals/low scores are not rounded or fabricated. Missing/non-numeric scores never become zero or a sibling's result.
+- [ ] Only the score header changes; body, embedded Story/Test Case table, review Result/Notes and bodyRevision remain unchanged. Edited fileRevision advances.
+- [ ] When the primary SPEC revision changed after a passing score, one normal cache/metadata call records that final revision; both raw attempt records remain intact. No force_review or display/rescore loop.
+- [ ] The metadata-call result, displayed value and current binding agree before readiness. A disagreement has at most one correction/check, then bounded recovery; parser failure or a low score still blocks Jira.
+- [ ] Resume with an unchanged verified header makes no extra write or scoring call. A Story change invalidates/resets its displayed score before new review/scoring.
+- [ ] Both export skill directories remain unchanged, including the existing first Jira write and separate database association call. The shown total stays out of Jira Description/AC and other issue fields.
