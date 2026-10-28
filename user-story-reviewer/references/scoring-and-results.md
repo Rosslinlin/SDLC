@@ -2,9 +2,17 @@
 
 Read this only for assessment requests after selecting the content source. Writeback-only requests follow the source-selection rules in [score writeback](jira-score-sync.md) and skip the scorer. Collect missing Jira sources only for Jira-mode scoring.
 
+## Distinguish the source from its carrier
+
+A Jira crawl, query/export response, pasted Issue record or uploaded dump remains Jira input when the platform saves it to Workspace because it is long. File extension, Markdown structure, auto-saving, truncation and presentation conversion do not establish a local business revision. Inspect the original request/crawl target or Issue identity fields to select the primary Key; use Jira mode when that target is clear. Do not read/convert the entire dump merely to prepare a Workspace scoring input.
+
+Use the requested target or each Issue record's own `key`/`issueKey`/Ticket identity, with its Issue header or browse URL as evidence when available. Nested Parent/Epic/linked-ticket keys and references in descriptions/comments do not add review targets. Multiple requested primary records can form a batch. Missing/conflicting identity requires a focused question, not a Workspace fallback or a guessed target.
+
+An authored Story or explicitly selected local business revision remains Workspace content. Retain observed local edits after Jira export; mere file persistence or formatting changes are not those edits. If the user clearly requests a particular local version, preserve that source. Record a brief routing basis (raw Jira import, local revision or ticketless input) with the primary target when applicable.
+
 ## Jira route
 
-Use this route when the user selects Jira's current content, or supplies a Ticket Key/incoming JSON with no selected current local revision. A ticket mapped to a locally revised Story does not override the Workspace route. Do not convert Jira-mode inputs into Workspace Markdown.
+Use this route for a Jira target identified above, including a raw Jira import residing in Workspace. Call with its primary Ticket Key and confirmed Jira source, not the carrier file path. A selected genuine local revision follows Workspace mode even when it has an exported Ticket.
 
 Call `nodejs-base-mcp.score_requirement_markdown` with the ticket and its user-provided source:
 
@@ -23,7 +31,7 @@ Jira ratings may be reused by source and issue key across conversations. Within 
 
 ## Workspace route
 
-Use this route for ticketless content and selected current local Story revisions, including a Story created, scored and exported earlier in this conversation. Read and verify the actual edited Markdown according to [workspace input conversion](input-format.md); reuse its suitable current path, then call:
+Use this route for ticketless/locally authored content and selected current local business revisions, including a Story created, scored and exported earlier in this conversation. Pass the provenance check before reusing the file; raw Jira imports cannot enter merely because they have a Workspace path. Read and verify the actual local Story according to [workspace input conversion](input-format.md), then call:
 
 ```json
 {
@@ -53,7 +61,7 @@ Decode the documented single JSON text content block. If the runtime exposes an 
 
 Keep these sections in the result file:
 
-- **Target and route:** actual selected content source, invocation parameters excluding secrets and assessment version. For Workspace content with an exported target, retain its verified Ticket/source mapping separately from scorer arguments; record the current scored input path and known content revision.
+- **Target and route:** actual content provenance/routing basis, primary target, invocation parameters excluding secrets and assessment version. A raw Jira carrier path may be noted for provenance but is not the scorer input. For Workspace content with an exported target, retain its verified Ticket/source mapping separately from scorer arguments; record the actual scored input path and known revision.
 - **Input conversion:** workspace field mapping, presentation changes, expected AC count and read-back result; for Jira mode state that the tool read Jira directly and no local conversion was used.
 - **Assessment:** actual tool status and all returned score fields and substantive diagnostics.
 - **Recognition:** returned AC counts, warnings, parse errors and any checkable mismatch or limitation.

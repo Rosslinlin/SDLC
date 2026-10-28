@@ -12,6 +12,8 @@ Use this reference for an explicit score-writeback request, or automatically aft
 
 Only use evidence for the selected Ticket/assessment, not another Story's latest score or an earlier version. A newer Jira-mode assessment must not inherit an older Workspace path. Confirmed user/context information can identify Jira-mode scoring without a local result file. Do not claim which historical score the backend selected: the API has no score-value or review-ID argument.
 
+Classify a completed assessment by the scorer arguments actually sent. A raw Jira dump's carrier path does not prove Workspace scoring, and later saving a file does not change a Jira-mode call. If an earlier call incorrectly used `relativePath` for a dump, preserve its actual Workspace provenance; do not relabel it as Jira mode. Apply the corrected source routing before the next requested assessment.
+
 Workspace assessment itself does not immediately trigger this tool. Its requested content export/update remains with `jira-createissue-helper`; after successful content write, that helper must complete the five-field binding. A subsequent explicit request can recover a missed binding under the rules below. Known SDLC handoffs remain with their dedicated gateway; do not bypass SDLC gates through this reviewer.
 
 ## Resolve required values

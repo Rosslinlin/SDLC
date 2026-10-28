@@ -1,6 +1,6 @@
 # SDLC 与 Story/Jira 工具说明
 
-整理日期：2026-10-26；reviewer 按评分来源回写及单票更新关联规则更新于 2026-10-28。适用于本仓库当前的 SDLC Task、三个活动 Skill，以及独立的 `user-story-reviewer`。这是配置和排查用的工具速查；实际调用仍须核对平台当时暴露的工具 schema。
+整理日期：2026-10-26；reviewer 长文本来源识别、评分回写及单票更新关联规则更新于 2026-10-28。适用于本仓库当前的 SDLC Task、三个活动 Skill，以及独立的 `user-story-reviewer`。这是配置和排查用的工具速查；实际调用仍须核对平台当时暴露的工具 schema。
 
 ## 资料与边界
 
@@ -32,8 +32,8 @@
 
 | 模式 | 必要输入 | 当前流程 |
 | --- | --- | --- |
-| Workspace Markdown | `relativePath`：真实、已保存的工作区相对 `.md`/`.markdown` 路径 | SDLC 新建和更新都使用最终 `STORY.md` 路径；独立评分中无 Ticket 的 Story，以及用户选择的当前本地修订（即使已导出并有 Ticket），也使用 Workspace 模式 |
-| Jira Issue | `jira_number` 与 `source` 成对提供；`source` 为 `WPB`、`ALM`、`DATA`、`FCR` 或 `GO` | 独立 reviewer 对用户指定的 Jira 当前版本，或未选本地修订的 Ticket/带 Ticket JSON 输入，读取 Jira 当前 Issue |
+| Workspace Markdown | `relativePath`：真实、已保存的工作区相对 `.md`/`.markdown` 路径 | SDLC 新建和更新都使用最终 `STORY.md` 路径；独立评分中无 Ticket/本地创作的 Story，以及用户明确选择的当前业务修订（即使已导出并有 Ticket），也使用 Workspace 模式；自动落盘的 Jira 抓取不属于本地修订 |
+| Jira Issue | `jira_number` 与 `source` 成对提供；`source` 为 `WPB`、`ALM`、`DATA`、`FCR` 或 `GO` | 独立 reviewer 对 Jira 当前版本、原始抓取/导出/粘贴记录提取主 Ticket 评分；长内容自动落盘后仍不传载体路径 |
 
 两种入口不能混用。SDLC **更新**即使已知 Ticket Key，评分时仍传修改后的 Workspace `STORY.md` 路径，不传 `jira_number`/`source`。评分调用不传 `staffId` 或 `conversationId`；Workspace 身份由可信请求头 `X-AF-Conversation-ID` 提供。不要把上传 JSON 文件路径当作 Workspace Markdown 评分输入。
 

@@ -1,6 +1,8 @@
 # Workspace input conversion
 
-Read this for a selected Workspace assessment: ticketless input or the current local Story revision, including continued local edits after the Story was exported to Jira. The mapped Ticket Key is an export/update target, not a reason to read Jira for this assessment. Use the selected actual Story as evidence; a template supplies structure, never missing business text. Jira-mode assessments do not use this conversion.
+Read this only after selecting a genuine Workspace assessment: ticketless input, a locally authored Story or the user's selected local business revision, including continued edits after Jira export. A long Jira crawl/export automatically saved to a file remains Jira input; selecting that file, changing its presentation or finding Markdown headings does not by itself establish a local revision. Return raw Jira imports to primary-Ticket/source routing before conversion.
+
+For a selected local revision, its mapped Ticket Key remains an export/update target. Use the actual revised Story as evidence; a template supplies structure, never missing business text. Preserve an explicit request to assess a local draft, even when it has a Ticket.
 
 Read the current local Markdown first. If it already has the supported field/AC structure, score its actual path without making another input copy. If presentation conversion is required, preserve business wording and record the exact converted input path; that path is the later export binding path. Missing/ambiguous local content requires clarification, not a fallback to Jira's older content.
 
