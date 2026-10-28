@@ -125,5 +125,14 @@
       "status": "pending",
       "requestRevision": null
     }
+  },
+  "specScoreDisplay": {
+    "status": "pending",
+    "storyRevision": null,
+    "finalScore": null,
+    "scoreRecordPath": null,
+    "verifiedSpecPaths": [],
+    "primarySpecFileRevision": null,
+    "metadataFinalized": false
   }
 }

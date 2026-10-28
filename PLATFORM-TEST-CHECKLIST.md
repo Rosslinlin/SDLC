@@ -137,3 +137,14 @@
 - [ ] 内容/附件/关联各编号 attempt 不覆盖；当前 binding 预览覆盖 jira-preview.md 后，原 first-write payload 与结果仍可核查。
 
 记录 GPT-6 Luna 实测的导出阶段耗时、三种 query 调用数、工具返回输入量、数据库 B 调用数及重复读取数。静态验证/离线场景通过不等于真实 Jira 集成通过。
+
+
+## SPEC Story Score display (2026-10-28)
+
+- [ ] SPEC starts with Result, Reviewer Notes, then Story Score before the first `---`; before real scoring the third field is `Not scored`, which does not block content review.
+- [ ] A persisted `ok=true` finite numeric finalScore is copied exactly as `<number> / 100` to all current SPECs for that Story; decimals/low scores are not rounded or fabricated. Missing/non-numeric scores never become zero or a sibling's result.
+- [ ] Only the score header changes; body, embedded Story/Test Case table, review Result/Notes and bodyRevision remain unchanged. Edited fileRevision advances.
+- [ ] When the primary SPEC revision changed after a passing score, one normal cache/metadata call records that final revision; both raw attempt records remain intact. No force_review or display/rescore loop.
+- [ ] The metadata-call result, displayed value and current binding agree before readiness. A disagreement has at most one correction/check, then bounded recovery; parser failure or a low score still blocks Jira.
+- [ ] Resume with an unchanged verified header makes no extra write or scoring call. A Story change invalidates/resets its displayed score before new review/scoring.
+- [ ] Both export skill directories remain unchanged, including the existing first Jira write and separate database association call. The shown total stays out of Jira Description/AC and other issue fields.
