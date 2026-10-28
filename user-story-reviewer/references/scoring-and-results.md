@@ -1,6 +1,6 @@
 # Scoring modes and result records
 
-Read this only for assessment requests after selecting the content source. Explicit update-only requests bypass this reference and the scorer. Collect missing Jira sources only for Jira-mode scoring.
+Read this only for assessment requests after selecting the content source. Writeback-only requests follow the source-selection rules in [score writeback](jira-score-sync.md) and skip the scorer. Collect missing Jira sources only for Jira-mode scoring.
 
 ## Jira route
 
@@ -33,7 +33,7 @@ Use this route for ticketless content and selected current local Story revisions
 
 Use the actual workspace-relative `.md` or `.markdown` path. Do not pass pasted content, a URL, an absolute path or the result path. Do not include `jira_number` or `source`. Workspace cache identity uses the current conversation, relative path and content checksum when available.
 
-Workspace assessment does not automatically run the reviewer's four-field trigger, even when the Story has an exported Ticket Key. Carry the current score input/result and known Ticket/source mapping back to the caller. When content export/update is requested, the existing helper updates the current local content to that Ticket and then performs its five-field binding with the exact scored `relativePath`. This assessment step does not collect IDs for a four-field call.
+Workspace assessment does not automatically run the reviewer's four-field trigger, even when the Story has an exported Ticket Key. Carry the current assessment/input/result and known Ticket/source mapping back to the caller. Each new assessment intended for export/update has its own pending path binding; the previous version's success does not complete it. The helper writes the current content and then performs five-field binding with the exact scored `relativePath`. A later writeback-only request resumes that pending five-field step after verified content-write success, without rescoring or replaying the write. This assessment step does not collect IDs solely for a four-field call.
 
 Workspace identity comes from trusted platform context. Do not add a conversation ID to either scoring call; the separate Jira update trigger uses its own required arguments.
 
@@ -58,7 +58,7 @@ Keep these sections in the result file:
 - **Assessment:** actual tool status and all returned score fields and substantive diagnostics.
 - **Recognition:** returned AC counts, warnings, parse errors and any checkable mismatch or limitation.
 - **Complete tool response:** full scoring JSON plus any transport wrapper or actual error information.
-- **Persistence outcome:** Jira mode records the scoring tool's Jira review/cache outcome and the automatic four-field trigger's invocation/response or reason it was not sent. Generic tool success is not proof that Jira score fields were written. Workspace mode records its completed assessment and any pending export/update handoff; scoring itself does not bind the revised Workspace record to Jira. The helper owns the subsequent content write and path-based binding.
+- **Persistence outcome:** Jira mode records the scoring tool's Jira review/cache outcome and the four-field trigger's invocation/response or reason it was not sent. Workspace mode retains this assessment's actual input path, version/invocation reference when available, mapped Ticket/source, content-write outcome and binding status (pending/success/failed/unknown) in the same result record/context. Reset binding to pending for each new assessment intended for export, including a new invocation with cached content score. Later confirmed write/binding outcomes update only this assessment's state. Generic success does not prove Jira score-field writes.
 
 ## Validate and report
 

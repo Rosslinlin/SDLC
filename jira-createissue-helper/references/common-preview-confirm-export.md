@@ -205,6 +205,10 @@ For Test Case export, the submitted payload must be self-contained. Preview text
 
 ## Result Handling
 
+For a successful **single non-SDLC generic Story content create/update** whose exported revision has a completed current Workspace assessment or known pending binding, execute the post-write step in [generic Story score binding](generic-story-score-binding.md) before finishing the item. Use the current assessment's actual input path and returned Ticket Key; a previous version's association is insufficient. If prerequisite evidence is missing, preserve the write success and pending binding rather than silently skipping it. Check its recorded outcome so this result handler cannot repeat an association already confirmed for that assessment.
+
+This hook applies only to that content-write result. It does not run for genuinely unscored Stories, other issue types, Test Case, association-only operations, Jira-mode four-field triggers, binding-only responses or SDLC handoffs. Batch exports retain their existing per-item binding step; do not run an additional single-item hook for the batch response.
+
 On success, show:
 
 - `ticketKey`

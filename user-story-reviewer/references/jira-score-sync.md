@@ -1,34 +1,48 @@
-# Automatic Jira update trigger
+# Score writeback by assessment source
 
-Enter through either of two paths: (1) the user explicitly requests only a score update/sync for an existing Jira Ticket, without new scoring or Story content changes; or (2) a Jira-mode scorer call has returned `ok === true` and a finite numeric `finalScore`, including 0 or a cache hit. Update-only requests do not call the scorer or require a local score record. Failed/indeterminate scoring does not qualify for the automatic post-score trigger.
+Use this reference for an explicit score-writeback request, or automatically after a Jira-mode scorer result with `ok === true` and finite numeric `finalScore` (including 0/cache hits). Writeback-only requests never call the scorer. Resolve the assessment the user refers to from actual calls, result records or confirmed context; a local score-record file is not mandatory.
 
-This four-field call triggers backend handling for the existing Ticket. Only some projects support Jira score-field updates; generic success confirms tool execution, not final score-field writes. The call has no score-value or review-ID parameter; do not manufacture a score or claim which historical assessment the backend selected. A request to rescore must return to the selected assessment route first.
+## Choose the call before collecting arguments
 
-Workspace assessments, including locally revised Stories with exported Ticket mappings, do not automatically enter this four-field flow. Their requested content updates and five-field path bindings belong to the existing export helper. A separate explicit existing-ticket score-update request may use update-only mode, without pretending that a local Story content update has occurred.
+| Referenced assessment | Follow-up |
+| --- | --- |
+| Workspace call using `relativePath`, including a local Story revised after earlier Jira export | Five fields, including that actual scoring input path, after this assessment's content was successfully written to the mapped Ticket. A pending current Workspace binding takes priority when the user says “finish writeback”. |
+| Jira call using `jira_number` and `source` | Four fields, without a Markdown path. This also applies to an explicit request referring to an existing Jira-mode assessment, with no new scoring. |
+| Source, target assessment or mapping is unclear | Ask a focused question. An existing Ticket Key alone does not establish Jira-mode scoring. Do not fall back to four fields, invent a path or rescore to avoid the question. |
 
-## Automatic invocation and inputs
+Only use evidence for the selected Ticket/assessment, not another Story's latest score or an earlier version. A newer Jira-mode assessment must not inherit an older Workspace path. Confirmed user/context information can identify Jira-mode scoring without a local result file. Do not claim which historical score the backend selected: the API has no score-value or review-ID argument.
 
-For an explicit update-only request, resolve the existing Ticket Key and source from the request or confirmed conversation context. Ask if “this score” has no unambiguous target; do not choose an unrelated Ticket. After a Jira assessment, reuse the ticket/source just scored. Perform one trigger per target without a sync confirmation, preview popup or project-support check. Respect an explicit no-Jira-write instruction. Reuse the actual `staffId` when reliably available; otherwise ask and wait. Collect missing inputs together when possible, then continue directly. Do not read `jira-user-info.md`, invent IDs, or silently skip missing inputs.
+Workspace assessment itself does not immediately trigger this tool. Its requested content export/update remains with `jira-createissue-helper`; after successful content write, that helper must complete the five-field binding. A subsequent explicit request can recover a missed binding under the rules below. Known SDLC handoffs remain with their dedicated gateway; do not bypass SDLC gates through this reviewer.
 
-Use the current conversation's real ID for `conversationId`, resolving it from trusted platform context first. If unavailable, request the actual current ID; never derive it from a file path. Until inputs are available, keep the trigger pending, preserve any existing score and resume after the answer without rescoring. Report an unavailable tool or identity that cannot be supplied. Convert the explicitly confirmed target `source` to `almType`: `WPB`→`wpb`, `ALM`→`alm`, `DATA`→`data`, `FCR`→`fcr`, `GO`→`go`. Never infer source from the Ticket prefix.
+## Resolve required values
 
-## Exact call
+Resolve the Ticket Key, confirmed Jira source and real `staffId` from the request or trusted context. Resolve `conversationId` from actual platform context: Workspace binding must use the scoring Workspace's verified conversation identity; Jira-mode triggering uses the current conversation identity. Never derive an ID from a file path. Ask together for missing required inputs and wait, then continue without asking whether to sync. Do not read `jira-user-info.md` or infer source from the Ticket prefix.
 
-For each eligible existing ticket, call `java-base-mcp.exportJiraByDynamicFields` once with exactly four direct, nonempty strings:
+Map confirmed source to `almType`: `WPB`→`wpb`, `ALM`→`alm`, `DATA`→`data`, `FCR`→`fcr`, `GO`→`go`. Respect an explicit no-Jira-write instruction. An unavailable tool/identity remains a precise pending blocker, not a fabricated successful call.
+
+## Direct arguments
+
+Both variants call `java-base-mcp.exportJiraByDynamicFields` with these four nonempty strings:
 
 | Argument | Actual value |
 | --- | --- |
 | `staffId` | Current user's verified staff ID |
 | `almType` | Lowercase mapping of the confirmed target source |
-| `issueIdOrKey` | The exact existing Ticket Key requested or just scored |
-| `conversationId` | Actual current conversation ID |
+| `issueIdOrKey` | The exact existing Ticket Key |
+| `conversationId` | Verified conversation identity for the selected variant |
 
-Use that confirmed target. Omit `markdownReviewRelativePath`, `summary`, `description`, `dynamicFieldsJson`, attachments and all other Jira content-change arguments. Do not send a manual score, local file path or workflow mode. The helper's five-field Workspace binding remains a separate route.
+For Workspace binding, add exactly one fifth string: `markdownReviewRelativePath` equals this assessment's actual `relativePath`. It is the Story scoring input, never the score-result file, SPEC or a newly invented Jira dump. For Jira-mode triggering, omit this fifth argument.
 
-## Record the outcome
+Neither variant sends Summary, Description, dynamic fields, attachments, batch data, a manual score or workflow state.
 
-Keep any scoring response and score unchanged. Append the actual trigger arguments excluding secrets and full response/error to the matching existing score-result file when available; read back an edited record. With no local result, retain the tool response in the conversation and do not create a fictitious assessment or score-result file. Record missing prerequisites or an explicit no-write instruction accurately.
+## Recover only a missing Workspace binding
 
-Record tool execution separately from any Jira score-field effect. Generic `success`, `pass`, a Ticket Key or absence of an error does not prove score-field synchronization. Do not infer that an unconfirmed project is enabled or disabled. Treat numeric `status=400` as a business failure even when MCP `isError=false`.
+Follow the binding-only recovery section of the helper's [generic Story score binding](../../jira-createissue-helper/references/generic-story-score-binding.md). Verify the current assessment/input and the successful content-write response for the same Ticket/revision. A previous assessment's binding success does not complete a newer one, even at the same path and Ticket Key.
 
-After normal scoring, show the assessment without routine trigger messages or claims that Jira score fields were written. For an explicit update-only request, acknowledge a successful invocation as “Update request submitted for <actual Ticket Key>”; report an actual failed/unknown invocation accurately. Required-input questions still apply. Neither mode automatically retries the trigger or rescoring; preserve the actual outcome and answer accurately if asked.
+If the current content write succeeded and this binding was never called, execute only its five-field call. Do not repeat create/update/attachments or rescore. If content has not yet been written, return the pending content update to the helper; do not bind a local revision to an older Jira write. If this assessment's binding already succeeded, retain that outcome. For failed/partial/unknown attempts, preserve their evidence and reconcile before a user-directed recovery; do not automatically repeat an uncertain call.
+
+## Record and report
+
+Keep all score responses unchanged. Append this assessment's source, actual arguments excluding secrets and full response/error to the matching result record when available; otherwise retain actual tool evidence in the conversation without creating a fictitious score-result file. Keep content-write and binding outcomes separate. Workspace association is confirmed only by a successful `markdownReview` result; generic success or a Ticket Key alone is insufficient. Numeric `status=400` is a business failure even if MCP `isError=false`.
+
+After scoring, keep routine trigger details in the record. For an explicit writeback request, acknowledge a successful invocation as “Update request submitted for <actual Ticket Key>” and report actual errors/uncertainty accurately. Neither variant's success proves that a project's Jira score fields were written. Do not add a project-support check, rescore or automatically retry.

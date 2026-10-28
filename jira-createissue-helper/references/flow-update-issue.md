@@ -60,10 +60,10 @@ After `getJiraInfos` succeeds:
 4. Assemble only fields that need changes and conform to the confirmed metadata rules.
 5. For requested non-Test rich-text replacements authored in Markdown, create a Jira-wiki transport rendering according to `common-jira-text-rendering.md`. Do not reformat untouched fields and do not apply the module to Test Case content.
 6. Leave labels untouched unless the update requests a change; the backend manages `CEAIA_GEN` according to `common-field-assembly.md`.
-7. For a Story with prior Workspace scoring evidence, read [generic Story score binding](generic-story-score-binding.md) before preview and bind only after a successful update.
+7. For a Story whose revision being exported has a completed current Workspace assessment or pending binding, read [generic Story score binding](generic-story-score-binding.md) before preview. Carry this assessment's actual input path/result and binding state through the update. Missing current evidence stays pending; historical scoring alone does not make an unscored new revision require a binding.
 8. Write or overwrite `jira-preview.md` with both the source-to-transport conversion status and exact outgoing values.
 9. Wait for explicit user confirmation.
-10. Call `exportJiraByDynamicFields` only after both metadata confirmation and explicit user confirmation.
+10. Call `exportJiraByDynamicFields` only after both metadata confirmation and explicit user confirmation. Then execute the result handling in `common-preview-confirm-export.md`: a successful scored Workspace Story update must continue to its current assessment's five-field binding before finishing. Retain the successful update if only that binding remains pending; a recovery performs only the missing binding.
 
 Update intent itself is not submission confirmation.
 

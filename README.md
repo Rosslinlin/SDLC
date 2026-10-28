@@ -16,7 +16,7 @@
 
 独立评分 Skill：
 
-- `user-story-reviewer`：供非 SDLC 的 Story 评分及已有 Jira 评分回写触发使用。明确只要求同步已有分数时，直接执行四字段 update，不重新评分。评分请求先确定内容来源：用户指定的当前本地 Story（包括同会话生成、导出后继续修改的 Story）按 `relativePath` 评分；用户要求读取 Jira 当前版本，或只提供 Ticket/带 Ticket 的 JSON 且未选择本地修订时，按 `jira_number`/`source` 评分。Jira 模式有效评分后自动执行四字段 update；Workspace 模式交回当前评分路径与已知 Ticket 映射，用户要求导出/更新时由原 helper 完成内容写入和五字段路径关联。缺少 source、员工号等必填值仍正常询问；来源不从 Ticket 前缀或 `jira-user-info.md` 推断。保留完整评分结果和版本记录，普通工具 success 不代表 Jira 分数字段已写入。它不参与下方三 Skill 安装顺序，也不替代 SDLC 的 76 分门槛。
+- `user-story-reviewer`：供非 SDLC 的 Story 评分及已有 Jira 评分回写触发使用。明确只要求回写已有分数时，先按本次评分来源选调用：Workspace 评分在对应内容已成功写入后用五字段带实际评分路径补关联；Jira 直接评分用四字段，不重新评分。已有 Ticket 不能作为选择四字段的理由。评分请求先确定内容来源：用户指定的当前本地 Story（包括同会话生成、导出后继续修改的 Story）按 `relativePath` 评分；用户要求读取 Jira 当前版本，或只提供 Ticket/带 Ticket 的 JSON 且未选择本地修订时，按 `jira_number`/`source` 评分。Jira 模式有效评分后自动执行四字段 update；Workspace 模式交回本次评分路径、结果版本和已知 Ticket 映射；每轮新评分重置待关联状态，导出/更新后必须由 helper 完成该轮五字段路径关联。内容已更新但漏关联时，只补五字段调用，保留已成功的内容写入。缺少 source、员工号等必填值仍正常询问；来源不从 Ticket 前缀或 `jira-user-info.md` 推断。保留完整评分结果和版本记录，普通工具 success 不代表 Jira 分数字段已写入。它不参与下方三 Skill 安装顺序，也不替代 SDLC 的 76 分门槛。
 
 推荐安装顺序：
 

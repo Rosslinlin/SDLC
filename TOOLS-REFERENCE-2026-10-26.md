@@ -1,6 +1,6 @@
 # SDLC 与 Story/Jira 工具说明
 
-整理日期：2026-10-26；reviewer 意图分流与本地 Story 续改规则更新于 2026-10-27。适用于本仓库当前的 SDLC Task、三个活动 Skill，以及独立的 `user-story-reviewer`。这是配置和排查用的工具速查；实际调用仍须核对平台当时暴露的工具 schema。
+整理日期：2026-10-26；reviewer 按评分来源回写及单票更新关联规则更新于 2026-10-28。适用于本仓库当前的 SDLC Task、三个活动 Skill，以及独立的 `user-story-reviewer`。这是配置和排查用的工具速查；实际调用仍须核对平台当时暴露的工具 schema。
 
 ## 资料与边界
 
@@ -88,10 +88,10 @@
 | 场景 | 首次 Jira 操作后 | 后续调用 | 完成判定 |
 | --- | --- | --- | --- |
 | **SDLC Story** | 已通过独立审查、SPEC 同步及 76 分门槛；第一次创建/更新 Jira 与要求的附件成功，得到该项真实 `ticketKey` | 每个成功项各调用一次，**恰好五个非空直接参数**：`staffId`、`almType`、`issueIdOrKey`（返回的 Key）、`conversationId`、`markdownReviewRelativePath`（本次通过评分所用的 `STORY.md` 路径） | `markdownReview` 明确确认绑定成功；失败时保留已成功的 Jira Ticket |
-| **普通 Jira 导出的已评分 Workspace Story** | 普通创建/更新/批量写入成功，且能验证这条 Story 的 Workspace 评分及其输入路径 | 对每个符合条件的成功项使用相同的五个字段；未评分或无法确认来源的项不绑定。普通导出仍按原规则预览并确认 | 每项分别记录 Jira 写入和评分绑定；普通流程不套用 SDLC 的 76 分门槛 |
-| **独立 reviewer 的已有 Jira update 触发** | Jira 模式返回有效数值评分后自动执行；或用户明确只要求回写已有评分时直接执行，不重新评分、不强制要求本地评分记录 | 自动以**四个非空直接参数**触发后台 update：`staffId`、`almType`、`issueIdOrKey`、`conversationId`；**不传** `markdownReviewRelativePath`，不询问是否同步；缺少必需 ID 时正常询问并等待，补齐后自动继续 | 普通 success 只证明调用完成，不证明项目已开放或分数字段已写入；有匹配评分文件时追加响应，否则保留会话工具结果；评分后的自动触发不展示常规状态，明确只回写时答复请求已提交。失败不重新评分或自动重试 |
+| **普通 Story 的 Workspace 评分及补回写** | 当前评分所对应的创建/更新成功；确认该轮实际评分输入路径与 Ticket 映射 | 每个符合条件的成功项使用五字段；单票更新也必须继续此步。新评分重置待关联状态，同路径/同 Ticket 的旧关联不能代替本轮。漏关联时只补这一步；已知已评分但缺路径时询问并保持待关联 | 分别记录内容写入和本轮绑定；真正未评分的普通 Story 保持原导出行为，不套用 SDLC 门槛 |
+| **Jira 模式评分的 update 触发** | Jira 模式返回有效数值评分后自动执行；或用户明确要求回写所指的 Jira 模式评分。不因 Ticket 已存在就假定属于此模式；来源不明时正常询问 | 自动以**四个非空直接参数**触发后台 update：`staffId`、`almType`、`issueIdOrKey`、`conversationId`；**不传** `markdownReviewRelativePath`，不询问是否同步；缺少必需 ID 时正常询问并等待，补齐后自动继续 | 普通 success 只证明调用完成，不证明项目已开放或分数字段已写入；有匹配评分文件时追加响应，否则保留会话工具结果；评分后的自动触发不展示常规状态，明确只回写时答复请求已提交。失败不重新评分或自动重试 |
 
-同一会话里生成并导出过的本地 Story 继续修改时，reviewer 读取当前本地文件，以实际 `relativePath` 评分，保留原 Ticket/source 映射。用户要求更新 Jira 时，现有 helper 先更新该 Ticket 的内容，再以本次评分输入路径执行五字段关联；Workspace 评分本身不自动触发四字段调用。
+同一会话里生成并导出过的本地 Story 继续修改时，reviewer 读取当前本地文件，以实际 `relativePath` 评分，保留原 Ticket/source 映射。用户要求更新 Jira 时，helper 先更新该 Ticket 的内容，再以本轮评分输入路径执行五字段关联；每次新评分均有独立的待关联状态。后续补说“回写”时，按这轮 Workspace 评分恢复缺失的五字段步骤，不再把已有 Ticket 直接归为四字段。Workspace 评分本身不自动触发四字段调用。
 
 SDLC 第一次 Jira 写入不带 `markdownReviewRelativePath`，因为新建时尚无 Ticket Key。第二次只做上述关联，不带 Summary、Description、动态字段、附件、批量字段或其他 Jira 内容变更参数。多个 SDLC 新建可先用 `issuesJson`，但其返回的每个成功 Story 都需要以各自的 Key 和路径分别完成后续关联；Task 更新逐票执行。
 
@@ -113,6 +113,6 @@ SDLC 第一次 Jira 写入不带 `markdownReviewRelativePath`，因为新建时�
 | `ceaia-sdlc-story-spec-generation` | Workspace 文件读写；`getJiraInfos`、`readJiraAttachments`（现有 Ticket 更新）；`fetchConfluenceContent`、`fuzzyMatchingConfluence`（涉及 Confluence 证据时）；`ask_user_question`；最终 `score_requirement_markdown`；独立 reviewer 的平台调用能力 |
 | `ceaia-spec-review` | 独立只读审查和 Workspace/证据读取；不调用评分或 Jira 写入工具 |
 | `jira-createissue-helper` | 三个 Jira 项目/类型/字段查询工具、`getJiraInfos`、`exportJiraByDynamicFields`、`ask_user_question` 与 Workspace 预览/复读能力 |
-| `user-story-reviewer`（非 SDLC） | `score_requirement_markdown`；已有 Jira 有效评分后或明确只同步已有分数时触发四字段 update 用 `exportJiraByDynamicFields`；Workspace 读写；`ask_user_question` |
+| `user-story-reviewer`（非 SDLC） | `score_requirement_markdown`；Jira 模式评分用四字段触发；Workspace 内容已写成功后的补关联用带实际输入路径的五字段 `exportJiraByDynamicFields`；Workspace 读写；`ask_user_question` |
 
 本仓库 [Task JSON](SDLC-workflow-v5.task.json) 的 `tools` 列表列出 SDLC 所需的 10 个命名工具；Workspace 文件操作和独立 reviewer 能力由平台另行提供，不在该列表中。Skill 的具体路由和字段规则见各自 `SKILL.md`，尤其是 [SDLC Jira gateway](jira-createissue-helper/references/sdlc-gateway.md)。
