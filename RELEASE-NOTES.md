@@ -1,5 +1,7 @@
 # CEAIA SDLC Skill Bundle v5.3
 
+2026-10-29 测试分支调整：每个 candidate / evidenceRevision 的默认自动修复由三轮降为一轮，review 与评分问题共用；初审后最多一个集中修复批次及受影响内容复审。仍需修改时立即暂停并返回现有问题，不再额外启动诊断 reviewer。续跑保留已消耗额度；额外修复仅来自真实新增实质证据/决策或用户明确的有限加轮授权。独立审查、76 分、SPEC 分数显示、工具恢复及导出/逐票数据库关联均保留，两个 exporter 目录未改。
+
 更新日期：2026-10-27。目标运行模型：GPT-6 Luna。
 
 新增独立 `ceaia-sdlc-jira-export`，仅处理已通过 SDLC 门禁的 Story 创建、更新与批量导出，保留 SPEC 附件及首次 Jira 成功后的逐票五字段数据库评分关联。原 `jira-createissue-helper/` 与独立 `user-story-reviewer/` 原样保留。Task 和 generation handoff 已接入新 exporter；平台导入前须填写新 skill 的实际 ID。

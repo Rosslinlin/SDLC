@@ -148,3 +148,15 @@
 - [ ] The metadata-call result, displayed value and current binding agree before readiness. A disagreement has at most one correction/check, then bounded recovery; parser failure or a low score still blocks Jira.
 - [ ] Resume with an unchanged verified header makes no extra write or scoring call. A Story change invalidates/resets its displayed score before new review/scoring.
 - [ ] Both export skill directories remain unchanged, including the existing first Jira write and separate database association call. The shown total stays out of Jira Description/AC and other issue fields.
+
+## Single automatic repair round — experimental branch (2026-10-29)
+
+- [ ] Initial review and scoring pass without a repair; no extra content review is launched for SPEC header synchronization or score display.
+- [ ] Initial review finds several supported defects: generation fixes them in one consolidated batch, increments active/cumulative repair counters once, then runs affected read-only re-review. Unchanged valid gates are retained.
+- [ ] The post-repair review still fails: no second artifact-edit batch, additional diagnostic reviewer or unchanged rescore; readiness remains false and the exact recovery decision is returned once.
+- [ ] Initial content PASS followed by a supported low-score defect uses the same one-round allowance, then independent re-review and eligible scoring. A later defect cannot start another automatic batch.
+- [ ] A low score without a supported correction does not trigger cosmetic edits, force_review or repeated scoring. Missing business evidence waits immediately.
+- [ ] After review begins, body/filename/reference formatting repairs share the same allowance; relabeling them mechanical or technical does not bypass it. Derived header-only writes and bounded tool/persistence recovery remain separate.
+- [ ] Resume or an older three-round state preserves consumed counters and attempt history; round>=1 does not permit another default repair. A session/stage change or cosmetic rename does not reset the allowance.
+- [ ] Genuine new source evidence/user decisions reset only the affected candidate's active evidence-revision allowance. Cumulative repair and review/score counts remain monotonic. An explicitly authorized extra round is finite, scoped and recorded before editing.
+- [ ] Existing current PASS results can still continue through final scoring and export after the repair was used; exhausted allowance alone does not invalidate successful work. Export skill directories and both Jira/database write phases are unchanged.

@@ -54,6 +54,7 @@
     }
   },
   "repair": {
+    "defaultRoundLimit": 1,
     "round": 0,
     "usedInRound": false,
     "stagnantRounds": 0,

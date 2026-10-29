@@ -13,7 +13,7 @@ Use core-review-gates.md as the authority for definitions. Every row must have c
 - [ ] UPDATE: baseline, AC status, attachment inventory and preservation/mapping valid; N/A only for new Story.
 - [ ] Every finding identifies full path, evidence, owner, impact and smallest supported repair.
 - [ ] storyChangeRequired reflects actual cause, not blanket restart.
-- [ ] Repair eligibility accounts for phase, consumed rounds, stagnation and user evidence; no second edit within the same round.
+- [ ] Repair eligibility accounts for phase, the single shared automatic round, consumed counters and actual user evidence/finite extra authorization; no second automatic batch or counter reset on resume.
 - [ ] Reviewed content revisions, actual read-back findings and SCORE=DEFERRED appear in structured conclusion.
 - [ ] Verdict/header synchronization and final-file read-back are assigned to parent.
 - [ ] jiraReady/updateReady remain false even on content PASS until the parent confirms the later score with current SPEC status/path and global coverage.

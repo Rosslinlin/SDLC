@@ -7,7 +7,7 @@ Active SDLC: generation → independent review → SPEC sync → final Workspace
 | New Story / existing Story intake | generation | Per-ticket confirmed source, original Description and separate AC, complete attachment inventory; persist exportContext pointers and available target facts. |
 | Planning / decomposition / coverage | generation | Evidence-backed INVEST, complete original-scope coverage; this change does not alter batch generation scheduling. |
 | Story / Test Case / SPEC | generation | Current latest deliverables, distinct replacement SPECs, executable tests, exact embedding and source preservation unchanged. |
-| Independent review / repair | review + generation | Read-only content PASS, shared bounded repair, manual title validation; reviewer SCORE remains DEFERRED. |
+| Independent review / repair | review + generation | Read-only content PASS, one consolidated automatic repair round shared with score findings, affected re-review then wait if unresolved; manual title validation and SCORE=DEFERRED preserved. |
 | SPEC review header / score | generation + scoring tool | Verified headers before final Workspace score; exact specFileStatus=Pass and primary SPEC path; ok=true, numeric 76–100, parser/AC integrity; complete numbered raw evidence. |
 | Story-only export | exporter SKILL + handoff-and-content | Single/batch create and updates; no other issue type, no generic fallback, no re-generation at export. Existing Epic/Parent relationships remain supported. |
 | Cross-session configuration | exporter workspace-profile | Persist compact all-required/AC/selected-optional field schema, IDs, selected-option formats and confirmed defaults in real user workspace; matching profile skips three queries, no TTL refresh. |
