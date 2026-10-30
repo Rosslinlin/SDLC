@@ -69,6 +69,16 @@
     "attempts": 0,
     "outcome": null
   },
+  "userRecovery": {
+    "status": "none",
+    "kind": null,
+    "evidenceRevision": null,
+    "reviewAttempt": null,
+    "detailRecordPath": null,
+    "answerRecordPath": null,
+    "questions": [],
+    "questionRef": null
+  },
   "jiraReady": false,
   "updateReady": false,
   "jiraExportRequested": true,

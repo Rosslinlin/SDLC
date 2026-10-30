@@ -160,3 +160,12 @@
 - [ ] Resume or an older three-round state preserves consumed counters and attempt history; round>=1 does not permit another default repair. A session/stage change or cosmetic rename does not reset the allowance.
 - [ ] Genuine new source evidence/user decisions reset only the affected candidate's active evidence-revision allowance. Cumulative repair and review/score counts remain monotonic. An explicitly authorized extra round is finite, scoped and recorded before editing.
 - [ ] Existing current PASS results can still continue through final scoring and export after the repair was used; exhausted allowance alone does not invalidate successful work. Export skill directories and both Jira/database write phases are unchanged.
+
+## Content clarification popup and resume — experimental branch (2026-10-30)
+
+- [ ] Exhausted repair with a genuine missing fact produces detailed chat findings (actual full path, section/item ID, current quote or precise absence, source-based reason and exact missing fact), then a real ask_user_question interaction. Popup uses a unique short locator, brief reason and concrete question, without full report/JSON; ambiguous basenames include their candidate folder.
+- [ ] Multiple findings sharing one business decision are grouped. Partial answers preserve resolved facts and ask only remaining questions; no repeated full regeneration/review/scoring while material blockers remain.
+- [ ] An answer is bound to the candidate/question/current item. A substantive clarification is recorded in new numbered planning evidence and resumes affected Story, dependent Test Case/SPEC generation, independent review, SPEC sync and normal score/parser/display gates. Unaffected candidates are not restarted.
+- [ ] An already clear AI defect asks only for a scoped one-extra-repair decision after allowance exhaustion, not invented business facts. Approval adds exactly one authorized round without resetting evidence/cumulative counters; vague continue/dismissal is not approval.
+- [ ] A vague/unmatched answer remains waiting; a sufficient actual business answer continues automatically without an extra continue popup. Old state can initialize recovery bindings without restoring consumed repair allowance.
+- [ ] One-round policy, independent review criteria, Story/Test Case/SPEC templates, scorer contract/76 threshold, both export skills and separate database binding are unchanged. Check the actual small popup layout in GPT-6 Luna platform testing; offline validation does not verify visual fit.

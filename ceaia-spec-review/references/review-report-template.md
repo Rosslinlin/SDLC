@@ -114,6 +114,8 @@ Required fields; use actual values and arrays/objects. This illustration is a no
 
 Each issues entry includes id, severity, gate, owner, path, line (null if unknown), evidence, impact, action and storyChangeRequired. Never invent line numbers or optional audit IDs.
 
+For user-owned issues, use the existing evidence/impact/action and question fields to identify the section/AC/FR/TC item, a short current quotation or precise absence, concrete reason and exact fact/decision needed. Keep the full actual path in the report; parent prepares its short popup separately. Keep the existing report schema; vague "AC wrong" questions are not acceptable.
+
 Compatibility fields are required, not optional prose replacements. validatedIssues/selfFixableIssues/platformOwnedIssues contain applicable issue IDs; needsHumanClarification contains concrete questions. sourceCoverage gives actual counts and gaps; coverageCapability states supported layers; sizingSplitRecommendation always has a reason, even for NO SPLIT.
 
 reviewAttempt is the monotonic review count. aiSelfRepairCount is cumulative actual repair batches; it may exceed one only across legitimate evidence revisions or explicitly bounded extensions. It never grants extra edits in the current revision. repairRound is the active counter against the shared default limit of one plus recorded authorized extra rounds; preserve all counters on resume.

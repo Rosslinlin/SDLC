@@ -23,6 +23,8 @@ FAIL is a gate result, never the overall reviewResult.
 
 Classify each finding by owner: generation, technical or user; affected artifact; evidence; business impact; concrete fix; storyChangeRequired; invalidated gates. A SPEC-only defect must not prescribe Story rewrite/rescoring. Harmless preference changes are not blockers.
 
+For a user-owned blocker, make the existing finding/question fields actionable: exact file and section/item ID, short observed text (or the precise absent item), evidence-based failure reason and the specific missing fact/decision. Do not return only "AC incorrect" or ask the user to repeat already clear requirements. Parent alone loads its [clarification procedure](../../ceaia-sdlc-story-spec-generation/references/user-clarification-and-resume.md) when user input is needed, presenting details in chat and a short popup; reviewer need not load that procedure and never opens the popup itself.
+
 Parent persists every completed report at a new monotonically numbered path and updates compact current state to reference the latest applicable report. Reviewer never writes even in a standalone review invocation; return the report to the caller.
 
 ## Repair eligibility
