@@ -2,6 +2,8 @@
 
 Read this only after selecting a genuine Workspace assessment: ticketless input, a locally authored Story or the user's selected local business revision, including continued edits after Jira export. A long Jira crawl/export automatically saved to a file remains Jira input; selecting that file, changing its presentation or finding Markdown headings does not by itself establish a local revision. Return raw Jira imports to primary-Ticket/source routing before conversion.
 
+Before treating an uploaded or platform-saved file as ticketless, check the complete selected input for primary Issue identities. A truncated preview or unreadable file does not pass this check. Raw Jira batch Markdown must be routed per Ticket before any conversion; its existing Workspace path is only an input carrier.
+
 For a selected local revision, its mapped Ticket Key remains an export/update target. Use the actual revised Story as evidence; a template supplies structure, never missing business text. Preserve an explicit request to assess a local draft, even when it has a Ticket.
 
 Read the current local Markdown first. If it already has the supported field/AC structure, score its actual path without making another input copy. If presentation conversion is required, preserve business wording and record the exact converted input path; that path is the later export binding path. Missing/ambiguous local content requires clarification, not a fallback to Jira's older content.

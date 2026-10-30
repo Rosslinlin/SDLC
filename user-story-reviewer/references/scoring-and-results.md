@@ -8,6 +8,8 @@ A Jira crawl, query/export response, pasted Issue record or uploaded dump remain
 
 Use the requested target or each Issue record's own `key`/`issueKey`/Ticket identity, with its Issue header or browse URL as evidence when available. Nested Parent/Epic/linked-ticket keys and references in descriptions/comments do not add review targets. Multiple requested primary records can form a batch. Missing/conflicting identity requires a focused question, not a Workspace fallback or a guessed target.
 
+For batch Markdown or platform-saved long input, search the complete selected file for Issue records before calling the scorer. A path-only message, truncated preview or partial read cannot establish that no Ticket exists. Extract the requested primary Keys and explicit sources first; read only the identity context needed instead of reformatting every Story body. If the file cannot be fully searched/read, resolve that input gap before routing it.
+
 An authored Story or explicitly selected local business revision remains Workspace content. Retain observed local edits after Jira export; mere file persistence or formatting changes are not those edits. If the user clearly requests a particular local version, preserve that source. Record a brief routing basis (raw Jira import, local revision or ticketless input) with the primary target when applicable.
 
 ## Jira route
@@ -26,6 +28,18 @@ Call `nodejs-base-mcp.score_requirement_markdown` with the ticket and its user-p
 Accepted sources are `WPB`, `ALM`, `DATA`, `FCR`, and `GO`. Do not infer one from the issue-key prefix. The tool uses the authenticated user's Jira access, retrieves the issue, uses the latest `*spec.md` attachment when available, and treats Jira fields as supporting context.
 
 Do not include `relativePath`. Omit `specFileStatus` and `specFilePath` in this skill version. Do not call a Jira retrieval tool before scoring. A successful Jira review is stored and associated by the scoring tool itself; then perform the automatic four-field [Jira update trigger](jira-score-sync.md) without a confirmation popup.
+
+Example: `uploads/jira-batch.md` contains primary records `AIWPB-8052` and `AIWPB-8053`. With `WPB` explicitly supplied for both, make two separate scoring calls:
+
+```json
+{"jira_number":"AIWPB-8052","source":"WPB"}
+```
+
+```json
+{"jira_number":"AIWPB-8053","source":"WPB"}
+```
+
+Never pass the batch carrier path as `relativePath` or create converted per-ticket scoring copies. Ask once for missing sources; a Jira error remains a Jira assessment failure and does not switch its input mode.
 
 Jira ratings may be reused by source and issue key across conversations. Within the configured cache window the existing rating is reused; an identical versioned fingerprint may also reuse the prior rating afterward. A reused rating is a valid result.
 
