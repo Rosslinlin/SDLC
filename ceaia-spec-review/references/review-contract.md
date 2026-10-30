@@ -23,13 +23,15 @@ FAIL is a gate result, never the overall reviewResult.
 
 Classify each finding by owner: generation, technical or user; affected artifact; evidence; business impact; concrete fix; storyChangeRequired; invalidated gates. A SPEC-only defect must not prescribe Story rewrite/rescoring. Harmless preference changes are not blockers.
 
+For a user-owned blocker, make the existing finding/question fields actionable: exact file and section/item ID, short observed text (or the precise absent item), evidence-based failure reason and the specific missing fact/decision. Do not return only "AC incorrect" or ask the user to repeat already clear requirements. Parent alone loads its [clarification procedure](../../ceaia-sdlc-story-spec-generation/references/user-clarification-and-resume.md) when user input is needed, presenting details in chat and a short popup; reviewer need not load that procedure and never opens the popup itself.
+
 Parent persists every completed report at a new monotonically numbered path and updates compact current state to reference the latest applicable report. Reviewer never writes even in a standalone review invocation; return the report to the caller.
 
 ## Repair eligibility
 
-Initial review does not consume a repair. Parent applies the shared candidate budget. During post-repair-verification aiSelfRepairAllowed=false; a non-PASS result identifies the next action, not permission for a second batch in the same round. To start another round parent checks remaining budget/stagnation and updates state.
+Initial review does not consume a repair. Parent applies the shared allowance: one automatic consolidated batch per candidate/evidenceRevision across review- and score-driven findings. During post-repair-verification aiSelfRepairAllowed=false; a non-PASS report identifies remaining blockers, not permission for a second automatic batch. Another round needs a valid recorded finite extension or genuinely new substantive evidence/decision under the shared policy.
 
-Missing business evidence sets userActionRequired immediately. Exhausted budget/stagnation also requires a decision unless the one bounded read-only diagnosis remains useful. Technical recovery needs technical information, not invented business requirements. UserActionRequired includes business input, correction, additional bounded authorization, defer or stop decisions; it is not limited to new requirements.
+Missing business evidence sets userActionRequired immediately. Exhausted repair allowance also requires a decision; summarize the cause from current findings instead of launching an additional diagnostic reviewer. Technical recovery needs technical information, not invented business requirements. UserActionRequired includes business input, correction, additional bounded authorization, defer or stop decisions; it is not limited to new requirements.
 
 Do not recommend more identical retries, lower the later score threshold, discard ACs or accept a conditional content PASS.
 

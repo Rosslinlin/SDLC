@@ -1,16 +1,16 @@
 {
-  "bundleVersion": "5.2.0",
-  "releaseDate": "2026-10-23",
+  "bundleVersion": "5.3.0",
+  "releaseDate": "2026-10-30",
   "executionProfile": "text-only",
   "activeSkills": [
     "ceaia-sdlc-story-spec-generation",
     "ceaia-spec-review",
-    "jira-createissue-helper"
+    "ceaia-sdlc-jira-export"
   ],
   "replacedSkill": "ceaia-sdlc-only-jira-push-content",
-  "jiraGateway": "jira-createissue-helper/references/sdlc-gateway.md",
+  "jiraGateway": "ceaia-sdlc-jira-export/SKILL.md",
   "taskFile": "SDLC-workflow-v5.task.json",
-  "taskHelperSkillId": "REPLACE_WITH_PLATFORM_JIRA_CREATEISSUE_HELPER_SKILL_ID",
+  "taskHelperSkillId": "REPLACE_WITH_PLATFORM_CEAIA_SDLC_JIRA_EXPORT_SKILL_ID",
   "scoreRecordFormat": "numbered-markdown-with-complete-raw-json",
   "outputPolicy": "latest-deliverables",
   "internalHistoryPolicy": "numbered-and-retained",
@@ -18,10 +18,14 @@
   "jiraDescriptionFormat": "jira-wiki-transport-rendering-for-sdlc-and-generic-non-test-rich-text",
   "jiraWritePolicy": "validated-sdlc-direct-export-after-final-preview-readback-preflight",
   "markdownReviewBindingPolicy": "second-export-call-after-confirmed-jira-and-attachment-success-with-five-required-fields-per-ticket",
-  "jiraRoutingProfile": "sdlc-only-user-workspace-jira-user-info.md-with-confirmation",
+  "jiraRoutingProfile": "persistent-user-workspace-ceaia-sdlc-jira/profiles.json-with-per-export-settings-confirmation",
   "notes": [
     "No executable scripts are included.",
     "v5 changes only the validated SDLC route and task contract; generic Jira and Test Case routes are preserved.",
-    "The generic Test Case export route is unchanged by the v5.2 Task and scoring-status update."
-  ]
+    "The generic Test Case export route is unchanged by the v5.2 Task and scoring-status update.",
+    "v5.3 is the main-branch default: Story-only SDLC export with persistent field profiles, upstream intake reuse and mandatory separate five-field bindings. The latest main-branch generic helper and standalone reviewer fixes are preserved.",
+    "The latest experimental SDLC one-round repair and clarification/resume rules are included; standalone review-requirements contains only SKILL.md and templates/review-report-template.md and is not added to the SDLC Task."
+  ],
+  "runtimeModel": "gpt-6-luna",
+  "preservedGenericSkill": "jira-createissue-helper"
 }

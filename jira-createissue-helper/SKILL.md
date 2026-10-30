@@ -1,6 +1,6 @@
 ---
 name: jira-createissue-helper
-description: Jira issue export and write helper for create, update, batch export, Test Case export, user story generation, associations, attachments, dynamic fields, and non-Test Jira-wiki text rendering through java-base-mcp. Use when the user asks to export to Jira, create stories or issues, update a Jira ticket, submit to Jira, batch export Jira items, preview a Jira payload, or explain Jira fields. Also use automatically when internal workflow state contains a validated CEAIA SDLC handoff, even if the user did not say push or export. Preview all writes; generic routes require confirmation, while a validated CEAIA SDLC handoff exports directly after its dedicated final preflight.
+description: Jira issue export and write helper for generic create, update, batch export, Test Case export, user story generation, associations, attachments, dynamic fields, and non-Test Jira-wiki rendering through java-base-mcp. Use for ordinary Jira export/update requests, payload previews, or Jira fields. Current bundled CEAIA SDLC handoffs use ceaia-sdlc-jira-export; this helper retains an explicitly selected legacy SDLC gateway. Preview all writes; generic routes require confirmation, while the selected legacy gateway follows its dedicated preflight.
 ---
 
 # Jira Create Issue Helper
@@ -9,9 +9,15 @@ Version: 2.6.0-sdlc-v5
 
 This skill separates reusable Jira helper capabilities from business flows. Read this entry file first, then load the common and flow modules required by the selected route.
 
+## SDLC exporter ownership
+
+The current bundled SDLC workflow uses `ceaia-sdlc-jira-export` in both Task mode and normal conversation mode. If a current SDLC handoff or request reaches this helper, transfer its unchanged reviewed content, state and evidence pointers to that exporter before loading common modules or the legacy gateway. Do not perform Jira writes here for that handoff. If the current exporter is unavailable or blocked, report the blocker rather than falling back to this helper.
+
+The helper-based SDLC gateway remains available only when the user or caller explicitly selects the **legacy helper-based SDLC workflow**. A validated `handoffType: ceaia-sdlc-validated` alone is not a legacy selection. All SDLC-specific helper rules and references below apply only to that explicitly selected legacy route. Ordinary non-SDLC Story scoring/export, generic create/update/batch, associations and Test Case routes retain their existing rules.
+
 ## Core execution contract
 
-1. Never write to Jira without a complete preview. Generic create, update, association, batch and Test Case routes retain their explicit-confirmation contract. A validated CEAIA SDLC handoff is the sole bundled exception: its dedicated gateway calls `exportJiraByDynamicFields` directly after the final preview, metadata validation, read-back and attachment preflight pass; no separate approval tool or confirmation popup is used.
+1. Never write to Jira without a complete preview. Generic create, update, association, batch and Test Case routes retain their explicit-confirmation contract. An explicitly selected legacy helper-based CEAIA SDLC handoff is the exception in this helper: its dedicated gateway calls `exportJiraByDynamicFields` directly after the final preview, metadata validation, read-back and attachment preflight pass; no separate approval tool or confirmation popup is used.
 2. Generate Jira content before export. For generic non-Test create, update and batch routes, render Markdown-authored Jira-visible rich text through `common-jira-text-rendering.md` before preview; keep workspace sources unchanged. Test Case content is explicitly excluded and remains controlled only by its dedicated flow.
 3. Generate summary and description; do not collect them through pop-ups.
 4. Assemble metadata fields after `queryJiraCreateMetaFields`.
@@ -27,8 +33,8 @@ This skill separates reusable Jira helper capabilities from business flows. Read
 14. Preserve Test Case execution fields exactly apart from transport-safe line-break normalisation. For all Test Case export modes, keep required line breaks as newline characters in Jira-visible payload values and never submit literal HTML break tags such as `<br>`.
 15. Test Case source export must use the text-only `flow-testcase-source-export.md` and its two required payload shapes.
 16. Final Jira-visible Test Case fields must be source-contained; do not substitute file references.
-17. A CEAIA SDLC validated handoff has priority over generic create, update and batch flows.
-18. Every SDLC export must first execute the dedicated `sdlc-gateway.md`; generic create, update, batch and Test Case rules do not override that gateway.
+17. Dispatch a current bundled SDLC handoff to `ceaia-sdlc-jira-export` before any helper route. An explicitly selected legacy SDLC handoff has priority over generic create, update and batch flows.
+18. Only the explicitly selected legacy helper-based SDLC route executes `sdlc-gateway.md`; generic create, update, batch and Test Case rules do not override that gateway.
 19. SDLC export requires `sdlc-handoff-validation.md`; do not regenerate or rewrite approved Story or SPEC business content.
 20. An SDLC handoff is exportable only when independent content review is `PASS`, every final SPEC review header has been synchronized and read back, the final Workspace Story score is current and passing with verified primary SPEC status/path, `jiraReady` is `true`, and `testCaseTitleValidation` is `manual-pass`. The reviewer report itself keeps jiraReady=false before scoring; use current parent state for final readiness.
 21. For SDLC only, split the exact reviewed `STORY.md` at its canonical `## Acceptance Criteria` section. Jira Description is a Jira-wiki transport rendering of every other Story section in its original order; the Acceptance Criteria section and its criteria must not appear there. Keep the Workspace Story unchanged.
@@ -69,7 +75,7 @@ This skill separates reusable Jira helper capabilities from business flows. Read
 
 Routing is semantic and ordered. Select the first matching route; do not downgrade a blocked specialised route to a generic route.
 
-1. **SDLC validated handoff export:** When internal workflow state supplies `handoffType: ceaia-sdlc-validated`, enter this route automatically whether or not the request contains push/export wording. Also enter it when the request explicitly asks to export already reviewed CEAIA SDLC Story/SPEC artefacts. Normal conversation execution of the bundled SDLC workflow uses this same route even without Task orchestration; do not switch to generic create/update/batch because the Task JSON is absent. If a purported SDLC handoff is incomplete, validate or repair the handoff before export rather than bypassing the SDLC gateway. Read `sdlc-gateway.md`, `flow-sdlc-validated-handoff.md`, and `sdlc-handoff-validation.md` before any generic create, update or batch flow. The dedicated gateway is controlling for SDLC routing, rendering, final preflight and write safety; common modules supply reusable mechanics only. Never forward `handoffType` to a Jira MCP tool.
+1. **SDLC dispatch:** For `handoffType: ceaia-sdlc-validated` or a request to export reviewed CEAIA SDLC Story/SPEC artifacts, use `ceaia-sdlc-jira-export` for the current bundle, with or without Task orchestration and whether or not the request contains push/export wording. Stop this helper's processing after transfer. Only an explicit legacy helper-based workflow selection enters this helper's old SDLC route: then read `sdlc-gateway.md`, `flow-sdlc-validated-handoff.md`, and `sdlc-handoff-validation.md` before any common mechanics. An incomplete/failed handoff stays blocked or returns upstream; never bypass it through generic export. Never forward `handoffType` to a Jira MCP tool.
 2. **Test Case source export:** When exporting Test Cases from a file, pasted table, spreadsheet-like content or another structured source, use `flow-testcase-source-export.md`. This route is independent of generic batch/create rules.
 3. **Association:** For link, associate or relate requests, use `flow-associate-issue.md`.
 4. **Generic update:** For a non-SDLC update request containing a Jira key or `/browse/<KEY>` link, use `flow-update-issue.md`.
@@ -83,8 +89,9 @@ If an SDLC or Test Case specialised-flow gate fails, explain the blocker and sto
 
 | Input condition | Required route | Forbidden route |
 | --- | --- | --- |
-| Reviewed `STORY.md`, `TEST_CASE.md`, one SPEC and a PASS review handoff | SDLC validated handoff | Generic create, generic batch |
-| Existing ticket plus reviewed SDLC update manifest | SDLC validated handoff | Generic update |
+| Current bundled reviewed Story/Test Case/SPEC handoff | Transfer to `ceaia-sdlc-jira-export` | Legacy helper gateway, generic create/batch |
+| Current bundled existing-ticket SDLC update manifest | Transfer to `ceaia-sdlc-jira-export` | Legacy helper gateway, generic update |
+| Explicit legacy helper-based SDLC selection with a validated handoff | Legacy SDLC gateway | Generic create/update/batch |
 | Structured source Test Case table | Test Case source export | Generic batch |
 | Multiple ordinary Jira tasks with no SDLC handoff | Generic batch | SDLC validated handoff |
 | One ordinary new Jira bug | Generic create | SDLC validated handoff |

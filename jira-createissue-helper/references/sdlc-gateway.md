@@ -1,12 +1,14 @@
-# CEAIA SDLC Jira Gateway
+# Legacy CEAIA SDLC Jira Gateway
 
 Gateway version: 1.4.1 — v5.2
+
+This module is retained only for an explicitly selected legacy helper-based SDLC workflow. Current bundled SDLC handoffs, in Task or normal conversation mode, belong to `ceaia-sdlc-jira-export`. Apply the dispatch in the helper's `SKILL.md` before this module; `handoffType: ceaia-sdlc-validated` alone does not select this legacy gateway. References to the bundled workflow below describe that legacy configuration.
 
 This is the controlling entry point for a `ceaia-sdlc-validated` handoff. It adds SDLC-specific validation, Jira rendering, preview, direct export, post-write Markdown review ticket binding and recovery rules without changing the helper's generic create, update, batch, association or Test Case flows.
 
 ## 1. Routing boundary
 
-Enter this gateway when the handoff declares `handoffType: ceaia-sdlc-validated`. The bundled SDLC workflow creates that handoff automatically after independent content-review PASS, verified SPEC synchronization and final Workspace Story score PASS, whether or not the user's opening input mentioned Jira export. An explicit preparation-only/no-Jira request or explicit stop suppresses the handoff.
+Enter this gateway only when the legacy helper-based workflow was explicitly selected and its handoff declares `handoffType: ceaia-sdlc-validated`. That legacy workflow creates its handoff automatically after independent content-review PASS, verified SPEC synchronization and final Workspace Story score PASS, whether or not the user's opening input mentioned Jira export. An explicit preparation-only/no-Jira request or explicit stop suppresses the handoff.
 
 `handoffType` is an internal routing discriminator. Retain it in workflow state/handoff validation, but strip it before every Jira MCP call. It is not exposed by the Jira tool schema and must never appear in tool arguments, `dynamicFieldsJson`, `attachmentsJson`, or `issuesJson`.
 

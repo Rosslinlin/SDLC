@@ -54,6 +54,7 @@
     }
   },
   "repair": {
+    "defaultRoundLimit": 1,
     "round": 0,
     "usedInRound": false,
     "stagnantRounds": 0,
@@ -67,6 +68,16 @@
     "operation": null,
     "attempts": 0,
     "outcome": null
+  },
+  "userRecovery": {
+    "status": "none",
+    "kind": null,
+    "evidenceRevision": null,
+    "reviewAttempt": null,
+    "detailRecordPath": null,
+    "answerRecordPath": null,
+    "questions": [],
+    "questionRef": null
   },
   "jiraReady": false,
   "updateReady": false,
@@ -100,6 +111,31 @@
   "artifactRevisions": {
     "storyRevision": 0,
     "testCaseRevision": 0
+  },
+  "exportContext": {
+    "target": {
+      "source": null,
+      "ticketKey": null,
+      "projectKey": null,
+      "storyTypeName": null,
+      "storyTypeId": null,
+      "identityEvidence": null
+    },
+    "baseline": {
+      "descriptionPath": null,
+      "acceptanceCriteriaPath": null,
+      "acceptanceCriteriaStatus": null,
+      "attachmentInventoryPath": null,
+      "intakeComplete": false
+    },
+    "currentFields": {},
+    "currentRelationships": {},
+    "unavailableFields": [],
+    "userWorkspaceProfileKey": null,
+    "settingsConfirmation": {
+      "status": "pending",
+      "requestRevision": null
+    }
   },
   "specScoreDisplay": {
     "status": "pending",

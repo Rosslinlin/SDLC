@@ -1,13 +1,14 @@
-# v5 Platform Test Checklist
+# v5.3 Platform Test Checklist
 
 ## 安装前
 
 - [ ] 上传三个活动 Skill，并记录平台返回的 skill IDs。
-- [ ] 替换 task 中的 helper skill ID 占位值。
+- [ ] 替换 task 中的新 ceaia-sdlc-jira-export skill ID 占位值；不可使用原 helper ID。
 - [ ] 确认平台提供 `ask_user_question`、Jira MCP tools 和 `nodejs-base-mcp.score_requirement_markdown`；SDLC 路由不依赖审批工具。
 - [ ] 用实际运行配置的 GPT-6 Luna 跑下面的新建和更新样例；task/Skill 不硬编码旧模型名称。核对实时评分工具 schema 接受 `relativePath`、`specFileStatus`、`specFilePath` 三个参数。
 - [ ] 若平台提供用量明细，记录单 Story 各阶段的 input tokens、工具调用次数及耗时；检查是否重复加载未变的 Skill/证据或重复执行 review/score。Task 精简不保证单独消除异常高用量。
 - [ ] 确认平台能读取全部 Markdown/JSON 文本资源，包括已转换为纯文本的 `flow-testcase-source-export.md`；流程不调用 Python、Shell、JavaScript 或本地校验代码。
+- [ ] 如需独立评分、通用导出或需求审查，分别更新保留 main 修复的 `user-story-reviewer`、`jira-createissue-helper` 和新 `review-requirements`；三者不加入新的 SDLC Task。
 
 ## 场景 A：新 Story 正常链路
 
@@ -35,13 +36,13 @@
 - [ ] SPEC-only 修复不触发 Story 重写；如之前已评分，同 Story 的新 SPEC 元数据通过正常缓存调用保存，不设置 force_review。
 - [ ] 同一 Story 路径出现旧低分和新高分记录时，最终 Jira Ticket 关联本次最终通过且带当前 SPEC 状态的记录。
 - [ ] 已有旧分数但缺少最终 SPEC 状态时，补一次携带真实 SPEC 元数据的正常评分调用；缓存复用分数仍正确保存本次状态/路径。
-- [ ] 三轮预算用尽或连续两轮无进展后停止自动编辑并请求明确决策。
+- [ ] 同一 candidate/evidenceRevision 的 review 与评分修复共用一次集中自动修复额度；修复后仍有问题立即等待，不再自动编辑、追加诊断 reviewer 或重置计数。追加轮次须有真实新证据/决策或明确有限授权。
 
 ## 场景 C：SPEC header 回写失败
 
 - [ ] 首次 mismatch 只执行一次 header-only retry。
 - [ ] 第二次 mismatch 进入 WAITING_TOOL。
-- [ ] helper gateway 拒绝未验证的 SPEC，即使 review report 为 PASS。
+- [ ] 新的 SDLC exporter 拒绝未验证的 SPEC，即使 review report 为 PASS。
 
 ## 场景 D：Jira wiki 转换
 
@@ -69,7 +70,7 @@
 - [ ] 首次调用的 `attachmentsJson` 已返回成功时，后续只记录该结果，不重复上传 SPEC；附件失败只针对该附件恢复，不重放成功的 Jira 写入。
 - [ ] 绑定返回 partial、失败、未知或业务 `status=400` 时分别记录 Jira/附件和绑定结果；保留 Key/URL，不重建 Ticket、不自动重试不确定的绑定、不宣布整体成功。
 - [ ] 首次写入预览和结果保留在编号内部记录；取得 Key 后，当前 `jira-preview.md` 展示并复读第二次调用的精确五字段 payload。
-- [ ] 普通 create/update/batch/association 和 Test Case 导出没有第二次评分关联调用。
+- [ ] 非 SDLC 中，当前 Workspace 已评分 Story 的 create/update/batch 成功后仍按 helper 规则完成该轮五字段关联；真正未评分的 Story、其他 Issue 类型、association-only 和 Test Case 不新增评分关联调用，也不套用 SDLC 76 分门槛。
 
 ## 场景 F：Helper 通用流程回归
 
@@ -84,9 +85,9 @@
 
 - [ ] 无论初次输入是否包含 “push to Jira”，都先运行 generation → independent content review → SPEC 状态同步 → final Workspace Story scoring，不在 intake 阶段询问 project 或 Epic Link；全部放行后进入 Jira。
 - [ ] 第一次 SDLC create 在 Jira 阶段主动询问可验证的 Epic Link或明确的 no-Epic 选择。
-- [ ] 首次成功 SDLC 导出后，user workspace 的 `jira-user-info.md` 只有一个 CEAIA SDLC 默认配置区。
-- [ ] 下一次 SDLC 导出先读取并验证保存的 source、project、Story type、Epic/Parent Link，然后显示全部设置并要求一次 Use/Change 确认。
-- [ ] 保存值失效或用户明确变更时，只询问受影响字段并重新验证。
+- [ ] 首次成功 SDLC issue/所需附件操作后，真实 user workspace 的 `ceaia-sdlc-jira/profiles.json` 保存对应身份/来源/项目/Story 类型/操作能力的精简字段 schema、字段 ID 和默认值；不能只保存最终 payload。
+- [ ] 跨 session 再次导出命中完整配置时不调用项目/类型/metadata query，也不重读已确认 Epic；显示本次 source/project/Story type/Ticket Number/Epic/Parent/字段值并要求一次 Use/Change 确认。
+- [ ] 只有缺失/不适用配置、用户明确变更/刷新或实际字段校验失败时查询受影响部分；不因 session 或时间经过强制刷新。
 
 ## 场景 H：SPEC 文件名与对话一致
 
@@ -106,6 +107,41 @@
 - [ ] 普通非 SDLC create/update/batch 和 Test Case 的字段映射与原有流程一致。
 
 
+## 场景 J：跨 session 字段配置与身份范围
+
+- [ ] 首次未命中时按需查询项目、Story 类型、metadata；只支持 Story，缺 Story 类型明确阻断，不提供 Task/Bug/Test fallback。
+- [ ] Profile 保存所有 required 字段规则（含后端默认未显式提交的字段）、AC 映射、已选 optional 字段/option ID 与传输格式；不保存全 raw metadata、全 allowedValues、Story/AC 正文或会话文件路径。
+- [ ] 只缺字段 schema 时不重新查询已确认的项目和 Story 类型；同批同配置只解析一次。
+- [ ] 新 session 命中时三个 query 调用数均为 0；配置老旧本身不触发刷新。
+- [ ] 当前用户/来源/项目/type 不匹配不能串用；JWT 身份优先，不能仅凭另一个 staffId 借用他人的配置。
+- [ ] 旧 jira-user-info.md 仅迁移路由，不伪装成有完整字段 schema 的命中。
+- [ ] 当前用户明确值覆盖适用默认值，但不能扩大 reviewed update scope；历史 Ticket Number 不能替代本次更新目标。
+- [ ] 只有 issue 和全部所需附件成功的项可更新对应 profile；binding 失败时保留该成功配置，记录 binding pending，不宣布全流程成功。
+- [ ] 配置写入失败不回滚成功 Jira，不重放 Jira 写入；明确报告没有跨 session 保存。
+- [ ] 未暴露真实 user-workspace 能力时不把对话目录当作持久化；metadata 分页不完整时不声称缓存完整，不臆造工具参数。
+
+## 场景 K：导出接入与读取去重
+
+- [ ] Task、generation handoff 与活动 skill 列表均调用 ceaia-sdlc-jira-export，不加载通用 helper 或其公共模块。
+- [ ] Update 正常路径从 upstream 已保存的 Description/AC 和附件 inventory 比对，不新增 getJiraInfos/readJiraAttachments；缺失、已知外部变更和不确定写入恢复分别处理。
+- [ ] 首次 create 必须有 Epic 或明确 no-Epic；新的 Epic key 只读验证一次，命中保存的 Epic 不重复查询。
+- [ ] 每次设置确认都展示更新 target key 与所有实际字段值；确认不要求用户重填 Story/AC，也不让用户挑哪些字段算必填。
+- [ ] 保留整合前 main 的 helper/reviewer 最新修复，不采用实验分支中的旧版本；helper 仅 `SKILL.md` 和 `references/sdlc-gateway.md` 两个入口做新/legacy SDLC 分流，其余 helper 文件和全部 reviewer 文件与该 main 基线一致。
+- [ ] 新 exporter 和 helper 同时安装时，普通对话的当前 bundled SDLC handoff 和 Task 均进入 `ceaia-sdlc-jira-export`；即使 helper 先被选中也转交新 exporter，不执行旧 gateway 或重复 Jira 写入。
+- [ ] 只有明确选择 legacy SDLC 时才进入旧 gateway，并保留其既有门禁；新 exporter 缺失、失败或门禁未通过时不自动回退旧 gateway。普通非 SDLC Jira 和 Test Case 路由不被转交新 exporter。
+
+## 场景 L：数据库回写与恢复
+
+- [ ] 一条 Story 正常成功有 A（内容/附件）和 B（数据库关联）两次调用；B 恰好五个非空字符串且路径是评分输入 STORY.md。
+- [ ] 多条 Story 首次 batch write 后，每个符合条件的成功 resource 单独 B，不丢关联，不交叉路径；首次 payload/各项均不带 markdownReviewRelativePath。
+- [ ] B 的 status=400 即使 isError=false，也保留成功票号、标记 binding pending，不重建票、不重复上传、不自动重试。
+- [ ] 附件失败或 unknown 的项不进入 B，原已成功 issue 保留；替换新文件未成功前不删除旧文件。
+- [ ] update-only 列表按预览顺序逐票，第一个失败/partial/unknown 后不发后续 update；显式 mixed batch 才允许 integrated issuesJson。
+- [ ] 内容/附件/关联各编号 attempt 不覆盖；当前 binding 预览覆盖 jira-preview.md 后，原 first-write payload 与结果仍可核查。
+
+记录 GPT-6 Luna 实测的导出阶段耗时、三种 query 调用数、工具返回输入量、数据库 B 调用数及重复读取数。静态验证/离线场景通过不等于真实 Jira 集成通过。
+
+
 ## SPEC Story Score display (2026-10-28)
 
 - [ ] SPEC starts with Result, Reviewer Notes, then Story Score before the first `---`; before real scoring the third field is `Not scored`, which does not block content review.
@@ -114,4 +150,41 @@
 - [ ] When the primary SPEC revision changed after a passing score, one normal cache/metadata call records that final revision; both raw attempt records remain intact. No force_review or display/rescore loop.
 - [ ] The metadata-call result, displayed value and current binding agree before readiness. A disagreement has at most one correction/check, then bounded recovery; parser failure or a low score still blocks Jira.
 - [ ] Resume with an unchanged verified header makes no extra write or scoring call. A Story change invalidates/resets its displayed score before new review/scoring.
-- [ ] Both export skill directories remain unchanged, including the existing first Jira write and separate database association call. The shown total stays out of Jira Description/AC and other issue fields.
+- [ ] SPEC score display does not alter the current export route's first Jira write and separate database association call. The shown total stays out of Jira Description/AC and other issue fields; current bundled SDLC uses the new exporter, with the old gateway reserved for explicit legacy selection.
+
+## Single automatic repair round — main (introduced 2026-10-29)
+
+- [ ] Initial review and scoring pass without a repair; no extra content review is launched for SPEC header synchronization or score display.
+- [ ] Initial review finds several supported defects: generation fixes them in one consolidated batch, increments active/cumulative repair counters once, then runs affected read-only re-review. Unchanged valid gates are retained.
+- [ ] The post-repair review still fails: no second artifact-edit batch, additional diagnostic reviewer or unchanged rescore; readiness remains false and the exact recovery decision is returned once.
+- [ ] Initial content PASS followed by a supported low-score defect uses the same one-round allowance, then independent re-review and eligible scoring. A later defect cannot start another automatic batch.
+- [ ] A low score without a supported correction does not trigger cosmetic edits, force_review or repeated scoring. Missing business evidence waits immediately.
+- [ ] After review begins, body/filename/reference formatting repairs share the same allowance; relabeling them mechanical or technical does not bypass it. Derived header-only writes and bounded tool/persistence recovery remain separate.
+- [ ] Resume or an older three-round state preserves consumed counters and attempt history; round>=1 does not permit another default repair. A session/stage change or cosmetic rename does not reset the allowance.
+- [ ] Genuine new source evidence/user decisions reset only the affected candidate's active evidence-revision allowance. Cumulative repair and review/score counts remain monotonic. An explicitly authorized extra round is finite, scoped and recorded before editing.
+- [ ] Existing current PASS results can still continue through final scoring and export after the repair was used; exhausted allowance alone does not invalidate successful work. Repair-budget changes do not alter the required Jira content/attachment write and separate database binding phases.
+
+## Content clarification popup and resume — main (2026-10-30)
+
+- [ ] Exhausted repair with a genuine missing fact produces detailed chat findings (actual full path, section/item ID, current quote or precise absence, source-based reason and exact missing fact), then a real ask_user_question interaction. Popup uses a unique short locator, brief reason and concrete question, without full report/JSON; ambiguous basenames include their candidate folder.
+- [ ] Multiple findings sharing one business decision are grouped. Partial answers preserve resolved facts and ask only remaining questions; no repeated full regeneration/review/scoring while material blockers remain.
+- [ ] An answer is bound to the candidate/question/current item. A substantive clarification is recorded in new numbered planning evidence and resumes affected Story, dependent Test Case/SPEC generation, independent review, SPEC sync and normal score/parser/display gates. Unaffected candidates are not restarted.
+- [ ] An already clear AI defect asks only for a scoped one-extra-repair decision after allowance exhaustion, not invented business facts. Approval adds exactly one authorized round without resetting evidence/cumulative counters; vague continue/dismissal is not approval.
+- [ ] A vague/unmatched answer remains waiting; a sufficient actual business answer continues automatically without an extra continue popup. Old state can initialize recovery bindings without restoring consumed repair allowance.
+- [ ] Clarification/resume changes preserve the one-round policy, independent review criteria, Story/Test Case/SPEC templates, scorer contract/76 threshold and current export/database binding gates. Check the actual small popup layout in GPT-6 Luna platform testing; offline validation does not verify visual fit.
+
+## 场景 M：保留 main 的独立 reviewer 与普通 Story 关联修复
+
+- [ ] 长篇 Jira 抓取/导出/粘贴记录即使自动保存为 Workspace Markdown，仍按主 Ticket 与已确认 source 走 Jira 评分；parent/Epic/linked/comment 引用不自动扩大评分目标。主目标或来源不明时正常询问，不回退为文件评分。
+- [ ] 同 session 已导出的 Story 继续真实修改时，评分读取当前本地 Story 路径；更新原 Ticket 内容成功后完成该轮五字段关联，同 Ticket/同路径的旧关联不能替代新评分。
+- [ ] 用户明确只要求回写已有评分时不重新评分；按实际评分调用决定四字段 Jira-mode update 或缺失的五字段 Workspace 绑定。缺必需 ID/路径正常询问，不猜值或以无路径四字段代替。
+- [ ] 有效 Jira-mode 评分后自动触发四字段调用，不再询问是否同步；普通 success/pass 或票号返回不被描述为 Jira 分数字段已确认写入。不支持项目的后台触发不得被误报为分数字段成功。
+- [ ] 真正未评分的普通 Story、Test Case、其他 Issue 类型和 association-only 保留原导出行为；评分关联失败只恢复缺少的步骤，不重建票或重放成功附件。
+
+## 场景 N：独立 review-requirements
+
+- [ ] 上传包只有 `SKILL.md` 与 `templates/review-report-template.md`；全部审查标准包含在主文件中，没有额外 references 依赖、执行脚本或外部遥测。
+- [ ] 用户提供需求和 task plan 时完成两阶段审查并输出填好的报告；只有需求但要求完整审查时，缺失的 task plan 明确保持未完成，不声称完整 PASS。
+- [ ] 四个 AC 仅触发拆分评估；紧密且不能独立交付的同一流程不被机械拆票。可理解性 PASS 阈值仍为 4/5。
+- [ ] 候选需求问题按原规则由第二审查者确认；平台无法完成时明确标记验证未完成，不冒称独立验证或完整 PASS。
+- [ ] 检查 PR 但没有发布授权时只读取/生成报告；用户明确要求后才调用可用评论工具。此 Skill 不调用评分/Jira 导出，也不增加现有 SDLC Task 阶段。

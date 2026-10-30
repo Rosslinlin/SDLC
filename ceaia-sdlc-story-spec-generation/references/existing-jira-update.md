@@ -10,6 +10,8 @@ Read workflow-contract.md for source-qualified latest-output paths and retained 
 4. Read every returned imported readable attachment at its workspace-relative path. Record relevance or reason for non-applicability for each; preserve every skipped file and reason.
 5. Store original description and AC result under <internalRoot>/intake/. Imported files remain at returned paths, unmodified as source evidence.
 
+Retain exportContext pointers to this completed Description/AC and attachment inventory. Record actual returned or explicitly confirmed target project/Story type and known current Epic/Parent/metadata values with retrieval/confirmation status; mark unavailable facts explicitly. Do not add unsupported Jira field arguments or invent missing values. These facts accompany the final reviewed handoff so export reuses intake instead of repeating remote reads. Missing destination facts may be clarified at export; an unknown unchanged field remains untouched.
+
 Reader input follows the live schema, with ticketKey, source, and current conversationId only when runtime requires it. It returns relativePath, attachment ID, name, MIME, size, import/skip status; do not invent missing fields. Never use download URLs, guessed IDs or user-entered IDs as substitutes.
 
 If description exists but separate AC is empty/unavailable, record empty-or-unavailable and inspect embedded criteria; continue. If AC was returned, preserve that actual status/value. Unusable description blocks baseline replacement. Failed/incomplete inventory blocks update until resolved; zero attachments is a valid completed inventory.
@@ -28,7 +30,7 @@ Before generating a replacement, build <internalRoot>/update-manifest.md with:
 
 Score paths/values/checksums/audit IDs do not belong in this manifest. They are in state.json and the score record, accessible to review via statePath.
 
-The current tool contract does not guarantee current summary retrieval. Do not invent it. Never update priority, assignee, labels, custom fields, status, links or unsupported fields in the bundled update mode.
+The current tool contract does not guarantee current summary retrieval. Do not invent it. Never change unrelated priority, assignee, labels, custom fields, status or issue-link associations in the bundled update mode. The reviewed Acceptance Criteria field mapping remains supported. Preserve Epic/Parent by default; a relationship or required-metadata change needs explicit authorisation in the reviewed update scope before handoff. A saved create default or export settings confirmation never grants that authorisation. Unsupported fields remain untouched.
 
 Inherited broad baseline scope is not by itself a reason to split into newly created tickets. Preserve commitments; flag scope adjustments for a user decision when needed. Do not delete old requirements to improve the score.
 
@@ -54,6 +56,6 @@ Reader evidence is immutable; write replacement content under outputRoot. Upload
 
 Use normal planning, artifact generation, independent content review, SPEC status synchronization, final Workspace Story scoring and repair gates in that order. Story changes preserve baseline and update only supported behavior. Review checks original description, available AC, every relevant readable attachment, preservation matrix and action-specific mapping.
 
-A none mapping is resolved and can yield updateReady=true. A replace mapping must be fully resolved before PASS. Send statePath and reviewed manifest to the `jira-createissue-helper` SDLC gateway; generation never calls the Jira export tool directly.
+A none mapping is resolved and can yield updateReady=true. A replace mapping must be fully resolved before PASS. Send statePath, exportContext baseline/inventory pointers and the reviewed manifest to `ceaia-sdlc-jira-export`; generation never calls the Jira export tool directly. Normal export does not retrieve the same ticket fields or attachment inventory again. Explicit recovery or known external changes may require the bounded read-only reconciliation below.
 
 If a ticket changed externally before submission, reconcile the current baseline and rerun affected preservation/content review. Do not overwrite concurrent user changes from stale intake. Maintain ticket/source-specific status and exact affected paths.

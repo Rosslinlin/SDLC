@@ -1,6 +1,6 @@
 # SDLC 与 Story/Jira 工具说明
 
-整理日期：2026-10-26；reviewer 长文本来源识别、评分回写及单票更新关联规则更新于 2026-10-28。适用于本仓库当前的 SDLC Task、三个活动 Skill，以及独立的 `user-story-reviewer`。这是配置和排查用的工具速查；实际调用仍须核对平台当时暴露的工具 schema。
+整理日期：2026-10-26；2026-10-30 同步 main 的 v5.3 SDLC 导出接入、既有 reviewer 修复和独立需求审查。适用于当前 SDLC Task、三个活动 Skill，以及独立的 `user-story-reviewer`、`jira-createissue-helper` 和 `review-requirements`。这是配置和排查用的工具速查；实际调用仍须核对平台当时暴露的工具 schema。
 
 ## 资料与边界
 
@@ -14,17 +14,18 @@
 | 工具或平台能力 | 主要用途 | 使用位置 |
 | --- | --- | --- |
 | `nodejs-base-mcp.score_requirement_markdown` | 读取 Workspace Story 或 Jira Issue、评分并保存评分/审计记录 | SDLC 最终 Story 评分；独立 `user-story-reviewer` |
-| `java-base-mcp.exportJiraByDynamicFields` | Jira 创建、更新、批量、附件、Issue 关联，以及评分记录与 Ticket 的关联/同步 | `jira-createissue-helper`；独立 reviewer 的自动后台 update 触发 |
+| `java-base-mcp.exportJiraByDynamicFields` | Jira 创建、更新、批量、附件、Issue 关联，以及评分记录与 Ticket 的关联/同步 | `ceaia-sdlc-jira-export`（SDLC）；`jira-createissue-helper`（通用）；独立 reviewer 的自动后台 update 触发 |
 | `java-base-mcp.queryJiraProjectsByName` | 按来源和项目名检索、验证 Jira 项目 | Jira 导出准备 |
 | `java-base-mcp.queryJiraIssueTypesByProject` | 获取选定项目可用的 Issue 类型 | Jira 导出准备 |
 | `java-base-mcp.queryJiraCreateMetaFields` | 获取项目/类型的字段元数据，确认 AC 等字段可写及其 ID | Jira 创建/更新字段组装 |
-| `java-base-mcp.getJiraInfos` | 读取已有 Issue 信息 | SDLC 更新的基线、普通更新/关联 |
+| `java-base-mcp.getJiraInfos` | 读取已有 Issue 信息 | SDLC generation 的更新基线；新 exporter 验证新 Epic 或异常核对；普通更新/关联；需求审查的可选 Jira 上下文 |
 | `java-base-mcp.readJiraAttachments` | 读取已有 Issue 的附件清单和可读内容 | SDLC 现有 Ticket 更新的证据 intake |
 | `java-base-mcp.fetchConfluenceContent` / `java-base-mcp.fuzzyMatchingConfluence` | 获取或搜索用户指定的 Confluence 需求证据 | SDLC 需求 intake |
 | `ask_user_question` 或平台等效弹窗 | 收集缺少的 Jira source、必填选择、配置确认或恢复决策 | 各 Skill 按自身规则使用 |
-| 平台 Workspace 读写能力、独立只读 reviewer | 保存/复读 Story、Test Case、SPEC、评分与审查记录；执行独立内容审查 | 前两项是平台能力，reviewer 是执行角色，均不是本文中命名的 Jira MCP 工具 |
+| 平台 Workspace 读写能力、独立只读 reviewer | 保存/复读 Story、Test Case、SPEC、评分与审查记录；执行独立内容审查；真实用户级 Workspace 保存跨 session 导出配置 | Workspace 操作是平台能力，reviewer 是执行角色，均不是本文中命名的 Jira MCP 工具；用户级存储不能用会话文件冒充 |
+| 平台 GitHub/PR 读取及经授权的评论发布能力、独立验证 agent | 读取 PR 文档、diff 和现有评论，验证候选问题，按用户明确请求发布报告 | 仅独立 `review-requirements` 按需使用；无固定工具名，不执行 gh CLI、脚本或外部遥测 |
 
-后三类工具的完整实时参数 schema 未在本对话提供。表格只说明当前仓库如何使用它们，不推断未展示的参数。
+Jira 读取、Confluence 和上述平台能力的完整实时参数 schema 未在本对话提供。表格只说明当前仓库如何使用它们，不推断未展示的参数或工具名。
 
 ## 2. Story 评分工具：`nodejs-base-mcp.score_requirement_markdown`
 
@@ -81,7 +82,7 @@
 
 单条成功返回 `ticketKey`、`ticketUrl`；带附件、Issue 关联或 Markdown 绑定时还需检查各自结果和 `pass`/`partial` 状态。批量返回 `uploadType=multiple`、`successCount`、`failureCount` 和逐项 `resources`。数字 `status=400` 是参数业务失败，即使 MCP 外层 `isError=false` 也不能当作成功。绑定失败不抹去已保存的 Jira Ticket；保留 Key/URL，不重建或重放成功的第一步。
 
-当前 helper 还要求：Jira 后端会在导出时添加 `CEAIA_GEN` 标签，调用方不要把它再放进工具 payload。这个标签行为来自仓库现行 Skill，不是上述参数表的必填输入。
+当前 Jira 写入 Skill 还要求：Jira 后端会在导出时添加 `CEAIA_GEN` 标签，调用方不要把它再放进工具 payload。这个标签行为来自仓库现行 Skill，不是上述参数表的必填输入。
 
 ## 4. 同一 Jira 工具的三种后续调用，不要混淆
 
@@ -102,7 +103,7 @@ SDLC 第一次 Jira 写入不带 `markdownReviewRelativePath`，因为新建时�
 | `queryJiraProjectsByName` | `staffId`、`almType`、`projectName` |
 | `queryJiraIssueTypesByProject` | `staffId`、`almType`、`projectKey` |
 | `queryJiraCreateMetaFields` | `staffId`、`almType`、`projectKey`，再加 `issueType` 或 `issueTypeId` 中至少一个 |
-| `getJiraInfos` | 更新前读取当前 Jira 内容；SDLC 分别读取 Description 与 Acceptance Criteria。完整参数 schema 未在本对话给出。 |
+| `getJiraInfos` | SDLC generation intake 分别读取原 Description 与 Acceptance Criteria，并保存结果供新 exporter 复用；导出正常路径不例行重读。新选择 Epic 可验证一次，实际证据缺口、已知外部变化或不确定写入结果按需核对。完整参数 schema 未在本对话给出。 |
 | `readJiraAttachments` | SDLC 更新在规划前完成附件清单 intake，并保留原附件、ID、可读内容及无法读取的原因。完整参数 schema 未在本对话给出。 |
 | `fetchConfluenceContent` / `fuzzyMatchingConfluence` | 只用于获取相关需求证据；完整参数 schema 未在本对话给出。 |
 
@@ -112,7 +113,15 @@ SDLC 第一次 Jira 写入不带 `markdownReviewRelativePath`，因为新建时�
 | --- | --- |
 | `ceaia-sdlc-story-spec-generation` | Workspace 文件读写；`getJiraInfos`、`readJiraAttachments`（现有 Ticket 更新）；`fetchConfluenceContent`、`fuzzyMatchingConfluence`（涉及 Confluence 证据时）；`ask_user_question`；最终 `score_requirement_markdown`；独立 reviewer 的平台调用能力 |
 | `ceaia-spec-review` | 独立只读审查和 Workspace/证据读取；不调用评分或 Jira 写入工具 |
-| `jira-createissue-helper` | 三个 Jira 项目/类型/字段查询工具、`getJiraInfos`、`exportJiraByDynamicFields`、`ask_user_question` 与 Workspace 预览/复读能力 |
+| `ceaia-sdlc-jira-export` | 正常配置命中：真实用户级/当前会话 Workspace、`ask_user_question`、`exportJiraByDynamicFields`；缺配置、变更或恢复时按需使用三个查询工具；新 Epic 或异常核对时 `getJiraInfos`，不例行重复 intake |
+| `jira-createissue-helper`（通用，独立保留） | 三个 Jira 项目/类型/字段查询工具、`getJiraInfos`、`exportJiraByDynamicFields`、`ask_user_question` 与 Workspace 预览/复读能力；保留 main 的通用已评分 Story 绑定与恢复修复，仅在主入口和旧 gateway 入口分流当前 bundled SDLC 与明确选择的 legacy SDLC |
 | `user-story-reviewer`（非 SDLC） | `score_requirement_markdown`；Jira 模式评分用四字段触发；Workspace 内容已写成功后的补关联用带实际输入路径的五字段 `exportJiraByDynamicFields`；Workspace 读写；`ask_user_question` |
+| `review-requirements`（独立需求/拆分审查） | Workspace/文档读取与报告保存；PR 模式按需使用 GitHub/PR 读取；有 title Jira ID 时可选 Jira 读取；独立验证 agent。只有用户明确要求时才使用可用的 GitHub 评论写入工具；不调用 Story 评分、Jira 导出或遥测 |
 
-本仓库 [Task JSON](SDLC-workflow-v5.task.json) 的 `tools` 列表列出 SDLC 所需的 10 个命名工具；Workspace 文件操作和独立 reviewer 能力由平台另行提供，不在该列表中。Skill 的具体路由和字段规则见各自 `SKILL.md`，尤其是 [SDLC Jira gateway](jira-createissue-helper/references/sdlc-gateway.md)。
+本仓库 [Task JSON](SDLC-workflow-v5.task.json) 的 `tools` 列表列出 SDLC 所需的 10 个命名工具；Workspace 文件操作和独立 reviewer 能力由平台另行提供，不在该列表中。Skill 的具体路由和字段规则见各自 `SKILL.md`，尤其是 [SDLC Story exporter](ceaia-sdlc-jira-export/SKILL.md)。通用 helper 的旧路由及独立需求审查不加载进新的 SDLC Task。
+
+新 SDLC exporter 的字段 profile 位于真实用户工作区 `ceaia-sdlc-jira/profiles.json`，跨 session 复用精简字段规则、ID 与已确认默认值。完整命中跳过三个 query 和已确认 Epic 读取，不因 session 或时间经过刷新；仅对缺失/不适用配置、用户明确变更/刷新或明确字段校验失败查询受影响部分。每次导出仍确认本次目标、字段值及 Epic/Parent 决策。原 helper 的 metadata 复验/确认规则保留在其独立目录，不用于新的 SDLC 路径。
+
+两种 Jira 导出 Skill 同时安装时，当前 bundled SDLC 的 Task 和普通对话 handoff 均交给 `ceaia-sdlc-jira-export`；helper 即使先被选中，也须转交新 exporter，不自动执行旧 gateway。只有明确选择 legacy SDLC 时才使用旧 gateway；新 exporter 缺失或门禁失败不能自动回退旧流程。此次仅调整 helper 的 `SKILL.md` 和 `references/sdlc-gateway.md` 两个入口，其余 helper 文件及全部独立 reviewer 文件保留整合前 main 基线，普通 Jira/Test Case 流程不改。
+
+`review-requirements` 仅有 `SKILL.md`（全部审查标准）与 `templates/review-report-template.md`（报告模板）两个文件，作为独立审查能力使用，不替代 SDLC 的 `ceaia-spec-review` 或新增 Task 阶段。

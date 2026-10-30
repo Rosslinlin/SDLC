@@ -1,4 +1,31 @@
-# CEAIA SDLC Skill Bundle v5.2
+# CEAIA SDLC Skill Bundle v5.3
+
+2026-10-30：统一到 `main`。
+
+- 默认 SDLC 链路为 `ceaia-sdlc-story-spec-generation` → `ceaia-spec-review` → `ceaia-sdlc-jira-export`；Task 同步采用新导出 Skill，字段配置复用、SPEC 附件及逐票五字段数据库关联保留。
+- 合入原实验分支最新的单轮自动修复、SPEC 分数显示及问题澄清/绑定答案续跑规则。
+- 保留合并前 `main` 的 `user-story-reviewer` 与 `jira-createissue-helper` 全部修复，包括长/批量 Jira 输入来源路由、同会话本地续改、实际评分模式决定四/五字段及漏关联恢复。通用 Jira/Test Case 功能不迁移到新 exporter。
+- helper 的主入口及旧 gateway 增加当前/旧版分流：Task 和普通对话的当前 SDLC handoff 统一交给新 exporter；旧 gateway 仅供明确选择的旧版兼容流程，通用及评分绑定业务资源保持原 main 内容。
+- 新增独立 `review-requirements`，仅含 `SKILL.md` 和 `templates/review-report-template.md`，不加入 SDLC Task；按纯文本平台适配，不执行脚本、命令或遥测，PR 评论仅按用户明确请求发布。
+- 本次完成静态合并验证；真实 GPT-6 Luna、Jira、附件和数据库集成仍按测试清单验证，不把离线检查当作平台实测。
+
+2026-10-30 内容澄清与续跑（已合入 main）：review/最终评分阻塞时，生成方在聊天区展示具体文件、条目、当前内容、失败原因和所需事实；ask_user_question 弹窗仅保留唯一简短定位、简短原因及具体问题。补充信息与当前问题绑定，充分回答后更新受影响 Story/Test Case/SPEC 并重新独立审查、评分；明确的 AI 编写错误只询问有限追加修复决定，不要求用户重复提供已知需求。保留单轮预算、所有质量门禁与导出/数据库回写。
+
+2026-10-29 单轮修复调整（已合入 main）：每个 candidate / evidenceRevision 的默认自动修复由三轮降为一轮，review 与评分问题共用；初审后最多一个集中修复批次及受影响内容复审。仍需修改时立即暂停并返回现有问题，不再额外启动诊断 reviewer。续跑保留已消耗额度；额外修复仅来自真实新增实质证据/决策或用户明确的有限加轮授权。独立审查、76 分、SPEC 分数显示、工具恢复及导出/逐票数据库关联均保留，两个 exporter 目录未改。
+
+v5.3 导出专用化最初实现于 2026-10-27，本次统一到 main 的日期为 2026-10-30。目标运行模型：GPT-6 Luna。
+
+新增独立 `ceaia-sdlc-jira-export`，仅处理已通过 SDLC 门禁的 Story 创建、更新与批量导出，保留 SPEC 附件及首次 Jira 成功后的逐票五字段数据库评分关联。保留合并前 main 的 `jira-createissue-helper/` 与独立 `user-story-reviewer/` 最新修复。Task 和 generation handoff 已接入新 exporter；平台导入前须填写新 skill 的实际 ID。
+
+字段配置和默认值成功后保存到真实用户工作区 `ceaia-sdlc-jira/profiles.json`；完整命中跨 session 跳过项目/type/metadata query，不按 TTL 刷新。每次确认实际目标、Ticket Number、Epic/Parent 与字段值。Update 复用生成阶段的 baseline 和完整附件清单，不重复远端 intake。首次 Epic/no-Epic、76 分、独立 PASS、SPEC sync、全局覆盖、内容保真、附件替换顺序和失败恢复门禁保留。
+
+v5.3 最初的导出专用化改动保留生成候选串行/阶段依赖和评分阈值；当前 main 还包含上述单轮修复与澄清续跑规则。静态和离线验证不能代替 GPT-6 Luna 平台上的真实 Jira/附件/数据库关联回归；实测按 PLATFORM-TEST-CHECKLIST.md 执行。
+
+---
+
+# 历史发布说明：CEAIA SDLC Skill Bundle v5.2
+
+以下记录当时的实现；其中三轮预算、旧 helper 接入及旧 reviewer 路由均以当前 v5.3 和对应 Skill 为准，不能作为当前运行指令。
 
 更新日期：2026-10-23
 
@@ -114,12 +141,12 @@ v4 以 v3 为基线，将最后的 Jira 写入阶段从 `ceaia-sdlc-only-jira-pu
 - v4 阶段 `flow-create-issue.md`、`flow-update-issue.md` 和 `flow-batch-export.md` 主要接入非 Test rich-text transport rendering；它们的业务路由、metadata、preview/confirmation 和写入规则在当前版本继续保留。v5.1 另修正旧工具参数示例与文本引用格式。
 - v4 时 `flow-testcase-source-export.md` 实际是 WPS/OLE 二进制文档，曾为避免改变旧流程而保留原字节；v5.1 已将它替换为纯文本 Markdown，并依据现有通用 Test Case 规则明确两种 payload 形态。平台仍需按清单做真实导出回归测试。
 - 评分阈值仍为 `ok === true` 且 `finalScore >= 76`，并要求 AC/parser 完整性。
-- 三轮自动修复预算、无进展提前停止和用户授权额外有限轮次逻辑保持不变。
+- 历史 v5.2 使用三轮自动修复；当前 v5.3 改为每个 candidate / evidenceRevision 共用一轮，保留无进展停止及用户明确授权有限追加轮次。
 
-## Task 使用前需要填写的值
+## 当前 Task 使用前需要填写的值
 
-`SDLC-workflow-v5.task.json` 中 helper 的平台 skill ID 使用占位值：
+当前 `SDLC-workflow-v5.task.json` 中 SDLC exporter 的平台 skill ID 使用占位值：
 
-`REPLACE_WITH_PLATFORM_JIRA_CREATEISSUE_HELPER_SKILL_ID`
+`REPLACE_WITH_PLATFORM_CEAIA_SDLC_JIRA_EXPORT_SKILL_ID`
 
-在平台上传/更新 `jira-createissue-helper` 后，用平台实际返回的 skill ID 替换该值。Skill name 已设置为 `jira-createissue-helper`，评分工具仍位于 tools 列表最后。
+在平台上传/更新 `ceaia-sdlc-jira-export` 后，用平台实际返回的 skill ID 替换该值。Skill name 已设置为 `ceaia-sdlc-jira-export`，评分工具仍位于 tools 列表最后。`jira-createissue-helper`、`user-story-reviewer` 与 `review-requirements` 独立安装，不加入当前 SDLC Task。

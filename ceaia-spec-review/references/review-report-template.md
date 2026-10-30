@@ -31,7 +31,7 @@ Internal report only; parent saves this at the next unused numbered reviewPath a
 - Inherited update scope limitation: [update only or None]
 - Affected files/gates: [explicit set]
 - User input or technical recovery needed: [exact information/decision or None]
-- Budget/stagnation decision: [current state and next action]
+- Repair allowance decision: [active round, one-round default, any recorded authorized extras and next action]
 
 ## Sizing and Split Decision
 - Decision: [NO SPLIT / SPLIT RECOMMENDED / NOT ASSESSABLE]
@@ -114,9 +114,11 @@ Required fields; use actual values and arrays/objects. This illustration is a no
 
 Each issues entry includes id, severity, gate, owner, path, line (null if unknown), evidence, impact, action and storyChangeRequired. Never invent line numbers or optional audit IDs.
 
+For user-owned issues, use the existing evidence/impact/action and question fields to identify the section/AC/FR/TC item, a short current quotation or precise absence, concrete reason and exact fact/decision needed. Keep the full actual path in the report; parent prepares its short popup separately. Keep the existing report schema; vague "AC wrong" questions are not acceptable.
+
 Compatibility fields are required, not optional prose replacements. validatedIssues/selfFixableIssues/platformOwnedIssues contain applicable issue IDs; needsHumanClarification contains concrete questions. sourceCoverage gives actual counts and gaps; coverageCapability states supported layers; sizingSplitRecommendation always has a reason, even for NO SPLIT.
 
-reviewAttempt is the monotonic review count. aiSelfRepairCount is cumulative actual repair batches; it may exceed three only across legitimate evidence revisions or explicitly bounded extensions. It is not the current revision's allowance. repairRound remains the active budget counter.
+reviewAttempt is the monotonic review count. aiSelfRepairCount is cumulative actual repair batches; it may exceed one only across legitimate evidence revisions or explicitly bounded extensions. It never grants extra edits in the current revision. repairRound is the active counter against the shared default limit of one plus recorded authorized extra rounds; preserve all counters on resume.
 
 reviewedSpecArtifacts lists every state.specArtifacts path with the observed bodyRevision, contentReadBack, result and preservation conclusion. Header synchronization happens later; parent records final fileRevision and the final export-preflight read-back. Revision numbers describe observed edits, not computed fingerprints.
 
