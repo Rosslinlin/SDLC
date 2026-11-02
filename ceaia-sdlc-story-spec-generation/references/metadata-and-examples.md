@@ -1,6 +1,6 @@
 # Metadata and worked authoring examples
 
-Read when filling Story, Test Case or SPEC templates. Examples are illustrative only, not default source facts.
+Read when assembling Story JSON and deriving its Test Case and SPEC projection. Examples are illustrative only, not default source facts.
 
 ## Metadata retention
 
@@ -14,7 +14,7 @@ SPEC also retains:
 
 Include these only when supplied and intended for the business deliverable; otherwise remove the fields. These explicit approved design references are exceptions to the ban on leaking internal evidence locators. Do not leak workspace paths, private download/token URLs, source registers or arbitrary provenance URLs. Test Case Related SPEC remains a workspace reference in the standalone workspace file, never an additional Jira attachment.
 
-## Parser-safe Story example
+## Canonical business behavior and SPEC projection
 
 Assume source explicitly says a permitted reviewer can open an existing application and see supplied details:
 
@@ -24,7 +24,7 @@ Assume source explicitly says a permitted reviewer can open an existing applicat
 - **AC-001**: Given a permitted reviewer and an existing application, when the reviewer opens the application, then the details panel displays the supplied application details.
 ```
 
-Use exactly this section heading; add as many real criteria as needed. Stable AC IDs and Given/When/Then preserve BDD without a combined heading. Never create a second AC section just for the scorer.
+Store this behavior first in the JSON acceptanceCriteria with stable AC IDs and matching BDD detail; the shown Markdown heading is for the readable SPEC projection. The JSON scorer does not require a literal Markdown heading inside the JSON file.
 
 ## Correct negative dispositions
 
@@ -57,9 +57,10 @@ This is not a default diagram to paste into other Stories. Add error, empty, per
 
 ## Recovery examples
 
-- Correct Story, incorrect SPEC diagram: repair diagram, independently review affected consistency, synchronize SPEC Result, then submit final Story plus current SPEC metadata. If Story is unchanged, the scorer may reuse its cached content score.
-- Correct AC, missing test: repair tests and embedded SPEC tables, independently review affected consistency, then submit final Story plus current SPEC metadata; unchanged Story content may use normal cache.
-- Wrong Story requirement: repair from evidence, update impacted tests/SPEC, independently review current content, then score the final Story.
-- "No Acceptance Criteria section found." with combined heading: correct to canonical heading, preserve business meaning, recheck impacted content and assess the changed final Story after content review.
-- Canonical heading still unrecognized: technical recovery, not endless business rewrites.
-- Missing approved design: ask for the design or a supported scope decision, not invented UI details.
+- Correct JSON, incorrect SPEC diagram: repair only the supported diagram, independently review affected consistency, synchronize Result/Notes before a new package score, then confirm the current package again.
+- Correct JSON AC, missing test: repair tests and embedded tables, independently verify affected content, synchronize headers and assess the changed package. SPEC content now participates in currentness; do not assume an old cached score is valid.
+- Wrong Story requirement: repair the canonical JSON from evidence, align tests/SPEC, independently review and score the final files. Keep path identity unchanged where possible; do not score a report or an old Markdown file.
+- A VALIDATION_FAILED result points to a JSON field/type: correct only that supported representation. Missing real business values require clarification, not guessed defaults.
+- Actual canonical ACs still unrecognized: technical diagnosis, not endless rewording or an invented score.
+- Preview changes business content: update JSON and dependent artifacts, review affected content, score and ask for fresh confirmation.
+- After scoring, preserve SPEC byte content; display the actual numeric score in its independent record/UI. There is no score-header write or display-driven S2 call.

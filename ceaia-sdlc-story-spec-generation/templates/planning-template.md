@@ -8,9 +8,9 @@ Internal evidence only. Use actual source locations and short facts; preserve or
 | SR-001 | [source/section] | [fact] | [candidate] | [in scope / approved exclusion / waiting] |
 
 ## Candidate decision
-| Candidate / mode / source / ticket | Cohesive value and scope | SR IDs | Split / inherited-scope rationale | Dependencies / blockers | Final SPEC names / attachment action |
+| Candidate / mode / source / ticket | Cohesive value and scope | SR IDs | Split / inherited-scope rationale | Dependencies / blockers | Canonical JSON / SPEC names / attachment action |
 | --- | --- | --- | --- | --- | --- |
-| [identity] | [supported outcome] | SR-001 | [short evidence-based decision] | [actual facts] | [names / add for create; none or replace for update] |
+| [identity] | [supported outcome] | SR-001 | [short evidence-based decision] | [actual facts] | [actual JSON path / SPEC names / add for create; supported none or replace for update] |
 
 ## Artifact coverage
 Fill when files exist; do not create placeholder future artifacts.
@@ -25,3 +25,5 @@ Fill when files exist; do not create placeholder future artifacts.
 - Q1–Q7 self-check and production precheck: [actual result / defects]
 - Original obligations reconciled: [covered SRs, approved exclusions and pending SRs]
 - Clarifications / user scope decisions: [exact facts or None]
+
+- Jira assembly snapshot: [numbered schema/query/profile/settings record and exact JSON revision; complete before scoring]

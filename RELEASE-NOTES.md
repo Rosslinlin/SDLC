@@ -1,3 +1,28 @@
+# CEAIA SDLC v6.1.0-preview.1 — JSON4Jira flow
+
+日期：2026-11-02。工作分支：`codex/sdlc-json4jira-flow`，尚未合入 `main`。运行目标仍为平台 GPT-5.6 Luna / GPT-6 Luna，纯文本执行。本预览按新接口重构活动三 Skill，不表示后端集成或两种模型已完成实测。
+
+- 每候选的最终 `story.json4jira` 成为唯一 Story 业务源及提交文件。取消独立 `STORY.md`，SPEC 中 Story 投影来自 JSON；`TEST_CASE.md` 保留。
+- 项目、Story 类型、字段 metadata 查询和跨会话配置复用前移至 generation，在最终 JSON 写成前完成。成功后保存已确认 profile，export 不再另组装一套提交字段。
+- 评分改用 `nodejs-base-mcp.scoreUserStory`，仅传 `story_json_workspace_path`、`specFileStatus`（精确 `Pass` / `Fail`）和 `specFilePath`。完整响应与真实输入/标识保留；主链内容 PASS 不代替真实评分及持久化。
+- 分数不写 SPEC，取消旧显示字段及仅为显示引起的 S2。导出工具仍为 `java-base-mcp.exportJiraByDynamicFields`，但**仅传 `story_json_workspace_path`**；评分与导出使用同一候选最终 JSON 路径。
+- 真实评分通过后，先展示当前业务内容、目标与附件操作的前端 HTML 预览，用户明确确认当前内容后才导出。内容变化使旧评分/确认失效，必须重新完成相应步骤。
+- 后端导出负责校验 score checksum/threshold、写入 Jira 与所需附件、回填数据库关联并入异步队列。前端不再执行旧五字段 B；分别记录 issue、attachments、linkage、queue、async sync 真实证据，不能把普通 success 或入队当作数据库/Jira UI 分数全部完成。
+- 批量仍为每候选一个 JSON，默认逐票调用，不使用旧 `issuesJson`。外部未知/部分结果先核对，不能为修复关联或队列状态重建已成功票据。
+- Q1–Q7 标准保持，审查对象更新为 JSON 业务内容与 SPEC 投影；review/score 共享两批内容修复、机械 cause 一次的规则保留。
+- 更新 `none` / `replace` 业务语义保留，但 live schema 未暴露 target/replace 时明确 `WAITING_TOOL`。不猜新字段、不改成 create、不上传 score-only SPEC；预览版不冒称更新后端已集成。
+- `jira-createissue-helper`、`user-story-reviewer`、`review-requirements` 三个独立包完全不改，不为旧工具所有路由新增兼容代码或脚本。
+
+Task 兼容文件名仍为 `SDLC-workflow-v5.task.json`，显示名改为 `SDLC-workflow-v6.1 JSON preview`；schema 与原 10 工具顺序保留，最后评分工具 ID 替换为 `nodejs-base-mcp.scoreUserStory`。现有 generation/review ID 与 exporter 占位仍须核对实际安装结果，不能伪造平台 ID。
+
+当前行为以 [workflow-contract](ceaia-sdlc-story-spec-generation/references/workflow-contract.md)、[评分契约](ceaia-sdlc-story-spec-generation/references/scoring-tool-contract.md) 与 [导出协议](ceaia-sdlc-jira-export/references/jira-write-and-recovery.md) 为准。新接口平台结果在 [测试清单](PLATFORM-TEST-CHECKLIST.md) 留空等待实测；旧 v6 本地、旧 S1–S2–A–B 验证仅为历史，不适用于新调用形态。
+
+---
+
+# 历史发布记录：v6.0 及更早版本（不作为 v6.1 运行指令）
+
+以下原文包含旧工具、Markdown Story、SPEC 分数显示、S2 和五字段 B 等当时协议，均不适用于当前 JSON 主链；只保留版本历史。其“当前”“默认”“本次”等词仅指当时版本。
+
 # CEAIA SDLC v6.0.0
 
 发布日期：2026-10-31。运行目标：平台 GPT-5.6 Luna / GPT-6 Luna；纯文本执行。

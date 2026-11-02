@@ -1,42 +1,23 @@
-# Reviewed SPEC attachments
+# JSON attachment boundaries
 
-The reviewed manifest owns attachment operations, original IDs and output mappings. Only reviewed SPECs may be uploaded; profiles never supply conversation file paths.
+Generation assembles the final JSON and authorized plan before scoring. Export verifies saved files and mappings; it does not construct attachmentsJson or invent JSON update/replace fields.
 
-## Allowed plans
+## Scoring files versus uploads
 
-- Create: exactly one primary `<name>-spec.md` per Story. Explicit reviewed many-to-one sharing remains authorized separately per item; never infer sharing from identical paths.
-- Bundled update: none or replace only. none omits attachmentsJson (or a live-contract accepted inactive empty string) and never suppresses a required operation. A local no-upload SPEC is not described as uploaded.
-- Replace: every selected original attachment ID maps to its reviewed output path/name. Distinct contents keep distinct files. Existing names need not match new naming rules. Duplicate old names are selected by upstream-confirmed ID, never filename alone. Many-to-one replacement requires explicit reviewed authorization.
-- Exporter add/delete support is available only to another explicitly supported reviewed upstream workflow, not as an extension/fallback for bundled updates. Delete uses original confirmed IDs; add uses reviewed files.
+The backend uploads every file listed in the .json4jira attachments list. Inspect that actual list against the reviewed plan; no implicit extra files or top-level batch inheritance. A normal new Story lists its reviewed primary SPEC. Distinct replacement contents retain their own reviewed files and original-ID mappings. Only selected reviewed SPEC uploads are in this bundled route; do not add Test Case, state, plans, baselines, profiles or score/review records.
 
-**Replacement uploads first and deletes the selected original only after confirmed upload success.** Preserve an old file after failed/unknown upload. Never re-upload an already confirmed success.
+scoreUserStory separately receives specFilePath, but the exact live contract must establish how a local non-upload SPEC is read/scored when it is absent from attachments. A none update keeps its local reviewed SPEC without inserting it into uploads. If that independent scoring meaning is not supported or cannot be evidenced, wait for the tool-contract gap; never turn none into add to make scoring work.
 
-## Local preflight
+## Updates require supported schema
 
-Before preview and immediately before A, read planned uploads in the actual Workspace scope. Check exact manifest relativePath, matching fileName/basename, current reviewed content and operation, and original IDs belonging to the intended ticket. Reuse same-stage reads only when no edit intervened. Reject absolute paths, URLs/schemes, traversal, missing/unreadable files or mismatched names/paths. Return defects upstream; do not substitute or rename at export. No routine remote inventory reread.
+The parent may authorize none or replace. Authorization does not define the new JSON encoding. Before any write, actual schema/documentation must show how this exact existing ticket and requested operation are represented. No create fallback, guessed issueIdOrKey field, inferred add/delete combination, or invented replace object is allowed.
 
-Build the authorized plan as an object and serialize once into attachmentsJson. Parse once to confirm exact operations, paths, names and IDs. For batch create, each issuesJson item carries its own serialized plan; top-level attachments are not inherited. The exact string and file bindings appear in the preview/numbered attempt. A changed file/path/ID/operation/string invalidates that preview and requires affected preflight again.
+For replace, retain upstream-confirmed original attachment IDs and current reviewed output mappings. Do not target by filename alone, merge distinct contents, or rename legacy originals. Explicit reviewed many-to-one replacement requires preservation of every original's relevant obligations. **The supported backend operation must upload the new file and confirm success before deleting the selected old file.** If the live JSON route cannot establish that behavior, replacement is WAITING_TOOL. Do not execute a separate legacy upload/delete API to bypass it.
 
-Known add shape:
+## Local preflight and results
 
-```json
-{"add":[{"relativePath":"outputs/ceaia/story-a/story-a-spec.md","fileName":"story-a-spec.md"}]}
-```
+Read each actual planned upload and the primary scoring SPEC before frontend confirmation and immediately before submission. Check exact Workspace-relative path, actual basename, current reviewed content/revision and authorized operation/mapping. Reuse complete reads only when no edit intervened. Reject URLs, absolute paths, traversal, missing/unreadable files or mismatches; return upstream without substitution.
 
-Known deletion shape (only with separately supported reviewed authorization):
+The upload list, primary scoring SPEC and their exact current revisions must match the score and frontend confirmation. A changed file/path/mapping invalidates affected confirmation/readiness and returns through the parent's review/scoring procedure. Preserve any service checksum exactly; no local hash or fabricated immutable version is required.
 
-```json
-{"deleteAttachmentIds":["10001"]}
-```
-
-Outer direct argument remains a string:
-
-```json
-{"attachmentsJson":"{\"add\":[{\"relativePath\":\"outputs/ceaia/story-a/story-a-spec.md\",\"fileName\":\"story-a-spec.md\"}]}"}
-```
-
-The tool supports replace but this repository does not define its inner schema. Use the live documented schema; if unavailable, block replacement with that precise tool-contract gap. Never guess its fields or combine separately guessed add/delete and label it replace. Upload-before-delete remains mandatory.
-
-## Outcomes
-
-Track issue results separately from each attachment result, including operation, upload path/name or original ID, preflight and sanitized error. A failed/partial/unknown attachment preserves a successful issue but blocks B until reconciled and successful. Recovery follows jira-write-and-recovery.md; never replay a successful issue or confirmed upload, or delete an old attachment after unconfirmed replacement upload.
+Record issue success separately from each upload/removal result. A failed/partial/unknown attachment never erases a confirmed issue and never permits replaying it. For uncertain replacement upload, retain the old file; never re-upload confirmed success. Use the supported read-only reconciliation/recovery path in jira-write-and-recovery.md. No recovery method is implied by the old API shapes.

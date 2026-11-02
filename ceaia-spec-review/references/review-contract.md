@@ -1,12 +1,22 @@
-# Independent review contract v6
+# Independent review contract 6.1.0-preview.1
 
 ## Inputs and bindings
 
-The parent supplies candidate identity, mode, original source paths/locations, current Story/Test Case paths and every current SPEC path. It also supplies known evidence/story/test/SPEC body revisions. Updates include the saved original Description, separate AC retrieval result, attachment inventory, approved changes and resolved attachmentAction=none or replace with any selected original-to-output mapping. Read the saved evidence; no routine fresh Jira read is needed.
+The parent supplies candidate identity, mode, original source paths/locations, the final Workspace storyJsonPath (`story.json4jira`), testCasePath and every current Markdown SPEC path. It supplies known evidence/storyJson/test/SPEC body revisions and confirmed schema/field meanings from its earlier Jira preparation. Updates include the saved original Description, separate AC retrieval result, attachment inventory, approved changes and resolved attachmentAction=none or replace with selected original-to-output mappings. Read the saved evidence; do not repeat Jira discovery or intake.
 
 Original evidence is authoritative for business facts. Read the relevant originals rather than only a shortened register. Missing business facts cannot be replaced by generator assertions. Review only this candidate's assigned scope; surface omissions or contradictions across candidates for the parent's global coverage check.
 
 Record actual paths and observed revisions. Revisions supplied by the parent describe observed edits; they are not hashes or proof of unchanged content. A missing counter alone is not a content defect when current files can be fully read and identified. Use null rather than inventing a revision. If current association or required content cannot be read, report a technical blocker and do not issue PASS.
+
+## JSON business content and Markdown projection
+
+Read the current JSON's summary, description, acceptanceCriteria, bddScenarios and customFields that carry business meaning. Interpret encoded business values using the parent's confirmed field metadata; do not invent labels or rules for unknown IDs. Assess acceptance criteria and BDD together without demanding that the same BDD be duplicated inline or that JSON contain Markdown headings. The JSON is the current authoritative business object, but original evidence still determines whether its claims are correct.
+
+Compare each SPEC's readable Markdown projection with the JSON business meaning, requirements and tests. Preserve actors, rules, AC/BDD outcomes, scope and relevant business custom-field values; rendering and structure may differ. Do not demand byte-for-byte raw JSON copies or a standalone Markdown Story. Routing, staffId, project/type/field IDs and other internal transport metadata do not belong in the SPEC business projection. A custom-field ID is transport metadata; its source-supported business value may still require coverage.
+
+All current SPECs remain review targets, including a score-only SPEC. A score-only SPEC is a required input to the parent's scoring stage; that does not require it to be listed for upload. Attachment declarations follow the confirmed JSON schema and authorized scope, not a reviewer-invented rule to attach the scoring file. Do not infer that a local SPEC was or will be uploaded merely because it exists.
+
+SPEC review metadata consists of Result and Reviewer Notes. No Story Score is required in SPEC; real score output belongs in a separate parent-owned report. Header-only changes do not by themselves fail Q1-Q7; the parent handles resulting scoring/currentness work. An edited JSON/SPEC/test business body requires affected independent content verification even when the front end preserves its path.
 
 ## Findings and verdicts
 
@@ -17,9 +27,9 @@ Use these classifications:
 - TECHNICAL_BLOCKER: required evidence/current content cannot be read or safely associated. Request technical recovery, not an invented business decision.
 - ADVISORY: a useful improvement when the content already meets the standard. It never prevents PASS.
 
-For each finding identify the criterion, actual file/item, source evidence, observed defect, practical impact and smallest supported correction. Mark whether Story content must change. A SPEC-only or test-only defect does not justify rewriting a correct Story. Confirm the issue is not already resolved elsewhere; do not duplicate one defect under several criteria. Keep short current quotations only when they locate the problem.
+For each finding identify the criterion, actual file/item, source evidence, observed defect, practical impact and smallest supported correction. Mark whether JSON business content must change. A SPEC-only or test-only defect does not justify rewriting correct JSON. Confirm the issue is not already resolved elsewhere; do not duplicate one defect under several criteria. Keep short current quotations only when they locate the problem.
 
-Do not fail content for filename style, table-column order, the row holding a negative label, use of the word "or", a stale review header or optional unknown metadata. Template/layout checks belong to the parent's generation precheck. A broken reference, misleading attachment claim or inconsistent business content is still a real defect and must identify its impact. Do not invent mandatory scenarios, per-AC negative companions, SLAs, endpoints, logs or implementation details to satisfy a checklist.
+Do not fail content for filename style, table-column order, the row holding a negative label, use of the word "or", a stale review header or optional unknown metadata. Template/layout and transport-schema checks belong to the parent's generation precheck. Malformed/unreadable JSON or an unavailable material field mapping is a technical blocker, not a new business requirement. A broken reference, misleading attachment claim or inconsistent business content is still a real defect and must identify its impact. Do not invent mandatory scenarios, per-AC negative companions, SLAs, endpoints, logs or implementation details to satisfy a checklist.
 
 Criteria results are PASS, FAIL, NOT_ASSESSED or N/A. FAIL requires a supported content blocker or material clarification. NOT_ASSESSED identifies missing technical access or incomplete review coverage. Q7 is N/A for a new Story; applicable content criteria are not waived because evidence is inconvenient. Each result needs concise actual evidence or the precise missing item.
 
@@ -34,8 +44,8 @@ Review each update target separately. A usable Description with an empty/unavail
 
 Preserve original obligations unless a specific approved change supersedes them. Check the delta against the baseline, including supplied relevant attachments. Inherited broad scope alone does not require new tickets. Do not authorize new fields, renamed Summary or expanded attachment operations as a side effect of review.
 
-For none, there is no replacement mapping or claim of a new upload; still read the local current SPEC. For replace, use the selected returned attachment IDs and the parent's reviewed output mapping; do not choose among ambiguous originals or merge distinct replacements. Each current SPEC gets its own preserved-obligations conclusion, even when Story/tests are shared. A missing material selection is a clarification. Unreconciled known baseline changes block preservation PASS. Add/delete requests go back to the parent for a scope decision; this review does not expand the none/replace update route.
+For none, there is no replacement mapping or claim of a new upload; still read the local current SPEC, including a score-only SPEC. For replace, use the selected returned attachment IDs and the parent's output mapping; do not choose among ambiguous originals or merge distinct replacements. Each current SPEC gets its own preserved-obligations conclusion, even when JSON business content/tests are shared. A missing business selection is a clarification; missing confirmed schema support for the update target or replace encoding is a technical blocker. Never invent an issue-key field, attachment operation field or create fallback to make the JSON appear executable. Unreconciled known baseline changes block preservation PASS. Add/delete requests go back to the parent for a scope decision; this review does not expand the none/replace update route.
 
 ## Return
 
-Use the report template. Include every current SPEC in reviewedSpecArtifacts with its path, observed bodyRevision, actual contentReadBack, result and preservation conclusion. Bind the Story/Test Case/evidence in reviewedBindings. No score placeholder, readiness flag, header-sync object, repair counter or title-validation compatibility field is part of this report. The parent owns those workflow decisions.
+Use the report template. Include every current SPEC in reviewedSpecArtifacts with its path, observed bodyRevision, actual contentReadBack, result and preservation conclusion. Bind the JSON/Test Case/evidence in reviewedBindings. No score placeholder, readiness flag, header-sync object, repair counter or title-validation compatibility field is part of this report. The parent owns those workflow decisions.

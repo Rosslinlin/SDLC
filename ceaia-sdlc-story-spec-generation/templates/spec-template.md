@@ -2,7 +2,6 @@
 
 **Result**: Not Reviewed
 **Reviewer Notes**: Independent review pending. After review, replace with `Attempt <N> — <brief evidence-backed notes>`.
-**Story Score**: Not scored
 
 ---
 
@@ -30,7 +29,7 @@
 
 ## Jira Story *(mandatory)*
 
-[Insert the complete current STORY.md bytes as text, without paraphrasing or additional metadata.]
+[Insert the faithful Markdown business projection derived from the current story.json4jira. Preserve every business section, AC and supported BDD detail; omit routing, identity, field IDs and transport controls.]
 
 ## Test Cases *(mandatory)*
 
@@ -52,16 +51,11 @@
 ### Measurable Outcomes
 - **SC-001**: [Observable measurable acceptance outcome, without invented targets.]
 
-<!-- Authoring instructions: replace placeholders and remove this comment.
-The first standalone --- separates the review header from reviewed business content.
-Only Result, Reviewer Notes and Story Score go above it, in that order. Reviewer Notes must identify the latest review attempt. Valid verdicts: Not Reviewed, PASS,
-NEEDS_REVISION, NEEDS_HUMAN_CLARIFICATION, FINAL_WITH_UNRESOLVED.
-The SPEC File Name value must equal the actual saved basename and follow <name>-spec.md for every generated SPEC.
-For SDLC scoring, map the synchronized Review Result / Result of PASS to the tool's exact specFileStatus value Pass; never send PASS/pass or the document lifecycle Status field. specFilePath is this SPEC's actual Workspace-relative path.
-Copy Story and table rather than using separate embedded examples.
-Retain applicable supplied metadata; never fabricate values or silently omit supplied fields.
-Only the two approved design-link fields above may include intended business references.
-Story Score is Not scored before assessment; afterward copy only the current Story's actual returned finalScore as <number> / 100, following references/spec-score-display.md. This one header value is the sole score-information exception. No internal source paths/provenance URLs, audit IDs, raw score records/diagnostics, workflow notes or unresolved promises.
-After review, only synchronize the header unless substantive repair is required. Re-read the
-complete file immediately and verify Result/Reviewer Notes against the latest numbered review record. Generation owns the later Story Score write/read-back and final metadata binding; it changes fileRevision only. Do not mark jiraReady until the current score, displayed value and final SPEC revision agree.
+<!-- Replace placeholders and remove this comment.
+Only Result and Reviewer Notes appear above the first standalone --- separator; Notes identify the actual review attempt. Valid verdicts: Not Reviewed, PASS, NEEDS_REVISION, NEEDS_HUMAN_CLARIFICATION, FINAL_WITH_UNRESOLVED.
+SPEC File Name equals the actual saved <name>-spec.md basename. The parent synchronizes review fields and reads back the full file before scoring, without changing its reviewed business body.
+For scoreUserStory, map actual Result PASS to exact specFileStatus Pass and use the actual specFilePath plus canonical story_json_workspace_path.
+The Jira Story section is the JSON business projection, never a separate requirement source or raw upload-payload dump. Embed exactly the saved executable Test Case table.
+Retain supplied metadata and approved general-spec/architecture links; omit optional unknown values. Do not leak source registers, internal paths, raw responses, audit IDs, credentials or unresolved business promises.
+Do not add Story Score or any numeric score to this file. Scores remain in the independent report/UI. Freeze SPEC and canonical JSON after scoring; any later change requires current scoring and a fresh content/upload confirmation.
 -->

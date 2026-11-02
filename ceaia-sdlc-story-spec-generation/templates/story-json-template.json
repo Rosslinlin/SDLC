@@ -1,0 +1,25 @@
+{
+  "jiraInstance": "<confirmed lowercase source>",
+  "projectKey": "<actual project key>",
+  "issueType": "<confirmed Story type in backend format>",
+  "summary": "<supported Story title>",
+  "description": [
+    "As a <evidenced role>, I want <supported goal>, so that <supported value>.",
+    "<supported business context, scope and material dependencies>"
+  ],
+  "acceptanceCriteria": [
+    "AC-001: Given <supported condition>, when <action>, then <observable result>."
+  ],
+  "bddScenarios": [
+    {
+      "scenario": "AC-001: <same supported behavior>",
+      "given": "<same supported condition>",
+      "when": "<same action>",
+      "then": "<same observable result>"
+    }
+  ],
+  "attachments": [
+    "outputs/ceaia/<candidate>/final-story-name-spec.md"
+  ],
+  "customFields": {}
+}

@@ -1,5 +1,5 @@
 {
-  "contractVersion": 6,
+  "contractVersion": 7,
   "candidateId": "example-story",
   "mode": "new_story",
   "source": null,
@@ -10,10 +10,10 @@
   "paths": {
     "historyRoot": ".ceaia-work/stories/example-story",
     "planningPath": ".ceaia-work/stories/example-story/plan-revision-001.md",
-    "storyPath": "outputs/ceaia/example-story/STORY.md",
     "testCasePath": "outputs/ceaia/example-story/TEST_CASE.md",
     "specPath": "outputs/ceaia/example-story/example-story-spec.md",
-    "scoreRecordPath": null
+    "scoreRecordPath": null,
+    "storyJsonPath": "outputs/ceaia/example-story/story.json4jira"
   },
   "status": "IN_PROGRESS",
   "nextAction": "plan",
@@ -25,9 +25,10 @@
     "specFilePath": null,
     "specFileRevision": null,
     "reviewAttempt": null,
-    "storyRevision": null,
     "scoreAttempt": 0,
-    "responseReadBack": false
+    "responseReadBack": false,
+    "storyJsonRevision": null,
+    "storyJsonPath": null
   },
   "review": {
     "result": "Not Reviewed",
@@ -35,7 +36,6 @@
     "recordPath": null,
     "unresolvedIssueIds": [],
     "specArtifacts": [],
-    "storyRevision": null,
     "testCaseRevision": null,
     "contentReadBack": false,
     "specHeaderSync": {
@@ -45,7 +45,8 @@
       "failedSpecPaths": [],
       "retryUsed": false
     },
-    "evidenceRevision": null
+    "evidenceRevision": null,
+    "storyJsonRevision": null
   },
   "repair": {
     "defaultRoundLimit": 2,
@@ -70,11 +71,15 @@
   "exportPreparation": {
     "status": "not-prepared",
     "exportAttempt": 0,
-    "requestPath": null,
     "previewPath": "jira-preview.md",
-    "requestRevision": null,
-    "attachmentRevisions": [],
-    "contentReadBack": false
+    "inputReadBack": false,
+    "previewConfirmation": {
+      "status": "pending",
+      "storyJsonPath": null,
+      "storyJsonRevision": null,
+      "specFileRevisions": [],
+      "recordPath": null
+    }
   },
   "writeResults": [],
   "bindingMethod": "readback-and-revision",
@@ -90,8 +95,8 @@
   "attachmentReplacementMapping": [],
   "executionProfile": "text-only",
   "artifactRevisions": {
-    "storyRevision": 0,
-    "testCaseRevision": 0
+    "testCaseRevision": 0,
+    "storyJsonRevision": 0
   },
   "exportContext": {
     "target": {
@@ -112,20 +117,12 @@
     "currentFields": {},
     "currentRelationships": {},
     "unavailableFields": [],
-    "userWorkspaceProfileKey": null,
-    "settingsConfirmation": {
+    "assembly": {
       "status": "pending",
-      "requestRevision": null
+      "recordPath": null,
+      "profileKey": null,
+      "storyJsonRevision": null
     }
-  },
-  "specScoreDisplay": {
-    "status": "pending",
-    "storyRevision": null,
-    "finalScore": null,
-    "scoreRecordPath": null,
-    "verifiedSpecPaths": [],
-    "primarySpecFileRevision": null,
-    "metadataFinalized": false
   },
   "phase": "intake"
 }

@@ -1,44 +1,34 @@
-# Plan, author and precheck
+# Produce JSON, tests and SPEC from the same requirements
 
-Before writing, read [Q1–Q7](quality-contract.md). [Workflow contract](workflow-contract.md) owns phases, revisions and bounded repair; this file owns production steps only.
+Read [Q1–Q7](quality-contract.md) before writing; [workflow](workflow-contract.md) owns sequence/repair and [assembly](jira-json-assembly.md) owns early Jira queries/field encoding.
 
-## 1. Plan from sources
+## Plan and assemble
 
-Use [planning template](../templates/planning-template.md). Record source location → explicit requirement → assigned candidate, plus material questions and approved exclusions. For updates also use [existing Jira update](existing-jira-update.md). Preserve the original source rather than treating a generated register as complete evidence.
+Use [planning template](../templates/planning-template.md): exact source → explicit obligation → candidate → AC/FR/TC. Assign batch-unique SR IDs and retain them through global coverage. Preserve the original source, not merely a generated summary. Include supplied reporting/integration/notification/audit/fraud/retention/MI/testing obligations; lack of implementation detail is not exclusion.
 
-Assign SR IDs uniquely across the selected batch before allocating candidates; retain those same IDs and original locations in candidate plans and global coverage. Do not restart SR-001 independently for each candidate or replace the original scope with a shortened generated summary.
+New Stories are cohesive independently testable value slices; AC count does not force splitting. Preserve inherited update scope. Resolve final names, source/project/type/required fields and attachment intent through assembly before final scoring. Simple inputs need only the compact coverage rows; expand UX/API/async/layer details only when actually supported.
 
-Retain explicit downstream integration, reporting, notification, audit/fraud, retention, operational MI and testing obligations when supplied. Missing implementation detail is not permission to omit the obligation or label it out of scope.
+## JSON → tests → Markdown SPEC
 
-Split new Stories by cohesive independently testable value where supported; record a short rationale. Preserve inherited update scope. Fix candidate paths, final SPEC names and attachment mappings before authoring.
+1. Save the complete canonical JSON using [JSON template](../templates/story-json-template.json) and actual schema/metadata. summary, description, acceptanceCriteria, bddScenarios and approved business customFields express the supported Story. Unique AC-### entries contain observable Given/When/Then; no filler or invented backend rules. Parent control facts and raw scoring diagnostics never enter business fields.
+2. Read the saved JSON and assign supported FR identifiers in planning. Derive [tests](../templates/test-case-template.md) from its actual ACs and source evidence. Every AC/FR has executable coverage with supported entry/data, ordered actions, observation and expected results. Keep 11 columns, supported scenario types and risk-based P0/P1/P2.
+3. Consider meaningful negative behavior. Covered identifies a real rejection case; N/A has a reason; material missing behavior uses draft-only To Confirm and waits. No mandatory positive companion for a denial AC, no word-level or ban and no combinations invented from word counts. Distinct conditions/results must be independently verifiable; equivalent supported data may be parameterized explicitly.
+4. Derive a readable [Story projection](../templates/story-projection-template.md) from the JSON business fields and place it inside [SPEC](../templates/spec-template.md). Include every business section/AC/BDD and approved field meaning, without routing, staff identity, custom-field IDs or JSON transport controls. This is a faithful view, not a separately authored requirement source. Do not create STORY.md or embed raw JSON bytes as the business Story.
+5. Embed the saved executable test table exactly in every SPEC, declare the same FRs and supported measurable SCs, and retain relevant entities/flows/context. Use supported Mermaid when meaningful; a trivial flow may be a short description. Preserve supplied metadata under [examples](metadata-and-examples.md), never invented SLAs/endpoints/logs/author/IDs.
+6. Different replacement contents retain distinct files and source-specific obligations; shared JSON/Story/test meaning must agree in every SPEC. A local score-only SPEC is not described as uploaded. Standalone Test Case metadata remains outside embedded tables and is not a Jira attachment.
 
-Simple inputs need only the requirement/coverage rows. When sources actually contain multiple UX states, API/data contracts, asynchronous or cross-system behavior, add the applicable state/layer rows. Label Confirmed / Not provided / To confirm honestly; a UI source does not prove backend behavior. Do not create eight mandatory registers or demand irrelevant layers.
+## One production precheck
 
-## 2. Story → tests → SPEC
+Read saved files and reuse those reads for this pass:
+- JSON is complete, not double-encoded, with actual schema types/options, unique AC IDs, no template placeholders and no old direct-call wrapper. AC/BDD/custom-field representations agree.
+- The actual JSON path is identical in state, assembly evidence and later call inputs. All intended attachment paths exist, match approved scope and actual -spec.md names/mappings; excluded/score-only files are absent from uploads.
+- SPEC business projection is lossless against JSON; its tests equal TEST_CASE.md's executable table. AC/FR/TC references resolve. Required metadata and 11 test columns are present; table pipes/newlines are valid.
+- Self-check Q1–Q7 against original sources, recording a concise result in the plan. Unknown optional values are omitted; real gaps stay pending.
 
-1. Write the [Story](../templates/story-template.md): supported Summary, actor/goal/value, Business Context, Scope, exactly `## Acceptance Criteria`, and Attachments. Give every AC a unique stable AC-### and Given/When/Then observable outcome. Do not invent category-filler ACs. New/add names its SPEC; update/replace names intended replacements; update/none states no attachment change.
-2. Read the saved Story. Assign supported FR IDs in planning, then derive executable [tests](../templates/test-case-template.md). Every AC and FR has coverage; each test supplies supported preconditions/data, ordered actions, observation and expected results. Do not invent endpoints, logs, thresholds, copy or permission rules.
-3. Keep the existing 11 test columns. Types: Positive, Negative, Validation, Boundary, Permission, Dependency, Empty State, State / Flow, Exception, Data Consistency, Security, Audit, Notification, Regression. P0 = core/release-blocking/permission/integrity behavior; P1 = important alternatives/errors; P2 = supported supplemental behavior.
-4. Consider meaningful negative coverage for each AC. Put Covered on its actual rejection case, or N/A with a reason when no additional negative behavior applies. The representative-row convention is authoring layout, not a content gate. To Confirm names a material missing expected outcome and waits for that fact; optional unknown metadata does not block.
-5. Check test scenarios semantically. Separate materially different conditions/results into executable cases; equivalent supported data can be parameterized with explicit data and outcomes. A title containing `or` is not automatically wrong. Do not calculate case counts from word counts or invent a full combination product.
-6. Assemble every [SPEC](../templates/spec-template.md) by copying the complete saved Story and the one saved test table exactly. Declare the same FR IDs, measurable supported SCs and relevant entities. Use a supported Mermaid flow when meaningful; a simple feature may have a simple flow. Never create generic or invented integration branches.
-7. Preserve supplied metadata and approved business references using [metadata/examples](metadata-and-examples.md). Keep internal registers, local paths, score diagnostics and credentials out of business deliverables. Only the real numeric Story Score belongs in the designated SPEC header later.
+Correct bounded mechanical defects, then give the independent reviewer actual originals, JSON, tests, all SPECs, field interpretation evidence and observed revisions. Do not give self-check marks as review proof.
 
-Different update replacements keep distinct files when source-specific contents differ. Each contains the current shared Story/table and its own preserved source context. Do not merge files or create extra Jira tickets to simplify authoring.
+## Repair, synchronize and freeze
 
-## 3. One production precheck
+Fix only the affected layer: JSON business error → JSON + dependent tests/projection/SPEC; correct AC but wrong test → test/table; SPEC-only error → affected SPEC. A technical schema/transport issue stays in assembly; a business fact gap waits. Apply the workflow's two-content-batch/per-cause mechanical policy and independently re-review affected business content.
 
-Read the current files once and reuse those reads for this pass:
-- Actual safe `<name>-spec.md` names, SPEC File Name, Story attachment names, Test Case Related SPEC, state and all replacement mappings agree.
-- Exactly one canonical AC heading, unique declared IDs and BDD; referenced AC/FR/TC IDs exist. Count declarations, not references.
-- Required template sections/11 columns and supplied metadata are present; no placeholder examples remain. Table rows have escaped literal pipes and `<br>` within cells.
-- Embedded Story and executable test table match their saved originals; all primary/additional SPECs are included.
-- Self-check Q1–Q7, with source-to-artifact coverage and no unsupported additions. Record the concise actual result in the plan, not another full report.
-
-Correct mechanical defects under the workflow's bounded policy. Then send readable sources, plan, current files and observed revisions to independent review. The reviewer evaluates content; formatting does not become a new business rule.
-
-## 4. Apply findings locally
-
-Fix only affected content: SPEC defect → affected SPEC; test defect with correct AC → tests + embedded tables; wrong requirement → Story + dependent content. Missing business fact → clarification. Align references and read back every affected file, then independently verify affected Q criteria and cross-artifact consistency. Parent saves each new review at an unused numbered path.
-
-After content PASS parent synchronizes Result/Reviewer Notes in **every** SPEC and verifies the complete body unchanged. First header mismatch permits one header-only retry; a second is WAITING_TOOL. Continue with [real scoring](scoring-tool-contract.md), including the retained [score display / metadata procedure](spec-score-display.md). Generation never performs Jira A or B itself.
+After content PASS, parent writes Result/Reviewer Notes in every SPEC, then reads complete files and verifies business bodies unchanged. First header mismatch allows one header-only retry, another waits. All header writes finish before [scoreUserStory](scoring-tool-contract.md). **No Story Score field is created or updated in SPEC.** Keep the returned score in the independent record/UI. Freeze JSON and scored SPECs through final preview/export; any later edit needs a current package assessment and fresh confirmation.

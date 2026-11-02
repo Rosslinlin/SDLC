@@ -1,6 +1,6 @@
 {
-  "bundleVersion": "6.0.0",
-  "releaseDate": "2026-10-31",
+  "bundleVersion": "6.1.0-preview.1",
+  "releaseDate": "2026-11-02",
   "executionProfile": "text-only",
   "activeSkills": [
     "ceaia-sdlc-story-spec-generation",
@@ -11,31 +11,51 @@
   "jiraGateway": "ceaia-sdlc-jira-export/SKILL.md",
   "taskFile": "SDLC-workflow-v5.task.json",
   "taskHelperSkillId": "REPLACE_WITH_PLATFORM_CEAIA_SDLC_JIRA_EXPORT_SKILL_ID",
-  "scoreRecordFormat": "numbered-markdown-with-complete-raw-json",
+  "scoreRecordFormat": "numbered-markdown-with-complete-raw-response-json-or-text",
   "outputPolicy": "latest-deliverables",
   "internalHistoryPolicy": "numbered-and-retained",
-  "specHeaderPolicy": "synchronize-readback-verify-before-jira-ready",
-  "jiraDescriptionFormat": "jira-wiki-transport-rendering-for-sdlc-and-generic-non-test-rich-text",
-  "jiraWritePolicy": "validated-sdlc-direct-export-after-final-preview-readback-preflight",
-  "markdownReviewBindingPolicy": "second-export-call-after-confirmed-jira-and-attachment-success-with-five-required-fields-per-ticket",
-  "jiraRoutingProfile": "persistent-user-workspace-ceaia-sdlc-jira/profiles.json-with-per-export-settings-confirmation",
+  "specHeaderPolicy": "synchronize-review-result-and-notes-before-scoring; no-story-score-display",
+  "jiraDescriptionFormat": "schema-confirmed-json-field-representation-assembled-before-scoring",
+  "jiraWritePolicy": "same-scored-json-path-only-after-explicit-current-content-confirmation",
+  "jiraRoutingProfile": "persistent-user-workspace-ceaia-sdlc-jira/profiles.json; settings-resolved-before-scoring; final-current-content-confirmation-before-export",
   "notes": [
-    "Text-only runtime; no executable scripts are required or shipped.",
-    "Generation and independent review read identical versioned Q1-Q7 content standards before authoring and review.",
-    "Task and ordinary chat use one workflow contract; file name remains SDLC-workflow-v5.task.json for installation compatibility, with display_name SDLC-workflow-v6.",
-    "All ten named Task tools and their order are preserved. Scoring persistence, final SPEC metadata calls, Jira A and each separate five-field binding B remain required.",
-    "Generic helper, standalone Story reviewer and original review-requirements business flows are preserved independently.",
-    "Platform integration and actual database persistence require live validation; offline checks are not production proof."
+    "First JSON-first preview; not merged into main and not a production integration claim.",
+    "Generation resolves Jira routing/field metadata and writes the final story.json4jira before scoring. SPEC remains Markdown; the standalone STORY.md is replaced by the JSON business projection inside SPEC.",
+    "User-confirmed scorer is nodejs-base-mcp.scoreUserStory with story_json_workspace_path, specFileStatus and specFilePath. This clarification supersedes the screenshot scoring one-argument example.",
+    "Export retains java-base-mcp.exportJiraByDynamicFields but uses only the same story_json_workspace_path. Backend linkage/queue replaces the old Agent B call.",
+    "Story score stays in its independent report/UI. No SPEC score mutation or display-driven S2. Full responses and unknown outcomes are preserved.",
+    "Shared content quality and independent review remain; destination assembly precedes scoring, final content confirmation follows scoring.",
+    "Update target, none/replace and score-only-attachment handling require active backend schema evidence; unsupported cases wait rather than fabricate fields or create a new ticket.",
+    "Independent Jira helper, Story reviewer and review-requirements directories are unchanged. Their backend compatibility was not validated here.",
+    "Actual model, preview, database, attachment and asynchronous score-sync behavior requires platform integration testing."
   ],
   "preservedGenericSkill": "jira-createissue-helper",
-  "internalContractVersion": 6,
+  "internalContractVersion": 7,
   "runtimeModels": [
     "gpt-5.6-luna",
     "gpt-6-luna"
   ],
-  "qualityContractVersion": "6.0.0",
+  "qualityContractVersion": "6.1.0-preview.1",
   "qualityContractSource": "ceaia-sdlc-story-spec-generation/references/quality-contract.md",
   "qualityContractPackagedCopy": "ceaia-spec-review/references/quality-contract.md",
   "contentRepairPolicy": "two-shared-content-batches-per-candidate-evidence-revision; one-mechanical-correction-per-cause; external-write-retry-policy-unchanged",
-  "specMetadataPolicy": "preserve-existing-post-display-normal-cache-metadata-invocation-and-complete-response-records"
+  "specMetadataPolicy": "scoreUserStory-JSON-path-plus-spec-status-and-path; frozen-SPEC-after-scoring; no-display-driven-S2",
+  "databaseLinkagePolicy": "backend-verified-score-match-and-jira-writeback-plus-sync-queue; no-separate-agent-five-field-call",
+  "featureBranch": "codex/sdlc-json4jira-flow",
+  "toolContracts": {
+    "score": {
+      "id": "nodejs-base-mcp.scoreUserStory",
+      "arguments": [
+        "story_json_workspace_path",
+        "specFileStatus",
+        "specFilePath"
+      ]
+    },
+    "export": {
+      "id": "java-base-mcp.exportJiraByDynamicFields",
+      "arguments": [
+        "story_json_workspace_path"
+      ]
+    }
+  }
 }

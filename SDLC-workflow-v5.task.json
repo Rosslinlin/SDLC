@@ -1,73 +1,75 @@
 {
   "schema_version": "enriched-agent.task/v2",
-  "display_name": "SDLC-workflow-v6",
+  "display_name": "SDLC-workflow-v6.1 JSON preview",
   "todo_list": [
     {
       "id": "classify-and-complete-intake",
-      "content": "Read sources and record every selected target",
-      "active_form": "Reading sources and identifying candidate blockers",
+      "content": "Read original sources and record selected Story targets",
+      "active_form": "Reading source evidence and target baselines",
       "instructions": [
-        "Load ceaia-sdlc-story-spec-generation. Read references/workflow-contract.md as the sole sequence/state/repair authority and references/quality-contract.md before planning. Use only existing platform tools; no scripts. Platform runtime is GPT-5.6 Luna or GPT-6 Luna, selected outside this Task schema.",
-        "Keep default end-to-end Jira intent unless the user explicitly requests preparation-only/no-Jira or stops. Classify new_story versus existing_ticket_update; an evidence ticket is not an update target. Before Jira access confirm each target source through ask_user_question when missing; never infer from a key. Defer destination/project/type/Epic settings to export.",
-        "Use the generation intake references. Updates require saved Description, separate AC retrieval result and complete readJiraAttachments inventory. Preserve exportContext pointers and actual available target facts. Record every selected candidate as intake-ready or with a precise fact/tool blocker; keep blocked candidates selected so independent ready candidates can continue."
+        "Load ceaia-sdlc-story-spec-generation and its workflow-contract plus shared quality standard. This is the JSON-first route; platform runtime is GPT-5.6 Luna or GPT-6 Luna, with no scripts or unconfirmed model parameters in this Task.",
+        "Keep complete SDLC intent unless explicitly preparation-only/no-Jira or stopped. Classify new_story versus existing_ticket_update and confirm each Jira source before reads; never infer from a key or turn an update into create. Save original Description, separate AC result and complete readJiraAttachments inventory for updates, plus actual available target facts.",
+        "Retain every selected candidate as ready or precisely blocked. Intake classification can complete with pending targets recorded so unrelated ready candidates can proceed. Assign batch-unique source requirement IDs; a shortened register never replaces original evidence."
       ],
       "completion_criteria": [
-        "Selected identities, sources and original evidence are recorded; each target is intake-ready or explicitly pending with a precise blocker. This is classification completion, not readiness or whole-workflow completion."
+        "Selected target/source identities, original evidence and per-target ready/waiting causes are recorded without silently dropping scope."
       ],
       "depends_on": []
     },
     {
-      "id": "prepare-each-candidate",
-      "content": "Generate, independently review and score each ready candidate",
-      "active_form": "Preparing one candidate at a time against the shared standard",
+      "id": "assemble-review-score-each-candidate",
+      "content": "Assemble final Story JSON, review and score each ready candidate",
+      "active_form": "Querying fields, generating JSON/SPEC and recording actual scores",
       "instructions": [
-        "For each intake-ready candidate, follow the workflow-contract candidate cycle with ceaia-sdlc-story-spec-generation. Read its shared quality standard before writing; generate Story, executable Test Case and every intended SPEC, then perform its one production precheck. Simple inputs use minimal source-to-AC-to-test mapping; add source-specific detail only when relevant.",
-        "Invoke a fresh independent read-only ceaia-spec-review with original sources and all current artifacts. It reads its identical packaged quality standard and returns the content report. Parent saves each actual review at the next numbered path. Reviewer does not score, edit, manage repair budgets or write Jira. Follow the shared bounded content/mechanical repair and clarification branches; continue independent preparation of other candidates while a target waits.",
-        "After candidate content PASS, synchronize and read back every SPEC review header with unchanged business bodies. Execute the generation scoring-tool-contract: actually call nodejs-base-mcp.score_requirement_markdown on the final Workspace STORY.md with exact specFileStatus=Pass and actual primary specFilePath, for creates and updates alike. Save/read back the complete response. Follow spec-score-display.md, retaining its required normal cached metadata-bearing call and each full response. Content PASS, displayed numbers and cache hits never substitute for required persistence calls.",
-        "Only current numeric 76-100 scores with ok=true, valid AC/parser recognition, verified headers/display and final SPEC metadata pass preparation. Do not force reassessment, invent facts or repeatedly call unchanged tools to seek a better result. A blocked candidate stays selected. No Jira A/B calls occur during this stage."
+        "For each ready candidate read generation jira-json-assembly.md now. Reuse matching user profiles, or queryJiraProjectsByName/queryJiraIssueTypesByProject/queryJiraCreateMetaFields only for missing supported routing/schema facts. Resolve actual project/Story type/required values and approved attachment intent during generation, before final scoring. Save confirmed field/schema evidence in its assembly record; do not postpone payload assembly or rendering to export.",
+        "Read Q1-Q7 before writing. Save the complete actual story.json4jira, then derive executable TEST_CASE.md and every named Markdown SPEC business projection from it. No standalone STORY.md or independent upload body. Perform one production precheck; current JSON field meanings, AC/BDD and SPEC/tests must align.",
+        "Invoke a fresh read-only ceaia-spec-review with originals, actual JSON, tests, all SPECs and field interpretation evidence. Parent saves the numbered report and follows the shared bounded repair/clarification rules. Reviewer does not score, edit or write Jira. Continue independent preparation of other ready candidates while preserving blocked scope.",
+        "After content PASS synchronize/read back all SPEC Result/Reviewer Notes before scoring. Actually call nodejs-base-mcp.scoreUserStory with exactly story_json_workspace_path, specFileStatus=Pass, specFilePath. Use the real saved JSON path and primary SPEC path; save/read back the complete response and actual input/revision binding. Retain 76-100 numeric/ok/parser policy and handle validation-failed strings or SKIPPED without inventing score PASS.",
+        "Keep Story score only in the independent result/UI, never write it into SPEC or JSON. Freeze current JSON/SPECs after scoring; no display-driven S2. Any later JSON or scored SPEC edit requires a current package score and affected review. Do not force unchanged rescoring or fabricate business facts. Unverified update/replace schema handling is a specific WAITING_TOOL, never permission to call a create-shaped package."
       ],
       "completion_criteria": [
-        "Every selected candidate has current independent content PASS and passing persisted final scoring/SPEC metadata, or the user explicitly changed/stopped its scope. Pending candidates prevent full stage completion; they do not prevent preparing unrelated candidates.",
-        "Actual source/read-back/review/score records and consumed repair state are retained. No readiness is inferred from a reviewer summary or a score display."
+        "Every selected candidate has current complete JSON/assembly, independent content PASS and a passing persisted JSON+SPEC assessment, or its scope was explicitly changed/stopped. Pending candidates prevent full stage completion but not unrelated preparation.",
+        "Current source/review/score records and consumed repair state are retained. There is no Jira write or legacy five-field call in this stage."
       ],
       "depends_on": [
         "classify-and-complete-intake"
       ]
     },
     {
-      "id": "reconcile-global-coverage",
-      "content": "Verify the complete selected scope before Jira handoff",
-      "active_form": "Reconciling original requirements across prepared candidates",
+      "id": "reconcile-and-confirm-scored-content",
+      "content": "Reconcile selected scope and obtain current upload-content confirmation",
+      "active_form": "Checking global coverage and presenting scored JSON previews",
       "instructions": [
-        "Use the workflow-contract global-coverage step. Reconcile original in-scope obligations against all selected candidates, supported exclusions and pending items. Read the originals when establishing coverage; per-candidate PASS alone is insufficient. Do not silently remove requirements or blocked candidates.",
-        "Verify current review, score and final SPEC bindings from the saved records, without rerunning unchanged calls. Set parent jiraReady/updateReady only when all applicable checks and global coverage pass. Preparation-only ends with actual artifact paths; otherwise hand current state, records and update exportContext to ceaia-sdlc-jira-export automatically."
+        "Reconcile original in-scope obligations with every selected current candidate, supported exclusions and pending items in actual batchStatePath. Require zero pending obligations and current evidence-revision bindings before integrated export. Do not silently omit blocked candidates or change scope.",
+        "Verify current review/score/JSON/SPEC/assembly evidence without rerunning unchanged tools, then set parent jiraReady/updateReady only where applicable. Preparation-only ends here with actual artifacts and score results, without Jira success.",
+        "For export intent, use exporter handoff and preview procedure to present the actual scored .json4jira content and attachments in the platform preview. Obtain explicit user confirmation bound to the current JSON path/revision and SPEC file revisions. Earlier destination settings confirmation is insufficient. A user edit returns to affected generation/review/scoring and requires fresh confirmation; do not alter content at submission."
       ],
       "completion_criteria": [
-        "No pending selected obligation or unsupported exclusion remains; ready handoff is current, or preparation-only has explicitly completed without claiming Jira success."
+        "Every selected obligation is reconciled and, for export intent, actual content/upload confirmation matches the frozen current scored package. No confirm event is invented."
       ],
       "depends_on": [
-        "prepare-each-candidate"
+        "assemble-review-score-each-candidate"
       ]
     },
     {
-      "id": "prepare-and-execute-jira-operation",
-      "content": "Export Story/SPEC and separately bind each ticket to its score",
-      "active_form": "Writing Jira A and verifying each database binding B",
+      "id": "export-by-unchanged-json-path",
+      "content": "Submit only the JSON path and verify backend operation results",
+      "active_form": "Exporting frozen JSON packages and recording backend persistence",
       "instructions": [
-        "For end-to-end intent load only ceaia-sdlc-jira-export. Follow its handoff/profile/field/attachment/write references; do not route through generic helper. Reuse upstream baseline and applicable persistent configuration, resolve missing actual facts and confirm this export settings. Keep the internal handoff discriminator out of tool arguments.",
-        "Preserve the exact A preview, payload and local attachment preflight; call java-base-mcp.exportJiraByDynamicFields directly. First write omits markdownReviewRelativePath. Keep the existing batch-create and sequential-update semantics and separate issue/attachment outcomes.",
-        "MANDATORY B: after each item issue AND all required attachments succeed, make a separate call to the same tool with exactly five nonempty strings: staffId, almType, returned issueIdOrKey, current conversationId, and markdownReviewRelativePath for that item final scored STORY.md. Each eligible batch item needs its own B. Require explicit markdownReview association success; ordinary tool success or A success is insufficient.",
-        "Preserve complete numbered attempts and all actual outcomes. Unknown/partial/failure follows exporter reconciliation; never replay successful A or attachments to repair B. Report each ticket, attachment, binding and profile result separately. Do not mark pending or unknown operations complete."
+        "Load ceaia-sdlc-jira-export only. Reuse current confirmation and handoff; no project/type/metadata queries, field partition, Markdown-to-wiki conversion, payload regeneration or generic-helper fallback at export. Read back the exact canonical JSON and scored SPECs; if changed, return upstream.",
+        "Actually call java-base-mcp.exportJiraByDynamicFields with exactly one argument: story_json_workspace_path copied unchanged from the passing score input. No other direct fields, staffId/conversationId, attachmentsJson/issuesJson, spec parameters or separate five-field association call. Batch selected files execute one at a time and stop further writes on failed/partial/unknown results.",
+        "The new backend validates the stored score/checksum/threshold, writes the ticket/attachments and owns database linkage plus sync queueing. Preserve the complete actual response and separate issue, attachment, database-link, queue and async Jira-score-sync evidence. A ticket key or generic success does not prove every effect. Confirmed synchronous submission may report Jira score synchronization pending; never claim asynchronous completion without evidence.",
+        "Unknown/partial results require supported reconciliation; never replay a successful ticket or upload to repair linkage/queue errors. Save eligible profile facts only from the actual upstream assembly snapshot after confirmed issue/required-attachment success, and report persistence separately. No actual returned evidence may be replaced by a fabricated success flag."
       ],
       "completion_criteria": [
-        "Every selected required issue, attachment and separate database binding is confirmed successful. Preparation-only skips this stage explicitly; stopped or pending items remain reported and are not whole-workflow success."
+        "Every intended synchronous issue/attachment/database-link/queue requirement has actual confirmation, or remains explicitly pending/unknown. Async Jira score synchronization is reported separately; no legacy B call is sent and no failed operation is hidden by a completed summary."
       ],
       "depends_on": [
-        "reconcile-global-coverage"
+        "reconcile-and-confirm-scored-content"
       ]
     }
   ],
-  "description": "Text-only CEAIA SDLC for GPT-5.6 Luna / GPT-6 Luna: shared authoring/review standard, serial candidate preparation, actual persisted Workspace scoring and final SPEC metadata, then Jira A and mandatory per-ticket five-field database binding B.",
+  "description": "JSON-first CEAIA SDLC preview for GPT-5.6 Luna / GPT-6 Luna: query/assemble final Story JSON during generation, independently review JSON and Markdown SPEC, call scoreUserStory with JSON path and SPEC status/path, confirm the scored content, then export only the unchanged JSON path. Backend linkage/queue and async Jira score-sync outcomes remain separate.",
   "skills": [
     {
       "skill_id": "96c6bb68-ab4c-4a34-a634-3fb5c66c96d8",
@@ -92,6 +94,6 @@
     "java-base-mcp.fuzzyMatchingConfluence",
     "java-base-mcp.readJiraAttachments",
     "ask_user_question",
-    "nodejs-base-mcp.score_requirement_markdown"
+    "nodejs-base-mcp.scoreUserStory"
   ]
 }

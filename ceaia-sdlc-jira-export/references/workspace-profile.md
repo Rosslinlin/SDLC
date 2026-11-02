@@ -1,42 +1,22 @@
-# User-workspace Jira profiles
+# Persist the upstream Jira assembly profile after success
 
-Profiles cache verified routing/schema and user-confirmed defaults; they never authorize business changes. Field-value precedence belongs to fields-and-rendering.md.
+Generation owns profile loading, project/type/metadata discovery, field-value precedence and settings confirmation before scoring. Its Skill resource references/jira-json-assembly.md is authoritative; read through supported Skill-name/resource access or use the parent's full applicable text. Do not repeat discovery at export or assume sibling filesystem access.
 
-## Scope and lookup
+## Eligibility and identity
 
-Use the real persistent user workspace at `ceaia-sdlc-jira/profiles.json`, not the conversation workspace. Select by authenticated identity, Jira source, project, actual Story type ID and operation capability (`create`/`update`); preserve other profiles. JWT subject takes identity priority without reading/parsing or storing a token. Use real request staffId as identity fallback, or a genuinely user-isolated platform workspace when identity is unavailable. Never share profiles across users merely because a staffId matches.
+Save only the already verified exportContext.assembly snapshot for this exact candidate/JSON revision, after actual issue and every required attachment operation succeed. Failed/partial/unknown issue or required-attachment outcomes never overwrite an older successful profile. Database linkage/queue/async results remain separately reported; pending linkage does not erase a confirmed issue or independently eligible profile. A profile-save failure never causes Jira replay.
 
-Resolve real nonempty staffId from trusted current identity/context or a confirmed same-user default; ask once if missing. Resolve the actual current conversation ID from platform context before Workspace attachment transport or B. Never save/reuse an older conversation ID or invent either identity value. Missing context blocks the affected operation. Without real user-workspace capability, use available real metadata for this export and report persistence unavailable; never claim a conversation file survives sessions.
+Use the real persistent user workspace ceaia-sdlc-jira/profiles.json, not conversation storage. Match authenticated identity, Jira source, project, actual Story type ID and verified create/update capability; preserve every other profile. Trusted JWT subject has priority without reading/parsing/storing a token. Use a real staffId fallback only within the same user's identity scope, or a genuinely user-isolated platform workspace. Do not share by staffId alone. Session/conversation IDs are not reusable defaults and never belong here.
 
-Legacy `jira-user-info.md` supplies routing defaults only, not schema. Source is an explicit/current confirmed or applicable-profile value: WPB/ALM/DATA/FCR/GO maps to lowercase almType. Never infer it from a key prefix.
+If the platform cannot persist user-level files, report persistence unavailable and keep the actual operation result. If the upstream snapshot is missing, incomplete or mismatched, return that profile issue to generation; do not query or reconstruct facts from successful business content.
 
-Reuse matching components independently: source/project binding, Story-type binding and operation-specific schema. A complete hit skips all three query tools and cached-Epic rereads across sessions. No TTL refresh. Query only missing/inapplicable components, explicit user change/refresh, or affected schema facts after a documented validation failure. Unknown selected options need supported lookup, not guessed IDs. A prior ticket never selects the next update target.
+## Compact reusable facts
 
-## Discovery
+Keep source/project and Story-type binding, operation-specific verified capability, complete applicable metadata descriptors and confirmed reusable defaults. Retain every required descriptor, the actual AC mapping when applicable, and selected optional fields with fieldId/name/schema.type/items/required/operations, observed default and used option ID/representation. Preserve exact true/false/unknown requiredness; success does not establish omitted-field rules or edit permission.
 
-| Tool | Exact known inputs |
-| --- | --- |
-| java-base-mcp.queryJiraProjectsByName | staffId, almType, projectName |
-| java-base-mcp.queryJiraIssueTypesByProject | staffId, almType, selected projectKey |
-| java-base-mcp.queryJiraCreateMetaFields | staffId, almType, projectKey, and supported issueType or issueTypeId |
+Never cache Story/AC text, payloads, attachment contents/paths, source registers, credentials or conversation paths. A canonical JSON acceptanceCriteria property does not establish a custom-field ID; retain only the actual backend/metadata mapping, which may be backend-owned. Do not invent an AC custom field merely to complete a profile.
 
-Use actual returned choices. One unambiguous project proceeds to normal settings confirmation; multiple plausible projects require selection. Offer Story types only, retaining different IDs even with identical display names. No available Story type blocks this route; never substitute another type.
-
-Parse wrapped metadata (`result.fields.values[]` where returned). Complete means the live contract guarantees completeness or returned pagination evidence closes all pages. Otherwise record complete=false and the limitation; never invent paging controls. Assemble only from a complete validated applicable schema. `queryJiraCreateMetaFields` is the available schema query, not proof of edit permission: create requiredness/defaults do not authorize update changes, and create operations must not be described as independently verified edit capabilities. Resolve an actual edit/schema limitation through supported evidence or bounded recovery; do not invent an edit-metadata tool.
-
-## Compact schema and defaults
-
-Retain every required field, the writable AC mapping and selected optional fields. Each descriptor retains actual fieldId/name, schema.type and items when present, exact required flag and operations, an applicable observed default, and selected option ID/transport representation when used. A writable text-compatible AC field is mandatory; a select field is not a substitute. If unknown, query metadata; if still unavailable, report the blocker instead of moving AC into Description.
-
-Keep only used option facts and confirmed reusable defaults, not full raw metadata/allowedValues. Never infer requiredness from a successful payload or an omitted field. Do not cache Story/AC text, secrets, payloads, attachment content or conversation paths. Omitted/unavailable update fields remain untouched.
-
-Every export obtains one settings confirmation under fields-and-rendering.md. New creates resolve an explicit Epic/no-Epic decision; newly supplied Epic keys are verified once with supported getJiraInfos evidence. Applicable saved confirmed Epics need no reread. Update relationships are preserved unless reviewed changes authorize them.
-
-## Save and reuse
-
-Save/update a profile only after that item's issue and all required attachment operations are confirmed successful. Failed/partial/unknown issue or attachment results cannot replace an older successful profile. B failure may leave a valid profile with bindingStatus=pending; it does not erase A success. A profile-write failure is reported separately and never causes Jira replay.
-
-Keep the existing compact shape: one object with a profiles array; update the matching tuple in place. The [empty template](../templates/profile-template.json) initializes storage, not verified values.
+Use the existing compact profiles-array shape from [empty template](../templates/profile-template.json), updating the matching tuple in place:
 
 ```json
 {
@@ -53,4 +33,8 @@ Keep the existing compact shape: one object with a profiles array; update the ma
 }
 ```
 
-This incomplete shape is not reusable schema: populate fields with actual descriptors and establish completeness before complete=true. identityScope.kind is jwt-sub, staff-id-fallback or user-workspace-isolated; the last kind omits value unless the platform provides a real opaque identifier. A descriptor marked acceptanceCriteriaMapping=true must match acceptanceCriteriaFieldId. selectedOption is absent/null or an observed ID plus exact transportFormat (for example id-object/id-array); preserve actual Jira-compatible values without fabricated defaults. Unknowns are null/omitted. After eligible success, lastSuccess records the actual status/ticketKey and bindingStatus; never initialize it as a fictional success.
+This incomplete example is not reusable evidence. identityScope.kind may be jwt-sub, staff-id-fallback or user-workspace-isolated; omit value for the last kind unless the platform exposes a real opaque identifier. Populate descriptors from upstream evidence before complete=true. A descriptor marked acceptanceCriteriaMapping=true must agree with the actual acceptanceCriteriaFieldId; leave unsupported values null/omitted. selectedOption retains only an observed ID and exact transportFormat, never a guessed option.
+
+lastSuccess records only actual ticket/status and separately observed linkage/queue state. Retain an older bindingStatus only as historical data, never as a command to send B. Unknown results stay unknown. Confirm the saved user-level file by read-back; report an unavailable or failed save separately.
+
+Generation reuses matching components across sessions without TTL refresh, querying only missing/inapplicable facts, explicit change/refresh or supported validation recovery. A saved profile never chooses an update target, authorizes changed relationships or replaces current content/upload confirmation.

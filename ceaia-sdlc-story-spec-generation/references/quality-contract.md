@@ -1,4 +1,4 @@
-# CEAIA shared content standard — Q1–Q7, version 6.0.0
+# CEAIA shared content standard — Q1–Q7, version 6.1.0-preview.1
 
 Generation reads this before planning/writing; independent review uses the same rules. This is the authoritative source in the repository. `ceaia-spec-review/references/quality-contract.md` is an identical packaged copy so either independently installed Skill can read it locally. Update both together. Task instructions and templates do not introduce additional content gates.
 
@@ -6,12 +6,12 @@ Generation reads this before planning/writing; independent review uses the same 
 
 | ID | Check | Pass condition | Material blocker |
 | --- | --- | --- | --- |
-| Q1 | Source fidelity and completeness | Every explicit in-scope requirement is represented in its assigned Story/AC/tests, or has an evidenced user-approved disposition. Business claims have source support. | A source obligation is omitted, contradicted, hidden as an exclusion or replaced by an invented rule. |
+| Q1 | Source fidelity and completeness | Every explicit in-scope requirement is represented in its assigned canonical JSON/AC/tests, or has an evidenced user-approved disposition. Business claims have source support. | A source obligation is omitted, contradicted, hidden as an exclusion or replaced by an invented rule. |
 | Q2 | Value, clarity and scope | Actor, trigger, action, outcome and scope can be identified. A new Story has a cohesive testable value outcome; material dependencies are clear. | A missing fact or conflicting interpretations prevent understanding or acceptance; unrelated goals prevent coherent delivery. |
 | Q3 | Verifiable acceptance | Each AC has stable identity, determinable conditions/actions and observable results. Given/When/Then expresses the behavior without adding facts. | Acceptance cannot distinguish success from failure, criteria conflict or required behavior is missing. |
 | Q4 | Relevant scenario coverage | Source-required success, rejection, boundary, permission and dependency behavior is covered where relevant. | An evidenced material alternative or failure rule is missing, or its required outcome is unresolved. |
 | Q5 | Executable tests | Each AC and declared FR has corresponding tests with supported preconditions/data, actions, observation and expected results. Tests assert the required behavior. | A test cannot be executed or cannot verify the AC; it changes the expected behavior or invents an endpoint, log, table or business rule. |
-| Q6 | SPEC consistency | Story, tests, FR/SC and any flow diagram describe the same supported scope. References resolve; every intended SPEC is current and preserves its relevant context. | Contradictory/stale content, missing requirement coverage, unresolved references or an invented flow. |
+| Q6 | SPEC consistency | Canonical JSON business fields, their SPEC projection, tests, FR/SC and any flow diagram describe the same supported scope. References resolve; every intended SPEC is current and preserves its relevant context. | Contradictory/stale content, missing requirement coverage, unresolved references or an invented flow. |
 | Q7 | Existing-ticket preservation | For updates, baseline obligations remain unless explicitly changed; delta and attachment mappings stay within approved scope. New Stories use N/A. | Wrong target, unauthorized changes/deletions or lost baseline/attachment obligations. |
 
 ## Evidence and missing facts
@@ -36,6 +36,8 @@ Report high-confidence, material findings only. Do not fail sufficient content b
 
 ## Generation and independent verification
 
-Generation derives tests and SPEC from the supported ACs, then self-checks Q1–Q7. Review independently reads original sources and current files, checking source → artifact omissions and artifact → source unsupported additions. Prior PASS, generated summaries and self-check marks do not substitute for that read.
+Generation assembles final Story JSON before scoring and derives tests and the SPEC business projection from its supported ACs, then self-checks Q1–Q7. Review independently reads original sources and current files, checking source → artifact omissions and artifact → source unsupported additions. Prior PASS, generated summaries and self-check marks do not substitute for that read.
 
-This standard does not calculate the external score or guarantee 76 points. Real scoring, exact parser/transport requirements, repair limits, SPEC metadata persistence and Jira/database calls are owned by their respective procedures. Neither role may weaken source obligations to satisfy a score.
+This standard does not calculate the external score or guarantee 76 points. Real scoring, JSON/schema/transport requirements, repair limits, SPEC metadata persistence and Jira/database calls are owned by their respective procedures. Neither role may weaken source obligations to satisfy a score.
+
+The current Story artifact is story.json4jira; there is no independent STORY.md input. Review its summary, description, acceptanceCriteria, bddScenarios and approved business field meanings against original evidence and the Markdown projection in SPEC. Pure routing/schema identifiers are not business prose. Scores stay outside JSON and SPEC; header synchronization completes before scoring.

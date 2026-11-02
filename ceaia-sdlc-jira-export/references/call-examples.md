@@ -1,64 +1,39 @@
-# Structural call examples
+# Path-only export examples
 
-All IDs, keys, paths and fields below are examples, never defaults. Use actual reviewed values after confirmation/preflight. The examples do not replace the live tool contract.
+Tool: java-base-mcp.exportJiraByDynamicFields. Every invocation has exactly one argument. Example paths are structural, never evidence or defaults.
 
-## A: create Story and SPEC
-
-```json
-{
-  "staffId": "12345678",
-  "almType": "wpb",
-  "conversationId": "example-current-conversation",
-  "projectKey": "DEMO",
-  "summary": "View registration status",
-  "issueType": "Story",
-  "description": "h1. View registration status\n\nh2. User Story\nAs a member, I want to view my registration status.\n\nh2. Attachments\nregistration-status-spec.md",
-  "dynamicFieldsJson": "{\"fields\":{\"customfield_12345\":\"AC-001: Given a saved status, when I open registration, then I see that status.\"}}",
-  "attachmentsJson": "{\"add\":[{\"relativePath\":\"outputs/ceaia/registration-status/registration-status-spec.md\",\"fileName\":\"registration-status-spec.md\"}]}"
-}
-```
-
-Epic omission assumes the user explicitly chose no Epic. A never carries markdownReviewRelativePath.
-
-## B: only after A returns DEMO-101 and confirms required attachments
+## One reviewed, scored and currently confirmed Story
 
 ```json
 {
-  "staffId": "12345678",
-  "almType": "wpb",
-  "issueIdOrKey": "DEMO-101",
-  "conversationId": "example-current-conversation",
-  "markdownReviewRelativePath": "outputs/ceaia/registration-status/STORY.md"
+  "story_json_workspace_path": "outputs/ceaia/registration-status/story.json4jira"
 }
 ```
 
-Exactly five nonempty strings, no content or attachments. Only an explicit successful markdownReview association completes this item.
+Copy the exact path from this candidate's actual passing scoreUserStory input. The file already contains the complete approved Jira fields and upload paths. Do not pass staffId, source, projectKey, content, SPEC status/path, attachment controls, requestJson, issuesJson or an association payload beside it. Identity/session context is platform-owned.
 
-## A: authorized update with no attachment change
+## Several candidates
+
+First confirmed candidate:
 
 ```json
 {
-  "staffId": "12345678",
-  "almType": "wpb",
-  "issueIdOrKey": "DEMO-99",
-  "description": "h1. View registration status\n\nh2. User Story\nAs a member, I want to view my registration status.\n\nh2. Attachments\nNo attachment changes.",
-  "dynamicFieldsJson": "{\"fields\":{\"customfield_12345\":\"AC-001: Given a saved status, when I open registration, then I see that status.\"}}"
+  "story_json_workspace_path": "outputs/ceaia/registration-status/story.json4jira"
 }
 ```
 
-The local reviewed SPEC remains available for scoring without being uploaded. Omit unchanged AC only when its baseline matches and the reviewed plan allows omission. After confirmed A success this update still requires B with returned DEMO-99 and its own scored Story path.
-
-## Batch A nesting
-
-Each item's dynamicFieldsJson/attachmentsJson is still a JSON string inside issuesJson. This one-item array only demonstrates encoding; an actual batch includes every selected item.
+Only after its required synchronous outcomes are confirmed, submit the next confirmed candidate:
 
 ```json
 {
-  "staffId": "12345678",
-  "almType": "wpb",
-  "conversationId": "example-current-conversation",
-  "issuesJson": "[{\"projectKey\":\"DEMO\",\"summary\":\"View registration status\",\"issueType\":\"Story\",\"description\":\"h1. View registration status\\n\\nh2. User Story\\nAs a member, I want to view my registration status.\\n\\nh2. Attachments\\nregistration-status-spec.md\",\"dynamicFieldsJson\":\"{\\\"fields\\\":{\\\"customfield_12345\\\":\\\"AC-001: Given a saved status, when I open registration, then I see that status.\\\"}}\",\"attachmentsJson\":\"{\\\"add\\\":[{\\\"relativePath\\\":\\\"outputs/ceaia/registration-status/registration-status-spec.md\\\",\\\"fileName\\\":\\\"registration-status-spec.md\\\"}]}\"}]"
+  "story_json_workspace_path": "outputs/ceaia/application-details/story.json4jira"
 }
 ```
 
-Match each returned resource to its own candidate; call B separately for every eligible returned key with that candidate's final scored Story path. Do not bind failed/unknown items or inherit a top-level path/attachment plan.
+Each file has its own actual review, score, current-content confirmation and numbered export record. Do not join paths into an array/string wrapper or substitute one candidate's score for another. Stop further writes after a failed/partial/unknown required outcome; accepted async score synchronization may remain pending.
+
+## Existing-ticket updates
+
+The call shape is still one JSON path, but this is not evidence of update support. Actual backend/schema evidence must define the JSON's exact target and approved none/replace semantics, including score-only SPEC handling. Until then keep WAITING_TOOL; no invented update payload or create-shaped example is provided. See [attachments](attachments.md).
+
+The backend response schema is not fully supplied. Interpret and preserve the real response under [submission and recovery](jira-write-and-recovery.md); do not copy a fictional success response or send the old five-field B call.
