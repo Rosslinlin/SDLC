@@ -1,49 +1,37 @@
-# Handoff and current-content gate
+# Current validated handoff
 
-The generation workflow owns business evidence, intake, planning, content repair, review and scoring. This skill validates that handoff; it does not repeat those workflows. Resolve artifacts from the current conversation workspace and persistent profiles from the real user workspace. They are different scopes.
+Generation owns business evidence, content repair, review, scoring and readiness. Consume its v6 state contract: Skill `ceaia-sdlc-story-spec-generation`, resource `references/workflow-contract.md`. The [repository link](../../ceaia-sdlc-story-spec-generation/references/workflow-contract.md) works only when sibling files are accessible. On separately installed platforms use supported Skill-name/resource reading, or have the parent supply the full applicable contract text. Never invent a reader or continue from a summary when the contract is inaccessible. Do not repeat upstream workflows. Conversation artifacts and persistent user profiles are separate scopes.
 
-## Selected items and identity
+## Validate each selected item
 
-Accept one create, multiple creates, one update or multiple updates. An explicitly requested mixed create/update batch remains supported under the write reference. Preserve selected candidates, their order, source and individual contents. A blocked selected item cannot silently disappear from an integrated batch; ask for a scope decision or return the affected blocker.
+Accept internal handoffType=ceaia-sdlc-validated, candidate identity and create/update. Keep the discriminator out of all Jira arguments. Preserve selected items, order and individual mappings; a blocked item cannot disappear from a batch without a scope decision.
 
-Each item carries these actual facts or pointers to readable current state:
-
-| Data | Required evidence |
+| Evidence | Check current saved facts, not a generator summary |
 | --- | --- |
-| Routing | Internal `handoffType: ceaia-sdlc-validated`, candidate ID and `create`/`update`; remove this discriminator before every Jira call. |
-| Destination | Supported confirmed source (`WPB`, `ALM`, `DATA`, `FCR`, `GO`; tool `almType` is lowercase), project and project's Story type from intake/current confirmed context or the applicable user profile. Never infer source/project from a Ticket prefix. |
-| Content | Current `STORY.md`, `TEST_CASE.md` and primary `<name>-spec.md` paths; every additional distinct SPEC in `specArtifacts`. Read saved content, not a generator's prose summary. A supplied content copy must match the saved reviewed Story after line-ending normalization only. |
-| Review | Latest independent report path/attempt, clean content PASS, observed Story/Test Case/SPEC body revisions, `testCaseTitleValidation: manual-pass`, all intended SPECs reviewed, no unresolved material findings. |
-| SPEC sync | Every intended SPEC's first two Review Result fields match that PASS/attempt, body unchanged after header synchronization and complete read-back recorded. |
-| Final score | Current numbered score record and its complete raw response; actual inputs bind this `STORY.md`, exact `specFileStatus: Pass`, primary SPEC path/file revision and current review attempt. |
-| Readiness | Current parent `jiraReady: true`, global source coverage PASS with zero pending obligations; `updateReady: true` for an update. The earlier review report's SCORE=DEFERRED and jiraReady=false are expected; use the later parent state. |
-| Update | Exact Ticket Key, source-confirmation evidence, update manifest, preserved original Description/AC and retrieval statuses, complete attachment inventory and selected original-ID-to-output mappings. Carry the actual target project/type and known current Epic/Parent/metadata values with their retrieval or explicit-confirmation evidence; mark unavailable facts explicitly. |
+| Artifacts | paths and specArtifacts identify the actual Story, Test Case and every current SPEC. Saved content and observed revisions match the reviewed/scored candidate. A supplied content copy may differ only in line endings. |
+| Review | review.result=PASS, review.recordPath and review.reviewAttempt identify the current independent report. Its reviewedBindings match current Story/Test Case/evidence revisions, and reviewedSpecArtifacts covers every current SPEC body with PASS and read-back evidence. No material finding remains. |
+| SPEC finalization | review.specHeaderSync and actual read-back bind every SPEC Result/Reviewer Notes to that review. specScoreDisplay verifies the persisted total in every current SPEC and finalizes primary SPEC metadata. Header changes preserved reviewed bodies. |
+| Score | score.status=pass points to the current numbered complete response and actual invocation inputs: this final Workspace Story, exact specFileStatus=Pass, primary SPEC path/revision and review attempt. Raw ok is boolean true, finalScore is a finite number in 76–100, and the parent's parser/AC gate is resolved. Validate saved evidence; do not rerun scoring or reinterpret quality diagnostics here. |
+| Parent readiness | jiraReady=true and updateReady=true for updates. Read the supplied batchStatePath (canonical `.ceaia-work/batch-state.json`); its selectedCandidateIds/state pointers and globalCoverage evidenceRevisionBindings must match all current selected candidates. Require coverage PASS with zero pending obligations; a detached PASS label is insufficient. |
+| Destination | Confirmed source, project and actual Story type from intake/current context or applicable profile. Sources are WPB/ALM/DATA/FCR/GO; tool almType is lowercase. Never infer source or project from a ticket prefix. |
+| Update | Exact target key, confirmed source, reviewed update manifest, preserved Description/separate AC results, complete attachment inventory and original-ID-to-output mappings. Reuse exportContext pointers and available project/type/field/relationship facts; unavailable is not empty. |
 
-Destination values marked unresolved at intake may be resolved at export; this does not require regenerating the Story. Match an update profile against the target's actual project and Story type from upstream evidence or explicit user confirmation of the target's facts. A project-scoped cached Story type alone proves neither the type nor the project of this ticket and never authorizes changing them. If target type or project is unknown, obtain the missing supported upstream fact or a focused user clarification, not a guessed key or a generic-type fallback. Unavailable unchanged relationships/metadata may remain untouched; do not demand unsupported remote fields just to prove they were omitted.
+The exporter checks provenance/currentness and authorized scope, not decomposition, test-writing style or business quality. Missing/stale evidence returns to its owner; never manufacture PASS from a label or counter.
 
-## Reuse upstream ticket reads
+## Update preservation and reads
 
-For an update, use the baseline Description and separate AC result already retrieved during generation. The original attachment inventory may be empty; it must be a completed inventory. Keep imported source attachments unchanged. Source evidence records the original attachment ID, name, scope and selected handling.
+Use generation's saved baseline and completed inventory, including a valid empty inventory. Normal export does not call getJiraInfos or readJiraAttachments again. An inaccessible, mismatched, incomplete or known externally changed baseline needs affected upstream reconciliation. If the approved business baseline changes, return for affected preservation/content review before overwriting.
 
-Do not re-fetch Jira Description, AC or attachment inventory merely because export is a new skill/stage/session. If the handoff's source evidence is inaccessible, mismatched to this target, incomplete, or known to have changed externally, return the missing/affected evidence to intake or perform an explicitly necessary read-only reconciliation. Reconcile known external changes before overwriting; rerun affected preservation/content gates when the approved business baseline changes. Lack of an automatic remote re-read does not establish remote atomicity.
+An update profile does not prove this ticket's project/type. Resolve missing target facts through supported upstream evidence or focused user confirmation; never change them by using create defaults. Unavailable unchanged fields remain untouched. A last-used ticket is history, not the next target.
 
-Use baseline/current values for update preservation. Record current Epic/Parent and metadata values only when actually returned or explicitly confirmed; absent means unavailable, not empty. Do not fabricate unsupported `getJiraInfos` fields. An unknown unchanged field stays untouched; if a proposed change needs its value, resolve that fact first. A saved last-used Ticket Number is historical information, never the next update target.
+Current bundled updates support attachment none or replace. Exporter add/delete support is reserved for a separately supported upstream workflow with its own explicit reviewed authorization; it cannot extend the bundled update surface.
 
-## Passing score and currentness
+## Files and currentness
 
-The raw score response must have boolean `ok === true`, a finite numeric `finalScore` from 76 through 100, no nonempty `parseErrors` or unresolved missing-AC recognition warning, and available AC counts consistent with the declared criteria. Missing optional counts alone do not fail. Never derive or coerce a total score from labels/subscores.
+- A create has one Story/Test Case/primary SPEC. An update may have additional distinct mapped SPECs. Even a no-upload update retains its reviewed local SPEC for score metadata; specArtifacts.uploaded describes the intended upload, not confirmed remote success.
+- Every generated/uploaded SPEC uses its actual reviewed lowercase kebab-case `<name>-spec.md` basename. Paths, filenames, references and manifest/upload mappings agree. Distinct contents keep distinct files; explicit reviewed many-to-one mappings remain per item. Retained/deleted legacy attachments keep original names/IDs.
+- Upload only authorized reviewed SPECs. Test Case, plans, baselines, score/review records, state, manifests and profiles are never Jira attachments.
+- Preserve business wording, IDs, section order, tables and approved links. Exclude internal registers, paths and diagnostics from Jira-visible text; preserve upstream-approved architecture/general-specification commit links.
+- Reuse complete verified reads when no edit intervened. Local/external changes invalidate affected bindings; return upstream rather than renaming, repairing or substituting at export. Observed revisions/read-back are not an atomic or cryptographic lock.
 
-The scoring input is this item's final Workspace Story for creates and updates, not a Jira-mode score or score-record path. A cache hit is valid when the actual invocation saved this current SPEC status/path. Do not call the scorer or set `force_review` during export; stale score/review bindings return upstream.
-
-Use the generation-owned observed revisions/read-back sequence. A counter or PASS label alone is insufficient evidence of unchanged content. Reuse the just-verified complete reads when no write intervened; do not recheck the same gate solely because another reference restates it. An external/local edit or interrupted write invalidates affected readiness and preview bindings. Read-back is not an immutable or cryptographic lock.
-
-## Files and output preservation
-
-- One create has exactly one reviewed Story, Test Case and SPEC. An update has one Story/Test Case set, its primary SPEC and any distinct mapped additional SPECs. A local SPEC is still required for a no-upload update's final score binding.
-- Upload only selected reviewed SPECs. Test Case, planning, baseline, score/review records, state, manifests and user profiles are never Jira attachments or substitutes for Jira-visible business text.
-- Every generated/uploaded basename matches case-sensitive `^[a-z0-9]+(?:-[a-z0-9]+)*-spec\.md$`, names the reviewed business function and agrees across the actual file, state, review, sibling references and upload mapping. Examples: `registration-entry-spec.md` passes; `SPEC.md`, `Registration-spec.md`, `entry.md` do not.
-- Distinct replacement contents keep distinct files and mappings. An explicitly reviewed many-to-one mapping may be preserved; never merge them for brevity. Existing retained/deleted legacy attachments keep their original names and IDs.
-- A path/name/mapping defect returns upstream; do not rename at export, use an upload-only alias or reuse PASS for a changed path.
-- Keep original business wording, IDs, section order, tables and approved links. Exclude internal source registers, workspace paths, scoring/review diagnostics and unresolved promises from Jira-visible text. Preserve specifically approved architecture/general-specification commit links where the upstream contract allows them.
-
-After these gates pass, continue through profile resolution, field rendering and exact export preflight. Missing export tools yields WAITING_TOOL with prepared artifacts, never fictional Jira success.
+If export tools are unavailable, retain prepared artifacts and report WAITING_TOOL; never claim Jira success.

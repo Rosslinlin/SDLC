@@ -1,39 +1,33 @@
 ---
 name: ceaia-sdlc-jira-export
-description: Export reviewed CEAIA SDLC Stories and SPECs to Jira, reuse persistent user-workspace field profiles, and bind each successful ticket to its final Workspace score. Use for validated SDLC create/update handoffs; supports Story only.
+description: Export validated CEAIA SDLC Stories and reviewed SPECs to Jira, reuse user-workspace field profiles, and separately bind every successful ticket to its final Workspace score. Story create/update only.
 ---
 
 # CEAIA SDLC Story Export
 
-Version: 1.0.0 — 2026-10-27. Target runtime: GPT-6 Luna. Execution: text-only.
+Version: 6.0.0 — 2026-10-31. Runtime: GPT-5.6 Luna or GPT-6 Luna. Execution: text-only.
 
-Own the export stage after generation, independent content review, SPEC synchronization and final Workspace scoring. Use the platform's existing file, popup and Jira tools. Do not execute scripts, generate business content, score again, or load the generic `jira-createissue-helper`.
+Own transport and Jira operations after generation, content review, SPEC synchronization and final Workspace scoring. Use existing platform Workspace, popup and Jira tools; no scripts, new tools, content generation, scoring or generic helper workflow.
 
-## Scope and fixed boundaries
+## Boundaries
 
-- Accept `handoffType: ceaia-sdlc-validated`, one or more Story `create`/`update` items. A normal bundled handoff continues automatically unless the user requested preparation-only/no-Jira or stopped. Never route a failed handoff through generic export.
-- Create only the project's confirmed Story issue type; update only confirmed Story targets. Existing Epic/Parent links may be used without creating those issue types. Test Case export and standalone issue association are outside this skill.
-- Reuse generation's ticket baseline and attachment inventory. Normal export does not call `getJiraInfos` or `readJiraAttachments` again. A matching complete user-workspace profile skips all three Jira query tools, including across sessions.
-- Preserve the complete reviewed Story and SPEC. Only transport rendering, field mapping and serialization may change representation. Keep workflow metadata and diagnostics out of tool payloads and Jira-visible content.
-- Keep both remote stages: **A: write Story and required attachments; B: separately bind each confirmed ticket to its final Workspace Story score.** A successful A never replaces B. A binding failure never authorizes replaying A.
+- Accept one or more validated Story create/update items. Continue an authorized bundled handoff unless preparation-only/no-Jira or stopped; never bypass a failed gate through generic export.
+- Generation owns business quality and parent readiness. Check current evidence and mappings without repeating quality review. Preserve business content; only field partition, Jira rendering and serialization change its representation.
+- Reuse upstream update baselines/inventories and matching complete user-workspace profiles. New stages/sessions do not require routine remote rereads or rediscovery.
+- **A writes the Story and required attachments. B is a separate five-field call binding each successful ticket to its final Workspace score. Both are required. A or attachment success never substitutes for B.**
+- Story only. Existing Epic/Parent relationships are supported; Test Case export, other issue types and standalone association are outside this skill.
 
-## Execute in this order
+## Execute in order
 
-1. **Validate handoff.** Read [handoff and content](references/handoff-and-content.md) once. Check the selected items and current local evidence. Reuse same-stage verified reads when no intervening edit occurred. Return content defects upstream; do not repair them here.
-2. **Resolve saved configuration.** Read [workspace profile](references/workspace-profile.md). Load only the matching profile from the real persistent user workspace. On a complete match use it directly. Query only for a missing/inapplicable configuration, an explicit change/refresh, or a supported schema-error recovery. Never treat a new session or elapsed time alone as a cache miss.
-3. **Assemble and confirm values.** Read [fields and rendering](references/fields-and-rendering.md). Use this item's reviewed content and current update baseline. Ask only for unresolved required values or requested optional choices. Through `ask_user_question`, show the exact destination, operation, each update Ticket Number, Epic/Parent decision and actual metadata field values. Require one Use/Change confirmation for the current settings, including the first run. A settings change invalidates that confirmation; collect and confirm only the affected changes.
-4. **Prepare attachments when applicable.** Read [attachments](references/attachments.md) only when an add/replace/delete action exists. `none` stays a valid zero-upload update. Verify local files and upstream mappings without another remote inventory.
-5. **Write A, then B.** Read [Jira write and recovery](references/jira-write-and-recovery.md) before submission. Write and read back `jira-preview.md`, save a numbered attempt, perform final payload/local attachment preflight, then call Jira directly. There is no additional final-approval popup after the settings confirmation. On each confirmed successful Story and attachment operation, make the separate five-field binding call and verify its `markdownReview` result. Batch creates still bind every successful item separately.
-6. **Persist and report.** Save reusable profile facts only from confirmed successful issue-plus-required-attachment operations under the profile rules. Keep Jira, attachment, database-binding and profile-persistence results separate. Report every returned key/URL and pending operation. Mark complete only when all selected required Jira/attachment/binding operations are confirmed successful, or the user explicitly stops the remainder.
+1. Read [handoff and content](references/handoff-and-content.md). Validate selected items against current parent state and saved evidence; return stale/missing content evidence upstream.
+2. Read [workspace profile](references/workspace-profile.md). Reuse matching components; query only missing/inapplicable facts, explicit changes/refresh, or supported schema-error recovery.
+3. Read [fields and rendering](references/fields-and-rendering.md). Resolve allowed values and obtain one Use/Change settings confirmation for this export, including first use. Changes invalidate affected confirmation/preview bindings.
+4. For attachment operations, read [attachments](references/attachments.md). Apply only the reviewed plan. none is a valid zero-upload update.
+5. Read [Jira write and recovery](references/jira-write-and-recovery.md). Preserve/read back the exact A preview and numbered attempt, preflight, call A, then separately preview/call B for each eligible returned ticket. No additional final approval popup follows settings confirmation.
+6. Persist eligible profile facts and report issue, attachment, binding and profile results separately. Complete only after every selected required A/attachment/B operation succeeds; explicitly stopped or pending work remains reported as such.
 
-## Tools and context discipline
+## Tools and context
 
-Normal profile-hit export needs Workspace reads/writes, `ask_user_question`, and `java-base-mcp.exportJiraByDynamicFields`. These queries remain available for profile creation or explicit invalidation:
+Normal profile-hit export uses Workspace reads/writes, ask_user_question, and java-base-mcp.exportJiraByDynamicFields. Discovery/recovery also uses java-base-mcp.queryJiraProjectsByName, java-base-mcp.queryJiraIssueTypesByProject and java-base-mcp.queryJiraCreateMetaFields. java-base-mcp.getJiraInfos verifies a newly selected Epic once or reconciles necessary exceptions. readJiraAttachments belongs to upstream intake or necessary exception reconciliation. Follow live schemas; do not invent pagination, edit-metadata, checksum or bulk-binding capabilities.
 
-- `java-base-mcp.queryJiraProjectsByName`
-- `java-base-mcp.queryJiraIssueTypesByProject`
-- `java-base-mcp.queryJiraCreateMetaFields`
-
-`getJiraInfos` also verifies a newly selected Epic key once; a saved confirmed Epic is not queried again. Otherwise `getJiraInfos` and `readJiraAttachments` belong to upstream intake or necessary exception reconciliation, not unconditional export preflight. Follow each live callable schema; never invent filter, pagination, checksum or bulk-binding parameters.
-
-Load mode-specific references when the corresponding step is reached. Keep compact state with profile key, current file/review/score bindings, settings confirmation and per-operation outcomes. Store complete immutable attempt evidence in files; do not reload all past reports, all profiles or raw metadata on every step. Local output paths are conversation-specific; saved profiles are user-specific and contain no Story bodies or reusable attachment paths.
+Load each reference when needed. Reuse verified unchanged reads; keep current pointers/bindings in state and complete numbered attempts in files. Conversation artifacts and persistent user profiles have different scopes. Never put workflow metadata, diagnostics or internal paths into Jira-visible business fields.

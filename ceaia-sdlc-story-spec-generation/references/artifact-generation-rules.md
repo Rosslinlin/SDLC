@@ -1,70 +1,44 @@
-# Artifact production and targeted repair
+# Plan, author and precheck
 
-Read workflow-contract.md for versions and budget; planning-and-scoring.md owns post-review scoring. Read only the current artifact template.
+Before writing, read [Q1–Q7](quality-contract.md). [Workflow contract](workflow-contract.md) owns phases, revisions and bounded repair; this file owns production steps only.
 
-## A1 — Story
+## 1. Plan from sources
 
-Generate from supported planning SR rows, never from a score response alone. Required sections: Summary; As a/I want/so that; Business Context; granular Scope; exactly `## Acceptance Criteria`; Attachments. BDD remains in each AC's Given/When/Then; do not create a competing AC section.
+Use [planning template](../templates/planning-template.md). Record source location → explicit requirement → assigned candidate, plus material questions and approved exclusions. For updates also use [existing Jira update](existing-jira-update.md). Preserve the original source rather than treating a generated register as complete evidence.
 
-Assign stable unique AC-### IDs and observable Given/When/Then behavior. Cover supported positive, negative/error, validation, boundary, dependency, empty and permission behavior; no requirement to invent every category. Explicit in-scope requirements must be covered or clarified, never hidden in Out of Scope.
+Assign SR IDs uniquely across the selected batch before allocating candidates; retain those same IDs and original locations in candidate plans and global coverage. Do not restart SR-001 independently for each candidate or replace the original scope with a shortened generated summary.
 
-Before generating dependent artifacts check supported actor/trigger/rules/outcomes, no placeholders, exact planned filename and correct attachmentAction:
-- new_story/add: exactly its matching final SPEC basename; update/replace: each selected reviewed replacement SPEC basename, no unselected local files;
-- update/none: explicit no-attachment-change statement, no link to workspace-only SPEC.
-No internal paths, evidence IDs, provenance URLs, score/audit information or TEST_CASE.md reference in Story. Approved business design links belong only in the SPEC fields defined in metadata-and-examples.md.
+Retain explicit downstream integration, reporting, notification, audit/fraud, retention, operational MI and testing obligations when supplied. Missing implementation detail is not permission to omit the obligation or label it out of scope.
 
-## A2 — Test design
+Split new Stories by cohesive independently testable value where supported; record a short rationale. Preserve inherited update scope. Fix candidate paths, final SPEC names and attachment mappings before authoring.
 
-Generate from the complete, read-back Story and supported source evidence before scoring. For every AC record internal test intent: precondition, trigger/data, outcome, observation point, type, priority and negative coverage disposition. Verification location must be concrete in steps/results; do not invent endpoints, tables or logs.
+Simple inputs need only the requirement/coverage rows. When sources actually contain multiple UX states, API/data contracts, asynchronous or cross-system behavior, add the applicable state/layer rows. Label Confirmed / Not provided / To confirm honestly; a UI source does not prove backend behavior. Do not create eight mandatory registers or demand irrelevant layers.
 
-At this design step assign the supported FR identifiers in the internal planning trace, then reference those IDs in tests and later declare the same FRs in SPEC. This reserves identifiers only; it does not create a SPEC before the Test Case title gate. Reconcile all final FR declarations against test references before review.
+## 2. Story → tests → SPEC
 
-Use one table with exact template columns. Each AC needs at least one executable test verifying its own intended behavior; a denial AC may be verified by a Permission/Negative case without a fabricated Positive companion. Each FR must also have executable coverage.
+1. Write the [Story](../templates/story-template.md): supported Summary, actor/goal/value, Business Context, Scope, exactly `## Acceptance Criteria`, and Attachments. Give every AC a unique stable AC-### and Given/When/Then observable outcome. Do not invent category-filler ACs. New/add names its SPEC; update/replace names intended replacements; update/none states no attachment change.
+2. Read the saved Story. Assign supported FR IDs in planning, then derive executable [tests](../templates/test-case-template.md). Every AC and FR has coverage; each test supplies supported preconditions/data, ordered actions, observation and expected results. Do not invent endpoints, logs, thresholds, copy or permission rules.
+3. Keep the existing 11 test columns. Types: Positive, Negative, Validation, Boundary, Permission, Dependency, Empty State, State / Flow, Exception, Data Consistency, Security, Audit, Notification, Regression. P0 = core/release-blocking/permission/integrity behavior; P1 = important alternatives/errors; P2 = supported supplemental behavior.
+4. Consider meaningful negative coverage for each AC. Put Covered on its actual rejection case, or N/A with a reason when no additional negative behavior applies. The representative-row convention is authoring layout, not a content gate. To Confirm names a material missing expected outcome and waits for that fact; optional unknown metadata does not block.
+5. Check test scenarios semantically. Separate materially different conditions/results into executable cases; equivalent supported data can be parameterized with explicit data and outcomes. A title containing `or` is not automatically wrong. Do not calculate case counts from word counts or invent a full combination product.
+6. Assemble every [SPEC](../templates/spec-template.md) by copying the complete saved Story and the one saved test table exactly. Declare the same FR IDs, measurable supported SCs and relevant entities. Use a supported Mermaid flow when meaningful; a simple feature may have a simple flow. Never create generic or invented integration branches.
+7. Preserve supplied metadata and approved business references using [metadata/examples](metadata-and-examples.md). Keep internal registers, local paths, score diagnostics and credentials out of business deliverables. Only the real numeric Story Score belongs in the designated SPEC header later.
 
-Allowed scenario types: Positive, Negative, Validation, Boundary, Permission, Dependency, Empty State, State / Flow, Exception, Data Consistency, Security, Audit, Notification, Regression.
+Different update replacements keep distinct files when source-specific contents differ. Each contains the current shared Story/table and its own preserved source context. Do not merge files or create extra Jira tickets to simplify authoring.
 
-Exactly one row per AC carries its AC-level Negative Coverage Status:
-- Covered: an executable source-supported rejection/failure/prohibition case exists; put disposition on that row (Negative, Permission, Validation, Security or another accurately classified rejection case).
-- N/A: no meaningful additional negative behavior; rationale on its representative test.
-- To Confirm: draft only, precise missing expected behavior; blocks final PASS until clarified or supported N/A/exclusion is established.
-Other rows leave disposition blank. No blanket Positive requirement for all ACs.
+## 3. One production precheck
 
-P0: core accepted outcome, release blocker, permission boundary, irreversible/integrity/legal-commercial condition. P1: important alternate/error/boundary/dependency/audit/notification behavior. P2: evidenced low-risk supplemental/usability/regression. Avoid assigning priority mechanically.
+Read the current files once and reuse those reads for this pass:
+- Actual safe `<name>-spec.md` names, SPEC File Name, Story attachment names, Test Case Related SPEC, state and all replacement mappings agree.
+- Exactly one canonical AC heading, unique declared IDs and BDD; referenced AC/FR/TC IDs exist. Count declarations, not references.
+- Required template sections/11 columns and supplied metadata are present; no placeholder examples remain. Table rows have escaped literal pipes and `<br>` within cells.
+- Embedded Story and executable test table match their saved originals; all primary/additional SPECs are included.
+- Self-check Q1–Q7, with source-to-artifact coverage and no unsupported additions. Record the concise actual result in the plan, not another full report.
 
-Deduplicate equivalent AC/FR, role/state, trigger, observation objective and outcome. Different source-supported partitions/risks may justify distinct tests.
+Correct mechanical defects under the workflow's bounded policy. Then send readable sources, plan, current files and observed revisions to independent review. The reviewer evaluates content; formatting does not become a new business rule.
 
-## A3 — Description alternatives
+## 4. Apply findings locally
 
-Final Test Case Description must not contain case-insensitive standalone `or` (`(?i)\bor\b`). Inspect meaning as well as lexical matches; do not hide alternatives using punctuation or vague rewriting.
+Fix only affected content: SPEC defect → affected SPEC; test defect with correct AC → tests + embedded tables; wrong requirement → Story + dependent content. Missing business fact → clarification. Align references and read back every affected file, then independently verify affected Q criteria and cross-artifact consistency. Parent saves each new review at an unused numbered path.
 
-Enumerate actual alternative sets. A or B or C is three choices; two independent binary dimensions have four combinations. Use product of set sizes only for independent dimensions, then exclude unsupported/impossible combinations. Never compute case count from the number of word occurrences.
-
-Each supported split gets distinct ID, title, preconditions, data, steps and expected outcome. Non-choice natural-language uses require a precise single-scenario title, not invented branches. Unknown meaningful combinations/outcomes require clarification. Record manual-pass only after manual semantic inspection and final lexical scan. Read the actual words and meaning; a lexical check alone does not establish business completeness.
-
-## A4 — SPEC assembly
-
-Use the mandatory `<name>-spec.md` basename from workflow-contract.md for every generated SPEC, whether uploaded or workspace-only. Do not create `SPEC.md`, `<name>.md`, a temporary generic filename, or an upload-only alias; an earlier user-requested safe-name exception does not override this rule. For multiple distinct update replacements, choose distinct evidenced business-function qualifiers before `-spec.md`. Read back the actual saved path and confirm that its basename matches the SPEC File Name field, state, planning, sibling references, applicable update manifest/mapping, and intended upload plan. Start with Result, Reviewer Notes and Story Score in that order under Review Result, then a standalone --- separator. Story Score starts as Not scored; generation later finalizes the real total under spec-score-display.md. Required content follows the SPEC template.
-
-Copy sibling Story exactly into Jira Story section. Copy the single executable table from sibling Test Case into Test Cases section, omitting standalone tracking metadata. Do not independently regenerate either embedded block.
-
-FR-### and SC-### map to supported behavior and measurable outcomes. Measurement can be observable completion/acceptance behavior; do not invent percentages or SLAs. Mermaid represents only evidenced states/decisions. Omit irrelevant optional entities/metadata or mark Not applicable with support.
-
-Metadata: use every applicable supplied field from the full templates and metadata-and-examples.md. Omit optional unknown fields, but never omit a supplied field merely for brevity. Date may use actual generation date. Locally generated IDs must be clearly local and not presented as Jira/source IDs. No fabricated UUID, branch or author. Approved general-spec/architecture commit links are explicit exceptions to provenance-URL exclusion; no source registers, audit material or unresolved business promises in final output.
-
-For multiple update replacements, write one distinct final SPEC per selected mapping when content differs. Each follows the active template, embeds the current shared Story and executable Test Case table, declares the shared FR coverage, and preserves its own source-specific context/entities/flows/obligations. Do not merge selected attachments to save tokens. Read existing-jira-update.md for inventory, bindings and review of every file.
-
-## A5 — Review and repair
-
-Before independent content review validate structure, references, exact embedding and titles in one read-based pass. Send actual files, original evidence, planning and state to the reviewer without requiring a score record. Parent saves each returned report at the next unused `review-attempt-<nnn>.md` path (or the same attempt's `-post-repair.md` verification path) and points state to the latest applicable report; never overwrite a completed review record.
-
-Classify affected layer before editing:
-- SPEC formatting/diagram/embedding defect → SPEC only.
-- Missing/incorrect test for existing correct AC → Test Case and embedded SPEC table.
-- Missing/wrong Story requirement supported by source → Story and affected downstream, then independent review and final score.
-- Missing source fact → clarification, not guessed repair.
-
-Use the shared single-round repair policy: combine all known supported fixes into one targeted batch, then independently recheck changed gates and cross-artifact relationships before eligible scoring. Never blindly regenerate unchanged Story. Keep PASS evidence for unchanged gates only when its bindings remain current. Further artifact correction after the allowance is used returns a blocker, not another automatic edit or diagnostic review.
-
-Review header is output of review, not evidence for that same review. Parent writes actual verdict/brief notes after the reviewer returns; header-only synchronization does not trigger another substantive review. Immediately re-read every intended SPEC and compare its Result and Reviewer Notes to the latest review. Record `specHeaderSync` with the review attempt, path, expected values and verified read-back. If the first header-only write/read check fails, retry that header synchronization once; a second mismatch is WAITING_TOOL and jiraReady remains false. Notes must contain no internal paths/score data in Jira-facing SPEC.
-
-After independent content-review PASS and verified SPEC-header synchronization, verify global source coverage, current content, observed revisions, and the final actual basename/path of every SPEC. Map the primary SPEC's verified `Review Result` / `Result: PASS` to exact `specFileStatus: Pass` and submit its workspace-relative path as `specFilePath` when scoring the final Story. Only a current passing score bound to that SPEC metadata opens the `ceaia-sdlc-jira-export` handoff. Include the existing intake pointers for updates. Use read-back paths verbatim in the user-facing artifact list. If export capability is missing, return WAITING_TOOL with artifacts prepared, not fictional Jira success.
+After content PASS parent synchronizes Result/Reviewer Notes in **every** SPEC and verifies the complete body unchanged. First header mismatch permits one header-only retry; a second is WAITING_TOOL. Continue with [real scoring](scoring-tool-contract.md), including the retained [score display / metadata procedure](spec-score-display.md). Generation never performs Jira A or B itself.

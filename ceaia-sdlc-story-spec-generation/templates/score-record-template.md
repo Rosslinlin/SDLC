@@ -1,44 +1,25 @@
 # Story Quality Score — Attempt [NNN]
 
-## Binding
-
-- Candidate: [candidate ID]
-- Story path: [complete workspace-relative STORY.md path]
-- Story revision: [observed workflow revision]
-- Scoring mode: Workspace Story (`relativePath`); for updates use this modified Story path, not the Jira ticket
-- Verified primary SPEC Review Result / Result: [source header verdict, normally PASS]
-- Submitted specFileStatus: [exact case-sensitive tool value, normally Pass]
-- Submitted SPEC path: [complete workspace-relative primary <name>-spec.md path]
-- SPEC file revision / content-review attempt: [observed values]
-- Score attempt: [monotonic integer]
-- Invocation reference: [actual returned review/audit/invocation ID, or Not returned]
-- Cache hit: [true/false/not returned]
-- Persistence mode: [verbatim-json-in-markdown/complete-object-json-in-markdown]
-- Response read back: [true/false]
+## Actual invocation and binding
+- Candidate / call purpose: [identity; initial-final-score or final-SPEC-metadata]
+- Inputs: [actual relativePath, exact specFileStatus and specFilePath]
+- Source SPEC verdict / review attempt: [verified PASS and numbered content review]
+- Observed Story revision / primary SPEC file revision: [local observations, not remote version claims]
+- Invocation / assessment references: [actual returned identifiers only, or Not returned]
+- Cache hit / persistence mode / response read-back: [actual values]
 
 ## Result
-
-- Invocation OK: [true/false]
-- Final status: [returned value or Not returned]
-- Final score: [returned numeric value or Not returned]
+- Returned ok / numeric finalScore / finalStatus: [actual values; do not infer or coerce]
 - SDLC score gate: [PASS/FAIL/BLOCKED]
-- Parser / AC recognition: [PASS or exact blocker]
-- Declared Story AC count: [count]
-- Returned AC count(s): [all returned count paths/values or Not returned]
-
-## Human-readable diagnostics
-
-- Summary: [brief returned summary or Not returned]
-- Blocking critical issues / warnings / evidence gaps: [brief returned items relevant to the next action, or None; retain every original item in raw JSON]
-- Parse errors: [exact blockers or None]
-- Other returned section/dimension scores and diagnostics remain in the complete raw response below; do not calculate a replacement score or duplicate full structures here.
+- Parser / AC check: [declared AC count, any returned count paths, parseErrors and missing-section warning; exact blocker or PASS]
+- Relevant diagnostic and next action: [brief returned facts; no replacement total or invented rule]
 
 ## Complete raw tool response
 
-The fenced block below is the complete single JSON text response returned by `nodejs-base-mcp.score_requirement_markdown`. Do not edit, shorten, reorder, normalize or omit unknown fields.
+Preserve the complete single JSON text unedited, including unknown fields. If only the decoded object is exposed, serialize it completely once and label persistenceMode accordingly. The human summary does not replace this evidence.
 
 ```json
 [complete raw JSON text]
 ```
 
-<!-- Replace all placeholders. The binding records actual submitted inputs even if the service does not echo them. The readable sections are a view of the raw response, not a substitute for it. Never place this record in Jira content or attachments. -->
+<!-- Replace placeholders. Allocate a new numbered record for each actual call, including metadata/cache calls. Never overwrite completed records, invent an invocation, or put this record in Jira fields/attachments. A failed local save retries this same received response, not the scoring call. -->

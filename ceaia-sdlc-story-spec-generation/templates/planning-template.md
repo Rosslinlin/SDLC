@@ -1,46 +1,27 @@
-# CEAIA Internal Planning
+# CEAIA Planning — [candidate / batch]
 
-Internal only. Replace example cells; use mode-specific planningPath from workflow-contract.md. Keep facts and traceability compact: use evidence/SR/AC/FR/TC IDs across tables rather than repeating complete Story text or test steps. Preserve every material requirement and exact source location.
+Internal evidence only. Use actual source locations and short facts; preserve original documents separately. Unknown material facts become questions, never exclusions or invented defaults.
 
-## Source Evidence Register
-| Evidence ID | Class | Exact source / section / location | Supported fact | Limitation | Used by SR |
-|---|---|---|---|---|---|
-| EV-001 | Direct requirement | [source location] | [fact] | [limitation or None] | SR-001 |
+## Requirement and source register
+| SR ID | Exact source location | Supported obligation / actor / trigger / result | Candidate | Disposition / material question |
+| --- | --- | --- | --- | --- |
+| SR-001 | [source/section] | [fact] | [candidate] | [in scope / approved exclusion / waiting] |
 
-## Atomic Requirement Register
-| SR ID | Evidence IDs | Requirement | Actor / trigger | Journey / state | Rule / data / dependency | Observable outcome | Disposition / candidate |
-|---|---|---|---|---|---|---|---|
-| SR-001 | EV-001 | [requirement] | [actor/event] | [known state] | [supported rule] | [outcome] | [candidate or clarification or supported exclusion] |
+## Candidate decision
+| Candidate / mode / source / ticket | Cohesive value and scope | SR IDs | Split / inherited-scope rationale | Dependencies / blockers | Final SPEC names / attachment action |
+| --- | --- | --- | --- | --- | --- |
+| [identity] | [supported outcome] | SR-001 | [short evidence-based decision] | [actual facts] | [names / add for create; none or replace for update] |
 
-## Coverage Capability Matrix
-| Candidate / journey | UI | API / FSD | Backend | Integration / async | Persistence | Downstream / reporting | Permission / security | Coverage statement |
-|---|---|---|---|---|---|---|---|---|---|
-| [candidate] | Confirmed | Not provided | Not provided | Not provided | Not provided | Not provided | To confirm | [honest supported scope] |
+## Artifact coverage
+Fill when files exist; do not create placeholder future artifacts.
+| SR ID | Candidate | AC IDs | FR IDs | TC IDs | Covered / exact gap |
+| --- | --- | --- | --- | --- | --- |
+| SR-001 | [candidate] | AC-001 | FR-001 | TC-001 | [actual coverage] |
 
-## UX State Inventory
-| Screen / state | Evidence IDs | Actor / entry | Actions | Decision / validation | Transition / visible result |
-|---|---|---|---|---|---|
-| [state or N/A] | [EV IDs] | [actor] | [actions] | [rules] | [result] |
+## Source-specific details — include only when applicable
+[Supported UX states/transitions, API/data rules, async/integration dependencies or original-attachment preservation. Use exact source locations. Distinguish Confirmed / Not provided / To confirm; omit irrelevant categories.]
 
-## Candidate Register
-| Candidate ID | Mode / source / ticket | Value and scope | SR IDs | Independent delivery or inherited baseline rationale | Dependencies | Readiness / blockers | Final SPEC name | Attachment action |
-|---|---|---|---|---|---|---|---|---|
-| [unique ID] | [mode/identity] | [outcome] | SR-001 | [rationale] | [confirmed/gap] | [ready or exact gap] | [final-name.md] | [add/replace/none] |
-
-## Artifact Traceability
-Fill after corresponding artifacts exist. Do not create placeholder Test Case/SPEC files.
-| SR ID | Candidate | Story scope / AC IDs | FR IDs | TC IDs | Status / supported exclusion |
-|---|---|---|---|---|---|
-| SR-001 | [candidate] | AC-001 | FR-001 | TC-001 | [covered or gap] |
-
-## Test Design Register
-| AC / FR | Preconditions | Trigger / data | Expected outcome | Verification location | Type | Priority | Negative disposition / rationale |
-|---|---|---|---|---|---|---|---|
-| AC-001 / FR-001 | [state] | [input] | [observable] | [supported observation] | [type] | [priority] | [Covered/N/A/To Confirm and rationale] |
-
-## Global Coverage Decision
-- Original evidence reconciled: [yes/no and precise omissions]
-- Selected candidate IDs: [complete list]
-- Every in-scope SR has a disposition: [yes/no]
-- Blocking clarifications: [exact items or None]
-- Unsupported claims / cross-Story inconsistencies: [items or None]
+## Current check and decisions
+- Q1–Q7 self-check and production precheck: [actual result / defects]
+- Original obligations reconciled: [covered SRs, approved exclusions and pending SRs]
+- Clarifications / user scope decisions: [exact facts or None]

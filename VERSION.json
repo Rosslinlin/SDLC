@@ -1,6 +1,6 @@
 {
-  "bundleVersion": "5.3.0",
-  "releaseDate": "2026-10-30",
+  "bundleVersion": "6.0.0",
+  "releaseDate": "2026-10-31",
   "executionProfile": "text-only",
   "activeSkills": [
     "ceaia-sdlc-story-spec-generation",
@@ -20,12 +20,22 @@
   "markdownReviewBindingPolicy": "second-export-call-after-confirmed-jira-and-attachment-success-with-five-required-fields-per-ticket",
   "jiraRoutingProfile": "persistent-user-workspace-ceaia-sdlc-jira/profiles.json-with-per-export-settings-confirmation",
   "notes": [
-    "No executable scripts are included.",
-    "v5 changes only the validated SDLC route and task contract; generic Jira and Test Case routes are preserved.",
-    "The generic Test Case export route is unchanged by the v5.2 Task and scoring-status update.",
-    "v5.3 is the main-branch default: Story-only SDLC export with persistent field profiles, upstream intake reuse and mandatory separate five-field bindings. The latest main-branch generic helper and standalone reviewer fixes are preserved.",
-    "The latest experimental SDLC one-round repair and clarification/resume rules are included; standalone review-requirements contains only SKILL.md and templates/review-report-template.md and is not added to the SDLC Task."
+    "Text-only runtime; no executable scripts are required or shipped.",
+    "Generation and independent review read identical versioned Q1-Q7 content standards before authoring and review.",
+    "Task and ordinary chat use one workflow contract; file name remains SDLC-workflow-v5.task.json for installation compatibility, with display_name SDLC-workflow-v6.",
+    "All ten named Task tools and their order are preserved. Scoring persistence, final SPEC metadata calls, Jira A and each separate five-field binding B remain required.",
+    "Generic helper, standalone Story reviewer and original review-requirements business flows are preserved independently.",
+    "Platform integration and actual database persistence require live validation; offline checks are not production proof."
   ],
-  "runtimeModel": "gpt-6-luna",
-  "preservedGenericSkill": "jira-createissue-helper"
+  "preservedGenericSkill": "jira-createissue-helper",
+  "internalContractVersion": 6,
+  "runtimeModels": [
+    "gpt-5.6-luna",
+    "gpt-6-luna"
+  ],
+  "qualityContractVersion": "6.0.0",
+  "qualityContractSource": "ceaia-sdlc-story-spec-generation/references/quality-contract.md",
+  "qualityContractPackagedCopy": "ceaia-spec-review/references/quality-contract.md",
+  "contentRepairPolicy": "two-shared-content-batches-per-candidate-evidence-revision; one-mechanical-correction-per-cause; external-write-retry-policy-unchanged",
+  "specMetadataPolicy": "preserve-existing-post-display-normal-cache-metadata-invocation-and-complete-response-records"
 }

@@ -1,39 +1,25 @@
 ---
 name: ceaia-spec-review
-description: Independently review current CEAIA Story, Test Case and SPEC content against original evidence, traceability and existing-ticket preservation before final Story scoring; return structured findings for targeted repair.
+description: Independently review CEAIA Story, Test Case and every SPEC against original evidence and the shared Q1-Q7 content standard; return high-signal findings and update-preservation conclusions without scoring or writing artifacts.
 ---
 
-# CEAIA Independent Review
+# CEAIA Independent Content Review
 
-Bundle revision: 5.3 text-only — 2026-10-27. Target runtime: GPT-6 Luna.
+Bundle revision: 6.0.0 text-only. Supported platform runtimes: GPT-5.6 Luna and GPT-6 Luna.
 
-Review actual files read-only. Do not edit artifacts/state, recalculate scores, invoke the score tool, prepare Jira payloads, run final export preflight or write Jira. Parent generation owns repair, state persistence and user interaction.
+Review independently from the generator, using actual original sources and current artifacts. Use platform read and agent capabilities; run no scripts or local code. Return the report to the caller. Do not edit artifacts/state, invoke scoring, prepare Jira payloads or write Jira. The parent owns repair, persistence, user interaction and workflow progression.
 
-## Required resources
+## Resources
 
-Read:
-1. [shared workflow contract](../ceaia-sdlc-story-spec-generation/references/workflow-contract.md).
-2. [review contract](references/review-contract.md).
-3. [core gates](references/core-review-gates.md).
-4. [checklist](references/review-checklist.md).
-5. [report template](references/review-report-template.md).
-6. For updates only, [update review](references/existing-jira-update-review.md).
-7. Active [planning](../ceaia-sdlc-story-spec-generation/templates/planning-template.md), [Story](../ceaia-sdlc-story-spec-generation/templates/story-template.md), [Test Case](../ceaia-sdlc-story-spec-generation/templates/test-case-template.md), [SPEC](../ceaia-sdlc-story-spec-generation/templates/spec-template.md) templates when validating structure. The scoring contract belongs to the parent's later scoring step.
-
-Skill links are relative to this Skill. Artifact paths are workspace-relative and come from current state. No hard-coded skill_read_resource tool or workspace root name is assumed.
+Read the local [shared quality contract](references/quality-contract.md), [review contract](references/review-contract.md) and [report template](references/review-report-template.md). All required review instructions are inside this Skill package; no sibling package or local script is required. Generation ships the same version of the quality contract and reads it before authoring.
 
 ## Execution
 
-1. Identify candidate, mode, source/ticket, repair phase and current state.
-2. Read original sources and planning, then original Jira/attachment evidence for updates.
-3. Read current Story, Test Case, SPEC and manifest where applicable. No score response is required for a clean first review.
-4. Verify every substantive content gate. Mark SCORE `DEFERRED` in the structured report; a generator summary, prior PASS or SPEC header is not evidence for content quality.
-5. Return one complete report with gate findings, content bindings and one next action. Parent saves it at the next unused numbered reviewPath and points state to that record; it never overwrites a completed prior review.
+1. Identify the candidate, new/update mode, original sources, current Story/Test Case and the complete current SPEC list. For updates also obtain the saved baseline, approved delta, attachment inventory and resolved none/replace mapping from the parent.
+2. Read original sources first, then all current artifacts. Check source-to-output omissions and output-to-source unsupported promises. A generator summary, prior PASS, SPEC header or self-check is not content evidence.
+3. Apply Q1-Q7 once. Distinguish a supported content defect, a material missing business fact, a technical read blocker and a non-blocking suggestion. Verify each proposed finding against the relevant full context; discard cosmetic or low-confidence complaints.
+4. Return one report with current bindings, all SPEC results, evidence for every criterion and one next action. The caller saves it. Do not decide repair budgets, create additional review loops or calculate export readiness.
 
-The reviewer checks the canonical Acceptance Criteria heading and declared IDs as part of STORY/STRUCTURE. It does not inspect a pending score, calculate one, or demand a scoring call before its content verdict. SCORE=`DEFERRED` is not SCORE PASS; the parent later validates the complete tool response, parser integrity and final SPEC metadata.
+For a repaired candidate, read changed artifacts and their dependencies; verify affected criteria and cross-artifact consistency. Retain prior conclusions only where current source/content bindings are still established. A review of one SPEC cannot cover an unread additional SPEC.
 
-Review failure does not automatically mean rewriting Story. Classify exact affected files and whether Story must change. The shared contract controls all repair counts and waiting states; this reviewer does not run its own loop.
-
-On substantive content PASS return its evidence, but keep jiraReady=false and updateReady=false. Parent synchronizes and re-reads every intended SPEC header, then scores the unchanged final Workspace Story with the primary SPEC's verified path and `specFileStatus: Pass` mapped from its `Review Result` / `Result: PASS`. Header synchronization alone needs no substantive review. Parent may set jiraReady=true (and updateReady=true for a valid update, including attachmentAction=none) only after a current passing score with that SPEC metadata and global coverage PASS. A post-score content repair requires affected independent re-verification before a new final score call.
-
-Normal verdicts: PASS, NEEDS_REVISION, NEEDS_HUMAN_CLARIFICATION; FINAL_WITH_UNRESOLVED only after explicit stop. Technical blockers use NEEDS_REVISION with technical ownership and nextAction=technical-recovery, not invented business questions. Return WAITING actions to parent rather than spinning.
+Content verdicts remain PASS, NEEDS_REVISION, NEEDS_HUMAN_CLARIFICATION and FINAL_WITH_UNRESOLVED. The last requires an explicit user stop. Content PASS reports that the shared quality standard is met; the parent separately handles the external score and Jira operation.

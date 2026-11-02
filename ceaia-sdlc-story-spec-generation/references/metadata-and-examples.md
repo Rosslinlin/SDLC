@@ -30,12 +30,12 @@ Use exactly this section heading; add as many real criteria as needed. Stable AC
 
 | Source situation | Accurate test design |
 |---|---|
-| Valid submission and rejection of a specified invalid value are evidenced | Positive case for acceptance plus Validation/Negative case for rejection; Covered appears once on the rejection row. |
+| Valid submission and rejection of a specified invalid value are evidenced | Test acceptance and the specified rejection; put Covered on the rejection row as a compact authoring convention. |
 | AC itself requires an unauthorized role to be denied access | Permission/Negative test verifies the denial; no artificial successful-access companion is required. |
 | Read-only display AC has no meaningful additional negative behavior in confirmed scope | An executable display case with N/A and a specific rationale. |
 | Source says rejection is required but does not define observable rejection outcome | Draft To Confirm with the exact missing behavior; no final PASS until evidence resolves it. |
-| Two independent binary input dimensions are evidenced | Four supported combinations, excluding any combinations the source declares impossible. |
-| One field offers A, B or C | Three cases, not four because the word "or" occurs twice. |
+| Independent input dimensions affect the expected result | Verify supported distinct outcomes with separate cases or explicit data/outcome rows; exclude impossible combinations. |
+| One field offers equivalent A, B or C values | Explicit supported test data may be parameterized; do not infer required case count from the word "or". |
 
 ## Executable case illustration
 

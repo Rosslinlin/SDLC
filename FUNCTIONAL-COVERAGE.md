@@ -1,36 +1,24 @@
-# v5.3 Functional Coverage
+# v6.0 功能归属
 
-Active SDLC on main: generation → independent review → SPEC sync → final Workspace score → `ceaia-sdlc-jira-export`. Target runtime: GPT-6 Luna. The latest main scoring-route and per-assessment binding fixes are retained. Only the helper's SKILL.md and references/sdlc-gateway.md entry points change to forward current bundled SDLC to the new exporter and reserve the old gateway for explicit legacy selection; all other helper files and all standalone reviewer files preserve the pre-integration main baseline.
+当前活动包：`ceaia-sdlc-story-spec-generation`、`ceaia-spec-review`、`ceaia-sdlc-jira-export`。运行目标为平台 GPT-5.6 Luna / GPT-6 Luna，全部采用文本资源和现有工具。
 
-| Capability | Owner / authoritative reference | Preserved behavior or approved change |
+| 能力 | 唯一职责 / 参考 | v6 行为 |
 | --- | --- | --- |
-| New Story / existing Story intake | generation | Per-ticket confirmed source, original Description and separate AC, complete attachment inventory; persist exportContext pointers and available target facts. |
-| Planning / decomposition / coverage | generation | Evidence-backed INVEST, complete original-scope coverage; this change does not alter batch generation scheduling. |
-| Story / Test Case / SPEC | generation | Current latest deliverables, distinct replacement SPECs, executable tests, exact embedding and source preservation unchanged. |
-| Independent review / repair | review + generation | Read-only content PASS, one consolidated automatic repair round shared with score findings, affected re-review then wait if unresolved; manual title validation and SCORE=DEFERRED preserved. |
-| SPEC review header / score | generation + scoring tool | Verified headers before final Workspace score; exact specFileStatus=Pass and primary SPEC path; ok=true, numeric 76–100, parser/AC integrity; complete numbered raw evidence. |
-| Story-only export | exporter SKILL + handoff-and-content; helper entry-point forwarding | Single/batch create and updates; no other issue type, no generic fallback, no re-generation at export. Current bundled SDLC uses this exporter in Task and ordinary chat even when both skills are installed; only explicit legacy selection uses the old helper gateway. Existing Epic/Parent relationships remain supported. |
-| Cross-session configuration | exporter workspace-profile | Persist compact all-required/AC/selected-optional field schema, IDs, selected-option formats and confirmed defaults in real user workspace; matching profile skips three queries, no TTL refresh. |
-| Initial lookup / cache miss | exporter workspace-profile | Real project/type/metadata parameters; Story-only selection; ambiguous choices use popup; fresh lookup only for affected missing/changed facts. |
-| Update baseline reuse | generation exportContext + exporter handoff | Use upstream original Description/AC/inventory, target identity and approved mappings. No routine repeat Jira/attachment read; reconcile only actual evidence gaps/known changes or exception outcomes. |
-| Settings / Epic | exporter fields-and-rendering | Every export confirms destination, exact update key, Epic/Parent and actual field values. Every create resolves explicit Epic/no-Epic; new key verified once, saved confirmed key not reread. Defaults never expand update authorisation. |
-| Description / AC partition | exporter fields-and-rendering | Preserve all non-AC sections in order, including post-AC sections; only AC body in writable mapped AC field, unchanged Workspace Story. Verified matching baseline AC may be left untouched on update. |
-| Jira transport / empty values | exporter fields-and-rendering | Lossless Markdown→wiki including tables/code/links; exact IDs/options/types, no fabricated placeholders, no unintended update field clearing. |
-| SPEC attachment operations | exporter attachments | Create exactly one add; update none/add/replace/delete only as reviewed, multi-SPEC mapping retained, actual kebab-name-spec.md, local exact-path preflight and once-serialized plan. Replace uploads before deleting old target. |
-| Jira first write / batch | exporter jira-write-and-recovery | Direct arguments, no requestJson or handoffType, first call omits markdownReviewRelativePath; multiple creates use issuesJson, ordinary updates sequential with failure stop; explicit mixed-batch branch preserved. |
-| Database / score record binding | exporter jira-write-and-recovery | After each confirmed issue+required attachment success, separately call same export tool with exactly staffId/almType/returned issueIdOrKey/conversationId/scored STORY.md markdownReviewRelativePath. Every successful batch item binds separately. |
-| Preview / retained evidence | exporter jira-write-and-recovery | One current jira-preview.md, exact payload/local attachment read-back, numbered immutable attempts; B preview replaces current A preview while A audit is retained. No additional final-approval popup after settings confirmation. |
-| Failure / recovery | exporter jira-write-and-recovery | Separate issue/attachment/binding states, numeric status=400 is failure even if isError=false, reconcile unknown outcomes, no automatic write replay, binding failure never recreates issue or uploads again. |
-| Persistence after issue/attachments success | exporter workspace-profile | Save only confirmed successful-item configuration, preserve older profiles on failed/partial/unknown operations. Binding pending can coexist with a valid saved profile; persistence failure is reported separately. |
-| Generic and Test Case exports | jira-createissue-helper with main fixes and two scoped routing entry changes | Generic routes, confirmation and Test Case formats remain unchanged; legacy SDLC remains available only when explicitly selected. A qualifying current Workspace-scored Story requires its own five-field binding after successful content write; a missed binding recovers only that step. Truly unscored Stories and other issue types keep their existing export behavior without the SDLC score gate. |
-| Standalone scoring | preserved main user-story-reviewer | Route by actual business provenance: raw Jira records remain Jira mode even when saved as Markdown; genuine local revisions use their current Workspace Story path despite an existing Ticket. Completed Jira-mode scores automatically trigger four fields; Workspace scores use five-field association only after the corresponding content write. Writeback-only requests recover the relevant step without rescoring; missing required IDs are still requested, and generic tool success does not prove Jira score-field persistence. |
-| Independent requirements/decomposition review | review-requirements | Standalone two-phase qualitative review with Story/INVEST/AC, clarity rubric, sizing and task checks plus candidate-finding validation. Exactly SKILL.md and templates/review-report-template.md; no scripts, telemetry, scoring/export calls or extra SDLC Task stage. PR publication requires the user's explicit request. |
+| 主链、状态、失效与续跑 | generation [workflow-contract](ceaia-sdlc-story-spec-generation/references/workflow-contract.md) | Task/普通对话同序；逐候选串行准备含 review/score，全部选定候选和整批覆盖通过后导出；默认全流程。 |
+| 固定内容标准 | generation [quality-contract](ceaia-sdlc-story-spec-generation/references/quality-contract.md)；review 内同文副本 | Q1–Q7 在生成前加载并供独立审查复用；不新增 Skill，不计算本地分数。 |
+| 来源与拆分 | generation [source-enrichment](ceaia-sdlc-story-spec-generation/references/source-enrichment.md) 和 [authoring](ceaia-sdlc-story-spec-generation/references/artifact-generation-rules.md) | 原始要求有明确去向；不从 UI 推断后台、不按 AC 数机械拆分、不发明缺失事实。 |
+| 现有 Jira 更新 | generation [existing-jira-update](ceaia-sdlc-story-spec-generation/references/existing-jira-update.md) | 显式 source+target、原 Description/AC 状态、完整附件清单；保留义务，主链 none/replace，多份不同替换 SPEC 独立保留。 |
+| 产物与生产检查 | generation 模板及 authoring | 最新 Story/Test Case/SPEC；11 列测试表、实际 `*-spec.md`、镜像和路径一致性集中检查，不能冒充业务审查标准。 |
+| 独立内容审查 | review [contract](ceaia-spec-review/references/review-contract.md) / [report](ceaia-spec-review/references/review-report-template.md) | 独立读来源与当前内容；Q1–Q7、具体问题、全部 SPEC 绑定/保留结论；无评分、预算、readiness兼容字段或标题禁词门禁。 |
+| 局部修复与澄清 | generation workflow-contract / [clarification](ceaia-sdlc-story-spec-generation/references/user-clarification-and-resume.md) | 每 candidate/evidenceRevision 两批内容修复共享 review/score；纯机械原因另限一次且保留失效规则。缺事实只问具体问题，续跑不重置预算。 |
+| 真实评分及完整记录 | generation [scoring-tool-contract](ceaia-sdlc-story-spec-generation/references/scoring-tool-contract.md) | Workspace Story + 主 SPEC 的 Pass/path；实际 `ok=true`、数值 76–100 与 parser/AC有效；完整原始响应单调编号保留。 |
+| SPEC 状态/分数及最终元数据 | generation [spec-score-display](ceaia-sdlc-story-spec-generation/references/spec-score-display.md) | S1 后写真实总分，仅必要时以正常缓存 S2 完成最终元数据；不以显示值替代评分，也不删除持久化调用。 |
+| handoff与字段传输 | exporter [handoff](ceaia-sdlc-jira-export/references/handoff-and-content.md) / [fields](ceaia-sdlc-jira-export/references/fields-and-rendering.md) | 核对当前证据，不重做业务review或常规远端intake；非AC与AC分字段，Jira wiki无损转换，保留AC后的章节。 |
+| 跨会话配置 | exporter [workspace-profile](ceaia-sdlc-jira-export/references/workspace-profile.md) | 真实用户工作区精简profile；完整命中跳过发现查询，不按TTL刷新；每次确认实际设置，首次create解决Epic/no-Epic。 |
+| 附件 | exporter [attachments](ceaia-sdlc-jira-export/references/attachments.md) | 仅授权的SPEC；replace先确认上传再删旧，逐原件映射，成功附件不重传。 |
+| Jira A / 数据库 B | exporter [write-and-recovery](ceaia-sdlc-jira-export/references/jira-write-and-recovery.md) | A不带评分路径；每项A及附件成功后单独五字段B，验证markdownReview；逐项记录partial/unknown，失败不重放成功步骤。 |
+| 旧状态迁移 | generation workflow-contract | 记录旧状态并保留来源、版本、计数、元数据及所有已知/未知远端结果；不靠调用重放迁移。 |
 
-## Active package
+`planning-and-scoring.md`、`business-planning-checklist.md`、`validation.md` 的活动规则已归并到对应权威文件，不再作为独立必读清单。模板负责布局，内容标准负责质量，编排负责阶段和预算，工具协议负责调用及持久化。
 
-- `ceaia-sdlc-story-spec-generation/`
-- `ceaia-spec-review/`
-- `ceaia-sdlc-jira-export/`
-- `SDLC-workflow-v5.task.json`
-
-Independent packages: `jira-createissue-helper/` with main fixes and the two routing entry adjustments, preserved main `user-story-reviewer/`, and new `review-requirements/`. Upload the three active SDLC skills, replace the new export skill ID placeholder in the Task, and select GPT-6 Luna in the platform runtime. Install independent packages separately when needed; they are not added to the SDLC Task. No local executable script is required by the delivered workflow.
+独立包保持原文件：通用 Jira/Test Case 使用 `jira-createissue-helper`，独立评分使用 `user-story-reviewer`，独立需求/任务拆分审查使用 `review-requirements`。它们不替代本链路的评分或 reviewer；旧 SDLC gateway 仅在明确选择 legacy 时使用。平台集成证据按 [测试清单](PLATFORM-TEST-CHECKLIST.md) 记录，本文件不代表已完成实测。

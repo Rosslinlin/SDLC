@@ -1,8 +1,8 @@
-# Direct call examples
+# Structural call examples
 
-Structural examples only. Every ID, key, identity, path and field mapping below is an example, not evidence or an allowed default. Use the actual current values from the reviewed handoff and applicable profile. The examples assume settings confirmation and all content/attachment gates already passed. A one-item array below demonstrates nesting; real multiple creates include every selected item separately.
+All IDs, keys, paths and fields below are examples, never defaults. Use actual reviewed values after confirmation/preflight. The examples do not replace the live tool contract.
 
-## A: one Story create and one SPEC
+## A: create Story and SPEC
 
 ```json
 {
@@ -18,7 +18,9 @@ Structural examples only. Every ID, key, identity, path and field mapping below 
 }
 ```
 
-## B: database binding after A returns DEMO-101 and confirms attachments
+Epic omission assumes the user explicitly chose no Epic. A never carries markdownReviewRelativePath.
+
+## B: only after A returns DEMO-101 and confirms required attachments
 
 ```json
 {
@@ -30,19 +32,25 @@ Structural examples only. Every ID, key, identity, path and field mapping below 
 }
 ```
 
-## Update: only approved changed fields, no attachment operation
+Exactly five nonempty strings, no content or attachments. Only an explicit successful markdownReview association completes this item.
+
+## A: authorized update with no attachment change
 
 ```json
 {
   "staffId": "12345678",
   "almType": "wpb",
   "issueIdOrKey": "DEMO-99",
-  "description": "h1. View registration status\n\nh2. User Story\nAs a member, I want to view my registration status.\n\nh2. Attachments\nregistration-status-spec.md",
+  "description": "h1. View registration status\n\nh2. User Story\nAs a member, I want to view my registration status.\n\nh2. Attachments\nNo attachment changes.",
   "dynamicFieldsJson": "{\"fields\":{\"customfield_12345\":\"AC-001: Given a saved status, when I open registration, then I see that status.\"}}"
 }
 ```
 
-## Batch nesting: each dynamic/attachment value is still a JSON string
+The local reviewed SPEC remains available for scoring without being uploaded. Omit unchanged AC only when its baseline matches and the reviewed plan allows omission. After confirmed A success this update still requires B with returned DEMO-99 and its own scored Story path.
+
+## Batch A nesting
+
+Each item's dynamicFieldsJson/attachmentsJson is still a JSON string inside issuesJson. This one-item array only demonstrates encoding; an actual batch includes every selected item.
 
 ```json
 {
@@ -53,4 +61,4 @@ Structural examples only. Every ID, key, identity, path and field mapping below 
 }
 ```
 
-A has no markdownReviewRelativePath. B has exactly five non-empty strings, contains no Jira content/attachments, and uses the scored Story input path. A batch result still requires one B call per eligible returned key and its own scored Story path. Omission of epicLink in a create is valid here only because the user explicitly chose no Epic.
+Match each returned resource to its own candidate; call B separately for every eligible returned key with that candidate's final scored Story path. Do not bind failed/unknown items or inherit a top-level path/attachment plan.

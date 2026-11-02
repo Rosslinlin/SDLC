@@ -1,3 +1,28 @@
+# CEAIA SDLC v6.0.0
+
+发布日期：2026-10-31。运行目标：平台 GPT-5.6 Luna / GPT-6 Luna；纯文本执行。
+
+本次重构保留三个活动 Skill，将重复的内容标准、编排和工具协议分开：
+
+- generation 在写作前必读固定 Q1–Q7，review 包内携带同文副本。review 独立核查原来源与当前内容，保留遗漏/编造/可验收性/测试/SPEC/更新保留检查；移除SCORE=DEFERRED、标题禁or及预算/readiness等兼容门禁。
+- 模板布局、`*-spec.md`、11列测试表和镜像引用集中在生产检查；真实内容或引用不一致仍须修复。删除已归并的独立planning-and-scoring、business-planning-checklist、validation资源。
+- Task与普通对话遵循同一编排：每候选串行准备至review/score，保留阻塞项；全部选定候选及整批原始覆盖通过后才导出。默认全流程、显式preparation-only和阶段调用边界保留。
+- review/score共用的内容修复由一批调整为两批，无进展提前停止；每个纯机械原因另限一次，变更失效规则不豁免。续跑保留计数，实际新证据或明确有限授权按契约处理；不改变外部操作各自的恢复规则。
+- 真实S1评分、完整响应、76分/parser门槛、SPEC分数显示与必要S2最终元数据保存全部保留；不以共享标准保证后端高分，不以缓存命中省略持久化。
+- Jira A及所需附件成功后逐票五字段B关联全部保留；分开记录外部结果，未知先核对，B失败不重放A。跨会话profile、设置确认、AC分区、wiki转换及附件替换顺序保留。
+- 当前更新主链仍为none/replace；review逐SPEC记录保留义务。独立helper、user-story-reviewer及review-requirements原文件不改；legacy仅在明确选择时使用。
+- 升级旧状态保留全部版本、计数、评分元数据和已知/未知远端操作结果，不通过重放调用迁移。
+
+兼容文件路径仍为 `SDLC-workflow-v5.task.json`，显示名为v6；Task schema、10工具列表及score最后的位置保留，现有generation/review ID与exporter占位值仍须按实际平台核对。不在Task添加未经平台确认的模型参数，也不表示已完成平台安装。
+
+当前行为以 [workflow-contract](ceaia-sdlc-story-spec-generation/references/workflow-contract.md)、[质量标准](ceaia-sdlc-story-spec-generation/references/quality-contract.md)、[评分协议](ceaia-sdlc-story-spec-generation/references/scoring-tool-contract.md) 和 [Jira A/B协议](ceaia-sdlc-jira-export/references/jira-write-and-recovery.md) 为准。文本结构/链接检查不代表真实平台回归；两种模型及Jira/附件/数据库结果须填写 [平台测试清单](PLATFORM-TEST-CHECKLIST.md)。
+
+---
+
+# 历史发布记录（不作为v6运行指令）
+
+以下保留原发布文本，其中“当前”“默认”“本次”等词仅指当时版本。旧修复预算、旧review字段、旧helper路由与评分来源说明可能已被后续修正；执行一律以本文顶部v6和活动Skill为准。
+
 # CEAIA SDLC Skill Bundle v5.3
 
 2026-10-30：统一到 `main`。

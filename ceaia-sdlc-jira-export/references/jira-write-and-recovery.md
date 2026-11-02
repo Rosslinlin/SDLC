@@ -1,82 +1,59 @@
-# Jira Write and Recovery
+# Jira A, database binding B and recovery
 
-Use with `handoff-and-content.md`, `fields-and-rendering.md`, and `workspace-profile.md`. This reference covers reviewed Story create/update only. Do not call Jira until the upstream validated handoff, score, independent review, preview, and preflight are complete.
+Execute only with a current validated handoff, applicable field evidence, settings confirmation and preflight. The tool is `java-base-mcp.exportJiraByDynamicFields`; use its live direct-argument schema. No scripts or new tools.
 
-## 1. Profile, identity, and discovery
-
-- Read `workspace-profile.md` and use its applicable selected Jira source (`almType`), project, and Story issue-type profile. Treat profile values as already resolved: do not query metadata or rediscover the project/type during a normal run.
-- For a requested update, use the upstream Jira baseline and attachment manifest. Do not call `getJiraInfos` or re-read the live attachment list as routine preparation. If the upstream baseline/manifest is missing or stale, stop and return to the upstream workflow.
-- Use the real current `staffId`, the current conversation ID, and lowercase `almType`. Do not infer real identity values or fabricate a conversation ID.
-- Complete the applicable SDLC defaults/settings confirmation before preparing the final preview. This is the workflow's routing/defaults confirmation, not an additional final-write approval prompt.
-- If upstream authorizes a Story relationship, carry its reviewed Jira link fields at the export's top level only. Do not invoke the separate association flow, create another issue type, or invent relationship keys.
-
-## 2. Create and update payloads
-
-`exportJiraByDynamicFields` uses direct named arguments. Use only the live tool contract; relevant exposed arguments for this flow are:
+## A — Write the Story and required attachments
 
 | Argument | Use |
 | --- | --- |
-| `staffId`, `almType` | Real current staff ID and selected lowercase Jira source; required. |
-| `projectKey`, `issueType`, `summary`, `description` | Create values; include only as applicable to the operation. `issueTypeId` is not an exposed export argument. |
-| `issueIdOrKey` | Update target; use the reviewed existing ticket key. |
-| `dynamicFieldsJson` | Once-serialized JSON string for metadata-confirmed fields, including Acceptance Criteria when creating/changing it. |
-| `attachmentsJson` | Once-serialized authorized attachment plan; omit when there are no operations. |
-| `issuesJson` | Once-serialized non-empty array for the supported integrated batch mode. |
-| `conversationId` | Real current conversation ID when needed for Workspace attachment transport/binding. |
-| `epicLink`, `parentLink` | Dedicated direct relationship fields. Create uses a confirmed applicable value; omit Epic for an explicit no-Epic decision. Update sends a relationship only when its change is explicitly authorised. Never put these fields in `dynamicFieldsJson`. |
-| `linkedIssueKeys`, `linkType` | Only for a relationship explicitly authorized by upstream review; pass as top-level link fields, not in `dynamicFieldsJson`. |
+| staffId, almType | Real nonempty staff ID and confirmed lowercase source. |
+| projectKey, issueType, summary, description | Create values; updates include only applicable authorized changes. issueTypeId is not an exposed export argument. |
+| issueIdOrKey | Exact reviewed update target. |
+| dynamicFieldsJson | Once-serialized supported fields, including separately mapped AC. |
+| attachmentsJson | Once-serialized authorized attachment plan; omit for none. |
+| issuesJson | Once-serialized nonempty item array for supported batch mode. |
+| conversationId | Real current context for Workspace attachment transport/binding. |
+| epicLink, parentLink | Dedicated direct relationship fields; omit Epic for explicit no-Epic. Updates change only reviewed authorized relationships. |
+| linkedIssueKeys, linkType | Dedicated direct fields only for reviewed authorized relationships; keys are a native string array. No standalone association flow. |
 
-Omit unused optional arguments. Never send `requestJson`, an undocumented `issues` argument, or `testDetailsJson` from this Story-only skill.
+Single create uses direct fields; multiple creates use issuesJson with each item's own fields/attachments. Ordinary updates run one ticket at a time in preview order; stop on the first failed/partial/unknown operation. Only an explicitly requested mixed create/update batch may use integrated issuesJson; otherwise use separate previews. Never invent issues, requestJson or testDetailsJson arguments. **A never includes markdownReviewRelativePath.**
 
-- A single create uses direct named `exportJiraByDynamicFields` arguments. A batch of new Stories uses one `issuesJson` argument containing a once-serialized non-empty JSON array string. Do not use an `issues` argument.
-- Ordinary multiple updates are executed one ticket at a time in the exact preview order. Stop at the first failed, partial, or unknown result; do not proceed to later tickets. A mixed create/update batch may use one integrated `issuesJson` call only when the user explicitly requested a mixed batch. Otherwise, prepare separate operation previews. Keep each item's fields, target, attachment plan, and Story-to-score path with that item.
-- Use only the actual fields supported by the live tool contract and the reviewed field assembly. `dynamicFieldsJson` is a once-serialized JSON string. This Story-only skill never uses `testDetailsJson`.
-- The first Jira write includes the reviewed Story content and authorized attachment plan, but **never includes `markdownReviewRelativePath`**. Do not wrap arguments in `requestJson` or invent tool parameters.
-- Before writing, preserve the exact direct payload and numbered attempt record. Re-read every value and upload file immediately before the call. If anything changed, replace the current `jira-preview.md`, retain the previous write preview in its audit record, allocate the next numbered attempt, and repeat preflight. Never overwrite completed attempt records.
-- Write directly after exact preview and read-back. The user's export intent and upstream reviewed handoff govern this route; do not add another final approval prompt.
-- The first response is authoritative for attachment outcomes. If an attachment is confirmed successful there, do not upload it again in any later step. A Jira issue success and an attachment failure/partial result remain distinct facts.
+Before A:
 
-## 3. Separate Story-to-review binding
+1. Write/read back the single current `jira-preview.md`: candidate/operation/destination/update keys, applicable profile and settings confirmation, full effective Summary/non-AC Description/AC field mapping, metadata provenance, attachment operations/IDs/paths/names and serialized strings, and the exact complete direct-arguments payload. Do not duplicate full business bodies outside the payload.
+2. Save the exact preview, payload, current file bindings and preflight in the next numbered immutable A-attempt record under `.ceaia-work`. Preserve the complete actual response in that record after the call. Never overwrite a completed attempt.
+3. Immediately before calling, reread the exact payload and intended upload files; verify they match the preview. A change invalidates affected preparation: rebuild the current preview, retain prior attempt evidence and repeat preflight with a new numbered attempt. No internal handoff/score/state/profile metadata enters tool arguments.
+4. Call A directly after preflight; no additional final-approval popup follows settings confirmation. Inspect the returned issue and each requested attachment result separately. A's confirmed successful upload must never be uploaded again.
 
-After an item's Jira issue write **and all requested attachments** are confirmed successful:
+## B — Bind each eligible ticket to its final saved score
 
-1. Read that item's actual returned `ticketKey`. For an update, it must equal the intended key. Missing, numeric-only, ambiguous, or mismatched keys block binding; never infer a key from a URL or item position.
-2. For a batch create, match each returned resource to its own reviewed candidate. Bind each eligible successful item separately; never use a top-level Story path for another item.
-3. Replace the single current `jira-preview.md` with the exact binding preview and preserve the completed Jira-write preview/result in its numbered audit record. Allocate and read back a separate numbered binding-attempt record.
-4. Call `exportJiraByDynamicFields` a second time with **exactly five non-empty direct string arguments**:
-   - `staffId`: real current staff ID;
-   - `almType`: applicable lowercase source;
-   - `issueIdOrKey`: this write's confirmed returned `ticketKey`;
-   - `conversationId`: real current conversation ID;
-   - `markdownReviewRelativePath`: the exact Workspace-relative `STORY.md` input path used for this candidate's passing score.
+A successful issue **and all requested attachments** are prerequisites. For each eligible item, match its actual returned ticketKey to the reviewed candidate and final Workspace score path; an update's returned key must equal its intended key. A missing, numeric-only, ambiguous or mismatched key blocks B; never infer keys from URLs or batch positions.
 
-Match the Story path to the current score record, candidate state, and reviewed Story. It is never the score-record path. Do not add any content, attachment, dynamic-field, issue-batch, or link argument. This is the five-field SDLC binding call; do not substitute the separate four-argument independent-reviewer sync.
+**Call the same tool separately for every eligible ticket, with exactly these five nonempty direct strings:**
 
-Binding succeeds only when the returned `markdownReview` explicitly confirms the association. Record issue-write/attachment results and binding results separately. The item is complete only when both stages succeed.
+```json
+{
+  "staffId": "<real current staff ID>",
+  "almType": "<confirmed lowercase source>",
+  "issueIdOrKey": "<A's actual returned Ticket Key>",
+  "conversationId": "<real current conversation ID>",
+  "markdownReviewRelativePath": "<this candidate's final scored STORY.md relativePath>"
+}
+```
 
-## 4. Failure, uncertainty, and recovery
+The path is the final scoring input Story, never a score-record file or another candidate's path. Match it to current score/state/review evidence. B has no content, attachment, dynamic-field, batch or relationship argument; do not substitute the standalone reviewer's four-field sync.
 
-- Do not automatically resend any external write, attachment upload, or binding call. For partial/unknown results, reconcile state through supported read-only means before deciding the next action.
-- Never replay a confirmed successful Jira write or confirmed attachment to repair only a binding failure. Preserve the real ticket key/URL and exact failed binding attempt; keep the candidate pending.
-- If an attachment result is partial or unknown, reconcile that attachment specifically. Do not replay the issue write or repeat an upload already confirmed successful. For replacement, do not delete the old attachment unless the new upload is confirmed successful.
-- A numeric `status=400` is a business validation failure even when the MCP envelope says `isError=false`.
-- Only after a documented field-validation failure proves no external write occurred may metadata be refreshed once; then rebuild and preview the payload. For any further write, wait for the user's bounded recovery decision, then create a new attempt and perform the full read-back/preflight. Never auto-retry.
-- If the binding alone failed, recovery is binding-only and requires a supported recovery decision, a fresh exact five-field preview, and a new binding attempt record. Preserve the successful Jira write and attachment outcomes.
-- Preserve distinct statuses for Jira issue write, each attachment operation, and Markdown-review binding. Report exact key/URL and sanitized failure detail without claiming overall success for partial, waiting, failed, or unknown states.
+The current numbered export attempt binds the final scoreRecordPath/scoreAttempt. A prior binding for the same path/Key is historical and cannot complete a new assessment/content operation. Keep the old outcomes; mark the new operation's binding pending until its own eligible B succeeds. Resuming the unchanged existing operation reuses confirmed A/attachments and performs only its missing B, without another score call.
 
-After a confirmed successful Jira issue write and all its required attachment operations, persist only allowed non-secret reusable Jira defaults in the canonical SDLC user-workspace profile, according to `workspace-profile.md` (selected source, project, Story type, and explicitly confirmed Epic/Parent defaults or no-Epic decision). A binding failure leaves that eligible profile usable and records binding pending. Do not persist new configuration from a failed/partial/unknown issue or attachment result. Keep numbered attempt history for the write and each binding attempt; update only the single current `jira-preview.md`, while retaining prior previews/payloads/results in their completed audit records. Give a concise per-Story report with operation, ticket key/URL, issue-write status, each attachment status, binding status, and any sanitized error. Never report a partial or unknown item as complete.
+Preserve A's preview/payload/result in its attempt before replacing current jira-preview.md with B's exact five-field preview. Allocate/read back a separate numbered B-attempt record, call B and preserve its complete response. Batch A success still requires one B per eligible returned key/path; no top-level batch Story path is inherited. **B succeeds only when returned markdownReview explicitly confirms association.** Generic success or A success is insufficient. Item completion requires A, every required attachment, and B; profile persistence is reported separately.
 
-## 5. Final preview contents
+## Failure and recovery
 
-The single current `jira-preview.md` must identify each candidate and include:
+- Preserve distinct issue, per-attachment and binding results in writeResults and numbered attempt evidence. Report every real key/URL, pending operation and sanitized error; failed/partial/unknown is never complete.
+- Do not automatically resend external writes, uploads or bindings. Reconcile partial/unknown outcomes through supported read-only means before a bounded recovery decision. Numeric status=400 is business failure even when isError=false.
+- A success plus B failure/unknown keeps the ticket/attachments intact and binding pending. Recovery is B-only with a fresh exact five-field preview and new B-attempt; never recreate/rewrite the issue or re-upload to repair binding.
+- Issue success plus failed/unknown attachment preserves the issue, reconciles only that attachment, and does not enter B. For replace, old deletion waits for confirmed new upload. Never replay confirmed success.
+- Only documented field-validation failure proving no external write permits one affected metadata refresh. Rebuild/preview; any further write waits for the user's bounded recovery decision and a new read-back/preflight attempt. No automatic retry or generic fallback.
+- Persist eligible reusable profile facts only after issue plus all required attachments succeed. B pending may coexist with that valid profile; profile-write failure never causes replay. Follow workspace-profile.md.
 
-- Operation and destination: create or update, project, Story type, and for updates the intended Jira key.
-- Gate/profile state: applicable validated handoff and review/score status; selected profile values; and the completed SDLC defaults/settings confirmation, including the exact project/type/Epic/Parent decisions used.
-- Story field mapping: full Summary, full non-AC Description, full Acceptance Criteria value or the documented reason a verified matching update field stays unchanged; identify the metadata-confirmed AC field and its ID. State provenance for every Jira-visible value (reviewed Story, metadata/profile, user-authorized change, or unchanged baseline).
-- Attachments: every add/replace/delete/none operation, exact file path and filename for uploads, confirmed existing attachment ID for removal/replacement, preflight result, and serialized `attachmentsJson` where active.
-- One complete direct-arguments JSON payload for the export call. This JSON contains the full values above, so do not duplicate entire Story bodies in separate prose sections. For `issuesJson`, include the complete string and ensure every item contains its own required Story fields, attachment plan, target (if update), and other item-specific values.
-- Exact preview/read-back statement: the values and attachment bytes re-read immediately before the call match this payload. Never attach the source markdown, score, review, preview, attempt log, or other workflow files to Jira; only authorized reviewed SPEC files are attachments.
-
-For a mixed batch, show one integrated `issuesJson` only when the user explicitly requested the mixed operation. The displayed payload must be the exact direct tool arguments, with no wrapper and no `handoffType`. A binding call gets its own replacement current preview showing exactly its five fields and a separate numbered binding audit record.
-
-When checking unfamiliar JSON nesting or the binding shape, consult [call examples](call-examples.md); use actual current values, never copy example IDs or paths into an export.
+If the tool contract cannot establish the result or a supported recovery method, record the exact WAITING_TOOL/user decision; never fabricate service IDs, database success or a replacement schema. Local records are audit evidence, not proof of a remote operation. Whether create metadata establishes edit capability, which final score row B selects, and unknown-operation idempotency require actual platform evidence; do not remove calls or invent capabilities to resolve these uncertainties.

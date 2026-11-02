@@ -26,7 +26,7 @@
 [Supported business goal, value and scope.]
 
 ## User Flow Diagram
-[Insert an evidence-supported Mermaid diagram. Do not leave a generic example or invent backend/error branches.]
+[Insert an evidence-supported Mermaid flow when meaningful; for a trivial flow a short supported description is sufficient. Do not invent backend/error branches.]
 
 ## Jira Story *(mandatory)*
 

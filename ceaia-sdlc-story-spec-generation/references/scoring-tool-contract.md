@@ -2,6 +2,8 @@
 
 Source: user-supplied Tool details/response screenshots, 2026-09-20, plus the 2026-10-23 Story scoring tool handoff describing Workspace/Jira modes and SPEC metadata. These describe the external service; they are not a local evaluator or permission to alter scoring weights. Follow the live callable schema if it differs. No reconstructed "complete real response" is supplied here.
 
+Execute only after current independent content PASS and every SPEC's verified Result/Reviewer Notes synchronization. The parent owns the review record and header write/read-back; scoring does not perform another content review. A first header mismatch permits one header-only retry; another mismatch waits for technical recovery. Candidate-assigned source coverage must be complete here; the Task additionally reconciles the entire batch before Jira.
+
 ## Input and identity
 
 Tool ID: `nodejs-base-mcp.score_requirement_markdown`.
@@ -53,7 +55,7 @@ Before scoring, verify exactly one standalone `## Acceptance Criteria` heading w
 
 After scoring:
 1. Read parseErrors, warnings and available AC counts. The warning "No Acceptance Criteria section found." is a format/parser blocker even when dimensions mention ACs.
-2. If top-level acCount and/or dimensions.sizingSplit.acCount are returned, compare each with actual declared AC count. Conflicting counts or zero for a nonempty Story block downstream generation. Absence of both counts alone is not failure.
+2. If top-level acCount and/or dimensions.sizingSplit.acCount are returned, compare each with actual declared AC count. Conflicting counts or zero for a nonempty Story block Jira readiness. Absence of both counts alone is not failure.
 3. Nonempty parseErrors is a technical/parser blocker. Do not turn it into a request for invented business requirements.
 4. A noncanonical heading can be corrected without changing business scope, then assessed as changed Story bytes. Use the shared bounded correction/repair policy and record the cause.
 5. If canonical content still triggers recognition failure, pause for parser/service diagnosis. Do not endlessly reword ACs or set force_review merely to seek a better score.
@@ -64,6 +66,8 @@ Preserve service content_checksum exactly when returned; it is service metadata,
 ## Owner and recovery
 
 Generation owns the post-review invocation, response preservation and evidence-backed Story repair. Independent content review comes before this call and never invokes or refreshes the scorer. Each candidate owns its own result; no averaging or cross-candidate reuse.
+
+Persist/read back the complete result before evaluating the gate. A passing result continues to spec-score-display.md, including its existing normal cached metadata-bearing invocation when the final primary SPEC revision changes. This invocation has audit/persistence effects and is retained in v6; do not merge it away because Story bytes or explicit arguments are unchanged. The external API has no fileRevision input: record observed local revisions outside raw JSON without claiming the backend returned or stored that revision.
 
 No repeated call for unchanged current Story plus unchanged verified SPEC status/path/revision in normal operation. Changed SPEC metadata requires a new normal invocation even if Story bytes are unchanged; the content score may be cached. An explicitly authorized fresh assessment is the sole force_review exception; invalidate downstream readiness first. At most one supported technical retry after a confirmed pre-evaluation failure; an unknown timeout must be reconciled, not blindly replayed. Saving an already received response can be retried without another score call, using the same reserved attempt path when no complete record was committed. Never overwrite a completed earlier attempt.
 

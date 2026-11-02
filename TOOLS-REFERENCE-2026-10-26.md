@@ -1,11 +1,11 @@
 # SDLC 与 Story/Jira 工具说明
 
-整理日期：2026-10-26；2026-10-30 同步 main 的 v5.3 SDLC 导出接入、既有 reviewer 修复和独立需求审查。适用于当前 SDLC Task、三个活动 Skill，以及独立的 `user-story-reviewer`、`jira-createissue-helper` 和 `review-requirements`。这是配置和排查用的工具速查；实际调用仍须核对平台当时暴露的工具 schema。
+整理日期：2026-10-26；2026-10-31 同步 v6.0 重构。目标运行模型为 GPT-5.6 Luna / GPT-6 Luna；不向 Task 添加未经平台确认的模型参数。本文是工具参数与持久化速查，不定义内容审查标准；实时调用仍须核对平台暴露的 schema。独立 helper/reviewer 的业务协议保持原样。
 
 ## 资料与边界
 
 - `java-base-mcp.exportJiraByDynamicFields` 的参数和返回规则，以用户在本对话提供的开发说明为依据。
-- `nodejs-base-mcp.score_requirement_markdown` 的两种入口及返回概述，以用户提供的 [评分工具交接文档](/Users/rosshu/Documents/Codex/2026-10-09/users-rosshu-documents-codex-2026-09-2/outputs/story-scoring-tools-handoff-2026-10-23.md) 和本仓库 [评分工具契约](ceaia-sdlc-story-spec-generation/references/scoring-tool-contract.md) 为依据。交接文档早于后来确认的大小写规则：`specFileStatus` 现仅接受精确的 `Pass` 或 `Fail`。
+- `nodejs-base-mcp.score_requirement_markdown` 依据用户 2026-10-23 评分工具交接说明及本仓库 [评分工具契约](ceaia-sdlc-story-spec-generation/references/scoring-tool-contract.md)。`specFileStatus` 现仅接受精确的 `Pass` 或 `Fail`。材料未提供完整 evaluator 权重，不能自行建立替代评分器。
 - 各 Skill 的调用顺序、评分门槛、确认方式和绑定条件是**流程规则**，不一定是工具本身的必填参数。以下以当前仓库规则为准；旧交接文档中“独立 reviewer 不再调用导出工具”的说法已过时。
 - 本文不包含可执行脚本、Token 或真实用户的员工号、会话 ID。
 
@@ -50,6 +50,8 @@ Jira 读取、Confluence 和上述平台能力的完整实时参数 schema 未�
 | `metadata` | 可选审计信息，正常省略；不传秘密或完整业务正文。具体类型遵循实时 schema。 |
 
 `specFileStatus`/`specFilePath` 随评分记录保存，不改变 Story 分数。缓存命中时仍可保存本次传入的 SPEC 元数据；为了刷新这两个字段不强制重评。独立 `user-story-reviewer` 当前省略这两个 SPEC 参数。
+
+v6 保留 SPEC 分数显示后的必要正常缓存/元数据调用，完整保存每次响应；该调用不能因 Story 未变而删掉。工具没有 `fileRevision` 入参，本地修订号仅描述观察到的文件编辑，不能宣称后端保存了该字段。所有评分调用的服务端保存/审计不能由本地报告或显示分数替代。
 
 工具返回通常为**一个含完整 JSON 的文本块**。按实际返回保存所有字段；已知可能包括 `ok`、`finalScore`、`cache_hit`、`review_id`、`audit_id`、`acCount`、`parseErrors`、`warnings` 和分项诊断，但不要求每次都出现全部字段。不要从分项分数反算总分。`ok=true` 表示调用成功，不表示通过 SDLC 质量门槛。
 

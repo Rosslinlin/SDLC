@@ -1,5 +1,5 @@
 {
-  "contractVersion": 5,
+  "contractVersion": 6,
   "selectedCandidateIds": [],
   "candidates": [],
   "globalCoverage": {
@@ -11,7 +11,5 @@
     "evidenceRevisionBindings": []
   },
   "jiraPreviewPath": "jira-preview.md",
-  "latestJiraExportRecordPath": null,
-  "executionOrder": [],
-  "writeResults": []
+  "latestJiraExportRecordPath": null
 }
