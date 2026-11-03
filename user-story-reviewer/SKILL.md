@@ -1,74 +1,56 @@
 ---
 name: user-story-reviewer
-description: Review and score Jira or locally authored/revised Stories. Keep raw Jira imports in Jira mode even when long input is saved to Workspace; retain Workspace scoring for actual local revisions after export. Route writeback by the actual assessment source without a sync-confirmation popup.
+description: Score current Jira Stories or selected local Story JSON through scoreUserStory. Prepare missing Jira JSON metadata using reusable user-workspace profiles, preserve source wording, and report actual scores and persistence evidence without exporting Jira content.
 ---
 
 # User Story Reviewer
 
-**Assessment requests:** invoke `nodejs-base-mcp.score_requirement_markdown` for every Story requested for review before reporting a new score. A saved result or model judgment never replaces this call. A writeback-only request skips new scoring and selects four or five fields from the target assessment's source.
+Version: 3.0.0-json-preview.1 — 2026-11-03. Runtime: GPT-5.6 Luna or GPT-6 Luna, text-only platform tools; no scripts.
 
-## Select the action and content source
+A new assessment request calls nodejs-base-mcp.scoreUserStory for each selected target. A prior report or model judgment does not replace that call; the service decides cache reuse. Review does not export Jira, rewrite business requirements, generate SPEC/Test Case artifacts or run the SDLC workflow.
 
-Resolve intent before choosing a scoring mode:
+## Choose the actual scoring source
 
-1. **Writeback only:** an explicit request such as “sync this score to Jira” or “finish the missing writeback”, without new scoring or Story content changes, enters [score writeback](references/jira-score-sync.md). First identify the assessment referred to: Workspace `relativePath` means five-field path binding after its content write succeeded; Jira `jira_number/source` means four fields. A pending current Workspace binding takes priority over classifying the request from an existing Ticket alone. Resolve from actual calls, result records or confirmed context; a local score-record file is not mandatory. Ask for ambiguous source/target or missing inputs. Do not rescore, replay a successful content write, or ask whether to sync again.
-2. **Assess current Jira:** use `jira_number` and `source` for a selected Jira target, including a ticket alone, batch-uploaded Markdown, pasted/exported Jira data or long crawler output saved as a Workspace attachment/file. Saving, truncating into a file or presentation-only conversion does not turn Jira input into a local Story revision. Read/search the source file for its primary Issue records before routing; never pass that carrier path as scoring `relativePath` merely because it exists or is Markdown.
-3. **Assess current Workspace:** use the current Markdown for a locally authored Story or an explicitly selected local business revision, including a Story generated and exported earlier in this conversation that is now being edited locally. Use observed authoring/edit history or the user's clear selection of a local draft, not file existence. A generic request to score an uploaded Jira dump does not select a local revision. The known Ticket remains its export/update target.
-4. **Assess ticketless input:** convert the supplied Story to Workspace Markdown and score it as before.
+| User-selected content | Route |
+| --- | --- |
+| Current content of a Jira ticket, including an unchanged Jira dump saved to Workspace | jira_number plus confirmed source; the service reads Jira. No JSON generation or field discovery. |
+| New Story, authored local content, or an explicitly selected local business revision | Actual story_json_workspace_path; prepare or reuse the final .json4jira first. A local revision stays on this route even when it has an existing ticket. |
+| Only finish a prior persistence/sync step, with no new assessment | [Persistence and recovery](references/jira-score-sync.md); do not rescore or replay content writes. |
 
-Explicit content-source instructions take priority. A historical or auto-saved file alone does not override Jira input; a clear request to assess a local revision must not fall back to older Jira content. If provenance, primary target or mapping is unclear, ask. Select primary Issue keys from the original request/crawl target or each Issue record's own identity; Epic, Parent, linked tickets and keys inside descriptions/comments are references, not additional targets. Separate multiple primary Issue records actually requested for review, keep their sources/calls separate, and deduplicate identical targets.
+Explicit source selection takes priority. A file path, Markdown formatting or saving a long Jira response does not establish a local business revision. Search the complete selected carrier for primary Issue identities before treating it as ticketless; unreadable/truncated input needs further reading or a focused clarification. Parent/Epic/linked keys and keys mentioned in prose are references, not extra assessment targets. Keep distinct requested primary records separate and deduplicate only identical selected targets.
 
-## Tools
+## Tools and resources
 
-- `nodejs-base-mcp.score_requirement_markdown`: scores either a workspace Markdown file or one Jira issue and persists the service result/audit record.
-- `java-base-mcp.exportJiraByDynamicFields`: automatically uses four fields after Jira-mode scoring; for explicit writeback requests, uses the source-dependent four/five-field rules in [score writeback](references/jira-score-sync.md).
-- Workspace read/search tools to identify tickets in uploaded or platform-saved source files; read/write tools for selected local inputs, conversions and result records.
-- `ask_user_question`, or the platform's available input UI, to collect missing Jira sources or required IDs, or recover from an actual scoring failure. Collecting a missing ID does not ask whether to sync.
+Expose these named tools when installing this version:
 
-Expose both named tools when installing this skill. Direct Jira review retrieves the issue and records its Jira association in the scoring service. Its subsequent four-field call triggers backend handling. Workspace assessment itself does not invoke that four-field call; content export/update and recovery use path binding. Do not add a project-availability query, a separate Jira read or a sync confirmation popup. Generic tool success never proves Jira score fields were written.
+- nodejs-base-mcp.scoreUserStory: the only scoring tool, with two exclusive routes under [calls and results](references/scoring-and-results.md).
+- java-base-mcp.queryJiraProjectsByName, java-base-mcp.queryJiraIssueTypesByProject and java-base-mcp.queryJiraCreateMetaFields: only for missing JSON destination/type/field facts, after reading real user-workspace profiles. Follow [assembly and caching](references/jira-json-assembly.md).
+- java-base-mcp.getJiraInfos: only if a selected local update needs unavailable actual target project/type facts. Do not replace its selected local business content with Jira's older text. Direct Jira scoring does not need this preliminary read.
+- Workspace read/search/write and ask_user_question or the supported platform input UI: read originals/configuration, prepare JSON, save actual results and ask only missing facts.
 
-## Workspace layout
+No export/writeback tool is used by this reviewer. No independent SDLC content-review agent, script or sibling Skill is required. Read [input preparation](references/input-format.md) only for the local JSON route, [assembly](references/jira-json-assembly.md) when configuration/preparation is needed, and [calls/results](references/scoring-and-results.md) for either assessment. Read the persistence reference for actual sync/recovery or export-handoff work.
 
-Use one folder per review target:
+## Assessment sequence
 
-```text
-outputs/user-story-reviews/
-  aiwpb-123/
-    AIWPB-123-score-result.md
-  story-001/
-    story-001-score-input.md
-    story-001-score-result.md
-```
+1. Read original inputs and resolve current Jira versus selected local content. Collect all missing ticket-to-source mappings for a batch together; do not infer source from key prefixes. Reuse actual confirmed mappings. Jira source values are WPB/ALM/DATA/FCR/GO.
+2. For direct Jira, use only the confirmed ticket/source pair. Do not read profiles, ask staffId, query fields or create score-input JSON just to assess that ticket.
+3. For local content, read the actual selected JSON or original text. Reuse complete trustworthy JSON and its established path. Otherwise read the real profiles.json first and query only missing applicable facts, then preserve source content in the final JSON using the local templates/encoding rules. Do not generate missing business content to satisfy schema or improve a score.
+4. Resolve optional SPEC inputs before the call. With no SPEC, omit both specFileStatus and specFilePath. When a real SPEC is selected for assessment, use its real path and evidenced exact Pass/Fail status as a pair; never invent Pass, use Fail to mean absent, or create an empty SPEC. Unknown selected SPEC status needs a focused clarification. Direct Jira passes neither SPEC argument.
+5. Read back the exact current inputs, record the source/conversion basis, then call scoreUserStory once per target with that route's arguments. A failure does not authorize switching routes. Handle actual structural validation errors under the scoring reference; do not loop to raise a low or cached score.
+6. Save the complete actual response/error in the next result record, read it back and report the returned score, recognition diagnostics and result link. Preserve a real low score including 0. Assessment completion and backend/Jira synchronization are separate observations. Do not invoke another tool to trigger old four/five-field binding.
 
-For Jira-mode scoring, use the lowercase ticket key as the folder and the actual key as the filename prefix. If the same key already exists for a different Jira source, prefix the new folder with its lowercase source to prevent a collision. Do not create a score-input file for this mode.
+## Files and continuity
 
-For a ticketless Story, use the next unused `story-001`, `story-002`, etc. folder and prefix. Create its input first and its result only after the scoring call returns or fails.
+Use a separate candidate folder under outputs/user-story-reviews. For new local Stories choose the next unused story-001, story-002, etc.; save story.json4jira and story-001-score-result.md there. For direct Jira use a source/key folder such as wpb/aiwpb-123 with AIWPB-123-score-result.md and no input JSON. Reuse established folders when their source identity is verified; avoid same-key collisions across Jira sources.
 
-For a continued local Story, retain its established file identity and candidate folder even after Jira export. Reuse the selected current Markdown path when suitable for scoring; do not create a Jira-mode input merely because a ticket now exists.
+An already selected usable JSON keeps its actual Workspace path, including a path outside this layout. Local edits after export retain that file and their confirmed existing target. Update preparation uses root issueIdOrKey only for that actual target; reference tickets never select an update. Each later assessment gets the next unused result suffix -v2, -v3, etc. Preserve prior reports; do not create extra manifests, state files or source copies for this reviewer.
 
-For every scoring mode, save a later assessment or explicitly requested fresh assessment at the next unused `-v2`, `-v3`, etc. result name in the same candidate folder. A conversion input gets a matching version only when conversion is needed. Do not overwrite prior assessments or add source copies, manifests or handoff files. Writeback-only calls do not create a new score-result file.
-
-## Review sequence
-
-1. **Read inputs, inventory and route.** Select writeback-only or assessment. For assessment, resolve uploaded/platform-saved input paths first. Search across each complete selected source file for primary Issue identities, reading their record headers/fields as needed; do not rely only on a truncated chat preview or the first file chunk. Extract and deduplicate the requested batch targets and explicit sources before scoring. Classify raw Jira import versus actual local authoring/revision before conversion. An unreadable/incomplete input requires further reading or clarification, never a ticketless assumption. Writeback-only follows its reference and bypasses scoring.
-2. **Resolve sources once.** For Jira-mode scoring or writeback-only, reuse the explicitly confirmed ticket-to-source mapping. Ask once for unresolved targets: `WPB`, `ALM`, `DATA`, `FCR`, or `GO`. Do not infer from ticket prefixes or read `jira-user-info.md`. Workspace scoring needs no Jira source argument; carry a known target/source mapping for later export.
-3. **Prepare only confirmed Workspace content.** After provenance routing, read [workspace input conversion](references/input-format.md) and the current authored/revised local Story, preserving its wording. Reuse a suitable file or convert when needed. Do not normalize a raw Jira dump into a score-input file or let the carrier path replace its primary Ticket.
-4. **Score each assessment item with the tool.** Read [scoring modes and result records](references/scoring-and-results.md). Call `nodejs-base-mcp.score_requirement_markdown` once per assessment target with only the parameters for that route, even when a prior score file or cached result exists. Before each Jira-mode call, verify `jira_number` and confirmed `source` are present and `relativePath` is absent. Missing source or a failed Jira assessment never authorizes a Workspace fallback. Omit SPEC parameters in this version. Never substitute the model's own score or a prior file for this call; if the tool cannot be called or returns no valid score, report that scoring could not be completed. Writeback-only items bypass this step.
-5. **Preserve and show every score.** Create the result only after scoring finishes, preserve the complete return, and read the saved result back. Show the Story or ticket/source, exact `finalScore`, status, returned score breakdown, key diagnostics and full-result link. Present batch scores together. A generation caller must also receive the Workspace score. For completed Jira assessments, keep the run active for the automatic trigger below.
-6. **Trigger the existing-ticket update automatically.** For each Jira-route result with `ok === true` and a finite numeric `finalScore`, including 0 or a cache hit, follow [Jira update trigger](references/jira-score-sync.md) once without asking whether to sync/export. Resolve its four actual arguments; if a required ID is missing, ask a focused input question and wait, then continue automatically without a sync confirmation. Record the returned outcome in the same result file. Final conversation output focuses on the assessment; omit routine trigger messages and do not claim Jira score fields were updated. Workspace assessments finish without this call and do not collect IDs for it.
-
-For a batch, collect every missing source before starting Jira calls so the user is not questioned one ticket at a time. A failure for one independent target does not block the others.
-
-## Continue a local Story after Jira export
-
-Preserve the verified mapping between the local Story/current score input, latest result, actual exported Ticket Key and confirmed source in existing result records and conversation context. A new local edit requires a new Workspace scoring call. For each Workspace assessment intended for export/update, record its actual `relativePath`, result version/invocation reference when available, target/source, content-write outcome and binding status. Each new assessment starts with binding pending, even if the path and Ticket match an earlier successfully bound assessment. Do not add another state file.
-
-When the user/caller requests export or update, return that current assessment mapping and scored content to `jira-createissue-helper`. For an already exported Story, update the same Ticket. The helper writes the current content and then performs the mandatory five-field binding with this assessment's actual input path. Keep normal helper preview/confirmation rules; its Jira baseline/metadata reads must not replace the local scoring source. Record a missing binding as pending. If the user subsequently asks to finish writeback after this content write succeeded, recover only the five-field binding under [score writeback](references/jira-score-sync.md); do not change the source to Jira mode.
+Save a result only after an actual scoring invocation returns, fails or has an observed unknown outcome. Freeze scored JSON and selected scoring SPEC/attachments for any later export handoff. Do not write scores into these inputs. Their changes require a current assessment; a same path or ticket alone does not establish currentness. Provide the exact input and assessment evidence when export is requested, without invoking or modifying the separately maintained exporter.
 
 ## Boundaries
 
-Do not create Jira issues or edit Story business content. The helper owns normal content writes and their subsequent Workspace bindings; reviewer may recover a verified missing Workspace binding on an explicit writeback request. Four-field calls apply to Jira-mode assessments, not every existing Ticket. Local content changes still follow the Workspace handoff. Respect an explicit no-Jira-write instruction; otherwise no sync confirmation is required. Report actual calls and known outcomes accurately.
-
-Preserve original business wording in ticketless conversion. Do not invent Given/When/Then steps, add business value, interpret unseen images or repair requirements to raise a score.
-
-Report the returned score separately from recognition reliability. Expose AC-count concerns and parser diagnostics. Never replace the tool's score with an estimate or force a fresh review merely because a cached or low score was returned.
+- Preserve original business wording, criterion grouping/IDs and additional supplied facts. Do not invent titles, actors, benefits, BDD steps, AC identifiers or unseen image content. Suggestions may be reported separately without changing the scored source.
+- Do not add SDLC Q1–Q7 preconditions, a minimum score, mandatory SPEC/tests or automatic business-repair rounds. Structural validation is distinct from quality: report genuine missing content or service rejection honestly.
+- VALIDATION_FAILED text, SKIPPED and transport errors are not numeric assessment success. Preserve all substantive diagnostics and actual service identifiers without inventing response properties.
+- Missing optional persistence/sync evidence does not invalidate a completed numeric assessment. Never infer database linkage, queue acceptance or Jira score-field completion from generic success alone.
+- Keep platform session/identity context platform-owned. Do not add staffId, conversation IDs, headers, manual scores or legacy binding parameters to score calls. Respect an explicit no-content-write request; this reviewer performs no content export.
