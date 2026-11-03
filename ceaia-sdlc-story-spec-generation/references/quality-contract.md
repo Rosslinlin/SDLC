@@ -1,4 +1,4 @@
-# CEAIA shared content standard — Q1–Q7, version 6.1.0-preview.1
+# CEAIA shared content standard — Q1–Q7, version 6.1.0-preview.2
 
 Generation reads this before planning/writing; independent review uses the same rules. This is the authoritative source in the repository. `ceaia-spec-review/references/quality-contract.md` is an identical packaged copy so either independently installed Skill can read it locally. Update both together. Task instructions and templates do not introduce additional content gates.
 
@@ -40,4 +40,4 @@ Generation assembles final Story JSON before scoring and derives tests and the S
 
 This standard does not calculate the external score or guarantee 76 points. Real scoring, JSON/schema/transport requirements, repair limits, SPEC metadata persistence and Jira/database calls are owned by their respective procedures. Neither role may weaken source obligations to satisfy a score.
 
-The current Story artifact is story.json4jira; there is no independent STORY.md input. Review its summary, description, acceptanceCriteria, bddScenarios and approved business field meanings against original evidence and the Markdown projection in SPEC. Pure routing/schema identifiers are not business prose. Scores stay outside JSON and SPEC; header synchronization completes before scoring.
+The current Story artifact is story.json4jira; there is no independent STORY.md input. Review fields.summary, the fields.description Markdown string, and actual AC Markdown obtained by resolving customFields.acceptanceCriteria to fields[that ID], plus approved business values under actual field IDs. customFields is a mapping, not business text; no top-level AC or separate bddScenarios is required. Check that content against original evidence and the SPEC projection. Missing mapping/field/type is a technical production issue, not an extra Q1–Q7 criterion. Pure routing/schema identifiers are not business prose. Scores stay outside JSON and SPEC; header synchronization completes before scoring.

@@ -4,7 +4,7 @@
 - **Date**: [actual date]
 - **Requirement ID**: [supplied requirement ID; omit if unknown]
 - **Parent Requirement ID**: [supplied parent ID; omit if unknown]
-- **Related Story**: [canonical JSON summary / known ticket]
+- **Related Story**: [canonical JSON fields.summary / known ticket]
 - **Related Story JSON**: [actual workspace-relative story.json4jira path]
 - **Related SPEC**: [current workspace-relative SPEC path]
 - **Status**: Draft

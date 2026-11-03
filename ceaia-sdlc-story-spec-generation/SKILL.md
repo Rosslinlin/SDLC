@@ -5,7 +5,7 @@ description: Generate final Jira-ready Story JSON and Markdown SPECs using share
 
 # CEAIA Story JSON and SPEC Generation
 
-Version 6.1.0-preview.1. Text-only. Platform runtimes: GPT-5.6 Luna or GPT-6 Luna.
+Version 6.1.0-preview.2. Text-only. Platform runtimes: GPT-5.6 Luna or GPT-6 Luna.
 
 ## Entry and resources
 
@@ -27,7 +27,7 @@ Version 6.1.0-preview.1. Text-only. Platform runtimes: GPT-5.6 Luna or GPT-6 Lun
 ## Execution
 
 - Classify new_story or existing_ticket_update. A cited evidence ticket is not an update target. Confirm each Jira source before reading it; do not infer from prefixes. UAT-only work uses its dedicated workflow.
-- Move project/type/metadata queries and final field assembly into this generation stage. Do not leave missing required fields or format conversion for export. Reuse verified profile components and actual upstream baseline reads.
+- Move project/type/metadata queries and final field assembly into this generation stage. Use the confirmed fields structure: customFields.acceptanceCriteria maps to the actual ID; fields[that ID] is the AC Markdown string. Do not use the older flat template, arrays for description/AC or independent BDD objects. Resolve required metadata before scoring; reuse verified profile components and actual upstream baseline reads.
 - Process candidates serially: source plan → resolve Jira fields → complete JSON → tests/SPEC → precheck → independent review → synchronize SPEC Result/Notes → score. Keep blocked selected candidates pending while preparing unrelated candidates.
 - The saved JSON is the authoritative Story and eventual upload input. SPEC contains its faithful Markdown business projection. No standalone STORY.md or independently authored upload payload is required. TEST_CASE.md remains a Workspace deliverable.
 - Use existing platform read/write, agent, question, query and scoring tools only; no local scripts. Read actual files, record observed revisions and preserve complete tool responses.

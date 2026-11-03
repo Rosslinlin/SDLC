@@ -6,7 +6,7 @@ This step moves the former export-time project/type/field discovery, value resol
 
 Read matching components from real persistent user workspace ceaia-sdlc-jira/profiles.json, isolated by authenticated user, Jira source, project, actual Story type ID and create/update capability. Never use a conversation file as cross-session storage or another user's profile. JWT/platform identity takes priority; staffId is a real fallback identity only. Do not parse/store tokens. Without real persistence, use actual metadata for this run and report cache persistence unavailable.
 
-Source is explicitly confirmed WPB/ALM/DATA/FCR/GO, not inferred from ticket prefix. Query calls use its lowercase almType. Resolve real staffId from trusted context or a confirmed same-user default, asking once if required. This identity is for discovery; do not insert it or a session ID into Story JSON without an actual schema requirement. Legacy jira-user-info.md supplies routing defaults, not field schema.
+Source is explicitly confirmed WPB/ALM/DATA/FCR/GO, not inferred from ticket prefix. Query calls use its lowercase almType. Resolve real staffId from trusted context or a confirmed same-user default, asking once if required. The confirmed file schema requires that real string at root staffId and, for creates, fields.reporter.name; update preservation/omission rules still apply. This does not add staffId to the score/export tool arguments. Session IDs remain platform-owned and do not enter the file. Legacy jira-user-info.md supplies routing defaults, not field schema.
 
 | Tool | Exact known query inputs |
 | --- | --- |
@@ -28,15 +28,26 @@ Show actual source/project/Story type, operation/update target, relationships an
 
 ## 3. Write the complete canonical file
 
-Use [JSON template](../templates/story-json-template.json) as a structural starting point, not evidence or the complete backend schema. The screenshot sample uses jiraInstance, projectKey, issueType, summary, description, acceptanceCriteria, bddScenarios, attachments and customFields. Use these canonical sample names unless the real schema establishes otherwise. Do not add duplicate almType/jiraType aliases just because the query APIs or prose use them.
+The developer screenshot and user confirmation on 2026-11-03 supersede the earlier flat sample. Use [JSON template](../templates/story-json-template.json). This structure is a required input contract for correct field recognition during scoring, not an additional Q1–Q7 business criterion. It is one JSON object with a fields object, never a stringified Jira request.
 
-- jiraInstance is the selected supported lowercase source. projectKey/type identify the confirmed Story destination. summary is the reviewed title.
-- description holds supported non-AC business content in schema-accepted form; acceptanceCriteria holds stable unique AC-### Given/When/Then entries. bddScenarios, when used/required, express those same conditions/outcomes rather than independent extra requirements.
-- customFields uses only actual metadata-confirmed IDs/types/options and approved values. If the backend requires an AC custom field in addition to canonical acceptanceCriteria, derive the exact same AC content once using its documented mapping; never maintain conflicting copies or invent an acceptanceCriteriaFieldId property.
-- attachments is the complete authorized upload path list under the active schema. Each listed path is uploaded by the backend. A scoring-only SPEC is provided through specFilePath and is not implicitly authorized for upload. See the update guard below.
-- businessBenefit, marketsAffected, links or additional fields are included only when supported and their exact schema is known. Example percentages/markets/tickets are never defaults.
+| JSON location | Required value / relationship |
+| --- | --- |
+| staffId | Actual current staff ID as a string; never copy a screenshot employee number. |
+| jiraInstance | Selected supported lowercase Jira source; do not add almType/jiraType aliases. |
+| projectKey and fields.project.key | The same actual confirmed project key. fields.project is an object. |
+| issueType and fields.issuetype.id | Confirmed Story type name at the root, its actual queried ID string inside fields.issuetype. Preserve the exact lowercase issuetype key; never substitute its display name for the ID or hardcode the screenshot ID. |
+| fields.reporter.name | The same real staffId string in the confirmed create format. Do not invent another reporter or use a string in place of the object. |
+| fields.summary | Supported reviewed title as a string. No root summary. |
+| fields.description | Supported non-AC business content as one Markdown string, with real line breaks represented by JSON escaping. No array or JSON-encoded inner document. |
+| customFields.acceptanceCriteria | The actual AC field ID string from applicable metadata/profile, not the AC text, an array or a field descriptor object. |
+| fields[customFields.acceptanceCriteria] | The actual AC Markdown string, with stable unique AC-### and observable Given/When/Then behavior. The mapped property must exist and be nonempty. |
+| attachments | Complete authorized upload path list. A separate score-only specFilePath does not authorize upload. |
 
-Produce the actual field representation now. Preserve Markdown where the backend JSON schema accepts Markdown; use Jira-specific encoding only where its contract requires it. Preserve all non-AC sections, including those following AC, and keep canonical AC content in its mapped field. There is no late Markdown-to-wiki conversion, field partition, dynamicFieldsJson/attachmentsJson/ issuesJson string wrapper or regenerated payload at export.
+Resolve the AC field ID first, then use that exact string as the key in fields and store AC content there. For example, only when metadata really returns customfield_27708, customFields.acceptanceCriteria is that string and fields.customfield_27708 contains the AC Markdown. It is not a global default. Replace both identical <actual AC field ID> placeholders in the template with the complete observed ID; do not concatenate a guessed number. Missing mapping/value or incompatible type blocks production precheck; never fall back to an old top-level AC array or put the ID into the business prose.
+
+customFields is a semantic-name-to-field-ID mapping, not a business-value container. Additional supported mappings use only the actual backend names; actual approved business values go in fields under their real metadata-confirmed IDs/types/options. Do not guess aliases or duplicate values at the root. Preserve authorized optional fields/relationships only in their confirmed schema locations. For an update, preserve baseline reporter/other unchanged fields and omission semantics under the approved delta; the create example does not authorize overwriting them.
+
+Do not generate top-level summary, description, acceptanceCriteria or bddScenarios. Express supported BDD detail in the AC Markdown instead of maintaining a separate BDD object. Preserve all non-AC sections in fields.description, including those originally following AC; AC has one authoritative mapped field. Description and AC use Markdown strings in this confirmed contract. There is no late Markdown-to-wiki conversion, field partition, dynamicFieldsJson/attachmentsJson/issuesJson wrapper or regenerated payload at export. Examples are not business facts or fixed environment IDs.
 
 Save/read back <outputRoot>/story.json4jira. It is one real JSON object, not a quoted JSON document and not a file with .md content. Remove every template placeholder. Record the actual immutable path in paths.storyJsonPath and reuse it exactly across score/preview/export. Backend validation remains authoritative; use precise returned errors for bounded incremental correction.
 

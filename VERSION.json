@@ -1,6 +1,6 @@
 {
-  "bundleVersion": "6.1.0-preview.1",
-  "releaseDate": "2026-11-02",
+  "bundleVersion": "6.1.0-preview.2",
+  "releaseDate": "2026-11-03",
   "executionProfile": "text-only",
   "activeSkills": [
     "ceaia-sdlc-story-spec-generation",
@@ -15,10 +15,11 @@
   "outputPolicy": "latest-deliverables",
   "internalHistoryPolicy": "numbered-and-retained",
   "specHeaderPolicy": "synchronize-review-result-and-notes-before-scoring; no-story-score-display",
-  "jiraDescriptionFormat": "schema-confirmed-json-field-representation-assembled-before-scoring",
+  "jiraDescriptionFormat": "fields.description-markdown-string; ac-markdown-at-fields[customFields.acceptanceCriteria]",
   "jiraWritePolicy": "same-scored-json-path-only-after-explicit-current-content-confirmation",
   "jiraRoutingProfile": "persistent-user-workspace-ceaia-sdlc-jira/profiles.json; settings-resolved-before-scoring; final-current-content-confirmation-before-export",
   "notes": [
+    "2026-11-03 confirmed file format: root staffId/routing, Jira values in fields, customFields.acceptanceCriteria as the actual metadata-confirmed field ID, and AC Markdown at fields[that ID]. This supersedes the flat preview.1 template without changing tool arguments or Q1-Q7 criteria.",
     "First JSON-first preview; not merged into main and not a production integration claim.",
     "Generation resolves Jira routing/field metadata and writes the final story.json4jira before scoring. SPEC remains Markdown; the standalone STORY.md is replaced by the JSON business projection inside SPEC.",
     "User-confirmed scorer is nodejs-base-mcp.scoreUserStory with story_json_workspace_path, specFileStatus and specFilePath. This clarification supersedes the screenshot scoring one-argument example.",
@@ -35,7 +36,7 @@
     "gpt-5.6-luna",
     "gpt-6-luna"
   ],
-  "qualityContractVersion": "6.1.0-preview.1",
+  "qualityContractVersion": "6.1.0-preview.2",
   "qualityContractSource": "ceaia-sdlc-story-spec-generation/references/quality-contract.md",
   "qualityContractPackagedCopy": "ceaia-spec-review/references/quality-contract.md",
   "contentRepairPolicy": "two-shared-content-batches-per-candidate-evidence-revision; one-mechanical-correction-per-cause; external-write-retry-policy-unchanged",
@@ -57,5 +58,6 @@
         "story_json_workspace_path"
       ]
     }
-  }
+  },
+  "storyJsonFormat": "jira-fields-with-ac-id-map"
 }

@@ -1,6 +1,6 @@
 # scoreUserStory — confirmed JSON input and persistence
 
-This branch follows the supplied 2026-11-02 backend screenshots, with the user's subsequent explicit clarification taking precedence: scoring is renamed scoreUserStory, retains SPEC status/path alongside the JSON path, and Story Score is no longer written into SPEC. The screenshots alone show a one-argument scoring example; that example does not override the confirmed three-argument contract below. No complete deployed response or evaluator weights were supplied.
+This branch follows the supplied backend screenshots and subsequent user confirmations: scoreUserStory retains SPEC status/path alongside the JSON path; Story Score is not written into SPEC; the 2026-11-03 file uses fields plus a customFields AC-ID map, superseding the earlier flat sample. The earlier one-argument scoring example does not override the confirmed three-argument contract below. No complete deployed response or evaluator weights were supplied.
 
 ## Invoke on the complete saved package
 
@@ -26,7 +26,7 @@ The backend validates JSON syntax, required fields/types and enums before evalua
 
 The supplied design keys results by session/path and version, with cache matching session/path/content_checksum. JSON and scoring SPEC content participate in currentness; do not assume SPEC edits are metadata-only or a normal call must hit cache. The backend computes checksums; the model does not create substitutes. Cache-hit audit/version semantics are not fully supplied: preserve actual responses/IDs without claiming each call necessarily creates a new version or audit row.
 
-Before invoking, read the exact JSON and scored SPECs, record storyJsonRevision, each relevant SPEC fileRevision, primary path/status and review attempt, then keep them unchanged during the call. The sole JSON path is the later database lookup identity; a renamed file is not the same scored package. Content PASS and local records do not replace actual service persistence.
+Before invoking, read the exact JSON and scored SPECs. Verify the [required fields structure](jira-json-assembly.md): fields.description is a Markdown string, customFields.acceptanceCriteria is the real field ID, and fields[that ID] contains the actual AC Markdown. Mapping IDs are not Story text; a missing/empty/non-string mapped value or a legacy flat file must return to production precheck before scoring. Record storyJsonRevision, each relevant SPEC fileRevision, primary path/status and review attempt, then keep them unchanged during the call. The sole JSON path is the later database lookup identity; a renamed file is not the same scored package. Content PASS and local records do not replace actual service persistence.
 
 ## Preserve and interpret the actual response
 
@@ -34,7 +34,7 @@ Allocate the next unused story-quality-score-attempt-<nnn>.md using [record temp
 
 Record the exact three inputs and observed file bindings outside the untouched response. The expected assessment can expose ok/finalScore/cache flags, counts, parser errors and service IDs; no single optional diagnostic/ID is mandatory unless the live contract requires it. A validation string or SKIPPED cannot be coerced into an assessment. Never calculate finalScore from components or infer it from a band/status.
 
-Retain the existing SDLC policy: actual boolean ok=true, finite numeric finalScore in 76–100 and valid AC/parser recognition. The screenshots do not specify the backend threshold number; do not claim its configured threshold has been verified as 76. A backend rejection still blocks creation. Inspect returned parseErrors/warnings and any AC counts against canonical JSON acceptanceCriteria; count distinct declared AC entries, not BDD references or occurrences. Missing optional counts alone do not fail; contradictory/zero returned counts for nonempty ACs or unresolved recognition errors block readiness. A .json4jira input is not required to contain a literal Markdown Acceptance Criteria heading.
+Retain the existing SDLC policy: actual boolean ok=true, finite numeric finalScore in 76–100 and valid AC/parser recognition. The screenshots do not specify the backend threshold number; do not claim its configured threshold has been verified as 76. A backend rejection still blocks creation. Inspect returned parseErrors/warnings and any AC counts against the actual Markdown at fields[customFields.acceptanceCriteria]; count distinct declared AC IDs/entries there, not the mapping, BDD references or repeated mentions in description/SPEC. Never count an absent old top-level array as zero ACs. Missing optional counts alone do not fail; contradictory/zero returned counts for nonempty ACs or unresolved recognition errors block readiness. Use the confirmed Markdown field representation; no additional exact-heading parser requirement has been supplied.
 
 ## Freeze and recovery
 

@@ -1,25 +1,20 @@
 {
+  "staffId": "<real current staff ID>",
   "jiraInstance": "<confirmed lowercase source>",
   "projectKey": "<actual project key>",
-  "issueType": "<confirmed Story type in backend format>",
-  "summary": "<supported Story title>",
-  "description": [
-    "As a <evidenced role>, I want <supported goal>, so that <supported value>.",
-    "<supported business context, scope and material dependencies>"
-  ],
-  "acceptanceCriteria": [
-    "AC-001: Given <supported condition>, when <action>, then <observable result>."
-  ],
-  "bddScenarios": [
-    {
-      "scenario": "AC-001: <same supported behavior>",
-      "given": "<same supported condition>",
-      "when": "<same action>",
-      "then": "<same observable result>"
-    }
-  ],
+  "issueType": "<confirmed Story type name>",
+  "customFields": {
+    "acceptanceCriteria": "<actual AC field ID>"
+  },
+  "fields": {
+    "project": {"key": "<actual project key>"},
+    "issuetype": {"id": "<actual Story type ID>"},
+    "reporter": {"name": "<real current staff ID>"},
+    "summary": "<supported Story title>",
+    "description": "## User Story\nAs a <evidenced role>, I want <supported goal>, so that <supported value>.\n\n## Business Context\n<supported context, scope and material dependencies>",
+    "<actual AC field ID>": "## Acceptance Criteria\n\n- **AC-001**: Given <supported condition>, when <action>, then <observable result>."
+  },
   "attachments": [
     "outputs/ceaia/<candidate>/final-story-name-spec.md"
-  ],
-  "customFields": {}
+  ]
 }

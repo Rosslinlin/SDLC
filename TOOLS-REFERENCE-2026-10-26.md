@@ -1,11 +1,12 @@
-# SDLC JSON 工具契约 — 6.1.0-preview.1
+# SDLC JSON 工具契约 — 6.1.0-preview.2
 
-更新日期：2026-11-02。文件路径沿用旧名；当前内容只定义本 feature 分支的 SDLC JSON 路线。目标模型为 GPT-5.6 Luna / GPT-6 Luna，纯文本调用已有平台能力，不运行脚本。
+更新日期：2026-11-03。文件路径沿用旧名；当前内容只定义本 feature 分支的 SDLC JSON 路线。目标模型为 GPT-5.6 Luna / GPT-6 Luna，纯文本调用已有平台能力，不运行脚本。
 
 ## 权威来源和边界
 
 - 新后端截图说明 `.json4jira` 文件驱动、服务端格式校验/checksum/评分保存、创建时自动关联及异步同步队列。
 - 用户随后明确：评分工具改名 **scoreUserStory**，仍传 **JSON 路径 + SPEC 状态 + SPEC 路径**；导出工具仍为 **exportJiraByDynamicFields**，只传该 JSON 路径；Story 分数暂不写入 SPEC。这些澄清优先于截图中的评分单参数样例及示意名称 create_jira。
+- 2026-11-03 开发截图与用户确认进一步替换了文件的旧扁平结构：根级 staffId/jiraInstance/projectKey/issueType，实际 Jira 内容在 fields；customFields.acceptanceCriteria 只映射实际字段 ID，AC Markdown 在 fields[该ID]。字段 ID、员工号与项目取真实上下文/metadata，不照抄截图。
 - 工具实时 schema 是实际调用依据。缺失的返回字段、更新/替换编码和恢复能力不能由调用方编造。完整后端评分权重没有提供；Q1–Q7 是共享内容标准，不是替代评分器。
 
 ## 评分：nodejs-base-mcp.scoreUserStory
@@ -36,7 +37,7 @@
 }
 ```
 
-不再传 Summary、Description、dynamicFieldsJson、attachmentsJson、issuesJson、身份/会话值或旧五字段关联参数。每候选一个完整 JSON，批次默认逐文件调用，不自行发明路径数组或批量 wrapper。路径必须与本轮评分输入原样一致；导出阶段不查询/转换/重组业务内容。
+不再把 Summary、Description、dynamicFieldsJson、attachmentsJson、issuesJson、身份/会话值或旧五字段关联作为工具参数；文件内必需的 staffId 不因此省略。每候选一个完整 JSON，批次默认逐文件调用，不自行发明路径数组或批量 wrapper。路径必须与本轮评分输入原样一致；导出阶段不查询/转换/重组业务内容。
 
 创建后端负责核评分记录/checksum/阈值、Jira/附件写入、匹配记录关联和同步任务入队。必须分别记录实际 issue、attachments、databaseLink、scoreSyncQueue 和 jiraScoreSync 结果；这些是本地规范化事实，不要求后端返回这些同名字段。普通成功或票号不能证明落库关联/入队全部完成。异步 PENDING 不等于 Jira 分数字段已同步。
 
@@ -54,7 +55,7 @@
 | java-base-mcp.fetchConfluenceContent / fuzzyMatchingConfluence | 原始需求证据获取；遵循来源资源中的已知参数及实时schema |
 | ask_user_question | 缺失事实/真实选择/设置、当前内容确认或有界恢复决定；不伪造用户确认 |
 
-这些query在 generation 组装 Story 时完成。实际认证/查询staffId不是新导出接口参数；query的almType也不自动成为JSON的字段名。截图JSON样例使用jiraInstance/issueType，不能凭旧API别名增设重复属性。缓存命中按用户/项目/type/操作能力复用，不按TTL强刷；成功后根据上游完整assembly snapshot保存精简profile。规范见 [前置组装](ceaia-sdlc-story-spec-generation/references/jira-json-assembly.md)。
+这些 query 在 generation 组装 Story 时完成。实际 staffId 写入 JSON 根级与 create 的 fields.reporter.name，但不是评分/导出接口的额外参数；query 的 almType 不自动成为 JSON 字段名。根级 projectKey 与 fields.project.key 一致，根级 issueType 是确认的类型名，fields.issuetype.id 是查询到的实际 ID；字段名大小写固定。fields.summary、fields.description 和 fields[customFields.acceptanceCriteria] 均为字符串，后两者是 Markdown。customFields 是映射，业务值在 fields；不再生成旧顶层 summary/description/acceptanceCriteria/bddScenarios。缓存命中按用户/项目/type/操作能力复用，不按 TTL 强刷；缺 AC ID 的旧 profile 需补齐该 metadata，成功后保存完整 assembly snapshot 的精简配置。规范见 [前置组装](ceaia-sdlc-story-spec-generation/references/jira-json-assembly.md)。
 
 平台另需真实 Workspace 读写、独立只读 reviewer、.json4jira内容预览和当前用户确认能力。Task保留10个命名工具位置，最后评分工具替换为scoreUserStory；不为这些平台能力杜撰工具名或模型参数。
 

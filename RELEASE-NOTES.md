@@ -1,3 +1,20 @@
+# CEAIA SDLC v6.1.0-preview.2 — fields 结构修正
+
+日期：2026-11-03。工作分支：`codex/sdlc-json4jira-flow`，尚未合入 `main`。按开发截图及用户后续确认修正 JSON 组装/读取约定，不表示新 schema 已通过真实评分或后端集成测试。
+
+- 根级保留实际 `staffId`、`jiraInstance`、`projectKey`、`issueType`；实际 Jira 写入业务字段放入 `fields`。`fields.project.key` 对应根级项目，`fields.issuetype.id` 使用查询到的 Story 类型 ID，`fields.reporter.name` 对应实际 `staffId`。
+- `customFields.acceptanceCriteria` 仅存实际字段 ID 映射；AC 正文存放在 `fields[customFields.acceptanceCriteria]`，值为 Markdown 字符串。其他已获准的自定义业务值也按实际字段 ID 放入 `fields`，不把映射 ID 当正文或 AC 数量依据。
+- `fields.summary` 为标题，`fields.description` 为 Markdown 字符串；删除旧顶层 `summary`、`description`、`acceptanceCriteria`、`bddScenarios`。员工号、项目、类型 ID 与自定义字段 ID 全部来自实际上下文/metadata，不硬编码截图示例。
+- 生成模板、组装自检、SPEC/测试投影、reviewer 读取及评分 AC 识别按同一字段结构处理。缺失映射、数组描述、目标/身份冲突等属于结构问题，Q1–Q7 业务审查标准不加严。
+- 评分仍为 `scoreUserStory` 三参数，导出仍为 `exportJiraByDynamicFields` 单路径；SPEC 不写分数、后端关联/队列分项记录和失败恢复规则不变。转换旧 JSON 后须重新评分并确认当前内容，不重放已成功或未知的远端写入。
+- 本次仍不修改三个独立包；平台清单补充新字段结构场景，真实平台结果留空。preview.1 的本地检查和 mock 轨迹属于历史证据，不能替代本次 schema 验证。
+
+---
+
+# 历史记录：v6.1.0-preview.1（JSON 字段约定已由 preview.2 修正）
+
+以下保留当时发布说明；当前字段结构以本文顶部 preview.2 和活动 Skill 为准。
+
 # CEAIA SDLC v6.1.0-preview.1 — JSON4Jira flow
 
 日期：2026-11-02。工作分支：`codex/sdlc-json4jira-flow`，尚未合入 `main`。运行目标仍为平台 GPT-5.6 Luna / GPT-6 Luna，纯文本执行。本预览按新接口重构活动三 Skill，不表示后端集成或两种模型已完成实测。

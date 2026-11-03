@@ -1,6 +1,6 @@
 # CEAIA SDLC v6.1 JSON4Jira flow — preview
 
-当前分支版本为 `6.1.0-preview.1`，日期 `2026-11-02`，工作分支为 `codex/sdlc-json4jira-flow`，尚未合入 `main`。本分支将每个候选的最终 Jira 内容统一为一个 `story.json4jira`，从该文件生成 SPEC 中的 Story 投影，使用同一路径评分、预览和导出。运行目标为平台 GPT-5.6 Luna / GPT-6 Luna；运行时仅使用现有平台工具和 Markdown/JSON 资源，不执行本地脚本。
+当前分支版本为 `6.1.0-preview.2`，日期 `2026-11-03`，工作分支为 `codex/sdlc-json4jira-flow`，尚未合入 `main`。本分支将每个候选的最终 Jira 内容统一为一个 `story.json4jira`，从该文件生成 SPEC 中的 Story 投影，使用同一路径评分、预览和导出。运行目标为平台 GPT-5.6 Luna / GPT-6 Luna；运行时仅使用现有平台工具和 Markdown/JSON 资源，不执行本地脚本。
 
 三个活动 Skill：
 
@@ -13,6 +13,17 @@
 唯一编排规则见 [workflow-contract](ceaia-sdlc-story-spec-generation/references/workflow-contract.md)。主链为：来源读取 → 在生成阶段解析项目/Story 类型/字段配置并复用缓存 → 每候选生成最终 `story.json4jira`、`TEST_CASE.md`、`<name>-spec.md` → 生产自检 → 独立内容审查 → 同步并读回 SPEC review 状态 → 真实评分 → 整批覆盖核对 → 前端 HTML 预览 → 用户明确确认当前内容 → 逐候选导出。默认继续完整流程；明确 preparation-only/no-Jira、停止、范围调整或未解决阻塞按契约处理。初始全流程意图不代替最终内容确认。
 
 `story.json4jira` 是唯一 Story 业务源，也是最终 Jira 提交文件；**不再生成独立 `STORY.md`**。SPEC 中的 Story 展示须从该 JSON 的实际业务字段投影，不能另写一份不同内容。`TEST_CASE.md` 仍保留；仅按已确认 schema 授权的 SPEC 附件计划进入 JSON，测试与内部记录不上传。
+
+开发与用户已确认以下 JSON 结构为生成及评分前的强制格式，具体 ID 和身份值从实际上下文/metadata 取得：
+
+| 位置 | 内容与一致性 |
+| --- | --- |
+| 根级 `staffId`、`jiraInstance`、`projectKey`、`issueType` | 实际员工号、已确认来源/项目和 Story 类型名；不把截图示例值当默认值。 |
+| `customFields.acceptanceCriteria` | 真实 AC 字段 ID 映射，不是验收标准正文；不硬编码截图中的字段 ID。 |
+| `fields.project.key`、`fields.issuetype.id`、`fields.reporter.name` | 分别与根级项目、实际 Story 类型 ID、实际 `staffId` 对应；保留精确大小写和对象结构。reporter 为新建格式，更新仍按获准增量/省略语义保留原值。 |
+| `fields.summary`、`fields.description`、`fields[customFields.acceptanceCriteria]` | 标题、Markdown 描述字符串、Markdown AC 正文字符串。其他获准自定义业务值也放在 `fields[实际字段ID]`。 |
+
+移除旧顶层 `summary` / `description` / `acceptanceCriteria` / `bddScenarios`。生成、自检、SPEC 投影、测试与 reviewer 都读取同一实际 `fields` 内容；映射缺失、类型错误或身份/目标冲突是结构问题，不给 Q1–Q7 新增业务标准。已评分旧 JSON 转为该结构后须重新完成当前包的评分及内容确认，不能沿用旧 checksum。
 
 当前接口边界：
 

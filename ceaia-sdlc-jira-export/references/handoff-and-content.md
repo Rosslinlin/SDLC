@@ -18,6 +18,8 @@ Keep internal handoffType=ceaia-sdlc-validated, candidate identity and create/up
 
 Read actual files and records, not generator summaries or counters alone. Validate provenance/currentness without repeating decomposition, business quality review or scoring diagnostics. Do not edit, rename, render, normalize or reserialize the scored JSON/SPECs at export. An affected edit returns to generation and invalidates its review/score/readiness/preview bindings under the parent contract.
 
+The confirmed file has real root staffId/routing and a fields object; AC content is the Markdown at fields[customFields.acceptanceCriteria], not the mapping ID or an old top-level array. The parent's assembly record establishes the actual type/field IDs and identity/target consistency. A legacy flat file, missing mapped value or mismatched structure returns upstream before submission; exporter never repairs it in place. File staffId is not an additional tool argument.
+
 ## Scope and file boundaries
 
 - One candidate has one fixed story.json4jira, one Test Case and primary SPEC; distinct reviewed replacement contents retain distinct SPECs/mappings. specArtifacts.uploaded describes planned upload only; actual remote outcomes live in writeResults.

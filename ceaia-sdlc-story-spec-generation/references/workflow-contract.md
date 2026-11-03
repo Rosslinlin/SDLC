@@ -1,6 +1,6 @@
 # CEAIA JSON-first workflow — contract 7
 
-Version 6.1.0-preview.1. This contract owns orchestration, state, invalidation and bounded repair. Content criteria belong to [Q1–Q7](quality-contract.md); JSON field mapping belongs to [assembly](jira-json-assembly.md); actual scoring belongs to [scoreUserStory](scoring-tool-contract.md). Task and ordinary chat use this same sequence. Runtime is text-only on GPT-5.6 Luna or GPT-6 Luna.
+Version 6.1.0-preview.2. This contract owns orchestration, state, invalidation and bounded repair. Content criteria belong to [Q1–Q7](quality-contract.md); JSON field mapping belongs to [assembly](jira-json-assembly.md); actual scoring belongs to [scoreUserStory](scoring-tool-contract.md). Task and ordinary chat use this same sequence. Runtime is text-only on GPT-5.6 Luna or GPT-6 Luna.
 
 ## Fixed sequence
 
@@ -77,6 +77,8 @@ After current independent PASS, verified pre-score SPEC headers, real score 76�
 Backend linkage and queueing replace the old Agent B call. A ticket key alone does not prove DB write-back. Record issue, attachments, databaseLink and scoreSyncQueue outcomes from actual evidence; absent evidence remains unknown/pending. Confirmed synchronous creation/linkage/enqueue can be reported as submitted with Jira score synchronization pending. Do not claim the Jira score field has updated without actual evidence, invent a polling tool or loop waiting for an asynchronous job.
 
 ## Migration from v6
+
+The 2026-11-03 confirmed fields/AC-ID-map format also supersedes preview.1's flat JSON. Before an unsubmitted package continues, generation rewrites it using actual metadata, aligns its dependent SPEC/tests, verifies affected review and obtains a current score and content confirmation. A schema-only edit still changes scored bytes. Preserve old records and every known/unknown remote outcome; an already submitted or uncertain operation is reconciled, never recreated to migrate its format. State contract remains 7 because the control-state shape is unchanged.
 
 Preserve old state, original inputs, score records and every known/unknown remote outcome as migration evidence before converting local metadata. A Markdown score or old five-field association cannot authorize a new JSON upload. An unexported candidate must assemble the actual JSON, regenerate dependent views, independently review and score it through the new interface. Remove old storyPath/storyRevision/specScoreDisplay only after their evidence is preserved; new control uses storyJsonPath/storyJsonRevision.
 

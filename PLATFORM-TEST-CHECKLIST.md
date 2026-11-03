@@ -1,6 +1,6 @@
 # v6.1 JSON4Jira flow 平台测试清单 — preview
 
-版本 `6.1.0-preview.1`，日期 `2026-11-02`，分支 `codex/sdlc-json4jira-flow`，未合入 `main`。分别在平台 GPT-5.6 Luna 与 GPT-6 Luna 验证新路径接口。下列结果栏留空表示尚未记录，不能把旧 v6 本地/旧接口检查、mock 推演或普通 tool success 当作新接口与数据库实测。
+版本 `6.1.0-preview.2`，日期 `2026-11-03`，分支 `codex/sdlc-json4jira-flow`，未合入 `main`。分别在平台 GPT-5.6 Luna 与 GPT-6 Luna 验证新路径接口。下列结果栏留空表示尚未记录，不能把旧 v6 本地/旧接口检查、mock 推演或普通 tool success 当作新接口与数据库实测。
 
 ## 环境与执行记录
 
@@ -35,6 +35,12 @@
 | J22 | 更新读取 source、目标、Description/独立AC状态和完整附件 inventory；none/replace 保留义务。live schema 不能表达 target/replace 时明确 WAITING_TOOL，不猜字段、不擅新建。 | | |
 | J23 | update none 的本地 SPEC 只用于审查/评分，不被自动当上传附件；replace 只有 schema 明确支持且原件映射获准时才执行，并按真实后端结果确认替换，不假设旧API可用。 | | |
 | J24 | 旧 v6 会话迁移保留原始状态、编号证据、修复计数及所有已知/未知远端结果；不把旧 STORY.md 评分当新 JSON 评分，不通过调用重放完成迁移，也不补旧 S2/B。 | | |
+| J25 | 按实际 metadata 取得 AC 字段 ID，`customFields.acceptanceCriteria` 保存该 ID，正文从 `fields[该ID]` 读取且为 Markdown 字符串；SPEC/测试/reviewer/评分 AC 识别指向相同正文，截图示例值不被硬编码。 | | |
+| J26 | 输入旧扁平 summary/description/acceptanceCriteria/bddScenarios 时在组装/自检识别并修正为 fields 结构；不拿旧顶层内容或旧评分继续导出。变更后按当前包重新评分、确认，不重放已有远端写入。 | | |
+| J27 | `fields.description` 被误写为数组/对象时作为结构问题处理，修为保留原业务含义的 Markdown 字符串；不因格式修正编造新业务要求或另加 Q1–Q7 门槛。 | | |
+| J28 | `customFields.acceptanceCriteria` 的字段 ID 不被计作 AC 正文/AC 数量；读取对应 fields 值，缺少实际正文不能被映射字符串伪装成内容通过。 | | |
+| J29 | AC 映射为空/缺失、指向不存在字段，或字段值为空/非字符串时明确结构阻塞并回到生成；不猜 ID、不从旧顶层数组静默兜底、不宣称通过评分。 | | |
+| J30 | 根级 projectKey 与 `fields.project.key`、类型名/真实 `fields.issuetype.id`、新建时 staffId 与 `fields.reporter.name` 一致；更新按获准增量/省略语义保留原 reporter。冲突在评分前解决，不硬编码类型 ID 7 或照抄示例员工号/项目。 | | |
 
 ## 后端结果证据
 
@@ -63,11 +69,19 @@
 | --- | --- | --- | --- | --- |
 | | | | | |
 
-### 2026-11-02 本地检查与 GPT-6 Luna 隔离推演
+### 2026-11-03 preview.2 本地检查与 assemble 隔离验证
 
-本次开发检查通过：6 个 JSON 文件解析、83 条本地文件链接、8 个 fenced JSON 示例、3 个 Skill 的 YAML/frontmatter/命名、两个 Q1–Q7 副本逐字一致、state contract 7、Task schema/skill IDs/10 工具顺序（仅评分 ID 更新）、评分三参数与三个导出单参数示例、独立三目录无修改、git diff --check。官方 quick_validate 因环境缺少 PyYAML 未完成；frontmatter 改由 Ruby Psych 解析并检查同类约束，未安装依赖。
+本地检查通过：6 个 JSON、85 条文件链接、8 个 fenced JSON 示例、3 个 Skill 的 YAML/frontmatter、共享标准副本一致、state 7 和 git diff --check；Task schema/skill IDs/工具列表及 Q1–Q7 业务判定表与 preview.1 一致。模板经 JSON 解码检查字段对象、动态 AC 映射、字符串类型、身份/项目关系及 Markdown 换行；旧顶层字段已移除。官方 quick_validate 仍因缺 PyYAML 未完成，frontmatter 使用 Ruby Psych 解析检查。
 
-GPT-6 Luna 读取最终包文本，使用给定 mock 文件状态/工具结果生成事件和具体调用提议；未调用真实评分、Jira、数据库或预览服务。根代理另行解析完整轨迹，核对六个场景的调用数量及参数键值。耗时、token、GPT-5.6 Luna 与真实后端行为未测；以上平台结果栏保持空白。
+GPT-6 Luna 读取更新后的 generation 资源，以与截图不同的模拟项目、Story 类型 ID 和 AC 字段 ID，完成一次仅 assemble 阶段的 JSON 生成。根代理独立解码实际产物，确认两个 AC 从真实模拟映射字段读取、描述与 AC 均为有实际换行的 Markdown 字符串、未照抄截图常量；附件仅保留获准的后续 SPEC 路径，未声称文件存在。没有执行完整生产 precheck、review、评分、预览确认或 Jira/数据库调用，不代表 J25–J30 的真实平台测试通过。平台结果栏继续留空；模型耗时/token 未测。
+
+### 历史记录：preview.1 — 2026-11-02 本地检查与 GPT-6 Luna 隔离推演
+
+以下是 preview.1 当时的检查，不验证 preview.2 的 fields/动态 AC 映射结构。新结构的真实平台结果尚未记录。
+
+当时开发检查通过：6 个 JSON 文件解析、83 条本地文件链接、8 个 fenced JSON 示例、3 个 Skill 的 YAML/frontmatter/命名、两个 Q1–Q7 副本逐字一致、state contract 7、Task schema/skill IDs/10 工具顺序（仅评分 ID 更新）、评分三参数与三个导出单参数示例、独立三目录无修改、git diff --check。官方 quick_validate 因环境缺少 PyYAML 未完成；frontmatter 改由 Ruby Psych 解析并检查同类约束，未安装依赖。
+
+GPT-6 Luna 当时读取 preview.1 包文本，使用给定 mock 文件状态/工具结果生成事件和具体调用提议；未调用真实评分、Jira、数据库或预览服务。根代理另行解析完整轨迹，核对六个场景的调用数量及参数键值。耗时、token、GPT-5.6 Luna 与真实后端行为未测；以上平台结果栏保持空白。
 
 | 隔离场景 | 实际推演结果 |
 | --- | --- |

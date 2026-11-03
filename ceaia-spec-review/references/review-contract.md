@@ -1,4 +1,4 @@
-# Independent review contract 6.1.0-preview.1
+# Independent review contract 6.1.0-preview.2
 
 ## Inputs and bindings
 
@@ -10,9 +10,11 @@ Record actual paths and observed revisions. Revisions supplied by the parent des
 
 ## JSON business content and Markdown projection
 
-Read the current JSON's summary, description, acceptanceCriteria, bddScenarios and customFields that carry business meaning. Interpret encoded business values using the parent's confirmed field metadata; do not invent labels or rules for unknown IDs. Assess acceptance criteria and BDD together without demanding that the same BDD be duplicated inline or that JSON contain Markdown headings. The JSON is the current authoritative business object, but original evidence still determines whether its claims are correct.
+Read fields.summary and the Markdown string fields.description from the current JSON. Resolve the nonempty field-ID string in customFields.acceptanceCriteria, then read the actual AC Markdown string from fields[that ID]. The mapping ID is configuration, never AC text. Read other confirmed custom-field business values from fields[actual field ID], interpreting them through the parent's confirmed metadata; do not invent labels or rules for unknown IDs. The JSON is the current authoritative business object, but original evidence still determines whether its claims are correct.
 
-Compare each SPEC's readable Markdown projection with the JSON business meaning, requirements and tests. Preserve actors, rules, AC/BDD outcomes, scope and relevant business custom-field values; rendering and structure may differ. Do not demand byte-for-byte raw JSON copies or a standalone Markdown Story. Routing, staffId, project/type/field IDs and other internal transport metadata do not belong in the SPEC business projection. A custom-field ID is transport metadata; its source-supported business value may still require coverage.
+A missing/invalid AC mapping, a mapping that points to an absent field, or an empty/non-string mapped AC value is a technical structure problem. Identify the exact JSON location and return it for production repair; do not add a Q1-Q7 business criterion or treat the mapping ID as evidence of covered acceptance. Assess the actual AC conditions/actions/outcomes once readable. Do not require the retired top-level acceptanceCriteria or bddScenarios properties, an independent BDD object, or duplicate scenario text merely to match the former structure.
+
+Compare each SPEC's readable Markdown projection with the JSON business meaning, requirements and tests. Preserve actors, rules, AC/scenario outcomes, scope and relevant business custom-field values; rendering and structure may differ. Do not demand byte-for-byte raw JSON copies or a standalone Markdown Story. Routing, staffId, project/type/field IDs and other internal transport metadata do not belong in the SPEC business projection. A custom-field ID is transport metadata; its source-supported business value may still require coverage.
 
 All current SPECs remain review targets, including a score-only SPEC. A score-only SPEC is a required input to the parent's scoring stage; that does not require it to be listed for upload. Attachment declarations follow the confirmed JSON schema and authorized scope, not a reviewer-invented rule to attach the scoring file. Do not infer that a local SPEC was or will be uploaded merely because it exists.
 
