@@ -1,5 +1,4 @@
 {
-  "staffId": "<real current staff ID>",
   "jiraInstance": "<confirmed lowercase source>",
   "projectKey": "<actual project key>",
   "issueType": "<confirmed Story type name>",
@@ -11,8 +10,8 @@
     "issuetype": {"id": "<actual Story type ID>"},
     "reporter": {"name": "<real current staff ID>"},
     "summary": "<supported Story title>",
-    "description": "## User Story\nAs a <evidenced role>, I want <supported goal>, so that <supported value>.\n\n## Business Context\n<supported context, scope and material dependencies>",
-    "<actual AC field ID>": "## Acceptance Criteria\n\n- **AC-001**: Given <supported condition>, when <action>, then <observable result>."
+    "description": "h2. User Story\nAs a <evidenced role>, I want <supported goal>, so that <supported value>.\n\nh2. Business Context\n<supported context, scope and material dependencies>",
+    "<actual AC field ID>": "* *AC-001*: Given <supported condition>, when <action>, then <observable result>."
   },
   "attachments": [
     "outputs/ceaia/<candidate>/final-story-name-spec.md"

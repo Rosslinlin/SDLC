@@ -1,6 +1,6 @@
 # v6.1 JSON4Jira flow 功能归属 — preview
 
-版本 `6.1.0-preview.3`，日期 `2026-11-03`，分支 `codex/sdlc-json4jira-flow`，未合入 `main`。本表描述新路径接口的职责与待验证边界，不代表真实后端已通过。
+版本 `6.1.0-preview.4`，日期 `2026-11-03`，分支 `codex/sdlc-json4jira-flow`，未合入 `main`。本表描述新路径接口的职责与待验证边界，不代表真实后端已通过。
 
 | 能力 | 唯一职责 / 参考 | 当前行为与边界 |
 | --- | --- | --- |
@@ -9,9 +9,10 @@
 | 固定内容标准 | generation [quality-contract](ceaia-sdlc-story-spec-generation/references/quality-contract.md)；review 内同文副本 | Q1–Q7 不另增标准；检查 JSON 业务内容、SPEC 投影和测试，不增加本地评分或第四个 Skill。 |
 | 来源与拆分 | generation [source-enrichment](ceaia-sdlc-story-spec-generation/references/source-enrichment.md) / [authoring](ceaia-sdlc-story-spec-generation/references/artifact-generation-rules.md) | 原始要求有明确去向；不从 UI 推断后台，不按 AC 数拆票，不发明缺失业务事实。 |
 | 前置项目/type/meta 与缓存 | generation | 在生成最终 JSON 前完成适用查询、确认字段类型/选项/必要值；命中真实用户工作区 profile 时复用，缺项定向查询；票据及要求附件确认成功后保存上游已确认快照；关联/队列结果另记。export 不另组装一套字段。 |
-| JSON 字段结构与取值 | generation assembly/precheck；reviewer 读取 | 根级 `staffId/jiraInstance/projectKey/issueType`，业务值在 `fields`；`customFields.acceptanceCriteria` 仅映射实际字段 ID，AC 正文为 `fields[该ID]` 的 Markdown 字符串。project/issuetype/reporter 对象与实际身份/目标一致；取消旧顶层 summary/description/AC/BDD，不硬编码示例 ID。结构问题回到生成处理，不增加 Q1–Q7。 |
+| JSON 字段结构与取值 | generation assembly/precheck；reviewer 读取 | 根级为 `jiraInstance/projectKey/issueType`，删除根级 `staffId`；身份配置和查询工具所需员工号仍按实际 schema 保留。业务值在 `fields`；`customFields.acceptanceCriteria` 仅映射实际字段 ID，AC 正文为 `fields[该ID]` 的 Jira wiki 字符串。project/issuetype 与实际目标一致，reporter 按 metadata 要求/授权使用真实身份；取消旧顶层 summary/description/AC/BDD，不硬编码示例 ID。结构问题回到生成处理，不增加 Q1–Q7。 |
+| Jira 文本格式 | generation assembly/precheck | 评分前将 description、映射 AC 及 metadata 确认的其他获准富文本写成 Jira wiki：标题 `h1.`/`h2.`，AC 如 `* *AC-001*: Given ...`；保留措辞、顺序、换行、代码及每条 AC。普通文本、summary、身份/路由/选项和未改动更新字段不转换；export 不再加工。 |
 | 单一 Story 业务源 | generation 模板及 authoring | 每候选一个最终 `story.json4jira`；取消独立 `STORY.md`。业务内容和获准的提交/附件配置由 live schema 约束，不能凭旧 direct 参数猜 JSON 字段。 |
-| 测试与 SPEC | generation | 保留 `TEST_CASE.md`；SPEC 的 Story 投影来自当前 JSON，测试表来自当前测试文件。保留必要元数据与实际文件/引用一致性；SPEC 不显示分数。 |
+| 测试与 SPEC | generation | 保留 `TEST_CASE.md`；SPEC 仍为 Markdown，Story 投影来自当前 JSON 中 Jira wiki 的相同业务语义，测试表来自当前测试文件，不直接复制 wiki 标记作为 Markdown。保留必要元数据与实际文件/引用一致性；SPEC 不显示分数。 |
 | 独立内容审查 | review [contract](ceaia-spec-review/references/review-contract.md) / [report](ceaia-spec-review/references/review-report-template.md) | 独立读取原来源、JSON 的实际 fields 业务值和所有当前 SPEC/测试；先解析 AC 字段映射再读正文，不将字段 ID 当业务文字；返回 Q1–Q7 内容结论及绑定，不评分、不管理预算/导出就绪、不把机械偏好升级为业务阻塞。 |
 | 局部修复与澄清 | generation workflow-contract / [clarification](ceaia-sdlc-story-spec-generation/references/user-clarification-and-resume.md) | review/score 共用两批内容修复；每个机械原因另限一次，仍保持变更失效。缺事实只问所需事实，续跑不重置计数。 |
 | 路径评分与完整记录 | generation [scoring-tool-contract](ceaia-sdlc-story-spec-generation/references/scoring-tool-contract.md) | `scoreUserStory(story_json_workspace_path, specFileStatus, specFilePath)`；真实输入/完整响应保留，同一候选的最终评分路径必须等于导出路径。 |

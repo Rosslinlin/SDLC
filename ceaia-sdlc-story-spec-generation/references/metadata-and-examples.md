@@ -18,13 +18,11 @@ Include these only when supplied and intended for the business deliverable; othe
 
 Assume source explicitly says a permitted reviewer can open an existing application and see supplied details:
 
-```markdown
-## Acceptance Criteria
-
-- **AC-001**: Given a permitted reviewer and an existing application, when the reviewer opens the application, then the details panel displays the supplied application details.
+```text
+* *AC-001*: Given a permitted reviewer and an existing application, when the reviewer opens the application, then the details panel displays the supplied application details.
 ```
 
-Resolve the real AC field ID into customFields.acceptanceCriteria, then store this AC Markdown string in fields[that ID], preserving stable IDs and supported Given/When/Then detail. Derive the SPEC projection from that value. The mapping ID is not AC text, and there is no top-level acceptanceCriteria/bddScenarios array. The shown heading is a readable template convention; the supplied backend evidence does not establish an additional exact-heading parser rule.
+Resolve the real AC field ID into customFields.acceptanceCriteria, then store this Jira wiki string in fields[that ID], preserving stable IDs and supported Given/When/Then detail. Use [text encoding](jira-text-format.md) before scoring. Derive the SPEC projection as Markdown with one Acceptance Criteria heading and - **AC-001**: for this same behavior. The mapping ID is not AC text, and there is no top-level acceptanceCriteria/bddScenarios array. No additional exact-heading parser rule is established by this example.
 
 ## Correct negative dispositions
 

@@ -1,6 +1,6 @@
 # CEAIA SDLC v6.1 JSON4Jira flow — preview
 
-当前分支版本为 `6.1.0-preview.3`，日期 `2026-11-03`，工作分支为 `codex/sdlc-json4jira-flow`，尚未合入 `main`。本分支将每个候选的最终 Jira 内容统一为一个 `story.json4jira`，从该文件生成 SPEC 中的 Story 投影，使用同一路径评分、预览和导出。运行目标为平台 GPT-5.6 Luna / GPT-6 Luna；运行时仅使用现有平台工具和 Markdown/JSON 资源，不执行本地脚本。
+当前分支版本为 `6.1.0-preview.4`，日期 `2026-11-03`，工作分支为 `codex/sdlc-json4jira-flow`，尚未合入 `main`。本分支将每个候选的最终 Jira 内容统一为一个 `story.json4jira`，从该文件生成 SPEC 中的 Story 投影，使用同一路径评分、预览和导出。运行目标为平台 GPT-5.6 Luna / GPT-6 Luna；运行时仅使用现有平台工具和 Markdown/JSON 资源，不执行本地脚本。
 
 三个活动 Skill：
 
@@ -20,12 +20,14 @@
 
 | 位置 | 内容与一致性 |
 | --- | --- |
-| 根级 `staffId`、`jiraInstance`、`projectKey`、`issueType` | 实际员工号、已确认来源/项目和 Story 类型名；不把截图示例值当默认值。 |
+| 根级 `jiraInstance`、`projectKey`、`issueType` | 已确认来源/项目和 Story 类型名；不再生成根级 `staffId`，不把截图示例值当默认值。 |
 | `customFields.acceptanceCriteria` | 真实 AC 字段 ID 映射，不是验收标准正文；不硬编码截图中的字段 ID。 |
-| `fields.project.key`、`fields.issuetype.id`、`fields.reporter.name` | 分别与根级项目、实际 Story 类型 ID、实际 `staffId` 对应；保留精确大小写和对象结构。reporter 为新建格式，更新仍按获准增量/省略语义保留原值。 |
-| `fields.summary`、`fields.description`、`fields[customFields.acceptanceCriteria]` | 标题、Markdown 描述字符串、Markdown AC 正文字符串。其他获准自定义业务值也放在 `fields[实际字段ID]`。 |
+| `fields.project.key`、`fields.issuetype.id`、`fields.reporter.name` | 项目与根级一致，类型 ID 来自实际查询；reporter 按 metadata 的要求及授权使用真实身份，不依赖已移除的根级 `staffId`。保留精确大小写和对象结构，更新按获准增量/省略语义保留原值。 |
+| `fields.summary`、`fields.description`、`fields[customFields.acceptanceCriteria]` | 标题保持原文；描述与 AC 正文为 Jira wiki 字符串。其他获准自定义业务值也放在 `fields[实际字段ID]`，只对 metadata 确认的可写富文本应用对应格式。 |
 
-移除旧顶层 `summary` / `description` / `acceptanceCriteria` / `bddScenarios`。生成、自检、SPEC 投影、测试与 reviewer 都读取同一实际 `fields` 内容；映射缺失、类型错误或身份/目标冲突是结构问题，不给 Q1–Q7 新增业务标准。已评分旧 JSON 转为该结构后须重新完成当前包的评分及内容确认，不能沿用旧 checksum。
+生成阶段、评分之前就完成 Jira wiki 编码：描述标题使用 `h1. 标题`、`h2. 标题`；AC 例如 `* *AC-001*: Given ... When ... Then ...`，以 Jira 列表和单星号粗体保留每条 AC 的声明。JSON 字符串解码后有真实换行，普通正文与代码内容保真；不对 summary、路由/身份/选项、附件路径或更新中未改动字段做格式转换。SPEC 仍为 Markdown，从这些字段的相同语义生成可读投影，不能直接贴入 wiki 标记。导出只提交已评分的原文件，不再临时转换格式。
+
+移除旧顶层 `summary` / `description` / `acceptanceCriteria` / `bddScenarios` 及根级 `staffId`。身份配置与查询工具按实际 schema 所需的 `staffId` 仍保留；这不是评分/导出的额外入参。生成、自检、SPEC 投影、测试与 reviewer 都读取同一实际 `fields` 内容；映射缺失、类型错误或身份/目标冲突是结构问题，不给 Q1–Q7 新增业务标准。旧 JSON 删除字段或转换文字格式后须重新完成当前包的评分及内容确认，不能沿用旧 checksum。
 
 当前接口边界：
 

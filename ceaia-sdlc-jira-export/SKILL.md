@@ -5,7 +5,7 @@ description: Export a reviewed and scored CEAIA story.json4jira through its unch
 
 # CEAIA JSON Story Export
 
-Version: 6.1.0-preview.3 — 2026-11-03. State contract: 7. Runtime: GPT-5.6 Luna or GPT-6 Luna. Execution: text-only.
+Version: 6.1.0-preview.4 — 2026-11-03. State contract: 7. Runtime: GPT-5.6 Luna or GPT-6 Luna. Execution: text-only.
 
 Generation owns project/type/field discovery, configuration, JSON assembly, content repair, review and scoreUserStory. This skill consumes their current evidence, obtains the scored file's frontend upload confirmation and invokes the exporter with one path. Use existing platform capabilities; no scripts, new tools, business generation or scoring here.
 
