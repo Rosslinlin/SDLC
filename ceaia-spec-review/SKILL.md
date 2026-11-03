@@ -5,7 +5,7 @@ description: Independently review the authoritative CEAIA story.json4jira busine
 
 # CEAIA Independent Content Review
 
-Bundle revision: 6.1.0-preview.2 text-only. Supported platform runtimes: GPT-5.6 Luna and GPT-6 Luna.
+Bundle revision: 6.1.0-preview.3 text-only. Supported platform runtimes: GPT-5.6 Luna and GPT-6 Luna.
 
 Review independently from the generator, using actual original sources and current artifacts. Use platform read and agent capabilities; run no scripts or local code. Return the report to the caller. Do not edit artifacts/state, discover Jira fields, invoke scoring or export, prepare replacement payloads or write Jira. The parent owns schema/field preparation, repair, persistence, user interaction and workflow progression.
 

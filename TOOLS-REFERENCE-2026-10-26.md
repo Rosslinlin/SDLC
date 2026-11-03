@@ -1,4 +1,4 @@
-# SDLC JSON 工具契约 — 6.1.0-preview.2
+# SDLC JSON 工具契约 — 6.1.0-preview.3
 
 更新日期：2026-11-03。文件路径沿用旧名；当前内容只定义本 feature 分支的 SDLC JSON 路线。目标模型为 GPT-5.6 Luna / GPT-6 Luna，纯文本调用已有平台能力，不运行脚本。
 

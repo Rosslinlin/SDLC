@@ -1,6 +1,6 @@
 # v6.1 JSON4Jira flow 平台测试清单 — preview
 
-版本 `6.1.0-preview.2`，日期 `2026-11-03`，分支 `codex/sdlc-json4jira-flow`，未合入 `main`。分别在平台 GPT-5.6 Luna 与 GPT-6 Luna 验证新路径接口。下列结果栏留空表示尚未记录，不能把旧 v6 本地/旧接口检查、mock 推演或普通 tool success 当作新接口与数据库实测。
+版本 `6.1.0-preview.3`，日期 `2026-11-03`，分支 `codex/sdlc-json4jira-flow`，未合入 `main`。分别在平台 GPT-5.6 Luna 与 GPT-6 Luna 验证新路径接口。下列结果栏留空表示尚未记录，不能把旧 v6 本地/旧接口检查、mock 推演或普通 tool success 当作新接口与数据库实测。
 
 ## 环境与执行记录
 
@@ -12,7 +12,7 @@
 | ID | 场景及通过条件 | 5.6 Luna结果/证据 | 6 Luna结果/证据 |
 | --- | --- | --- | --- |
 | J01 | 三个包独立安装、资源可读，generation/review 的 Q1–Q7 同文；实际 skill IDs 已核对，exporter 占位替换。兼容 Task 文件显示 `SDLC-workflow-v6.1 JSON preview`，schema 与 10 工具顺序保留，最后一项为 scoreUserStory；模型由平台配置。 | | |
-| J02 | 新请求未写 push/export 仍准备完整流程；preparation-only 不导出；阶段调用不越界。所有默认路径最终仍须当前内容 HTML 预览及用户明确确认。 | | |
+| J02 | 所有用户未写 push/export 也默认继续 Jira-backed 完整流程，入口不提供路线选择；缺信息只补缺项，不推荐 preparation-only。仅用户主动明确只准备/不导出时遵从；阶段调用不越界。默认流程最终仍须评分后的当前内容 HTML 预览及用户明确确认。 | | |
 | J03 | 项目/type/meta 查询在生成最终 JSON 前完成；只使用 live schema 真实字段、类型、选项和必要值，不把旧 direct 参数直接猜成 JSON 字段。缓存命中复用，缺项/显式变更才查相应部分。 | | |
 | J04 | 跨会话配置由 generation 读取；票据及要求附件确认成功后仅将上游已确认快照保存到真实用户工作区 profiles.json；票据/要求附件失败、partial 或 unknown 不覆盖已保存配置，linkage/queue 待处理单独记录。完整命中不因 TTL 刷新，对话文件不冒充用户持久化，create metadata 不冒充 edit 权限。 | | |
 | J05 | 每候选只有一个最终 story.json4jira 和保留的 TEST_CASE.md、SPEC；不生成独立 STORY.md。SPEC Story 投影与 JSON 业务字段一致，测试镜像与当前表一致；内部路由/诊断不泄露到 Jira。 | | |
@@ -41,6 +41,9 @@
 | J28 | `customFields.acceptanceCriteria` 的字段 ID 不被计作 AC 正文/AC 数量；读取对应 fields 值，缺少实际正文不能被映射字符串伪装成内容通过。 | | |
 | J29 | AC 映射为空/缺失、指向不存在字段，或字段值为空/非字符串时明确结构阻塞并回到生成；不猜 ID、不从旧顶层数组静默兜底、不宣称通过评分。 | | |
 | J30 | 根级 projectKey 与 `fields.project.key`、类型名/真实 `fields.issuetype.id`、新建时 staffId 与 `fields.reporter.name` 一致；更新按获准增量/省略语义保留原 reporter。冲突在评分前解决，不硬编码类型 ID 7 或照抄示例员工号/项目。 | | |
+| J31 | 首次无适用配置：先读真实 Workspace/可信身份，再只问尚缺来源、staffId、项目名称/已知 key 或实际项目选择；类型/schema/AC ID 由工具查。保留默认 Jira 意图，没有路线选择或 preparation-only 推荐；元数据未全时不伪造完整可评分 JSON。 | | |
+| J32 | 已有适用配置及可信身份：复用已确认项，不重复询问来源/员工号/项目；仅缺失或不适用部分定向查询/提问。Story 类型/schema/AC ID 从真实配置或工具取得，不让业务用户填技术 ID；继续默认流程及最终内容确认。 | | |
+| J33 | 用户主动明确只准备/不导出：记录该方向，不执行导出；不把此方向变成默认入口选项。仍只用已知真实值，缺必要元数据则交付已有事实和待补项，不伪造完整可评分 JSON 或实际评分成功。 | | |
 
 ## 后端结果证据
 
@@ -69,11 +72,19 @@
 | --- | --- | --- | --- | --- |
 | | | | | |
 
-### 2026-11-03 preview.2 本地检查与 assemble 隔离验证
+### 2026-11-03 preview.3 本地检查与入口隔离验证
 
-本地检查通过：6 个 JSON、85 条文件链接、8 个 fenced JSON 示例、3 个 Skill 的 YAML/frontmatter、共享标准副本一致、state 7 和 git diff --check；Task schema/skill IDs/工具列表及 Q1–Q7 业务判定表与 preview.1 一致。模板经 JSON 解码检查字段对象、动态 AC 映射、字符串类型、身份/项目关系及 Markdown 换行；旧顶层字段已移除。官方 quick_validate 仍因缺 PyYAML 未完成，frontmatter 使用 Ruby Psych 解析检查。
+本地检查通过：6 个 JSON、87 条文件链接、8 个 fenced JSON 示例、3 个 Skill 的 YAML/frontmatter（Ruby Psych）、共享质量副本一致、state 7 和 git diff --check。Task schema/skill IDs/工具列表、评分三参数/导出单路径、JSON 模板及 Q1–Q7 内容保持 preview.2 原样；质量标准版本仍为 6.1.0-preview.2。
 
-GPT-6 Luna 读取更新后的 generation 资源，以与截图不同的模拟项目、Story 类型 ID 和 AC 字段 ID，完成一次仅 assemble 阶段的 JSON 生成。根代理独立解码实际产物，确认两个 AC 从真实模拟映射字段读取、描述与 AC 均为有实际换行的 Markdown 字符串、未照抄截图常量；附件仅保留获准的后续 SPEC 路径，未声称文件存在。没有执行完整生产 precheck、review、评分、预览确认或 Jira/数据库调用，不代表 J25–J30 的真实平台测试通过。平台结果栏继续留空；模型耗时/token 未测。
+GPT-6 Luna 使用最终入口资源，对三个给定 mock 场景产出具体问题与状态。首次无配置：只合并询问来源/staffId/项目名称或已知 key，jiraExportRequested=true；完整已确认 profile：不提问、不重复 query，可继续 assemble；用户主动要求不导出：jiraExportRequested=false，仍补问最终 JSON 所需的缺失配置。根代理另行解析轨迹核对问题、参数范围与状态。三个场景均未提出流程模式选择，也未生成/评分/导出文档或执行真实服务调用；这是入口阶段的离线推演，不能作为 J31–J33 的平台实测。耗时/token 与 GPT-5.6 Luna 未测，平台结果栏留空。
+
+### 历史记录：preview.2 — 2026-11-03 本地检查与 assemble 隔离验证
+
+以下为 preview.2 当时的检查，不验证 preview.3 的默认入口与缺项补齐行为；新增 J31–J33 的真实平台结果尚未记录。
+
+当时本地检查通过：6 个 JSON、85 条文件链接、8 个 fenced JSON 示例、3 个 Skill 的 YAML/frontmatter、共享标准副本一致、state 7 和 git diff --check；Task schema/skill IDs/工具列表及 Q1–Q7 业务判定表与 preview.1 一致。模板经 JSON 解码检查字段对象、动态 AC 映射、字符串类型、身份/项目关系及 Markdown 换行；旧顶层字段已移除。官方 quick_validate 仍因缺 PyYAML 未完成，frontmatter 使用 Ruby Psych 解析检查。
+
+GPT-6 Luna 当时读取 preview.2 generation 资源，以与截图不同的模拟项目、Story 类型 ID 和 AC 字段 ID，完成一次仅 assemble 阶段的 JSON 生成。根代理独立解码实际产物，确认两个 AC 从真实模拟映射字段读取、描述与 AC 均为有实际换行的 Markdown 字符串、未照抄截图常量；附件仅保留获准的后续 SPEC 路径，未声称文件存在。没有执行完整生产 precheck、review、评分、预览确认或 Jira/数据库调用，不代表 J25–J30 的真实平台测试通过。平台结果栏继续留空；模型耗时/token 未测。
 
 ### 历史记录：preview.1 — 2026-11-02 本地检查与 GPT-6 Luna 隔离推演
 

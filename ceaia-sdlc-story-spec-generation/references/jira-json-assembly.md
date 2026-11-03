@@ -4,6 +4,17 @@ This step moves the former export-time project/type/field discovery, value resol
 
 ## 1. Reuse profile components, then query only missing facts
 
+### First entry or missing setup
+
+Keep the default Jira-backed workflow. Do not offer a delivery-route choice between preparation-only and Jira-backed or recommend no-Jira because setup is missing. Use this short path:
+
+1. Read real user-workspace profiles, trusted identity/context and already confirmed settings first. Reuse applicable known values; multiple actual destinations may need a project/settings selection, not a workflow-mode selection.
+2. Ask only unresolved user inputs through ask_user_question, together when useful: Jira source (WPB/ALM/DATA/FCR/GO), real staffId if unavailable, and project name or already known key if no destination is established. A user can supply a project name; never require technical schema, Story type IDs or AC field IDs. Do not ask again for current confirmed values.
+3. With those inputs, call the existing discovery tools only for missing project/type/field facts below. An already confirmed project key can feed the supported type/metadata queries directly; do not invent a project-key argument for the project-name query. Resolve ambiguous actual choices and required business values with focused questions. A missing technical mapping/service capability is WAITING_TOOL, not a reason to switch routes or have the user invent IDs.
+4. Preserve current Jira intent and pending question state while waiting: jiraExportRequested defaults to true, while an explicit user no-export request stays false. Once enough information arrives, resume discovery/assembly automatically; no extra continue or route confirmation. Missing setup is not a completed final JSON or score.
+
+Only honor preparation-only/no-Jira when the user explicitly requested it independently. Such a request still requires real destination/field data for a final scoreable .json4jira; incomplete drafts must remain identified as drafts. Final scored-content/upload confirmation is a later separate gate, unchanged by this entry rule.
+
 Read matching components from real persistent user workspace ceaia-sdlc-jira/profiles.json, isolated by authenticated user, Jira source, project, actual Story type ID and create/update capability. Never use a conversation file as cross-session storage or another user's profile. JWT/platform identity takes priority; staffId is a real fallback identity only. Do not parse/store tokens. Without real persistence, use actual metadata for this run and report cache persistence unavailable.
 
 Source is explicitly confirmed WPB/ALM/DATA/FCR/GO, not inferred from ticket prefix. Query calls use its lowercase almType. Resolve real staffId from trusted context or a confirmed same-user default, asking once if required. The confirmed file schema requires that real string at root staffId and, for creates, fields.reporter.name; update preservation/omission rules still apply. This does not add staffId to the score/export tool arguments. Session IDs remain platform-owned and do not enter the file. Legacy jira-user-info.md supplies routing defaults, not field schema.

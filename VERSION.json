@@ -1,5 +1,5 @@
 {
-  "bundleVersion": "6.1.0-preview.2",
+  "bundleVersion": "6.1.0-preview.3",
   "releaseDate": "2026-11-03",
   "executionProfile": "text-only",
   "activeSkills": [
@@ -19,6 +19,7 @@
   "jiraWritePolicy": "same-scored-json-path-only-after-explicit-current-content-confirmation",
   "jiraRoutingProfile": "persistent-user-workspace-ceaia-sdlc-jira/profiles.json; settings-resolved-before-scoring; final-current-content-confirmation-before-export",
   "notes": [
+    "Default Jira-backed entry asks only missing identity/source/project facts after reading available configuration; tool queries resolve schema/field IDs. Missing setup never triggers a preparation-only/Jira-backed route selector. Explicit user no-export intent and final scored-content confirmation remain supported.",
     "2026-11-03 confirmed file format: root staffId/routing, Jira values in fields, customFields.acceptanceCriteria as the actual metadata-confirmed field ID, and AC Markdown at fields[that ID]. This supersedes the flat preview.1 template without changing tool arguments or Q1-Q7 criteria.",
     "First JSON-first preview; not merged into main and not a production integration claim.",
     "Generation resolves Jira routing/field metadata and writes the final story.json4jira before scoring. SPEC remains Markdown; the standalone STORY.md is replaced by the JSON business projection inside SPEC.",
@@ -59,5 +60,6 @@
       ]
     }
   },
-  "storyJsonFormat": "jira-fields-with-ac-id-map"
+  "storyJsonFormat": "jira-fields-with-ac-id-map",
+  "entryPolicy": "default-jira-backed; reuse-configuration; ask-only-missing-setup-facts; no-entry-route-selector"
 }

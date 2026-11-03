@@ -1,3 +1,19 @@
+# CEAIA SDLC v6.1.0-preview.3 — 默认 Jira 入口与缺项补齐
+
+日期：2026-11-03。工作分支：`codex/sdlc-json4jira-flow`，尚未合入 `main`。本次调整入口行为，JSON fields 结构和 Q1–Q7 质量标准保持 preview.2 的规则。
+
+- 所有用户默认继续 Jira-backed 完整流程，入口不提供 Preparation-only / Jira-backed 路线选择。缺少配置或身份不取消默认 Jira 意图，不推荐 preparation-only 作为替代路线。
+- 先读取真实用户 Workspace 中适用的已确认配置与可信身份，只询问尚缺的来源、staffId、项目名称/已知 key，或让用户从工具返回的实际项目中选择。已确认项直接复用。
+- Story 类型、字段 schema 与 AC 字段 ID 通过现有查询工具取得，不要求业务用户填写技术 ID。元数据未补齐时保留明确待办，不能伪造完整可评分 JSON。
+- 仅在用户主动明确要求“只准备/不导出”时遵从；完整流程仍须评分后的当前内容预览和实际用户确认，再以同一 JSON 路径导出。评分三参数、导出单路径和后端分项结果规则不变。
+- 平台清单新增首次无配置、已有配置、用户主动不导出三类场景，真实结果留空。preview.2 本地/隔离记录保留为历史，不代表本次入口行为已经平台实测。
+
+---
+
+# 历史记录：v6.1.0-preview.2（入口行为由 preview.3 补充）
+
+以下保留当时发布说明；当前入口行为以本文顶部 preview.3 和活动 Skill 为准。
+
 # CEAIA SDLC v6.1.0-preview.2 — fields 结构修正
 
 日期：2026-11-03。工作分支：`codex/sdlc-json4jira-flow`，尚未合入 `main`。按开发截图及用户后续确认修正 JSON 组装/读取约定，不表示新 schema 已通过真实评分或后端集成测试。

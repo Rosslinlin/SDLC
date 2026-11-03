@@ -1,6 +1,6 @@
 # CEAIA JSON-first workflow — contract 7
 
-Version 6.1.0-preview.2. This contract owns orchestration, state, invalidation and bounded repair. Content criteria belong to [Q1–Q7](quality-contract.md); JSON field mapping belongs to [assembly](jira-json-assembly.md); actual scoring belongs to [scoreUserStory](scoring-tool-contract.md). Task and ordinary chat use this same sequence. Runtime is text-only on GPT-5.6 Luna or GPT-6 Luna.
+Version 6.1.0-preview.3. This contract owns orchestration, state, invalidation and bounded repair. Content criteria belong to [Q1–Q7](quality-contract.md); JSON field mapping belongs to [assembly](jira-json-assembly.md); actual scoring belongs to [scoreUserStory](scoring-tool-contract.md). Task and ordinary chat use this same sequence. Runtime is text-only on GPT-5.6 Luna or GPT-6 Luna.
 
 ## Fixed sequence
 
@@ -15,7 +15,7 @@ Version 6.1.0-preview.2. This contract owns orchestration, state, invalidation a
 | preview | Present the actual scored JSON through the platform's .json4jira preview and obtain explicit content/upload confirmation. | Confirmation bound to the current JSON and SPEC revisions. |
 | export | Call the path-only exporter on each confirmed file, unchanged. | Actual issue/attachment/database-link/queue results; asynchronous Jira score-sync status separate. |
 
-Default jiraExportRequested=true without needing export wording. Only explicit preparation-only/no-Jira, scope change or stop changes that intent. Stage-only invocations stop at the assigned boundary without cancelling later whole-workflow intent. Prepare one ready candidate through assemble/generate/review/score at a time. Blocked candidates remain selected; they do not prevent unrelated preparation. All selected scope and global coverage must pass before integrated export unless the user explicitly changes scope.
+Default jiraExportRequested=true without needing export wording. Entry is Jira-backed; never show a preparation-only/Jira-backed delivery-route selector or recommend dropping Jira because configuration is missing. Follow assembly's first-entry path: read available profile/context, ask only missing destination/identity facts, then query the remaining schema. Missing inputs retain Jira intent during a resumable wait. Only the user's explicit preparation-only/no-Jira, scope change or stop changes that intent; do not solicit that exception as a setup shortcut. Preparation-only skips submission, not the real configuration needed for final JSON/scoring. Stage-only invocations stop at the assigned boundary without cancelling later whole-workflow intent. Prepare one ready candidate through assemble/generate/review/score at a time. Blocked candidates remain selected; they do not prevent unrelated preparation. All selected scope and global coverage must pass before integrated export unless the user explicitly changes scope.
 
 ## Files and resources
 

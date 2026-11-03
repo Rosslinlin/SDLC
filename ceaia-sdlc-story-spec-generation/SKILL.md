@@ -5,11 +5,11 @@ description: Generate final Jira-ready Story JSON and Markdown SPECs using share
 
 # CEAIA Story JSON and SPEC Generation
 
-Version 6.1.0-preview.2. Text-only. Platform runtimes: GPT-5.6 Luna or GPT-6 Luna.
+Version 6.1.0-preview.3. Text-only. Platform runtimes: GPT-5.6 Luna or GPT-6 Luna.
 
 ## Entry and resources
 
-1. Read [workflow contract](references/workflow-contract.md) for the fixed sequence, state and resume rules. Default is complete SDLC including Jira unless explicitly preparation-only/no-Jira or stopped. An assigned stage executes only that stage.
+1. Read [workflow contract](references/workflow-contract.md) for the fixed sequence, state and resume rules. Default is Jira-backed complete SDLC. Do not ask users to choose preparation-only versus Jira-backed at entry. Read existing configuration first and ask only for missing inputs under [first-entry assembly](references/jira-json-assembly.md). Only the user's explicit preparation-only/no-Jira or stop request changes intent; an assigned stage executes only that stage.
 2. Read [shared quality standard](references/quality-contract.md) before planning or writing. Reviewer uses the identical packaged copy. Do not create a local numeric evaluator.
 3. Read only the current step's resources:
 

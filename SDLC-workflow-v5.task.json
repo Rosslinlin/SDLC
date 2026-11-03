@@ -8,7 +8,8 @@
       "active_form": "Reading source evidence and target baselines",
       "instructions": [
         "Load ceaia-sdlc-story-spec-generation and its workflow-contract plus shared quality standard. This is the JSON-first route; platform runtime is GPT-5.6 Luna or GPT-6 Luna, with no scripts or unconfirmed model parameters in this Task.",
-        "Keep complete SDLC intent unless explicitly preparation-only/no-Jira or stopped. Classify new_story versus existing_ticket_update and confirm each Jira source before reads; never infer from a key or turn an update into create. Save original Description, separate AC result and complete readJiraAttachments inventory for updates, plus actual available target facts.",
+        "Default to Jira-backed complete SDLC; do not ask users to choose preparation-only versus Jira-backed. Read saved user-workspace configuration and trusted identity/context first, then ask only unresolved Jira source, staffId and project name/known key or actual destination selection. Discover Story type/schema/AC field IDs through supported tools rather than requiring the business user to provide them. Keep Jira intent while waiting and resume automatically after answers. Only an explicit user preparation-only/no-Jira or stop request changes intent; final scored-content confirmation still applies.",
+        "Classify new_story versus existing_ticket_update and confirm each Jira source before reads; never infer from a key or turn an update into create. Save original Description, separate AC result and complete readJiraAttachments inventory for updates, plus actual available target facts.",
         "Retain every selected candidate as ready or precisely blocked. Intake classification can complete with pending targets recorded so unrelated ready candidates can proceed. Assign batch-unique source requirement IDs; a shortened register never replaces original evidence."
       ],
       "completion_criteria": [

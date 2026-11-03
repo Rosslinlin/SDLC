@@ -1,6 +1,6 @@
 # Clarify the actual blocker and resume
 
-Generation owns user interaction; reviewer stays read-only. Use only when a material business fact/decision is missing, sources conflict or the bounded local repair policy stops. Jira settings and technical recovery stay in their owning step.
+Generation owns user interaction; reviewer stays read-only. Use only when a material business fact/decision is missing, sources conflict or the bounded local repair policy stops. Missing Jira setup follows [first-entry assembly](jira-json-assembly.md): ask only missing facts, keep default Jira intent and do not open a preparation-only/Jira-backed route selector. Technical recovery stays in its owning step.
 
 1. Read the latest finding and affected saved item. In chat show its actual path, section/AC/TC/FR, a short quotation or precise absence, source-based reason, impact and required fact. Do not invent line numbers or ask the user to restate known requirements.
 2. Ask only the missing fact through `ask_user_question`. Keep the popup to a unique short item locator, short reason and one concrete question; group shared decisions, preferably no more than three related questions. Full paths/details stay in chat. If the issue is an AI writing error with sufficient evidence after the repair limit, request a named finite additional batch instead of inventing a business question.

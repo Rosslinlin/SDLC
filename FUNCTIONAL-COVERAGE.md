@@ -1,10 +1,11 @@
 # v6.1 JSON4Jira flow 功能归属 — preview
 
-版本 `6.1.0-preview.2`，日期 `2026-11-03`，分支 `codex/sdlc-json4jira-flow`，未合入 `main`。本表描述新路径接口的职责与待验证边界，不代表真实后端已通过。
+版本 `6.1.0-preview.3`，日期 `2026-11-03`，分支 `codex/sdlc-json4jira-flow`，未合入 `main`。本表描述新路径接口的职责与待验证边界，不代表真实后端已通过。
 
 | 能力 | 唯一职责 / 参考 | 当前行为与边界 |
 | --- | --- | --- |
-| 主链、状态、失效与续跑 | generation [workflow-contract](ceaia-sdlc-story-spec-generation/references/workflow-contract.md) | Task/普通对话同序；默认完整流程，最终已评分内容仍须 HTML 预览与明确确认。逐候选准备，保持阻塞项，导出前核对全部选定范围。 |
+| 主链、状态、失效与续跑 | generation [workflow-contract](ceaia-sdlc-story-spec-generation/references/workflow-contract.md) | Task/普通对话同序；所有用户默认 Jira-backed 完整流程，入口不提供路线选择；最终已评分内容仍须 HTML 预览与明确确认。逐候选准备，保持阻塞项，导出前核对全部选定范围。 |
+| 默认入口与缺项补齐 | generation intake/assembly | 先读真实 Workspace 配置/可信身份，只问尚缺的来源、staffId、项目名称/已知 key 或实际项目选择。类型/schema/AC ID 由查询工具取得，不要求业务用户填技术 ID。缺信息保留默认 Jira 意图，不推荐 preparation-only；仅遵从用户主动明确的只准备/不导出，且不伪造完整可评分 JSON。 |
 | 固定内容标准 | generation [quality-contract](ceaia-sdlc-story-spec-generation/references/quality-contract.md)；review 内同文副本 | Q1–Q7 不另增标准；检查 JSON 业务内容、SPEC 投影和测试，不增加本地评分或第四个 Skill。 |
 | 来源与拆分 | generation [source-enrichment](ceaia-sdlc-story-spec-generation/references/source-enrichment.md) / [authoring](ceaia-sdlc-story-spec-generation/references/artifact-generation-rules.md) | 原始要求有明确去向；不从 UI 推断后台，不按 AC 数拆票，不发明缺失业务事实。 |
 | 前置项目/type/meta 与缓存 | generation | 在生成最终 JSON 前完成适用查询、确认字段类型/选项/必要值；命中真实用户工作区 profile 时复用，缺项定向查询；票据及要求附件确认成功后保存上游已确认快照；关联/队列结果另记。export 不另组装一套字段。 |
