@@ -9,7 +9,7 @@ Return one JSON conclusion using the fields below. Replace examples with observe
     "mode": "new_story",
     "source": null,
     "ticketKey": null,
-    "qualityContractVersion": "6.1.0-preview.5"
+    "qualityContractVersion": "6.1.0-preview.6"
   },
   "reviewResult": "NEEDS_REVISION",
   "artifactPaths": {
@@ -75,7 +75,7 @@ Each findings entry has id, criterion (Q1-Q7), classification (CONTENT_BLOCKER/C
 
 Each clarifications entry has findingId and question. Name the actual item and precise missing fact/decision. Do not ask the user to repeat already clear requirements. Technical read failures stay in findings and lead to technical-recovery, not a business clarification question.
 
-Spec result and preservation result use PASS/FAIL/NOT_ASSESSED; preservation may use N/A only for a new Story. For an update, every SPEC's preservation lists the original attachment IDs applicable to it, preserved obligations and any gaps; none or a score-only SPEC may have no selected original attachments but must still preserve applicable baseline obligations. preservationConclusion covers the complete target, not merely the primary SPEC. attachmentAction is none or replace for an update, null for a new Story. These are review conclusions, not invented JSON transport fields or upload instructions.
+Spec result and preservation result use PASS/FAIL/NOT_ASSESSED; preservation may use N/A only for a new Story. For an update, every SPEC's preservation lists the original attachment IDs applicable to it, preserved obligations and any gaps; a first add or explicit none may have no selected originals but must still preserve applicable baseline obligations. All related local SPECs must reflect current Story business content even when remote attachments stay unchanged. preservationConclusion covers the complete target, not merely the primary SPEC. attachmentAction is add, replace or explicit none for an update, null for a new Story. These are internal review conclusions, not invented JSON transport fields or upload instructions.
 
 coverage uses actual source requirement references/locations, not invented counts. Record supported exclusions and cross-candidate gaps separately. Sizing decisions are NO_SPLIT, SPLIT_RECOMMENDED or NOT_ASSESSABLE, always with a reason; unknown capacity is not an estimate. Preserve inherited scope when proposing any update decision.
 

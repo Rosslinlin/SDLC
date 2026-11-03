@@ -10,7 +10,7 @@ Internal evidence only. Use actual source locations and short facts; preserve or
 ## Candidate decision
 | Candidate / mode / source / ticket | Cohesive value and scope | SR IDs | Split / inherited-scope rationale | Dependencies / blockers | Canonical JSON / SPEC names / attachment action |
 | --- | --- | --- | --- | --- | --- |
-| [identity] | [supported outcome] | SR-001 | [short evidence-based decision] | [actual facts] | [actual JSON path / SPEC names / add for create; supported none or replace for update] |
+| [identity] | [supported outcome] | SR-001 | [short evidence-based decision] | [actual facts] | [actual JSON path / synchronized SPEC names / add for create; update related SPECs=replace, first SPEC=add, explicit no remote change=none] |
 
 ## Artifact coverage
 Fill when files exist; do not create placeholder future artifacts.
@@ -27,3 +27,4 @@ Fill when files exist; do not create placeholder future artifacts.
 - Clarifications / user scope decisions: [exact facts or None]
 
 - Jira assembly snapshot: [numbered schema/query/profile/settings record and exact JSON revision; complete before scoring]
+- Update synchronization: [Story business delta → affected local SPEC/tests/projection changes or verified unchanged sections; actual related original SPEC IDs → outputs; derived add/replace or explicit none, with exact replacement capability gaps]

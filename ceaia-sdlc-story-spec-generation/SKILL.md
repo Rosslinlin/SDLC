@@ -5,7 +5,7 @@ description: Generate final Jira-ready Story JSON and Markdown SPECs using share
 
 # CEAIA Story JSON and SPEC Generation
 
-Version 6.1.0-preview.5. Text-only. Platform runtimes: GPT-5.6 Luna or GPT-6 Luna.
+Version 6.1.0-preview.6. Text-only. Platform runtimes: GPT-5.6 Luna or GPT-6 Luna.
 
 ## Entry and resources
 
@@ -27,9 +27,11 @@ Version 6.1.0-preview.5. Text-only. Platform runtimes: GPT-5.6 Luna or GPT-6 Lun
 ## Execution
 
 - Classify new_story or existing_ticket_update. A cited evidence ticket is not an update target. Confirm each Jira source before reading it; do not infer from prefixes. UAT-only work uses its dedicated workflow.
+- Both modes first read real user-workspace profiles.json. Reuse same-user/source/project/type components, including stable facts from a create profile during update; do not require a new update entry to reuse them. Existing baseline reads remain necessary. Query only missing/inapplicable components, explicit refresh/changed destination or actual schema-error recovery; never query create metadata as an edit-permission check.
 - Move project/type/metadata queries and final field assembly into this generation stage. Root acceptanceCriteria is the actual AC field-ID string; its Jira wiki text lives at fields[acceptanceCriteria]. Omit customFields, root staffId and fields.reporter. Creates omit issueIdOrKey entirely; updates put the exact confirmed existing target key in root issueIdOrKey after issueType and preserve the approved baseline/delta. Description and AC already contain Jira wiki (h2. headings, * *AC-001*: entries). Resolve required metadata before scoring; reuse verified profiles and actual upstream baseline reads. No older flat/Markdown template, description/AC arrays or independent BDD objects.
 - Process candidates serially: source plan → resolve Jira fields → complete JSON → tests/SPEC → precheck → independent review → synchronize SPEC Result/Notes → score. Keep blocked selected candidates pending while preparing unrelated candidates.
 - The saved JSON is the authoritative Story and eventual upload input. SPEC contains its faithful Markdown business projection. No standalone STORY.md or independently authored upload payload is required. TEST_CASE.md remains a Workspace deliverable.
+- A Story business change automatically synchronizes every affected local SPEC, projection and test before review/score, even when the user says only change Story/AC. For existing Jira delivery, [update rules](references/existing-jira-update.md) default related SPECs to replacement and a missing SPEC to first upload. Only an explicit remote-preservation request selects none; local synchronization still occurs. Show the actual plan in final confirmation, preserve unrelated originals and report unsupported replacement precisely instead of skipping SPEC.
 - Use existing platform read/write, agent, question, query and scoring tools only; no local scripts. Read actual files, record observed revisions and preserve complete tool responses.
 - Scoring uses nodejs-base-mcp.scoreUserStory with story_json_workspace_path, specFileStatus and specFilePath. Export uses java-base-mcp.exportJiraByDynamicFields with only the identical story_json_workspace_path. Never substitute a result/report path.
 - Story scores stay in the independent score record/UI, never in SPEC. Freeze JSON and scored SPEC contents after assessment. There is no display-driven S2 or separate five-field binding call in this new route; the creation backend owns linkage and queueing, whose actual results must still be checked.

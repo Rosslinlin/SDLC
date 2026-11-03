@@ -1,14 +1,14 @@
 # CEAIA JSON-first workflow — contract 7
 
-Version 6.1.0-preview.5. This contract owns orchestration, state, invalidation and bounded repair. Content criteria belong to [Q1–Q7](quality-contract.md); JSON field mapping belongs to [assembly](jira-json-assembly.md); actual scoring belongs to [scoreUserStory](scoring-tool-contract.md). Task and ordinary chat use this same sequence. Runtime is text-only on GPT-5.6 Luna or GPT-6 Luna.
+Version 6.1.0-preview.6. This contract owns orchestration, state, invalidation and bounded repair. Content criteria belong to [Q1–Q7](quality-contract.md); JSON field mapping belongs to [assembly](jira-json-assembly.md); actual scoring belongs to [scoreUserStory](scoring-tool-contract.md). Task and ordinary chat use this same sequence. Runtime is text-only on GPT-5.6 Luna or GPT-6 Luna.
 
 ## Fixed sequence
 
 | Phase | Action | Output / next |
 | --- | --- | --- |
 | intake | Classify targets, confirm each Jira source, read original evidence and update baseline/inventory. | Fixed selected list; each target ready or precisely pending. |
-| assemble | During Story generation, reuse/query project, Story type and field metadata; resolve required values and attachment intent. | Complete final story.json4jira and assembly snapshot, not a future export TODO. |
-| generate | Derive tests and Markdown business projection/SPEC from the saved JSON; perform one production precheck. | Actual consistent JSON, tests and all SPECs. |
+| assemble | Read real profiles and current baseline; reuse shared components across create/update and query only missing/inapplicable facts. Resolve required values and the automatic SPEC delivery plan. | Complete final story.json4jira and assembly snapshot, not a future export TODO. |
+| generate | Derive or synchronize tests and every affected Markdown SPEC from the saved JSON and approved delta, without needing separate update-SPEC wording; perform one precheck. | Actual consistent JSON, tests and all SPECs. |
 | review | Fresh read-only reviewer reads sources and current JSON/tests/SPECs. Parent saves its report. | PASS → score; supported defect → affected repair/review; missing fact → clarification. |
 | score | Parent synchronizes every SPEC Result/Notes and verifies unchanged bodies, then calls scoreUserStory on the JSON with SPEC status/path and saves the complete response. | Current passing score; JSON and all scoring inputs frozen. No score write into SPEC and no display-only S2. |
 | global-coverage | Reconcile all original obligations against every selected candidate, current evidence and approved exclusions. | Zero pending obligations before the integrated export stage. Preparation-only ends here. |
@@ -32,6 +32,8 @@ Default jiraExportRequested=true without needing export wording. Entry is Jira-b
 
 Keep latest deliverables at fixed paths; preserve original evidence and numbered completed records without overwriting. No historical deliverable copies. Full responses and payload/read-back evidence live in numbered records, not duplicated state bodies. There is no generated standalone STORY.md. The SPEC's Story section is a Markdown business projection from JSON, excluding routing/identity/schema control data.
 
+Every Story edit checks SPEC/test consistency. Business changes automatically update affected local artifacts; pure routing/schema edits or already aligned content do not require artificial body changes. Local SPEC synchronization is independent of remote attachment action. Under [existing-update rules](existing-jira-update.md), a changed Story defaults related remote SPECs to replace or a first SPEC to add; only explicit remote-preservation intent uses none. Missing update-SPEC wording never waives synchronization. Resolve the delivery plan before review/score; unsupported replacement remains precise pending work, not silently omitted scope.
+
 Batch state is .ceaia-work/batch-state.json: selectedCandidateIds in order, candidates entries with candidateId/statePath, and globalCoverage with batch-unique inScopeSRIds/coveredSRIds/pendingSRIds, supportedExclusions and candidateId/evidenceRevision bindings. Reconcile original sources before status=pass; a detached PASS label is insufficient. Send the actual batchStatePath with export handoff.
 
 Use local resources. Another Skill's full procedure can be read through actual supported Skill-name/resource capability or supplied in full by the caller. Do not assume sibling filesystem access or invent reader tools. Generation/review carry identical local quality-standard copies.
@@ -43,6 +45,7 @@ Initialize [candidate state](../templates/state-template.json) and [batch state]
 - Identity/progress: candidateId, mode, source, ticketKey, evidenceRevision, phase, status, nextAction and jiraExportRequested. Status is IN_PROGRESS/READY/WAITING_USER/WAITING_TOOL/STOPPED/COMPLETE. COMPLETE may describe the confirmed synchronous submission while jiraScoreSync remains pending; report that distinction explicitly.
 - Paths: storyJsonPath, testCasePath, specPath, planningPath, scoreRecordPath and historyRoot. review.recordPath is the sole review pointer.
 - Versions: artifactRevisions.storyJsonRevision/testCaseRevision and each specArtifacts entry's bodyRevision/fileRevision. The retained uploaded flag means intended upload only; actual remote success is in writeResults. attachmentReplacementMapping records approved existing IDs/output files, never guessed API encoding.
+- Update attachmentAction is add for first SPEC delivery, replace for existing related SPECs, or none for explicit remote preservation; none never disables local SPEC/test synchronization. Record the actual related IDs/output mapping or explicit preservation decision in the existing update manifest/plan.
 - Review: result, reviewAttempt, recordPath, evidenceRevision/storyJsonRevision/testCaseRevision, all SPEC-body bindings, contentReadBack and specHeaderSync. No score/readiness placeholders in the reviewer report.
 - Score: actual status, ok/finalScore when returned, scoreAttempt, submitted storyJsonPath/revision, exact SPEC status/path/fileRevision and review attempt, responseReadBack. Preserve actual IDs/version/checksum only as returned, in the full record. No specScoreDisplay state.
 - Assembly: exportContext retains actual target/baseline/current facts. exportContext.assembly has status (pending/verified/blocked), recordPath, profileKey and storyJsonRevision. The record contains exact schema/mappings/confirmed values/attachment intent needed for assembly and later successful profile persistence.

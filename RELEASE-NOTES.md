@@ -1,4 +1,18 @@
-# CEAIA SDLC v6.1.0-preview.5 — AC 映射修正与现有 Story 更新
+# CEAIA SDLC v6.1.0-preview.6 — 更新复用配置与自动同步 SPEC
+
+日期：2026-11-03。工作分支：`codex/sdlc-json4jira-flow`，尚未合入 `main`。本次修正 update 模式的配置复用和 Story/SPEC 同步行为，Q1–Q7 业务判定及现有评分/导出参数保持不变。
+
+- 创建、更新都先读取真实用户 Workspace 的 `ceaia-sdlc-jira/profiles.json`。同用户/source/project/Story type 的稳定项目/类型/AC 映射按组件跨模式复用，不因 profile 只有 create capability 而重跑三个 query。create/edit 权限、requiredness、操作和默认值仍分别保留；已有 baseline 可补实际目标信息，缺项、不适用、显式刷新/目标变化或真实 schema 错误才定向查询，不按 TTL 强刷。
+- 更新原票的 Description/AC 和完整附件 inventory 仍通过实际 baseline 读取取得；这些读取不由配置 profile 替代，也不能误记为重复字段 discovery。
+- Story 业务变更自动同步本地 SPEC、受影响测试和业务投影，不等待用户额外说“update spec”。每个相关 SPEC 保留其原有义务并核对当前 JSON，完成受影响审查及 Header 同步后评分；纯路由/schema 变化只核对业务一致性，不制造文件改动。
+- 默认远端 SPEC 同步计划为相关已有 SPEC→`replace`、无相关 SPEC→`add`；用户明确不改远端附件才 `none`，本地 SPEC 仍必须同步。原件歧义只问具体选择，最终预览包含真实附件计划；替换编码及上传后删除/覆盖保证不足时准确等待，不编造控制或旧 API，不跳过同步后宣布全完成。
+- 根级 AC 映射、无 reporter/root staffId、更新 issueIdOrKey、评分三参数、导出单路径、完整原始响应及数据库结果职责继续保留。三个独立包不改，新增平台场景结果留空；本次规则变更不代表真实后端已验证。
+
+---
+
+# 历史记录：v6.1.0-preview.5 — AC 映射修正与现有 Story 更新
+
+以下保留当时发布说明；当前 profile 复用与 SPEC 同步规则以本文顶部 preview.6 和活动 Skill 为准。
 
 日期：2026-11-03。工作分支：`codex/sdlc-json4jira-flow`，尚未合入 `main`。按用户转述的最新后端确认修正文件协议，Q1–Q7 业务判定保持不变；质量契约读取说明同步为 preview.5。
 
@@ -13,7 +27,7 @@
 
 # 历史记录：v6.1.0-preview.4 — Jira 文本格式与身份字段修正
 
-以下保留当时发布说明；当前 AC 映射、reporter 和更新目标规则以本文顶部 preview.5 和活动 Skill 为准。
+以下保留当时发布说明；当前 AC 映射、reporter 和更新目标规则以本文顶部 preview.6 和活动 Skill 为准。
 
 日期：2026-11-03。工作分支：`codex/sdlc-json4jira-flow`，尚未合入 `main`。本次调整 Story JSON 的提交格式，Q1–Q7 业务判定保持不变；质量契约的读取说明同步为 preview.4。
 
@@ -27,7 +41,7 @@
 
 # 历史记录：v6.1.0-preview.3 — 默认 Jira 入口与缺项补齐
 
-以下保留当时发布说明；当前 JSON 字段与文本格式以本文顶部 preview.5 和活动 Skill 为准。
+以下保留当时发布说明；当前 JSON 字段与文本格式以本文顶部 preview.6 和活动 Skill 为准。
 
 日期：2026-11-03。工作分支：`codex/sdlc-json4jira-flow`，尚未合入 `main`。本次调整入口行为，JSON fields 结构和 Q1–Q7 质量标准保持 preview.2 的规则。
 
@@ -41,7 +55,7 @@
 
 # 历史记录：v6.1.0-preview.2（入口行为由 preview.3 补充）
 
-以下保留当时发布说明；当前规则以本文顶部 preview.5 和活动 Skill 为准。
+以下保留当时发布说明；当前规则以本文顶部 preview.6 和活动 Skill 为准。
 
 # CEAIA SDLC v6.1.0-preview.2 — fields 结构修正
 
@@ -58,7 +72,7 @@
 
 # 历史记录：v6.1.0-preview.1（JSON 字段约定已由 preview.2 修正）
 
-以下保留当时发布说明；当前字段结构以本文顶部 preview.5 和活动 Skill 为准。
+以下保留当时发布说明；当前字段结构以本文顶部 preview.6 和活动 Skill 为准。
 
 # CEAIA SDLC v6.1.0-preview.1 — JSON4Jira flow
 

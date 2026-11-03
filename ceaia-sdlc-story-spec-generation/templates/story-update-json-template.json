@@ -11,5 +11,7 @@
     "description": "h2. User Story\n<baseline obligations with only the approved changes>\n\nh2. Business Context\n<preserved supported context and material dependencies>",
     "<actual AC field ID>": "* *AC-001*: Given <preserved or explicitly changed condition>, when <action>, then <observable result>."
   },
-  "attachments": []
+  "attachments": [
+    "outputs/ceaia/updates/<SOURCE>/<TICKET-KEY>/final-story-name-spec.md"
+  ]
 }
