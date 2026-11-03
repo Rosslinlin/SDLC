@@ -1,6 +1,6 @@
 # CEAIA JSON-first workflow — contract 7
 
-Version 6.1.0-preview.4. This contract owns orchestration, state, invalidation and bounded repair. Content criteria belong to [Q1–Q7](quality-contract.md); JSON field mapping belongs to [assembly](jira-json-assembly.md); actual scoring belongs to [scoreUserStory](scoring-tool-contract.md). Task and ordinary chat use this same sequence. Runtime is text-only on GPT-5.6 Luna or GPT-6 Luna.
+Version 6.1.0-preview.5. This contract owns orchestration, state, invalidation and bounded repair. Content criteria belong to [Q1–Q7](quality-contract.md); JSON field mapping belongs to [assembly](jira-json-assembly.md); actual scoring belongs to [scoreUserStory](scoring-tool-contract.md). Task and ordinary chat use this same sequence. Runtime is text-only on GPT-5.6 Luna or GPT-6 Luna.
 
 ## Fixed sequence
 
@@ -23,7 +23,7 @@ Default jiraExportRequested=true without needing export wording. Entry is Jira-b
 | --- | --- | --- |
 | outputRoot | outputs/ceaia/<slug> | outputs/ceaia/updates/<SOURCE>/<TICKET-KEY> |
 | internalRoot | .ceaia-work/stories/<slug> | .ceaia-work/updates/<SOURCE>/<TICKET-KEY> |
-| Canonical Story | <outputRoot>/story.json4jira | Same; update encoding must be supported by the active schema |
+| Canonical Story | <outputRoot>/story.json4jira; omit issueIdOrKey | Same; root issueIdOrKey identifies the confirmed existing target |
 | Other deliverables | TEST_CASE.md and <name>-spec.md | Same, with distinct mapped SPECs when required |
 | State | <internalRoot>/state.json | Same, plus update-manifest.md |
 | Numbered evidence | plan-revision-<nnn>.md, jira-assembly-revision-<nnn>.md, review-attempt-<nnn>.md, story-quality-score-attempt-<nnn>.md, jira-export-attempt-<nnn>.md | Same |
@@ -79,6 +79,8 @@ Backend linkage and queueing replace the old Agent B call. A ticket key alone do
 ## Migration from v6
 
 The 2026-11-03 confirmed fields/AC-ID-map format also supersedes preview.1's flat JSON. Before an unsubmitted package continues, generation rewrites it using actual metadata, aligns its dependent SPEC/tests, verifies affected review and obtains a current score and content confirmation. A schema-only edit still changes scored bytes. Preserve old records and every known/unknown remote outcome; an already submitted or uncertain operation is reconciled, never recreated to migrate its format. State contract remains 7 because the control-state shape is unchanged.
+
+Latest developer/user confirmation further moves the AC ID to root acceptanceCriteria, removes customFields and fields.reporter, and confirms root issueIdOrKey for updates only. Use the matching create/update template before scoring. For an update, bind that exact nonempty key to the actual baseline/source/target; never infer it from an evidence ticket or profile, and never remove it to retry as create. The selector is not an extra score/export tool argument. Separate unsupported attachment operations remain specific capability gaps, not a reason to label the confirmed basic update target unknown. Migration changes scoring inputs and needs a current score/confirmation; preserve all remote-outcome evidence.
 
 Preserve old state, original inputs, score records and every known/unknown remote outcome as migration evidence before converting local metadata. A Markdown score or old five-field association cannot authorize a new JSON upload. An unexported candidate must assemble the actual JSON, regenerate dependent views, independently review and score it through the new interface. Remove old storyPath/storyRevision/specScoreDisplay only after their evidence is preserved; new control uses storyJsonPath/storyJsonRevision. For an earlier fields-based JSON, follow [format migration](jira-text-format.md): remove root staffId and encode authored Jira rich text before rescoring/reconfirmation. Recheck affected semantic consistency; presentation-only changes do not justify a whole business rewrite. Never migrate by replaying a known/unknown remote write.
 

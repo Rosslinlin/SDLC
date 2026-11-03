@@ -1,0 +1,15 @@
+{
+  "jiraInstance": "<confirmed lowercase source>",
+  "projectKey": "<actual target project key>",
+  "issueType": "<actual target Story type name>",
+  "issueIdOrKey": "<confirmed existing ticket key>",
+  "acceptanceCriteria": "<actual AC field ID>",
+  "fields": {
+    "project": {"key": "<actual target project key>"},
+    "issuetype": {"id": "<actual target Story type ID>"},
+    "summary": "<preserved baseline title or explicitly approved replacement>",
+    "description": "h2. User Story\n<baseline obligations with only the approved changes>\n\nh2. Business Context\n<preserved supported context and material dependencies>",
+    "<actual AC field ID>": "* *AC-001*: Given <preserved or explicitly changed condition>, when <action>, then <observable result>."
+  },
+  "attachments": []
+}

@@ -1,4 +1,19 @@
-# CEAIA SDLC v6.1.0-preview.4 — Jira 文本格式与身份字段修正
+# CEAIA SDLC v6.1.0-preview.5 — AC 映射修正与现有 Story 更新
+
+日期：2026-11-03。工作分支：`codex/sdlc-json4jira-flow`，尚未合入 `main`。按用户转述的最新后端确认修正文件协议，Q1–Q7 业务判定保持不变；质量契约读取说明同步为 preview.5。
+
+- 将实际 AC 字段 ID 字符串放在 JSON 根级 `acceptanceCriteria`，移除旧 `customFields` 包装；验收标准正文仍是 `fields[acceptanceCriteria]` 的 Jira wiki 字符串，不恢复旧 AC 正文/数组结构。
+- 创建和更新 JSON 均移除 `fields.reporter`，不从旧模板或 profile 重新加入；根级 `staffId` 继续省略。现有查询工具与身份配置所需 staffId 保留，更新省略 reporter 不清空 Jira 上的原值。
+- 创建与更新共用生成、独立审查、评分及单路径导出主链。更新在 `issueType` 之后加入根级 `issueIdOrKey`（大写 I），值为已确认实际票号，与可信 source/target/baseline 一致；创建直接省略，不填空值或示例票号。更新模板及返回 key 核对防止误建新票；工具参数不额外增加票号。
+- 更新保留原始义务和获准增量。普通 none 使用 `attachments: []` 保留远端附件，本地 SPEC 通过既有 `specFilePath` 评分后正常确认/导出，不再先要求目标编码或 score-only 能力证明。replace 的具体编码和顺序保证仍需真实后端依据；实际明确拒绝或对应替换能力缺失时才记录准确缺口，不猜控制、追加上传或回退创建。
+- Description/AC 在生成阶段完成 Jira wiki 编码，SPEC 仍为 Markdown 投影。评分三参数、导出单路径、当前文件冻结与确认、原始响应及数据库结果保存职责保持原协议。
+- 旧 JSON 迁移字段后重新评估当前包并确认，不重放已成功或未知的外部写入。三个独立包保持不改；新增平台场景结果留空，不宣称真实后端已验证。
+
+---
+
+# 历史记录：v6.1.0-preview.4 — Jira 文本格式与身份字段修正
+
+以下保留当时发布说明；当前 AC 映射、reporter 和更新目标规则以本文顶部 preview.5 和活动 Skill 为准。
 
 日期：2026-11-03。工作分支：`codex/sdlc-json4jira-flow`，尚未合入 `main`。本次调整 Story JSON 的提交格式，Q1–Q7 业务判定保持不变；质量契约的读取说明同步为 preview.4。
 
@@ -12,7 +27,7 @@
 
 # 历史记录：v6.1.0-preview.3 — 默认 Jira 入口与缺项补齐
 
-以下保留当时发布说明；当前 JSON 字段与文本格式以本文顶部 preview.4 和活动 Skill 为准。
+以下保留当时发布说明；当前 JSON 字段与文本格式以本文顶部 preview.5 和活动 Skill 为准。
 
 日期：2026-11-03。工作分支：`codex/sdlc-json4jira-flow`，尚未合入 `main`。本次调整入口行为，JSON fields 结构和 Q1–Q7 质量标准保持 preview.2 的规则。
 
@@ -26,7 +41,7 @@
 
 # 历史记录：v6.1.0-preview.2（入口行为由 preview.3 补充）
 
-以下保留当时发布说明；当前规则以本文顶部 preview.4 和活动 Skill 为准。
+以下保留当时发布说明；当前规则以本文顶部 preview.5 和活动 Skill 为准。
 
 # CEAIA SDLC v6.1.0-preview.2 — fields 结构修正
 
@@ -43,7 +58,7 @@
 
 # 历史记录：v6.1.0-preview.1（JSON 字段约定已由 preview.2 修正）
 
-以下保留当时发布说明；当前字段结构以本文顶部 preview.4 和活动 Skill 为准。
+以下保留当时发布说明；当前字段结构以本文顶部 preview.5 和活动 Skill 为准。
 
 # CEAIA SDLC v6.1.0-preview.1 — JSON4Jira flow
 

@@ -1,6 +1,6 @@
 # CEAIA SDLC v6.1 JSON4Jira flow — preview
 
-当前分支版本为 `6.1.0-preview.4`，日期 `2026-11-03`，工作分支为 `codex/sdlc-json4jira-flow`，尚未合入 `main`。本分支将每个候选的最终 Jira 内容统一为一个 `story.json4jira`，从该文件生成 SPEC 中的 Story 投影，使用同一路径评分、预览和导出。运行目标为平台 GPT-5.6 Luna / GPT-6 Luna；运行时仅使用现有平台工具和 Markdown/JSON 资源，不执行本地脚本。
+当前分支版本为 `6.1.0-preview.5`，日期 `2026-11-03`，工作分支为 `codex/sdlc-json4jira-flow`，尚未合入 `main`。本分支将每个候选的最终 Jira 内容统一为一个 `story.json4jira`，从该文件生成 SPEC 中的 Story 投影，使用同一路径评分、预览和导出。运行目标为平台 GPT-5.6 Luna / GPT-6 Luna；运行时仅使用现有平台工具和 Markdown/JSON 资源，不执行本地脚本。
 
 三个活动 Skill：
 
@@ -21,13 +21,14 @@
 | 位置 | 内容与一致性 |
 | --- | --- |
 | 根级 `jiraInstance`、`projectKey`、`issueType` | 已确认来源/项目和 Story 类型名；不再生成根级 `staffId`，不把截图示例值当默认值。 |
-| `customFields.acceptanceCriteria` | 真实 AC 字段 ID 映射，不是验收标准正文；不硬编码截图中的字段 ID。 |
-| `fields.project.key`、`fields.issuetype.id`、`fields.reporter.name` | 项目与根级一致，类型 ID 来自实际查询；reporter 按 metadata 的要求及授权使用真实身份，不依赖已移除的根级 `staffId`。保留精确大小写和对象结构，更新按获准增量/省略语义保留原值。 |
-| `fields.summary`、`fields.description`、`fields[customFields.acceptanceCriteria]` | 标题保持原文；描述与 AC 正文为 Jira wiki 字符串。其他获准自定义业务值也放在 `fields[实际字段ID]`，只对 metadata 确认的可写富文本应用对应格式。 |
+| 更新专用根级 `issueIdOrKey` | 仅更新现有 Story 时，在 `issueType` 之后加入已确认的实际 Ticket Number；大小写固定为 `issueIdOrKey`（大写 I）。与本候选可信 source/target/baseline 完全一致；创建直接省略此键，不传空值或示例票号。 |
+| 根级 `acceptanceCriteria` | 真实 AC 字段 ID 字符串，不是验收标准正文；不再包在 `customFields` 中，不硬编码截图中的字段 ID。 |
+| `fields.project.key`、`fields.issuetype.id` | 项目与根级一致，类型 ID 来自实际查询；保留精确大小写和对象结构。创建和更新均不提交 `fields.reporter`，更新省略它不改变 Jira 上的原 reporter。 |
+| `fields.summary`、`fields.description`、`fields[acceptanceCriteria]` | 标题保持原文；描述与 AC 正文为 Jira wiki 字符串。其他获准自定义业务值也放在 `fields[实际字段ID]`，只对 metadata 确认的可写富文本应用对应格式。 |
 
 生成阶段、评分之前就完成 Jira wiki 编码：描述标题使用 `h1. 标题`、`h2. 标题`；AC 例如 `* *AC-001*: Given ... When ... Then ...`，以 Jira 列表和单星号粗体保留每条 AC 的声明。JSON 字符串解码后有真实换行，普通正文与代码内容保真；不对 summary、路由/身份/选项、附件路径或更新中未改动字段做格式转换。SPEC 仍为 Markdown，从这些字段的相同语义生成可读投影，不能直接贴入 wiki 标记。导出只提交已评分的原文件，不再临时转换格式。
 
-移除旧顶层 `summary` / `description` / `acceptanceCriteria` / `bddScenarios` 及根级 `staffId`。身份配置与查询工具按实际 schema 所需的 `staffId` 仍保留；这不是评分/导出的额外入参。生成、自检、SPEC 投影、测试与 reviewer 都读取同一实际 `fields` 内容；映射缺失、类型错误或身份/目标冲突是结构问题，不给 Q1–Q7 新增业务标准。旧 JSON 删除字段或转换文字格式后须重新完成当前包的评分及内容确认，不能沿用旧 checksum。
+移除旧顶层 `summary` / `description` / `bddScenarios`、旧 `customFields` 映射包装、根级 `staffId` 及 `fields.reporter`。根级 `acceptanceCriteria` 仅保留实际字段 ID，旧顶层 AC 正文/数组不适用。身份配置与查询工具按实际 schema 所需的 `staffId` 仍保留；这不是评分/导出的额外入参。生成、自检、SPEC 投影、测试与 reviewer 都读取同一实际 `fields` 内容；映射缺失、类型错误或目标冲突是结构问题，不给 Q1–Q7 新增业务标准。旧 JSON 迁移字段后须重新完成当前包的评分及内容确认，不能沿用旧 checksum。
 
 当前接口边界：
 
@@ -46,7 +47,9 @@
 
 跨会话字段规则仍保存到真实用户工作区 `ceaia-sdlc-jira/profiles.json`，由 generation 在生成最终 JSON 前读取/解析并拥有配置内容；票据及要求附件确认成功后，只保存上游已确认的配置快照，后端关联/异步结果仍单独报告。完整命中不按时间强制刷新。不能把对话文件当成用户级持久化，也不能把 create metadata 当作 update 权限。
 
-现有票据的 `none` / `replace` 业务语义保留，但只有 live JSON schema 明确支持目标、操作和附件语义时才能导出。目标或替换字段未暴露时明确 `WAITING_TOOL`：保存目标、baseline、增量和附件映射，不猜字段、不擅自改为新建、不把仅供评分的本地 SPEC 当成上传附件。首版不能据此宣称更新后端已集成可用。
+主链支持创建和更新现有 Story：创建使用 [创建模板](ceaia-sdlc-story-spec-generation/templates/story-json-template.json)，省略 `issueIdOrKey`；更新使用 [更新模板](ceaia-sdlc-story-spec-generation/templates/story-update-json-template.json)，在 `issueType` 后加入根级 `issueIdOrKey`，值为已确认的实际票号。更新先保留原始 Description/AC、附件清单、baseline 和获准增量，再按同一 JSON 路径完成评分、确认和导出；返回票号须与目标一致。目标缺失或冲突先澄清，不得通过省略目标改为新建。评分和导出工具不额外传票号参数。
+
+`none` / `replace` 附件语义保留。普通 `none` 更新使用 `attachments: []` 保留远端附件，本地 SPEC 通过已确认的 `specFilePath` 参数评分，再按标准更新流程确认和导出；不额外索取 score-only 支持证明，不把本地 SPEC 自动加入上传。具体 replace 编码及上传后删除保证仍须真实后端证据；仅实际后端明确拒绝普通更新，或请求的替换能力缺失时，记录对应的 `WAITING_TOOL`。保存已有目标、baseline、增量和附件映射，不猜附件控制、不擅自追加上传或回退创建。字段确认和本地检查不代表真实后端更新已集成验证。
 
 安装与验证：
 

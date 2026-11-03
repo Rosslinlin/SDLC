@@ -34,6 +34,14 @@ Each file has its own actual review, score, current-content confirmation and num
 
 ## Existing-ticket updates
 
-The call shape is still one JSON path, but this is not evidence of update support. Actual backend/schema evidence must define the JSON's exact target and approved none/replace semantics, including score-only SPEC handling. Until then keep WAITING_TOOL; no invented update payload or create-shaped example is provided. See [attachments](attachments.md).
+The user-confirmed update JSON has root issueIdOrKey after issueType, containing the actual existing-ticket number/key. Create JSON omits it. Reuse the scored file without adding the ticket key to tool arguments:
+
+```json
+{
+  "story_json_workspace_path": "outputs/ceaia/updates/WPB/EXAMPLE-123/story.json4jira"
+}
+```
+
+This is a structural example, not a real ticket or an authorized write. Its JSON target must match the actual selected baseline and confirmed update intent; use approved changed fields with preservation/omission semantics. For a normal none update, attachments=[] preserves remote attachments and the local SPEC is scored through specFilePath. Replacement still needs the supported encoding in [attachments](attachments.md). An actual backend rejection is preserved and handled precisely, never converted into an extra upload or create fallback.
 
 The backend response schema is not fully supplied. Interpret and preserve the real response under [submission and recovery](jira-write-and-recovery.md); do not copy a fictional success response or send the old five-field B call.

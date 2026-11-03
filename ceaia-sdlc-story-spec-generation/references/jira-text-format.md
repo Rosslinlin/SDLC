@@ -4,7 +4,7 @@ Read during [JSON assembly](jira-json-assembly.md), before independent review an
 
 ## Fields and examples
 
-Write fields.description and fields[customFields.acceptanceCriteria] as Jira wiki strings. Apply the same encoding to other intentionally authored rich-text fields only when metadata confirms a writable text-compatible field. Plain text needs no added markup. Do not format Summary, routing, IDs, option values, labels, dates, numbers, URLs, attachment paths, opaque custom strings or unchanged update fields.
+Write fields.description and fields[acceptanceCriteria] as Jira wiki strings. Apply the same encoding to other intentionally authored rich-text fields only when metadata confirms a writable text-compatible field. Plain text needs no added markup. Do not format Summary, routing, IDs, option values, labels, dates, numbers, URLs, attachment paths, opaque custom strings or unchanged update fields.
 
 Decoded field values look like this (these are text, not tool arguments):
 
@@ -44,4 +44,4 @@ Compare complete field values against the source sections: no lost/repeated AC, 
 
 Derive the SPEC projection by expressing the same Jira wiki business content in readable Markdown: `h2.` becomes `##`, `*bold*` becomes `**bold**`, and Jira lists/links/code/tables become their Markdown equivalents. Preserve wording, IDs, ordering, code bodies and link targets; compare semantic content, not raw syntax. Include one Acceptance Criteria heading in SPEC. Do not copy wiki markup blindly into the Markdown view or write the Markdown view back into canonical JSON.
 
-For an unexported older JSON, remove only root staffId and encode the affected authored rich text before a new score. Preserve query/profile identity, authorized reporter, mapping IDs, unrelated values and attachment intent. Record a new JSON revision. Recheck affected projections/tests for unchanged meaning; formatting alone does not require a business rewrite or full new content review. The changed file needs a current score and fresh final confirmation. Preserve prior score/attempt/remote-outcome evidence; never replay a successful or unknown export to migrate formatting.
+For an unexported older JSON, migrate its AC field-ID mapping to root acceptanceCriteria, remove the old customFields wrapper, root staffId and fields.reporter, and encode affected authored rich text before a new score. Preserve query/profile identity, actual mapping ID, business text, unrelated approved values and attachment intent. Record a new JSON revision. Recheck affected projections/tests for unchanged meaning; formatting/schema-only changes do not require a business rewrite or full new content review. The changed file needs a current score and fresh final confirmation. Preserve prior score/attempt/remote-outcome evidence; never replay a successful or unknown export to migrate formatting.

@@ -9,7 +9,7 @@ Return one JSON conclusion using the fields below. Replace examples with observe
     "mode": "new_story",
     "source": null,
     "ticketKey": null,
-    "qualityContractVersion": "6.1.0-preview.4"
+    "qualityContractVersion": "6.1.0-preview.5"
   },
   "reviewResult": "NEEDS_REVISION",
   "artifactPaths": {

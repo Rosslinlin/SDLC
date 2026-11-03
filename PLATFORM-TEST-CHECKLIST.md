@@ -1,6 +1,6 @@
 # v6.1 JSON4Jira flow 平台测试清单 — preview
 
-版本 `6.1.0-preview.4`，日期 `2026-11-03`，分支 `codex/sdlc-json4jira-flow`，未合入 `main`。分别在平台 GPT-5.6 Luna 与 GPT-6 Luna 验证新路径接口。下列结果栏留空表示尚未记录，不能把旧 v6 本地/旧接口检查、mock 推演或普通 tool success 当作新接口与数据库实测。
+版本 `6.1.0-preview.5`，日期 `2026-11-03`，分支 `codex/sdlc-json4jira-flow`，未合入 `main`。分别在平台 GPT-5.6 Luna 与 GPT-6 Luna 验证新路径接口。下列结果栏留空表示尚未记录，不能把旧 v6 本地/旧接口检查、mock 推演或普通 tool success 当作新接口与数据库实测。
 
 ## 环境与执行记录
 
@@ -32,21 +32,25 @@
 | J19 | 后端 linkage/queue 失败或未知时保留已创建票据与已成功附件，不执行旧五字段 B、不重建票据。只使用实际支持的核对/恢复接口；不可恢复时准确等待。 | | |
 | J20 | 三候选按各自 JSON 路径逐票执行，不用 issuesJson；绑定每票评分、预览确认和响应。前票失败/partial/unknown 时按契约停止并保留其余待办，不静默丢项或猜返回Key。 | | |
 | J21 | 超时/断连无法确定写入结果时记 unknown，先以实际可用只读手段核对，不自动重发未知/成功的 issue、附件或数据库步骤；status=400 等业务失败不被 envelope success 掩盖。 | | |
-| J22 | 更新读取 source、目标、Description/独立AC状态和完整附件 inventory；none/replace 保留义务。live schema 不能表达 target/replace 时明确 WAITING_TOOL，不猜字段、不擅新建。 | | |
-| J23 | update none 的本地 SPEC 只用于审查/评分，不被自动当上传附件；replace 只有 schema 明确支持且原件映射获准时才执行，并按真实后端结果确认替换，不假设旧API可用。 | | |
+| J22 | 更新读取 source、目标、Description/独立AC状态和完整附件 inventory；根级 issueIdOrKey 为已确认实际票号，必须与目标/baseline 一致。正常 none 更新以 attachments=[] 保留远端附件，本地 SPEC 经 specFilePath 评分后进入标准确认/导出，不因目标或 score-only 未额外证明而阻塞；实际后端明确拒绝才准确记能力缺口，不猜控制或擅自新建。 | | |
+| J23 | update none 的本地 SPEC 只用于审查/评分，不被自动当上传附件，也不要求额外 score-only 预授权才能继续已确认更新协议；replace 只有 schema 明确支持且原件映射获准时才执行，并按真实后端结果确认替换，不假设旧API可用。 | | |
 | J24 | 旧 v6 会话迁移保留原始状态、编号证据、修复计数及所有已知/未知远端结果；不把旧 STORY.md 评分当新 JSON 评分，不通过调用重放完成迁移，也不补旧 S2/B。 | | |
-| J25 | 按实际 metadata 取得 AC 字段 ID，`customFields.acceptanceCriteria` 保存该 ID，正文从 `fields[该ID]` 读取且为 Jira wiki 字符串；SPEC/测试/reviewer/评分 AC 识别指向相同正文，截图示例值不被硬编码。 | | |
-| J26 | 输入旧扁平 summary/description/acceptanceCriteria/bddScenarios 时在组装/自检识别并修正为 fields 结构；不拿旧顶层内容或旧评分继续导出。变更后按当前包重新评分、确认，不重放已有远端写入。 | | |
+| J25 | 按实际 metadata 取得 AC 字段 ID，根级 `acceptanceCriteria` 保存该 ID 字符串，不再使用 customFields 包装；正文从 `fields[acceptanceCriteria]` 读取且为 Jira wiki 字符串。SPEC/测试/reviewer/评分 AC 识别指向相同正文，截图示例值不被硬编码。 | | |
+| J26 | 输入旧扁平 summary/description/AC 正文或数组/bddScenarios，或旧 customFields.acceptanceCriteria 包装时，在组装/自检修正为当前结构：根级 acceptanceCriteria 仅映射字段 ID，正文在 fields。不得混用两套映射或旧评分继续导出；迁移后按当前包重新评分、确认，不重放已有远端写入。 | | |
 | J27 | `fields.description` 被误写为数组/对象时作为结构问题处理，修为保留原业务含义的 Jira wiki 字符串；不因格式修正编造新业务要求或另加 Q1–Q7 门槛。 | | |
-| J28 | `customFields.acceptanceCriteria` 的字段 ID 不被计作 AC 正文/AC 数量；读取对应 fields 值，缺少实际正文不能被映射字符串伪装成内容通过。 | | |
+| J28 | 根级 `acceptanceCriteria` 的字段 ID 不被计作 AC 正文/AC 数量；读取对应 fields 值，缺少实际正文不能被映射字符串伪装成内容通过。 | | |
 | J29 | AC 映射为空/缺失、指向不存在字段，或字段值为空/非字符串时明确结构阻塞并回到生成；不猜 ID、不从旧顶层数组静默兜底、不宣称通过评分。 | | |
-| J30 | 根级 projectKey 与 `fields.project.key`、类型名/真实 `fields.issuetype.id` 一致；新建 reporter 按 metadata 要求/授权使用真实身份，不从已移除的根级 staffId 取值；更新按获准增量/省略语义保留原 reporter。冲突在评分前解决，不硬编码类型 ID 7 或照抄示例员工号/项目。 | | |
+| J30 | 根级 projectKey 与 `fields.project.key`、类型名/真实 `fields.issuetype.id` 一致；创建和更新 JSON 均不含 fields.reporter，不因旧模板/profile 又加入它；更新省略 reporter 不清空远端原值。冲突在评分前解决，不硬编码类型 ID 7 或照抄示例员工号/项目。 | | |
 | J31 | 首次无适用配置：先读真实 Workspace/可信身份，再只问尚缺来源、staffId、项目名称/已知 key 或实际项目选择；类型/schema/AC ID 由工具查。保留默认 Jira 意图，没有路线选择或 preparation-only 推荐；元数据未全时不伪造完整可评分 JSON。 | | |
 | J32 | 已有适用配置及可信身份：复用已确认项，不重复询问来源/员工号/项目；仅缺失或不适用部分定向查询/提问。Story 类型/schema/AC ID 从真实配置或工具取得，不让业务用户填技术 ID；继续默认流程及最终内容确认。 | | |
 | J33 | 用户主动明确只准备/不导出：记录该方向，不执行导出；不把此方向变成默认入口选项。仍只用已知真实值，缺必要元数据则交付已有事实和待补项，不伪造完整可评分 JSON 或实际评分成功。 | | |
-| J34 | 模板与实际 Story JSON 不含根级 staffId；评分仍恰三参数、导出仍仅路径。身份配置和查询工具按实际 schema 保留所需 staffId，reporter 不被误删或无授权改写。 | | |
+| J34 | 模板与实际 Story JSON 不含根级 staffId 或 fields.reporter；评分仍恰三参数、导出仍仅路径。身份配置和查询工具按实际 schema 保留所需 staffId，删除提交中的 reporter 不代表清空 Jira 现有值。 | | |
 | J35 | 生成时即将 description/映射 AC 及其他获准富文本写成 Jira wiki，标题 h1./h2.、AC `* *AC-001*: Given ...`；代码、嵌套列表、链接及表格内容无损，已有 wiki 不重复转换。summary、路由/选项、普通文本及未改动更新字段不转换。评分后导出文件不被再次渲染。 | | |
 | J36 | SPEC 的 Markdown 投影与 JSON 的 Jira wiki 语义一致，AC ID/数量/措辞/顺序保留，引用不被误算为声明；reviewer 和评分读取同一映射正文。旧 JSON 去除 staffId 或转换格式后，旧评分/确认失效；重新评分确认不重放已成功或未知的远端写入。 | | |
+| J37 | 创建模板及实际创建 JSON 使用根级 acceptanceCriteria 字段 ID，无 customFields 包装、fields.reporter 或 issueIdOrKey；实际 AC 正文在 fields[acceptanceCriteria]。字段可写性与类型在评分前核对，不从旧缓存补回 reporter。 | | |
+| J38 | 更新模板及实际更新 JSON 在 issueType 后加入准确大小写的 issueIdOrKey，值与可信 source/target/baseline 实际票号一致；按获准增量保留原有义务，通过同一 JSON 路径评分/确认/导出，实际返回 key 与目标一致。普通更新不因目标编码未知而阻塞，也不新增票号工具参数。 | | |
+| J39 | 更新缺目标、目标与 baseline 冲突，或误用 issueldOrKey（小写 l）时在提交前阻止并修正/澄清；不得删除目标字段、填空字符串/示例 key 或切换创建继续执行。创建不因证据引用票号而加入更新目标。 | | |
+| J40 | 旧包装迁移为根级 AC 字段 ID、去除 reporter 或补入真实更新目标后，保留 AC 业务正文、其他获准字段和附件意图；旧评分/确认失效，完成当前包所需评估与确认。普通 none 按 attachments=[] 与既有 specFilePath 评分参数继续，只有真实拒绝才记录精确缺口；replace 编码仍据真实能力，不伪造控制或重放成功/未知外部写入。 | | |
 
 ## 后端结果证据
 
@@ -75,7 +79,15 @@
 | --- | --- | --- | --- | --- |
 | | | | | |
 
-### 2026-11-03 preview.4 本地检查与格式隔离验证
+### 2026-11-03 preview.5 本地检查与创建/更新隔离验证
+
+本地检查通过：7 个 JSON、100 条文件链接、9 个 fenced JSON 示例、3 个 Skill 的 YAML/frontmatter（Ruby Psych）、同文共享质量副本、state 7 和 git diff --check。Task schema/skill IDs/10 个工具顺序、评分三参数/导出单路径及 Q1–Q7 业务判定表与 preview.4 一致。解码创建/更新模板确认根级 acceptanceCriteria 为字段 ID、正文在对应 fields 值中，无 customFields/reporter/root staffId；创建省略目标，更新使用准确 issueIdOrKey。三个独立包与 origin/main 无差异，SPEC Header/控制状态模板未改。官方 quick_validate 仍因缺 PyYAML 未运行完成，不将替代检查记为官方通过。
+
+独立子代理使用当前资源与规范化 mock metadata/profile/baseline，仅完成两组 assembly/Markdown projection。父代理实际解码核对：创建没有把来源票当更新目标；更新使用指定目标，保留原标题及 AC-001/002，仅新增已要求的提交日期 AC-003。旧 profile/descriptor 中 reporter 未带入，动态 AC 字段、查询身份边界、labels、链接/行内代码/日期、Markdown 语义及 none 的空附件列表符合给定事实。没有完整 SPEC/测试表/生产全量 precheck、review、评分、用户确认或真实 Jira/数据库调用，也没有目标 Luna 模型平台实测；J37–J40 等真实结果栏继续留空。
+
+### 历史记录：preview.4 — 2026-11-03 本地检查与格式隔离验证
+
+以下是 preview.4 当时的检查，不验证 preview.5 的根级 AC 字段映射、reporter 移除及更新目标编码；相关真实平台结果尚未记录。
 
 本地检查通过：6 个 JSON、95 条文件链接、8 个 fenced JSON 示例、3 个 Skill 的 YAML/frontmatter（Ruby Psych）、共享质量副本一致、state 7 和 git diff --check。Task schema/skill IDs/10 个工具、评分三参数/导出单路径及 Q1–Q7 业务判定表与 preview.3 一致。解码模板确认无根级 staffId，description/映射 AC 为 Jira wiki 且含真实换行。三个独立包与 origin/main 无差异。官方 quick_validate 因缺 PyYAML 未运行完成，未将替代检查记作官方校验通过。
 

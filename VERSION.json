@@ -1,5 +1,5 @@
 {
-  "bundleVersion": "6.1.0-preview.4",
+  "bundleVersion": "6.1.0-preview.5",
   "releaseDate": "2026-11-03",
   "executionProfile": "text-only",
   "activeSkills": [
@@ -20,14 +20,14 @@
   "jiraRoutingProfile": "persistent-user-workspace-ceaia-sdlc-jira/profiles.json; settings-resolved-before-scoring; final-current-content-confirmation-before-export",
   "notes": [
     "Default Jira-backed entry asks only missing identity/source/project facts after reading available configuration; tool queries resolve schema/field IDs. Missing setup never triggers a preparation-only/Jira-backed route selector. Explicit user no-export intent and final scored-content confirmation remain supported.",
-    "2026-11-03 latest file clarification: no root staffId; routing and Jira fields remain, customFields.acceptanceCriteria maps to the actual metadata-confirmed field ID, and Description/AC use Jira wiki strings assembled before scoring. Query/profile identity and authorized metadata-based reporter are preserved. SPEC stays Markdown with the same business meaning. Tool arguments and Q1-Q7 business criteria are unchanged.",
+    "2026-11-03 latest developer/user confirmation: root acceptanceCriteria directly maps the actual AC field ID, without customFields or fields.reporter/root staffId. AC text lives at fields[acceptanceCriteria]. Updates add root issueIdOrKey after issueType; creates omit it. Query/profile identity remains for actual discovery schemas. Description/AC use Jira wiki before scoring and SPEC stays Markdown. Tool arguments and Q1-Q7 business criteria are unchanged.",
     "First JSON-first preview; not merged into main and not a production integration claim.",
     "Generation resolves Jira routing/field metadata and writes the final story.json4jira before scoring. SPEC remains Markdown; the standalone STORY.md is replaced by the JSON business projection inside SPEC.",
     "User-confirmed scorer is nodejs-base-mcp.scoreUserStory with story_json_workspace_path, specFileStatus and specFilePath. This clarification supersedes the screenshot scoring one-argument example.",
     "Export retains java-base-mcp.exportJiraByDynamicFields but uses only the same story_json_workspace_path. Backend linkage/queue replaces the old Agent B call.",
     "Story score stays in its independent report/UI. No SPEC score mutation or display-driven S2. Full responses and unknown outcomes are preserved.",
     "Shared content quality and independent review remain; destination assembly precedes scoring, final content confirmation follows scoring.",
-    "Update target, none/replace and score-only-attachment handling require active backend schema evidence; unsupported cases wait rather than fabricate fields or create a new ticket.",
+    "Root issueIdOrKey is the confirmed update selector and must match the actual existing target/baseline. Normal none updates preserve remote attachments with attachments=[] and score the local SPEC via confirmed specFilePath without extra pre-emptive capability proof. Actual backend rejection or unsupported requested replacement is a precise gap, never permission to fabricate fields, add a file or create another ticket.",
     "Independent Jira helper, Story reviewer and review-requirements directories are unchanged. Their backend compatibility was not validated here.",
     "Actual model, preview, database, attachment and asynchronous score-sync behavior requires platform integration testing."
   ],
@@ -37,7 +37,7 @@
     "gpt-5.6-luna",
     "gpt-6-luna"
   ],
-  "qualityContractVersion": "6.1.0-preview.4",
+  "qualityContractVersion": "6.1.0-preview.5",
   "qualityContractSource": "ceaia-sdlc-story-spec-generation/references/quality-contract.md",
   "qualityContractPackagedCopy": "ceaia-spec-review/references/quality-contract.md",
   "contentRepairPolicy": "two-shared-content-batches-per-candidate-evidence-revision; one-mechanical-correction-per-cause; external-write-retry-policy-unchanged",
@@ -60,6 +60,6 @@
       ]
     }
   },
-  "storyJsonFormat": "jira-fields-with-ac-id-map",
+  "storyJsonFormat": "jira-fields-with-root-ac-id-map; update-only-issueIdOrKey; no-reporter",
   "entryPolicy": "default-jira-backed; reuse-configuration; ask-only-missing-setup-facts; no-entry-route-selector"
 }

@@ -6,11 +6,13 @@ Generation assembles the final JSON and authorized plan before scoring. Export v
 
 The backend uploads every file listed in the .json4jira attachments list. Inspect that actual list against the reviewed plan; no implicit extra files or top-level batch inheritance. A normal new Story lists its reviewed primary SPEC. Distinct replacement contents retain their own reviewed files and original-ID mappings. Only selected reviewed SPEC uploads are in this bundled route; do not add Test Case, state, plans, baselines, profiles or score/review records.
 
-scoreUserStory separately receives specFilePath, but the exact live contract must establish how a local non-upload SPEC is read/scored when it is absent from attachments. A none update keeps its local reviewed SPEC without inserting it into uploads. If that independent scoring meaning is not supported or cannot be evidenced, wait for the tool-contract gap; never turn none into add to make scoring work.
+scoreUserStory separately receives the local reviewed SPEC through its confirmed specFilePath argument. A normal none update sets attachments=[] and uses that local SPEC for review/scoring while preserving remote attachments; it does not need an extra capability-proof gate merely because the SPEC is not uploaded. If the backend actually rejects this package, preserve the exact error and return a precise WAITING_TOOL; never turn none into add, invent a score or fall back to create to make scoring work.
 
-## Updates require supported schema
+## Update targets and attachment operations
 
-The parent may authorize none or replace. Authorization does not define the new JSON encoding. Before any write, actual schema/documentation must show how this exact existing ticket and requested operation are represented. No create fallback, guessed issueIdOrKey field, inferred add/delete combination, or invented replace object is allowed.
+Existing-ticket targeting is confirmed: the scored JSON places root issueIdOrKey after issueType, containing the exact nonempty approved ticket number/key. It must match the saved baseline and source; create JSON omits this property. The exporter still passes only story_json_workspace_path. Do not gate basic update targeting as unknown or replace it with a create.
+
+The parent may authorize attachmentAction none or replace. The confirmed issueIdOrKey establishes the ticket to update, not an attachment-replacement encoding. For none, keep attachments empty, preserve existing remote attachments and use the local SPEC through specFilePath. For replace, require actual schema/documentation for that requested attachment operation. No inferred add/delete combination, invented replace object or extra legacy API call is allowed.
 
 For replace, retain upstream-confirmed original attachment IDs and current reviewed output mappings. Do not target by filename alone, merge distinct contents, or rename legacy originals. Explicit reviewed many-to-one replacement requires preservation of every original's relevant obligations. **The supported backend operation must upload the new file and confirm success before deleting the selected old file.** If the live JSON route cannot establish that behavior, replacement is WAITING_TOOL. Do not execute a separate legacy upload/delete API to bypass it.
 
