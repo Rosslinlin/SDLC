@@ -1,149 +1,41 @@
-# Flow Batch Export
+# Export several ordinary Jira issues
 
-## Scope
+Use for a selected group of independent ordinary creates/updates. Test Cases from a structured source use [the dedicated Test Case flow](flow-testcase-source-export.md), including its own `single`/`multiple` choice and fixed business shapes.
 
-Use this module when the user asks to create, update, export, or submit multiple Jira issues or Test Cases in one request.
+## Prepare the selected items
 
-Also load:
+Read each selected actual issue file under [the file contract](common-json4jira-contract.md). Reuse complete files unchanged. Prepare missing files through [create](flow-create-issue.md) or [update](flow-update-issue.md), sharing applicable [profile facts](common-state-and-user-info.md) without inheriting business content, targets or attachment plans between items.
 
-- `common-tools-and-inputs.md`
-- `common-state-and-user-info.md`
-- `common-project-issue-type-validation.md`
-- `common-field-assembly.md`
-- `common-jira-text-rendering.md`, for non-Test items only
-- `common-preview-confirm-export.md`
-- `common-guardrails.md`
-- `common-attachments.md`, when attachments are present
+Keep an explicit source-item-to-file mapping and stable selection order. Every child contains its own actual source/project/type and fields; every update contains its own exact root `issueIdOrKey`. No defaults may overwrite unrequested update fields. Missing targets block their updates rather than converting them to creates.
 
-For Test Cases from source artifacts or structured source content, first load `flow-testcase-source-export.md`.
+Establish actual type identity before planning calls. Scoring requirements are project/backend-owned: do not preblock an unscored Story or invoke a scorer automatically. Retain any supplied [assessment evidence](story-assessment-evidence.md) accurately; an old result is not current evidence after an input change. A manifest is not a scoring input.
 
-## Strong Batch Rule
+## Build the deterministic submission plan
 
-Batch requests are a single-call flow:
+Preserve the user's original selection order and use this fixed rule:
 
-- Recognize batch intent from plural wording, multiple listed items, tables, CSV-like content, multiple Test Cases, or requests such as batch export, create these issues, update those tickets, or export all.
-- Assemble one `issuesJson` payload containing all items. For Test Case export with `uploadType` mode `single`, assemble one aggregate Test issue payload with top-level `summary` and clean table-only `description`; include `dynamicFieldsJson` only for other validated fields.
-- Before preview, render Markdown-authored rich text for each eligible non-Test item through `common-jira-text-rendering.md`. Do not apply common rendering to any Test Case item or field; mixed batches preserve the existing Test Case rules item by item.
-- If any Story has prior Workspace scoring evidence, read [generic Story score binding](generic-story-score-binding.md) before preview and map each eligible item to its score input path.
-- Generate one integrated batch preview in `jira-preview.md` before export.
-- Ask for explicit confirmation once for the whole batch.
-- Call `exportJiraByDynamicFields` exactly once for the approved batch issue-write payload.
-- Never loop through batch items and repeat issue-write calls unless the user explicitly asks to split the batch. Every successful eligible scored Story requires its own post-write binding call under [generic Story score binding](generic-story-score-binding.md).
+| Selected types | Submission plan |
+| --- | --- |
+| All non-Story, such as Bug/Task/Test | One manifest containing all selected non-Story issue paths; one export call. |
+| All Story | One individual issue-file path per call, submitted sequentially in selected order. |
+| Mixed Story and non-Story | Scan in order. Each maximal contiguous non-Story run becomes one manifest and one call; each Story remains its own individual-file call. Do not move items across a Story boundary. |
 
-## Supported Batch Scenarios
+A Story never appears in a manifest, including a project exempt from scoring. Do not change type to obtain a batch route. A mixed plan's non-Story run uses a manifest even when that run has one item. For example, Bug A / Story B / Task C / Bug D / Story E becomes manifest[A], B, manifest[C,D], E.
 
-- Batch create Jira issues.
-- Batch update existing Jira issues.
-- Batch create or update Test Cases only when not exporting Test Cases from a user source. Source-based Test Case export must follow `flow-testcase-source-export.md`.
-- Batch upload Test Details/Test Steps for existing Test issue types when not part of source-based Test Case export.
-- Batch add attachments after issue creation or update.
-- Batch delete or replace attachments when updating existing issues.
+Each non-Story manifest has exactly one property, `story_json_workspace_paths`: a nonempty native array of actual unique issue-file paths in selected order. It contains no inline issues, defaults, nested manifests, credentials or workflow controls. Each listed child contains its own actual routing and fields. Read back each manifest and all its children; non-Story manifest support is confirmed and needs no extra applicability gate.
 
-## Batch Mode Trigger
+Resolve required file/target/operation blockers before final confirmation, or obtain an explicit revised selection. Do not silently omit an invalid selected item. Missing upstream scoring evidence alone is not such a helper blocker.
 
-Batch mode uses active item data in `issuesJson`, not the mere presence of a parameter key. An explicitly supported inactive `issuesJson: ""` in a non-batch flow does not enable batch mode. A requested batch must provide a valid non-empty item list; missing, malformed, or empty batch data blocks export rather than falling back to a single create. Test Case source export with `uploadType` mode `single` is a single-call export and must not include `issuesJson`.
+## Confirm the whole plan and submit in order
 
-The current `exportJiraByDynamicFields` interface exposes `issuesJson` as a JSON-encoded non-empty array string; it does not expose an `issues` argument.
+Follow [the common preview/submission rules](common-preview-confirm-export.md) once for the whole current package. Show every selected item and its actual operation/target, all manifest membership/order, individual Story paths, intended attachments/relationships, available assessment evidence and the exact ordered call plan. Confirmation binds all current files, participating uploads and that plan.
 
-## Base Request Fields
+After unchanged read-back, execute each planned call sequentially through `java-base-mcp.exportjirabydynamicfield`, with exactly one `story_json_workspace_path`: either that non-Story manifest or that individual Story file. Do not pass arrays or additional fields beside the path. Preserve each actual response before proceeding to the next call.
 
-Top-level fields act as defaults for all items:
+Stop further calls at the first failed, partial or unknown required synchronous outcome, including a backend score-required rejection. Retain all confirmed effects and all unattempted selected files in order. An accepted asynchronous score-sync queue that is still pending is not itself a synchronous submission failure. No automatic scoring, type change, retry or rollback is used to continue the plan.
 
-- `staffId`: Required. Staff ID used to load the user's Jira token.
-- `almType`: Required. Jira source: `wpb`, `alm`, `data`, `fcr`, or `go`.
-- `uploadType`: Required only for Test Case source export as a mode selection. Valid values are `single` and `multiple`; do not include this control value in the final `exportJiraByDynamicFields` payload.
-- `projectKey`: Default project key for create items.
-- `issueType`: Default issue type for create items.
-- `description`: Optional default description.
-- `dynamicFieldsJson`: Optional default dynamic fields.
-- `conversationId`: Optional default conversation id for workspace attachments.
-- `attachmentsJson`: Optional top-level attachment operations for a separate single-item call; an active batch sets each item's attachment plan inside `issuesJson` because top-level attachments are not inherited.
-- `issuesJson`: Optional JSON array string for batch items.
+## Map results and recover the failed layer only
 
-Item-level fields override top-level defaults. Map Jira fields such as `labels`, `components`, `fixVersions`, and `customfield_xxxxx` into that item's JSON-encoded `dynamicFieldsJson`; do not send them as undocumented batch-item parameters.
+Map actual returned paths/indexes to the approved manifest's child order and then to source items. Report each individual Story call separately. Never guess index bases, consecutive Jira keys, or a key for an unreturned item. Unmatched results remain unknown.
 
-Validate each effective item after default inheritance using `common-field-assembly.md`'s Mandatory Empty-Value Contract. Update items must not inherit changes to unspecified fields; relocate defaults to the intended items when necessary. A requested update with a missing or empty `issueIdOrKey` must block, not silently become a create.
-
-## Create Versus Update Items
-
-- A batch item with `issueIdOrKey` updates an existing issue.
-- A batch item without `issueIdOrKey` creates a new issue.
-- Create items require `projectKey`, `summary`, and `issueType` from either item-level fields or top-level defaults.
-- Update items must provide their own `issueIdOrKey`.
-
-## Batch Create Payload
-
-```json
-{
-  "staffId": "12345678",
-  "almType": "wpb",
-  "projectKey": "AIWPB",
-  "issueType": "Story",
-  "issuesJson": "[{\"summary\":\"Batch story 1\",\"description\":\"Story 1 desc\",\"dynamicFieldsJson\":\"{\\\"fields\\\":{\\\"labels\\\":[\\\"BATCH\\\"],\\\"customfield_12345\\\":{\\\"value\\\":\\\"High\\\"}}}\"},{\"summary\":\"Batch story 2\",\"issueType\":\"Task\",\"dynamicFieldsJson\":\"{\\\"fields\\\":{\\\"customfield_67890\\\":\\\"Business value\\\"}}\"}]"
-}
-```
-
-## Batch Update Payload
-
-Each item to update must provide its own `issueIdOrKey`.
-
-```json
-{
-  "staffId": "12345678",
-  "almType": "wpb",
-  "issuesJson": "[{\"issueIdOrKey\":\"AIWPB-101\",\"summary\":\"Updated story summary\"},{\"issueIdOrKey\":\"AIWPB-102\",\"dynamicFieldsJson\":\"{\\\"fields\\\":{\\\"description\\\":\\\"Updated description\\\",\\\"customfield_12345\\\":{\\\"value\\\":\\\"Medium\\\"}}}\"}]"
-}
-```
-
-## Batch Test Case Payload
-
-This module is not authoritative for source-based Test Case export.
-
-When the user asks to export Test Cases from a source artifact, pasted table, spreadsheet-like content, or generated Test Case list into Jira, stop using this module as the primary flow and execute `flow-testcase-source-export.md`.
-
-Do not define, preview, or submit an alternative Test Case export payload from this module. The only allowed source-based Test Case export payload shapes are the two forced shapes in `flow-testcase-source-export.md`.
-
-## Batch Preview Requirements
-
-Before export, write one `jira-preview.md` according to `common-preview-confirm-export.md`.
-
-For source-based Test Case export preview requirements, follow `flow-testcase-source-export.md`.
-
-## Batch Response Handling
-
-Batch responses may include:
-
-```json
-{
-  "resources": [
-    {
-      "index": 0,
-      "summary": "Batch story 1",
-      "status": "pass",
-      "ticketKey": "AIWPB-101",
-      "ticketUrl": "https://xxx/browse/AIWPB-101"
-    },
-    {
-      "index": 1,
-      "summary": "Batch story 2",
-      "status": "fail",
-      "error": "summary must be provided"
-    }
-  ],
-  "successCount": 1,
-  "failureCount": 1
-}
-```
-
-Report batch results by item index and status. One failed batch item does not stop later items.
-
-Match `resources` to the previewed item indexes. For each successful Story with verified Workspace scoring evidence and a returned Ticket Key, call [generic Story score binding](generic-story-score-binding.md) once with that Story's input path. Do not stop at the batch write response or bind failed/unscored items. Report each eligible item's separate binding outcome; missing or ambiguous results remain pending.
-
-## Batch Notes
-
-- `dynamicFieldsJson`, when provided, must be a JSON-encoded string representing one object, including inside each `issuesJson` item.
-- For active attachment operations, `attachmentsJson` must be a once-serialized JSON string containing the validated plan from `common-attachments.md`, not an object or array.
-- `issuesJson` must be a JSON array string. For source-based Test Case export, follow `flow-testcase-source-export.md` instead of this generic batch note.
-- Omit unused optional parameters; an actual empty string is allowed only where the active tool accepts it as an inactive sentinel. Apply the Mandatory Empty-Value Contract to top-level inputs and every item; inactive sentinels cannot substitute for required batch or operation data.
-- Do not put attachment operations into Jira dynamic fields.
-- Do not split a batch into repeated single-item tool calls unless explicitly requested.
+Keep confirmed successes after partial failure. Do not replay a whole manifest, recreate a successful item, re-upload a confirmed file or rescore to repair another effect. Use only supported focused reconciliation/recovery under the common submission reference. Any later continuation or subset retry needs an established unapplied operation set, its current files and confirmation; do not treat a vague continue as permission to replay uncertain writes.

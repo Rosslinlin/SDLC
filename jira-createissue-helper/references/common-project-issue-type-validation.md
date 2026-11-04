@@ -1,69 +1,37 @@
-# Common Project And Issue Type Validation
+# Discover only missing project, type and field facts
 
-## Project Lookup
+Use after [profile lookup](common-state-and-user-info.md), only when selected input/upstream evidence and applicable cache cannot establish required facts. A complete trustworthy file does not need a new query chain. Configuration discovery does not replace a current update/attachment baseline read.
 
-When collecting or validating a project, first load reusable values from conversation context and ordinary user-workspace context. Load `jira-user-info.md` only when the active route is the validated SDLC gateway; generic create, update, batch, association and Test Case routes must not read it.
+## Discovery calls
 
-If the user already provided a project name, project key, or project keyword, still call `queryJiraProjectsByName` first to validate that the project exists unless an already selected project remains valid and the user did not ask to change it.
+Production authentication comes from platform context. Use the actual exposed query schema; historically the tools name these arguments:
 
-For a persisted SDLC default, use its stored project name as `projectName`; if only a project key is stored, use that exact key as the required fuzzy-search keyword. Do not ask the user for a redundant project keyword before this validation call.
+| Missing fact | Tool | Known query arguments |
+| --- | --- | --- |
+| Actual project | `java-base-mcp.queryJiraProjectsByName` | `almType`, `projectName`; `staffId` only if exposed/required and actually available from trusted context |
+| Actual issue type binding | `java-base-mcp.queryJiraIssueTypesByProject` | `almType`, `projectKey`; same identity rule |
+| Applicable field IDs, schemas, requiredness or option encoding | `java-base-mcp.queryJiraCreateMetaFields` | `almType`, `projectKey`, and supported `issueTypeId` or `issueType`; same identity rule |
 
-When calling `queryJiraProjectsByName`, use only these fixed conditions:
+Use confirmed `wpb`, `alm`, `fcr`, `go` or `data`; do not infer source from a ticket prefix. Never put query-only identity in issue JSON or exporter arguments. If a live query still requires unavailable staffId, report the exact schema/injection gap rather than fabricate it or collect authentication credentials.
 
-- `staffId`
-- `almType`
-- `projectName`
+A known exact project key can feed type/metadata discovery directly. Do not search projects merely to validate a key already established by current input, an actual target baseline or an applicable profile. Project-name search takes a keyword, not an invented projectKey parameter. Query type only when its binding is missing and metadata only when applicable field facts are missing; reuse every already known component.
 
-Do not dynamically load project query parameters or append other search conditions.
+## Resolve real choices and completeness
 
-## Project Selection
+Read the complete actual response. An exact requested key/name matching one returned project can continue without another selection. Ambiguity needs choices showing all plausible returned keys/names. No result needs a corrected search/destination, not a guessed project.
 
-After project query results return:
+Match a requested type to actual returned name/ID or verified cached binding. Same-name IDs remain distinct. Do not use a fixed type list, misclassify a Story as Test/Bug to place it in a non-Story manifest, or assume one type ID works in every project. A Test Case's dedicated flow controls its shape; discovery does not add Story AC/SPEC fields.
 
-- If the user's provided project clearly matches one returned project, store that project and continue without asking for a project popup again.
-- If multiple returned projects could match the user's provided project, generate a dynamic project popup from the actual returned results. Do not ask the user to choose by replying in normal chat.
-- If there are zero results, collect another `projectName` search keyword through the allowed popup input and do not continue to issue type lookup.
-- If there is exactly one result and no explicit or stored exact project was supplied, confirm it through a project popup before continuing. If a current user request names that exact returned key/name, store it and continue without another project-selection popup. A validated `jira-user-info.md` exact match may provide the same shortcut only inside the SDLC route, but the later-run SDLC defaults confirmation remains mandatory before preview.
-- When selection or confirmation is needed, each popup option must include at least project key and project name.
+Use supported pagination where available and needed; never invent pagination parameters. A truncated list does not prove a missing item does not exist. Unknown completeness stays explicit. A complete upstream Test file can establish type through its verified root binding; do not add redundant `fields.issuetype.id` solely because a Story template contains it.
 
-Any project popup must:
+## Interpret metadata at its evidenced scope
 
-- include every returned project that could match the user's provided project or keyword;
-- preserve the returned project key and project name for each option;
-- avoid filtering, truncating, hiding, or de-duplicating returned project options unless the backend result itself is duplicated; and
-- store the selected `projectKey` and project name before issue type lookup.
+Decode the actual outer response first. If `result` is a JSON string, decode that returned string once. Where `result.fields.values[]` exists, read its actual descriptors. Preserve wrapper/business errors; MCP transport success is not proof of successful metadata discovery.
 
-Store selected `projectKey` and project name.
+Read fieldId/name, schema.type/items/system/custom, required, operations, defaults and allowed values where returned. Establish full-list completeness from the actual response contract or closed pagination such as total/isLast. Missing requiredness, operations or options remain unknown, not fabricated false/empty values.
 
-Do not invent or accept a project key that is not returned by `queryJiraProjectsByName`, unless the user explicitly provides a known exact project key and accepts Jira validation risk.
+`queryJiraCreateMetaFields` describes create metadata. Reuse stable IDs, schemas and applicable option encodings on update while preserving operation-specific limits. It is not an edit-permission check. Do not require a synthetic update capability record or treat create defaults as authority to overwrite target values.
 
-Do not use a fixed project list. Do not proceed with a project selected from chat text when project selection or confirmation is required by the rules above.
+Save each verified compact component under the profile rules immediately; failed/unknown discovery never overwrites usable facts. Record the missing fact and actual evidence in existing context/preview, without extra query-state files.
 
-## Issue Type Lookup
-
-When calling `queryJiraIssueTypesByProject`, pass only:
-
-- `staffId`
-- `almType`
-- selected `projectKey`
-
-Do not pass project name or other dynamic conditions.
-
-## Issue Type Selection
-
-After results return:
-
-- If the user clearly provided an issue type and it exists in the returned issue type list, store the returned issue type name and id when available, then continue directly without showing the issue type popup.
-- If the user clearly provided an issue type but it does not exist in the returned issue type list, show the dynamic issue-type popup from all returned issue types.
-- If the user did not provide an issue type, generate a dynamic issue-type popup from the actual returned results.
-- If no issue types are returned, tell the user that issue types could not be found for the selected project and collect the next project choice through the allowed project popup flow.
-
-Any issue-type popup must:
-
-- include every returned issue type
-- preserve `id` and `name` for each option
-- avoid filtering, truncating, hiding, or de-duplicating by display name
-
-Do not use a fixed issue type list. Do not ask the user to choose an issue type by replying in normal chat. Do not proceed with a user-provided issue type until it has been validated against `queryJiraIssueTypesByProject`.
-
-Store selected issue type name and issue type id, if available.
+Use [native assembly](common-field-assembly.md) and [the file contract](common-json4jira-contract.md). Unresolved required technical mappings or unsupported encodings stop that preparation with precise diagnostics. Never borrow sample IDs, choose the first allowed option, ask users to invent hidden IDs or manufacture business content to satisfy a field.

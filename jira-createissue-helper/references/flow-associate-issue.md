@@ -1,63 +1,27 @@
-# Flow Associate Issue
+# Associate existing Jira issues
 
-## Scope
+Use for an explicit relationship request. A relationship's source issue, target issues, type and direction are current-operation facts; they are not project defaults or ordinary Jira field values.
 
-Use this module when the user asks to link, associate, relate, or add a relationship between Jira issues.
+## Resolve the actual relationship
 
-Also load:
+1. Reuse/confirm the selected Jira source, exact source ticket and target ticket(s). A key mentioned as business context does not select an association. Preserve the intended direction for asymmetric relationships.
+2. Read `java-base-mcp.getJiraInfos` for unavailable source/target identity and current relationship facts. Reuse verified relevant reads when still applicable. Check actual target existence and identify an already-present identical relationship before proposing a duplicate.
+3. Resolve the actual supported Jira link type and direction from available authoritative relationship information. Map user wording only when that match is established; do not invent a link type or infer direction from a convenient label.
 
-- `common-tools-and-inputs.md`
-- `common-state-and-user-info.md`
-- `common-field-assembly.md`
-- `common-preview-confirm-export.md`
-- `common-guardrails.md`
+Association alone does not need project search or issue-type discovery. `queryJiraCreateMetaFields` is create-field metadata, not a relationship-type validator or proof that a link operation is supported.
 
-## Association Information Extraction
+## Use the supported JSON encoding
 
-Extract:
+Read [the JSON file contract](common-json4jira-contract.md). Reuse an already prepared association/update file only when its actual target and supported relationship encoding match the user's selected operation. Otherwise prepare it only from the production JSON operation contract or actual supported tool schema.
 
-- `source`: Jira source, for example `wpb`.
-- `sourceIssueKey`: Source Jira key.
-- `targetIssueKey`: Target Jira key.
-- `linkType`: Relationship type.
+The earlier direct-argument association shape does not establish where link controls belong in a path-based file. Do not guess JSON property names, move link controls into `fields`, or pass extra arguments beside `story_json_workspace_path`. Do not change business text or create a new ticket merely to carry a link.
 
-Example:
+If the new association encoding is unavailable, preserve the resolved relationship plan in existing preview/context and report exactly what is missing: source, target(s), actual type/direction and the unsupported JSON representation. Keep unrelated prepared work. Do not claim the relationship was added or substitute a different operation. If the actual runtime exposes the supported encoding, use it; no separate capability gate is needed merely because the static example is absent.
 
-> https://wpb-jira.systems.uk.hsbc/browse/AIWPB-6705 to AIWPB-7799, under Relates to
+For a submitted Story issue file, retain any upstream [assessment evidence](story-assessment-evidence.md) accurately; changing the relationship input invalidates an old current-assessment claim. Scoring requirements are project/backend-owned, not a helper prerequisite, and no scoring is invoked automatically. A Story issue file always uses an individual path call, never a manifest, even for a relationship-only change or scoring-exempt project. A standalone documented relationship operation outside issue-file export follows its actual operation contract; never reclassify a Story or fabricate content to obtain another route.
 
-Parse as:
+## Preview and result
 
-- `source`: `wpb`
-- `sourceIssueKey`: `AIWPB-6705`
-- `targetIssueKey`: `AIWPB-7799`
-- `linkType`: `Relates`
+Follow [preview, confirmation and submission](common-preview-confirm-export.md). Show the exact source, targets, supported link type/direction, existing relationship evidence and actual saved file. Reuse current confirmation only for this same operation/package.
 
-Normalize user wording such as `Relates to` to the Jira link type `Relates`.
-
-## Association Update Order
-
-Execute in this exact order:
-
-1. Collect or reuse missing `staffId` according to `common-state-and-user-info.md`.
-2. Call `getJiraInfos` to read current information for the source `sourceIssueKey`.
-3. Identify source project key and issue type from the source Jira information.
-4. Read target Jira information as needed for preview display.
-5. Call `queryJiraCreateMetaFields` with the source Jira project key and issue type to validate association fields/metadata.
-6. Assemble the association update payload, keeping `linkedIssueKeys` and `linkType` as dedicated top-level parameters; never place them in `dynamicFieldsJson`.
-7. Write `jira-preview.md` and show source, target, normalized link type, and complete payload.
-8. Await explicit confirmation.
-9. After confirmation, call `exportJiraByDynamicFields` with `issueIdOrKey = sourceIssueKey`.
-
-Do not call project search or issue-type discovery for association updates.
-
-## Association Payload Example
-
-```json
-{
-  "staffId": "<staffId>",
-  "almType": "wpb",
-  "issueIdOrKey": "AIWPB-6705",
-  "linkedIssueKeys": ["AIWPB-7799"],
-  "linkType": "Relates"
-}
-```
+Submit only that file's `story_json_workspace_path` through `java-base-mcp.exportjirabydynamicfield`. Preserve the full response and actual per-relationship result. A content-update success or a generic accepted response does not independently prove the link exists. Unknown outcomes require supported read-only reconciliation; do not automatically replay, rescore or repeat a successful content update to repair a link.

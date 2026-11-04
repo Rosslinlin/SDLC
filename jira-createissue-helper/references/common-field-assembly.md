@@ -1,234 +1,51 @@
-# Common Field Assembly
+# Assemble native issue fields from actual source
 
-## Metadata Parsing
+Read only while preparing or intentionally revising a file. Reuse complete trustworthy upstream JSON unchanged under [the file contract](common-json4jira-contract.md). Use [profiles](common-state-and-user-info.md) and [discovery](common-project-issue-type-validation.md) for missing metadata. [Test Case source export](flow-testcase-source-export.md) owns its field/step/table shapes and overrides general content-generation rules.
 
-The `queryJiraCreateMetaFields` response may wrap an inner JSON string in an outer tool response:
+## Content and value precedence
 
-- `status`: success
-- `result`: JSON string
-- `tool_name`: `java-base-mcp.queryJiraCreateMetaFields`
-- `namespace`: `java-base-mcp`
+Preserve supplied export-ready wording, order, identifiers, criterion grouping, tables, examples, links and approved replacements. Map clearly identified source fields once. Non-field business sections remain faithfully named in Description; do not discard extra requirements or flatten an opaque schema-bound value into prose to hide an unresolved mapping. Never replace actual content with a source/preview/attachment pointer.
 
-Processing steps:
+A raw request explicitly asking to generate an issue permits content derived from its supplied facts; mark generated values in preview and obtain confirmation. Exporting an authored source does not authorize polishing, invented actors/benefits/ACs or regeneration to improve scores. Business gaps remain honest assessment subjects where permitted; unresolved required export content needs clarification rather than fabrication.
 
-1. Parse the outer response first.
-2. If `result` is a string, parse the inner JSON next.
-3. Treat `result.fields.values[]` as the authoritative field list.
-4. Treat escaped HTML entities or escaped JSON characters as data representation details; do not ask the user to parse them manually.
+Resolve values from current explicit input and the selected revision first. On update preserve unchanged target values or omit unrequested fields as supported. Only then consider applicable confirmed preferences or evidenced defaults. Create defaults never overwrite target values. Omit optional fields without a requested/required value; do not add them merely because they seem relevant.
 
-If the response contains pagination fields such as `maxResults`, `startAt`, `total`, or `isLast`, mention possible incomplete metadata when appropriate.
+## Native fields and types
 
-## Field Inspection Items
+Put Jira-visible values directly in native `fields` using actual field IDs. Do not assemble `dynamicFieldsJson`, a `customFields` wrapper or old direct tool arguments. Root routing/type and the update target follow the file contract and agree with included field values.
 
-Inspect these properties for each field:
+| Actual schema | Representation rule |
+| --- | --- |
+| Text | Complete source or approved generated JSON string; rich text uses [preparation rendering](common-jira-text-rendering.md). |
+| Number | A valid JSON number, without invented defaults or quoted numeric substitutes. |
+| Date | Supported encoding such as YYYY-MM-DD when applicable; not today's date as a guessed business date. |
+| Select/user/project/version reference | Actual supported ID/object/value representation from metadata or verified facts; never fabricated hidden IDs. |
+| Multi-value field or labels | Native array of the supported element type, preserving requested content/order where meaningful; no JSON-encoded string. |
 
-- `fieldId`
-- `name`
-- `required`
-- `schema.type`
-- `schema.items`
-- `schema.system`
-- `schema.custom`
-- `operations`
-- `allowedValues`
-- `defaultValue`
-- `hasDefaultValue`
-- `autoCompleteUrl`
+Select allowed values by actual source/user match or applicable evidenced default, never `allowedValues[0]` or an arbitrary enabled option. Distinguish ID from display label and user name from account identity. Unsupported encodings or unresolved required selections need a focused clarification or precise tool limitation.
 
-## Required Fields First
+Preserve intentional source empties only where supported. Omit unused optional fields. Do not use `"."`, `"N/A"`, string `"null"` or whitespace as missing-value substitutes. Keep collections typed and use JSON null only when supported. Do not globally replace punctuation in real content.
 
-Process all `required = true` fields first:
+An update omits unrelated fields; empty does not mean unchanged. A clear needs explicit intent, supported encoding and a preview identifying the clear operation. Every batch child owns its effective values; manifest/default inheritance must not change unintended fields.
 
-- `summary`: Generate from the user request and context; do not use a popup.
-- `description`: Generate from the user request and context; do not use a popup.
-- `project` / `projectKey`: Use the selected project.
-- `issuetype` / `issueType`: Use the selected issue type.
-- Other required fields: Generate or select automatically from context, metadata default, allowed values, and safe inference.
+## Story-specific mapping
 
-Except for allowed user inputs/selections such as `staffId`, `projectName`, and `issueType`, do not ask for required metadata fields through popup.
+- Root `acceptanceCriteria` is the actual AC field-ID string; complete AC text is at `fields[that ID]`. No root AC content array, `customFields` mapping or independent `bddScenarios` object.
+- Map real Title/Summary to `fields.summary` once. Preserve non-AC Description and additional sections in `fields.description` in original order. Do not duplicate Title as H1 or repeat the extracted AC body in Description.
+- Preserve whole criteria, existing labels/IDs and Given/When/Then/And/But relationships. BDD steps within one scenario remain one criterion. Do not invent AC-001 labels, merge criteria or complete missing steps to raise a score.
+- Create omits `issueIdOrKey`; update uses the exact confirmed actual target at the root. Parent/Epic/reference keys or profile history never select it.
+- Omit root `staffId` and Story `fields.reporter`. Platform/profile identity is not business payload. Do not generate SPEC/Test Case files or add attachments solely to satisfy scoring.
 
-## Optional Field Handling
+Other types use only applicable actual fields. Do not add Story AC/BDD/SPEC obligations to Bug/Task/Test/Epic or misclassify the actual type to put a Story in a non-Story manifest. Use [assessment evidence](story-assessment-evidence.md) when supplied or actually required; this helper neither imposes universal Story scoring nor calls the scorer.
 
-Add `required = false` fields to the payload only when:
+## Labels, attachments and relationships
 
-- The user explicitly provides them.
-- They can be safely inferred from context.
-- They have a useful default.
-- They are clearly relevant to the user request.
+Preserve requested labels and unrelated current labels on updates. Test Case specifically requires native `fields.labels` containing `CEAIA_GEN`; the old blanket caller-omission rule must not apply. Other marker behavior follows the confirmed file contract, not a guessed backend assumption.
 
-Omitted optional fields must not block creation.
+Paths/attachment operations and dedicated relationship controls follow [attachments](common-attachments.md), [associations](flow-associate-issue.md) and the file contract, not arbitrary custom fields. Query/profile facts never authorize adding or clearing them. A score-only SPEC path is not an upload instruction.
 
-## Jira-Visible Content Preservation Contract
+## Save once and preserve assessment provenance
 
-Apply this contract to all exported Jira-visible fields, including direct fields and values nested in `dynamicFieldsJson`, `issuesJson`, and `testDetailsJson`.
+Complete text rendering, field mapping and authorized upload selection before saving. Read back and decode native strings once; verify actual IDs/types, source-to-field mapping, whole-criterion counts, original order, newlines, links and code. Required values remain real, supported or precisely unresolved.
 
-- If the current task is exporting, migrating, updating from, or attaching already-authored business content, preserve that content's wording, order, identifiers, table cells, examples, acceptance criteria, Test Case steps/data/results, and user-approved replacement text.
-- The LLM may perform only required transport changes: Jira wiki syntax conversion, field mapping, JSON serialization/escaping, supported date/option formatting, and safe line-break normalization. These changes must not alter business meaning.
-- Do not summarize, paraphrase, polish, shorten, expand, reorder, renumber, merge, split, or regenerate export-ready source content unless the user explicitly asks for a rewritten version and confirms it in preview.
-- Do not replace content with a file path, attachment reference, source pointer, preview pointer, example value, or statement such as `see source`.
-- For a new Jira issue created from a raw business request where no export-ready wording exists, generate `summary`, `description`, and required metadata-derived content as usual, mark those values as generated in preview, and require confirmation before export.
-- For updates, change only fields explicitly requested or authorised by the selected flow; untouched Jira fields remain unchanged.
-
-Before preview and export, verify that every Jira-visible payload string is either generated content that was previewed for approval, source-derived content preserved under this contract, or a metadata/user-selected value formatted according to schema.
-
-## Mandatory Empty-Value Contract
-
-Apply this contract to every export flow, top-level parameter, batch item, inherited default, and generated dynamic field before preview and again before submission.
-
-- Never invent `"."`, `"-"`, `"N/A"`, `"null"`, `"undefined"`, or whitespace as a substitute for a missing value. These are not empty values.
-- When an unused optional string parameter is passed, use the actual empty string `""` only if the active tool accepts it as inactive. Otherwise omit it. Do not add unused parameters merely to fill every tool input or add parameters excluded by a specialised payload shape.
-- Preserve schema types: an empty array is `[]`, not `""` or `"[]"`; an empty object is `{}`, not `"."`. Use empty collections only when supported and semantically appropriate. Do not substitute JSON `null` unless explicitly supported.
-- If neither omission nor a valid empty value is supported, explain the schema conflict and block submission; never fall back to a dot to satisfy validation.
-
-| Parameter | Rule when unused or absent |
-|---|---|
-| `epicLink`, `epicName`, `parentLink`, `conversationId` | Use `""` if included and accepted by the active tool; otherwise omit. If required for the selected issue type or operation, resolve the real value instead. |
-| `linkType` | Use `""` or omit when no association is requested. Actual associations require a validated link type. Keep it outside `dynamicFieldsJson`. |
-| `issueIdOrKey` | For a new issue, use `""` if included and supported, otherwise omit. Updates and associations require a real existing issue id/key; never let a missing update target change the operation into a create. |
-| `issuesJson` | For a non-batch flow, use `""` if included and supported, otherwise omit. An active batch requires its valid serialized item array, not an empty sentinel. |
-| `attachmentsJson` | With no planned or required attachment operations, use `""` if included and supported, otherwise omit. Actual operations require the once-serialized validated plan from `common-attachments.md`. |
-| `testDetailsJson` | When no Test Details are needed, omit it or use `""` only when the tool accepts that inactive string. Active Test Details are a once-serialized JSON string of the documented type; required Test Case steps must remain populated. |
-| `linkedIssueKeys` | Use `[]` if included and empty arrays are supported, otherwise omit when no association is requested. Actual associations require real target keys. Keep it outside `dynamicFieldsJson`. |
-| `dynamicFieldsJson` | Preserve actual validated fields. If none exist, omit or use the JSON-encoded string `"{}"` only when accepted. Never send a native object at the tool-call root, insert dummy fields or replace real fields with an empty object. |
-
-Required values such as `staffId`, `almType`, and operation-specific `projectKey`, `issueType`, `summary`, or required metadata values must be resolved using existing input/metadata rules; block export if unresolved. Do not bypass non-empty requirements with empty values. A required key whose schema explicitly allows an empty value, such as absent Test Data mapped to `data: ""`, remains allowed.
-
-Before preview and before the final `exportJiraByDynamicFields` call, run this export-argument checklist:
-
-1. Build the tool call as direct named arguments only; never wrap them in `requestJson`.
-2. Confirm every route-required argument has a real value. At minimum Jira writes require `staffId` and `almType`; create, update, association, batch, Test Case, and SDLC routes add their own required fields.
-3. For each included optional string argument, preserve an actual empty value as `""` when no value is provided and the active tool accepts an inactive empty string. Otherwise omit the argument. Never coerce empty optional values to `"."`.
-4. If a generated payload has `"."` for an optional missing value, normalize it to `""` or omit it according to this contract. If `"."` appears where a real required value is needed, block export and resolve the required value.
-5. Re-read the preview payload and submit exactly those normalized arguments. Do not fill omitted or empty optional parameters after preview.
-
-Example optional/direct-field normalization for a non-batch, non-association payload subset:
-
-```json
-{
-  "epicLink": "EPIC-123",
-  "epicName": "",
-  "linkType": "",
-  "issuesJson": "",
-  "parentLink": "",
-  "projectName": "AIWPB",
-  "issueIdOrKey": "",
-  "testDetailsJson": ""
-}
-```
-
-The same subset must never be converted to:
-
-```json
-{
-  "epicLink": ".",
-  "epicName": ".",
-  "linkType": ".",
-  "issuesJson": ".",
-  "parentLink": ".",
-  "projectName": ".",
-  "issueIdOrKey": ".",
-  "attachmentsJson": ".",
-  "testDetailsJson": "."
-}
-```
-
-For updates, missing means unchanged: omit unrequested fields rather than populating them with empty values, inferred values, or defaults. Clearing an existing Jira field requires explicit user intent, metadata/tool support for the clear representation, and a preview identifying the clear operation. Inspect effective batch defaults too; remove or relocate defaults that would modify unrequested fields on update items. This update protection takes precedence over generic optional-field inference and value-generation strategies.
-
-Normalize known generated placeholders before preview. Do not globally replace periods or other characters inside descriptions, summaries, URLs, filenames, identifiers, decimals, Test Case content, or user-supplied evidence. If a value might be intentional rather than a placeholder, validate or clarify it instead of silently changing it.
-
-Regression checks:
-
-- A new Bug with no Epic, parent, association, batch, attachment, or Test Details must not receive `"."` in unused parameters. Included supported optional strings use `""`; an included supported empty `linkedIssueKeys` array is `[]`.
-- A summary-only update omits unrelated fields; neither empty values nor batch defaults clear or modify Epic Link, Parent Link, labels, or Test Details.
-- An active batch, attachment operation, or required Test Case step export cannot replace its required data with `""` or an empty collection.
-- Literal periods in supplied report text, URLs, decimals, and filenames remain unchanged.
-
-## Backend-managed label
-
-The Jira backend adds `CEAIA_GEN` automatically on export. Do not include it in `dynamicFieldsJson`, `issuesJson` items, or other outgoing Jira fields. Include `labels` only for other requested or required labels, de-duplicated; omit the field when there are none. An update without a requested label change leaves existing labels untouched. When changing labels, retain existing non-`CEAIA_GEN` labels unless the user asks to remove them.
-
-## Value Generation Strategy
-
-- Prefer a reasonable `defaultValue` when one exists.
-- For `allowedValues`, first match the user value; otherwise choose the metadata default; otherwise choose a visible non-disabled allowed value.
-- Do not choose an allowed value with `disabled = true` unless the user explicitly insists and accepts Jira validation risk.
-- If an opaque external ID is required and cannot be safely generated, do not fabricate it; mark it as unavailable from metadata/context in required-field status.
-- For text/number fields without defaults, generate a reasonable value from summary, description, current date, field name, and schema.
-- For user fields without a known user identifier, do not invent account IDs or hidden user keys.
-
-## JSON Structure Mapping
-
-Before mapping Jira-visible text into direct parameters or `dynamicFieldsJson`, apply `common-jira-text-rendering.md` to Markdown-authored rich text in generic non-Test create, update and batch routes. Keep source and rendered values separate and map only the previewed rendered transport value. Never apply common rendering to a Test Case route, Test issue item, Test Case table, or Test Details/execution field; the existing Test Case modules remain authoritative.
-
-Direct parameters:
-
-- `project` / `projectKey` -> `projectKey`
-- `summary` -> `summary`
-- `issuetype` / `issueType` -> `issueType`
-- `description` -> `description`
-
-`handoffType` is never a direct Jira parameter. Keep it only in workflow routing/state and remove it before assembling the tool arguments or any serialized payload.
-
-Put other fields into `dynamicFieldsJson`:
-
-- Put custom fields such as `customfield_25800`, `customfield_12251`, `customfield_26615`, or `customfield_27708` into `customFields` unless the tool has a dedicated parameter.
-- Put system fields such as `priority`, `labels`, `components`, `fixVersions`, `duedate`, `assignee`, or `timetracking` at the top level of `dynamicFieldsJson` or under the `fields` structure required by the Jira tool.
-- Do not put `attachment` in `dynamicFieldsJson`; attachments require the attachment flow in `common-attachments.md`.
-- Do not put `linkedIssueKeys` or `linkType` in `dynamicFieldsJson`; these are dedicated top-level parameters for association operations and must be passed directly to `exportJiraByDynamicFields`.
-- Do not duplicate required fields in `dynamicFieldsJson` when they are already covered by direct parameters.
-
-## Batch Item Field Assembly
-
-For batch create/update, apply the same field assembly rules to each item, then place the items in one `issuesJson` payload.
-
-- Top-level `projectKey`, `issueType`, `description`, `dynamicFieldsJson`, and `conversationId` can act as defaults.
-- Item-level values override top-level defaults.
-- For update items, validate the effective payload after inheritance against the Mandatory Empty-Value Contract. Do not let defaults modify unrequested fields; relocate such defaults to the intended items instead.
-- Map Jira fields such as `labels`, `components`, `fixVersions`, and `customfield_xxxxx` into the item's JSON-encoded `dynamicFieldsJson`; do not send undocumented batch-item parameters.
-- Item-level attachments or attachment operations must not be merged into Jira dynamic fields.
-- Apply common Jira text rendering independently to eligible non-Test items only. In a mixed batch, do not inherit a rendered non-Test description into a Test Case item and do not transform any Test Case field.
-- Use `testDetailsJson` per item for Test Case steps.
-- Do not call `exportJiraByDynamicFields` once per item; assemble all item fields into one batch payload.
-
-## Test Case `testDetailsJson` Assembly
-
-When Test Case source content contains Test Steps and Expected Results, assemble `testDetailsJson` automatically.
-
-- For source-based Test Case export with `uploadType=multiple`, item-level `testDetailsJson` is a JSON-encoded string containing one array of step/data/result objects inside each parsed `issuesJson` item. Serialize the array once; do not double-encode it or send a native array under this `*Json` parameter.
-- For source-based Test Case export with `uploadType=multiple`, use the source Test Case title as the item `description`; do not generate a long description from Requirement, Priority, Preconditions, Test Steps, Expected Results, or Comments.
-- Pair Test Steps and Expected Results by corresponding item number and original order.
-- Create one `testDetailsJson` row for each paired step/result item.
-- Map the exact Test Steps source value to `step`.
-- Map the exact Expected Results source value to `result`.
-- Map the exact Test Data source value to `data`. Use an empty string only when the source row has no Test Data value and the active Jira Test Step contract requires the `data` key.
-- Preserve item order and wording. If `step`, `result`, `data`, `description`, or any other Jira-visible field contains numbered list items, keep each numbered item on its own line using `\n`; do not collapse `1. ... 2. ...` into one line.
-- Do not convert source-based Test Case line breaks to literal `<br>` tags in any export mode. For `uploadType=multiple`, item `description` and every `testDetailsJson[].step`, `testDetailsJson[].data`, and `testDetailsJson[].result` value must keep required line breaks as newline characters (`\n` in JSON). For `uploadType=single`, the top-level table `description` must do the same. Normalize `<br>`, `<br/>`, `<br />` and escaped equivalents back to newline characters before preview and export.
-- If source step/result counts do not match, preserve all available content, mark the mismatch in the preview, and block export until the user corrects or explicitly provides a safe mapping.
-- Do not reconstruct `step`, `result`, or `data` from a preview summary, serialized JSON string, or prior response.
-
-For source-based Test Case export through `exportJiraByDynamicFields`, do not assemble the final payload from this common module. Execute `flow-testcase-source-export.md`, which owns the forced Create individual tickets and Group into a single ticket final payload shapes.
-
-## Type Generation Rules
-
-- single-select option: Prefer `{ "id": "..." }`; use visible value/name when no id is available.
-- multi-select / array option: Use `["id", "id"]`.
-- labels: Use a string array for requested or required values; omit the field when none are needed. Do not send `CEAIA_GEN`.
-- date: Use `YYYY-MM-DD`.
-- number: Use a JSON number, not a quoted string.
-- issue link: Use an explicit issue key; do not invent one.
-
-## Field Explanation Template
-
-Use this concise template when explaining metadata fields:
-
-- **Field name:** Metadata display name.
-- **Field ID:** For example `summary` or `customfield_12345`.
-- **Required:** yes/no.
-- **Type:** `schema.type`, plus `schema.items` for arrays.
-- **Generated payload form:** text/date/option/multiple options/user reference/issue link, etc.
-- **Allowed values:** Summarize visible options only and state which value was selected.
-- **Default:** State whether `defaultValue` was used.
-- **External lookup:** Mention `autoCompleteUrl` and avoid fabricating hidden ids.
-- **Payload rule:** Explain whether it is a direct parameter or where it belongs in `dynamicFieldsJson`.
-
-When custom field meaning is unclear, use only the visible name and schema; do not guess hidden business semantics.
+Keep the exact path/content for any requested or upstream assessment and submission. A user-authorized change to previously assessed content makes that prior score historical and requires a fresh preview/confirmation; never represent it as a score of the changed file. A new assessment is needed only where the actual project/backend/user requires it and remains with the reviewer/upstream caller. No submission-time mutation or reserialization is permitted. Retain conversion/source mapping in existing preview/context, not another manifest or source-copy file.

@@ -1,84 +1,27 @@
-# Flow Update Issue
+# Update an existing Jira issue
 
-## Scope
+Use for a confirmed existing-ticket content change. Keep the exact target in root `issueIdOrKey` under [the file contract](common-json4jira-contract.md); a reference ticket, Epic or parent mentioned in prose is not an update target.
 
-Use this module when the user provides a Jira ticket key or Jira link and asks to modify, update, change, or add information.
+## Establish the target and baseline
 
-Also load:
+Reuse the actual confirmed source/target mapping and trustworthy current target evidence. Source must come from confirmed context or an established Jira-host mapping, never from a ticket prefix. A profile cannot select the target.
 
-- `common-tools-and-inputs.md`
-- `common-state-and-user-info.md`
-- `common-field-assembly.md`
-- `common-jira-text-rendering.md`
-- `common-preview-confirm-export.md`
-- `common-guardrails.md`
+Read `java-base-mcp.getJiraInfos` when the actual target's project/type, relevant current fields, relationships or preservation baseline are unavailable. Read the fields needed for the requested change; broad replacement needs a complete relevant baseline. Existing verified baseline evidence can be reused when still applicable. A prepared file with complete target/assembly evidence does not require repeating intake or field-discovery calls merely to export it.
 
-## Recognition And Extraction
+For requested attachment changes, read the actual target's inventory as described in [attachments](common-attachments.md). Do not substitute cached settings for live target content or original attachment IDs.
 
-1. Extract `issueIdOrKey` from an explicit key or `/browse/<KEY>` link.
-2. Infer `almType` from the Jira link host when possible.
-3. If `almType` cannot be inferred, collect or reuse it according to `common-state-and-user-info.md`.
-4. If `staffId` is missing, collect or reuse it according to `common-state-and-user-info.md`.
+## Reuse or prepare the update file
 
-Treat this as an update flow, not a new issue flow.
+1. If the selected final JSON already matches the confirmed target, current approved change and file contract, retain its exact path/content. Do not query or rebuild it as a routine export step.
+2. Otherwise read [configuration](common-state-and-user-info.md) first and query only missing applicable facts under [discovery](common-project-issue-type-validation.md). Stable project/type/field facts can be reused across create/update. Create metadata does not prove edit permission.
+3. Use [field preparation](common-field-assembly.md) to include approved changes and any actual baseline values required by the file contract. Leave optional unrequested fields omitted; never turn omission or an empty template value into a field-clear operation. Saved create defaults cannot overwrite target values.
+4. Render only newly prepared non-Test rich-text replacements under [text rendering](common-jira-text-rendering.md). Preserve untouched fields. Finish the supported attachment/relationship plan before preview and confirmation.
+5. Save and read back the actual JSON. Root `issueIdOrKey` must remain the same exact nonempty target. A missing/mismatched target blocks the update; it never becomes create.
 
-## Read Current Information First
+## Assessment evidence and submission
 
-Before generating any update payload, call:
+Use [assessment evidence](story-assessment-evidence.md) when supplied. A ticket/source assessment of the online ticket is not the local revision's assessment; an input edit invalidates any claim that an older JSON result is current. Report stale evidence accurately, but do not impose a helper scoring prerequisite or automatically invoke scorer/reviewer. The actual project/backend decides whether a score is required. No generated SPEC or local minimum score is required here.
 
-- `java-base-mcp.getJiraInfos`
+Follow [preview and submission](common-preview-confirm-export.md): show the target, known baseline, approved differences and actual file; obtain/reuse current-content confirmation; submit the unchanged path through `java-base-mcp.exportjirabydynamicfield` with only `story_json_workspace_path`. A Story always uses its individual issue-file path, including in [a multi-item plan](flow-batch-export.md); it never enters a manifest even for a scoring-exempt project.
 
-Query fields relevant to the requested change, for example:
-
-- `summary`
-- `description`
-- `comments`
-- `priority`
-- `assignee`
-- `changelog`
-- `AcceptanceCriteria`
-
-For broad requests, query enough fields to understand the current ticket state.
-
-## Confirm Update Field Rules
-
-Before generating any update payload, use the current Jira project's project key and issue type from `getJiraInfos` to call:
-
-- `java-base-mcp.queryJiraCreateMetaFields`
-
-Treat the returned metadata as authoritative for the fields the user wants to update. Verify each proposed field's `fieldId`, `schema`, `operations`, `allowedValues`, and required/value rules before assembling `dynamicFieldsJson`.
-
-If the project key or issue type cannot be determined, or the metadata query fails or returns incomplete field rules, do not generate a final update payload and do not call `exportJiraByDynamicFields`. Explain what is missing and request the information or a metadata refresh.
-
-## Generate Proposed Changes
-
-After `getJiraInfos` succeeds:
-
-1. Summarize the current Jira information.
-2. Summarize the proposed changes.
-3. Confirm the update field rules with `queryJiraCreateMetaFields` as described above.
-4. Assemble only fields that need changes and conform to the confirmed metadata rules.
-5. For requested non-Test rich-text replacements authored in Markdown, create a Jira-wiki transport rendering according to `common-jira-text-rendering.md`. Do not reformat untouched fields and do not apply the module to Test Case content.
-6. Leave labels untouched unless the update requests a change; the backend manages `CEAIA_GEN` according to `common-field-assembly.md`.
-7. For a Story whose revision being exported has a completed current Workspace assessment or pending binding, read [generic Story score binding](generic-story-score-binding.md) before preview. Carry this assessment's actual input path/result and binding state through the update. Missing current evidence stays pending; historical scoring alone does not make an unscored new revision require a binding.
-8. Write or overwrite `jira-preview.md` with both the source-to-transport conversion status and exact outgoing values.
-9. Wait for explicit user confirmation.
-10. Call `exportJiraByDynamicFields` only after both metadata confirmation and explicit user confirmation. Then execute the result handling in `common-preview-confirm-export.md`: a successful scored Workspace Story update must continue to its current assessment's five-field binding before finishing. Retain the successful update if only that binding remains pending; a recovery performs only the missing binding.
-
-Update intent itself is not submission confirmation.
-
-## Update Payload
-
-After `queryJiraCreateMetaFields` confirms the field rules and the user confirms the preview, call `exportJiraByDynamicFields` with parameters such as:
-
-- `staffId`
-- `almType`
-- `issueIdOrKey`
-- `summary`, only when updating summary
-- `description`, only when updating description
-- `dynamicFieldsJson`
-- `testDetailsJson`
-- `epicLink`
-- `parentLink`
-
-`dynamicFieldsJson` must include only the fields that need changes.
+Preserve issue success separately from attachment, association, database and queue outcomes. A backend score-required rejection remains pending; do not silently rescore or repeat export. Refer the user to the reviewer when assessment is requested. Do not repeat a confirmed update to repair another outcome, issue a separate legacy binding, or call ticket/source score synchronization after this local JSON export.

@@ -1,29 +1,19 @@
 # Jira Create Issue Helper
 
-A modular skill for create, update, batch, association, Test Case and validated CEAIA SDLC Jira writes.
+Version 3.0.0-json-preview.1 prepares and exports ordinary Jira issues and source Test Cases through saved Workspace JSON. CEAIA SDLC uses its dedicated exporter; this package has no legacy SDLC gateway.
 
-## Guarantees
+Read [SKILL.md](SKILL.md) first. It routes to the selected business flow and loads preparation references only when needed.
 
-- Preview every Jira write. Generic routes retain explicit confirmation; the validated CEAIA SDLC gateway performs direct export after its final read-back/preflight and has no approval-tool step.
-- Assemble metadata from current Jira field definitions.
-- Let the Jira backend add `CEAIA_GEN`; omit it from outgoing payloads while preserving other requested labels.
-- Read current Jira information before an existing-ticket update.
-- Preserve Test Case execution fields during source-to-payload mapping, allowing only Jira-safe line-break normalization with newline characters, not literal `<br>` tags.
-- Keep Jira-visible Test Case fields self-contained.
-- Route validated CEAIA SDLC handoffs through a dedicated gateway with separate validation from generic business flows.
-- Render Markdown-authored Jira-visible rich text to Jira wiki syntax for non-Test create, update and batch items while leaving Workspace sources unchanged.
-- Keep `jira-user-info.md` exclusive to the validated SDLC route; first-run SDLC create collects Epic Link/no-Epic intent, and later runs confirm revalidated defaults.
-- After successful export, bind SDLC Stories as required; bind non-SDLC Stories only when a matching Workspace score is verified. Unscored Stories and other issue types keep their original export flow. Preserve the Jira key if binding fails.
+- Reuse complete upstream `.json4jira` files unchanged. Missing inputs use real user-Workspace `ceaia-sdlc-jira/profiles.json` before targeted discovery.
+- No global scoring prerequisite or automatic assessment is imposed. Preserve actual upstream scores when supplied; the backend decides project-specific requirements. No mandatory SPEC.
+- Preview actual files, obtain/reuse current explicit content confirmation and call production `java-base-mcp.exportjirabydynamicfield` with only `story_json_workspace_path`.
+- Multiple Stories submit individually in approved order. Ordinary non-Story batches use a path manifest; mixed plans preserve selection order.
+- Test Case multiple uses one native issue file per case plus one path manifest; single uses one five-column aggregate file with no Test Details. Both explicitly include `CEAIA_GEN` in native labels.
+- Preserve supplied content, supported extra fields and exact update targets. Render non-Test Markdown during preparation, before Story scoring.
+- Preserve full actual responses and separate issue, steps, attachment/relationship, Story association and queue outcomes. No post-export score-binding call or blind retry.
 
-## Usage
+The exact shared file/call format is in [the JSON contract](references/common-json4jira-contract.md). See [optional assessment evidence](references/story-assessment-evidence.md), [Test Case source export](references/flow-testcase-source-export.md), [profiles](references/common-state-and-user-info.md) and [submission/recovery](references/common-preview-confirm-export.md) for their conditional details.
 
-Read `SKILL.md` first, then only the matching modules:
+Production must expose the exporter, three query tools, Jira reads and the platform file/user-Workspace/preview/input capabilities listed in SKILL.md. Request authentication/session headers remain platform-owned. Test-environment tool aliases do not replace the confirmed production tool name.
 
-- Create: `flow-create-issue.md`, `common-tools-and-inputs.md`, `common-state-and-user-info.md`, `common-project-issue-type-validation.md`, `common-field-assembly.md`, `common-jira-text-rendering.md`, `common-preview-confirm-export.md`.
-- Update: `flow-update-issue.md`, `common-tools-and-inputs.md`, `common-state-and-user-info.md`, `common-field-assembly.md`, `common-jira-text-rendering.md`, `common-preview-confirm-export.md`.
-- Associate: `flow-associate-issue.md`, `common-tools-and-inputs.md`, `common-state-and-user-info.md`, `common-field-assembly.md`, `common-preview-confirm-export.md`.
-- Batch: `flow-batch-export.md`, `common-tools-and-inputs.md`, `common-state-and-user-info.md`, `common-project-issue-type-validation.md`, `common-field-assembly.md`, `common-jira-text-rendering.md` for non-Test items, `common-preview-confirm-export.md`.
-- Test Case source export: `flow-testcase-source-export.md`, `flow-batch-export.md`, `common-field-assembly.md`, `common-preview-confirm-export.md`.
-- CEAIA SDLC: `sdlc-gateway.md`, `sdlc-handoff-validation.md`, `flow-sdlc-validated-handoff.md`, then the common modules named by that flow.
-- Attachments: matching business flow plus `common-attachments.md`.
-- Guardrails: `common-guardrails.md`.
+Only supported operation encodings may be submitted. Non-Story path batching is confirmed; Stories never enter manifests. Standalone association and attachment delete/replace still require actual production encoding where not already established. Their missing schema is reported precisely; old direct parameters are never used as a fallback. Runtime is text/file-tool based for GPT-5.6 Luna or GPT-6 Luna; no scripts or sibling filesystem access are required.
