@@ -2,6 +2,8 @@
 
 当前分支版本为 `6.1.0-preview.6`，日期 `2026-11-03`，工作分支为 `codex/sdlc-json4jira-flow`，尚未合入 `main`。本分支将每个候选的最终 Jira 内容统一为一个 `story.json4jira`，从该文件生成 SPEC 中的 Story 投影，使用同一路径评分、预览和导出。运行目标为平台 GPT-5.6 Luna / GPT-6 Luna；运行时仅使用现有平台工具和 Markdown/JSON 资源，不执行本地脚本。
 
+用于平台“自然语言生成 workflow”的完整中文输入见 [SDLC 工作流自然语言说明](SDLC-WORKFLOW-NATURAL-LANGUAGE.md)，涵盖触发条件、阶段职责、工具调用、内容门禁、更新和附件规则、确认、恢复与验收条件，以本分支当前规则为准。
+
 三个活动 Skill：
 
 | Skill | 职责 |
