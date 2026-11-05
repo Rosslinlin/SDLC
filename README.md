@@ -2,6 +2,8 @@
 
 本项目把需求整理为可交付的 Story、Test Case、SPEC，并完成独立审查、真实评分和 Jira 导出。当前版本 `6.0.0`，更新日期 `2026-10-31`；目标平台可选 GPT-5.6 Luna 或 GPT-6 Luna。全部资源是 Markdown/JSON，运行时仅使用平台现有工具，不执行本地脚本。
 
+用于平台“自然语言生成 workflow”的试验输入见 [SDLC 工作流自然语言说明](SDLC-WORKFLOW-NATURAL-LANGUAGE.md)。该文档记录功能分支 `6.1.0-preview.6` JSON 流程的完整规则，并固定来源版本；本分支现有 Skills/Task 的运行版本仍为上述 v6.0。
+
 活动流程由三个 Skill 构成：
 
 | Skill | 职责 |
