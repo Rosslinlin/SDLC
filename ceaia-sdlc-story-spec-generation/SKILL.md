@@ -5,7 +5,7 @@ description: Generate final Jira-ready Story JSON and Markdown SPECs using share
 
 # CEAIA Story JSON and SPEC Generation
 
-Version 6.1.0-preview.6. Text-only. Platform runtimes: GPT-5.6 Luna or GPT-6 Luna.
+Version 6.1.0-preview.7. Text-only. Platform runtimes: GPT-5.6 Luna or GPT-6 Luna.
 
 ## Entry and resources
 
@@ -33,7 +33,7 @@ Version 6.1.0-preview.6. Text-only. Platform runtimes: GPT-5.6 Luna or GPT-6 Lun
 - The saved JSON is the authoritative Story and eventual upload input. SPEC contains its faithful Markdown business projection. No standalone STORY.md or independently authored upload payload is required. TEST_CASE.md remains a Workspace deliverable.
 - A Story business change automatically synchronizes every affected local SPEC, projection and test before review/score, even when the user says only change Story/AC. For existing Jira delivery, [update rules](references/existing-jira-update.md) default related SPECs to replacement and a missing SPEC to first upload. Only an explicit remote-preservation request selects none; local synchronization still occurs. Show the actual plan in final confirmation, preserve unrelated originals and report unsupported replacement precisely instead of skipping SPEC.
 - Use existing platform read/write, agent, question, query and scoring tools only; no local scripts. Read actual files, record observed revisions and preserve complete tool responses.
-- Scoring uses nodejs-base-mcp.scoreUserStory with story_json_workspace_path, specFileStatus and specFilePath. Export uses java-base-mcp.exportJiraByDynamicFields with only the identical story_json_workspace_path. Never substitute a result/report path.
+- Scoring uses nodejs-base-mcp.scoreUserStory with story_json_workspace_path, specFileStatus and specFilePath. Export uses java-base-mcp.exportjirabydynamicfield with only the identical story_json_workspace_path. Never substitute a result/report path.
 - Story scores stay in the independent score record/UI, never in SPEC. Freeze JSON and scored SPEC contents after assessment. There is no display-driven S2 or separate five-field binding call in this new route; the creation backend owns linkage and queueing, whose actual results must still be checked.
 
-Return actual file paths, candidate status, blockers and one next action. Missing facts/tools cause a resumable wait. An actual score, current content confirmation and backend persistence evidence are separate requirements, not inferred from a PASS label.
+Return only current deliverable links with useful labels, candidate score/status, actual Jira result or precise blocker and one next action. Keep internal preparation/state/attempt/preview links out of the default deliverable list; provide them only for requested history/diagnosis. Resolve and verify process-file writes under historyRoot, never outputRoot. Missing facts/tools cause a resumable wait. An actual score, current content confirmation and backend persistence evidence are separate requirements, not inferred from a PASS label.

@@ -1,10 +1,12 @@
-# Independent review contract 6.1.0-preview.6
+# Independent review contract 6.1.0-preview.7
 
 ## Inputs and bindings
 
 The parent supplies candidate identity, mode, original source paths/locations, the final Workspace storyJsonPath (`story.json4jira`), testCasePath and every current Markdown SPEC path. It supplies known evidence/storyJson/test/SPEC body revisions and confirmed schema/field meanings from its earlier Jira preparation. Updates include the saved original Description, separate AC retrieval result, attachment inventory, approved changes and the SPEC plan: replace existing related SPECs, add a first SPEC when absent, or none only for explicit user no-attachment-change intent. Replacements include actual original-to-output mappings. Read the saved evidence; do not repeat Jira discovery or intake.
 
-Original evidence is authoritative for business facts. Read the relevant originals rather than only a shortened register. Missing business facts cannot be replaced by generator assertions. Review only this candidate's assigned scope; surface omissions or contradictions across candidates for the parent's global coverage check.
+Original evidence is authoritative for business facts. Inspect the relevant complete originals, directly or as full original tool-returned snapshots already supplied with actual path/currentness evidence; a shortened register or generator assertion cannot replace them. Reuse complete unchanged contents already in the review context rather than refetching them for each criterion. Missing/abbreviated/changed or uncertain content requires an actual read. Review only this candidate's assigned scope; surface omissions or contradictions across candidates for the parent's global coverage check.
+
+A ticket used only as an Epic/Parent relationship target is not automatically a requirement source. The parent's actual key/source/type validation evidence is sufficient for that role; empty Description/AC does not create a missing-business-content finding. If explicitly also selected as a source of requirements, assess that separate business evidence without declaring the confirmed relationship invalid.
 
 Record actual paths and observed revisions. Revisions supplied by the parent describe observed edits; they are not hashes or proof of unchanged content. A missing counter alone is not a content defect when current files can be fully read and identified. Use null rather than inventing a revision. If current association or required content cannot be read, report a technical blocker and do not issue PASS.
 

@@ -1,6 +1,6 @@
 {
-  "bundleVersion": "6.1.0-preview.6",
-  "releaseDate": "2026-11-03",
+  "bundleVersion": "6.1.0-preview.7",
+  "releaseDate": "2026-11-05",
   "executionProfile": "text-only",
   "activeSkills": [
     "ceaia-sdlc-story-spec-generation",
@@ -12,13 +12,16 @@
   "taskFile": "SDLC-workflow-v5.task.json",
   "taskHelperSkillId": "REPLACE_WITH_PLATFORM_CEAIA_SDLC_JIRA_EXPORT_SKILL_ID",
   "scoreRecordFormat": "numbered-markdown-with-complete-raw-response-json-or-text",
-  "outputPolicy": "latest-deliverables",
-  "internalHistoryPolicy": "numbered-and-retained",
+  "outputPolicy": "only-current-json-tests-specs; all-process-records-under-internal-historyRoot",
+  "internalHistoryPolicy": "shared-internal-preparation-sections; numbered-records-only-for-actual-review-score-export-invocations",
   "specHeaderPolicy": "synchronize-review-result-and-notes-before-scoring; no-story-score-display",
   "jiraDescriptionFormat": "jira-wiki-strings-in-description-and-mapped-ac-before-scoring; spec-markdown-semantic-projection",
   "jiraWritePolicy": "same-scored-json-path-only-after-explicit-current-content-confirmation",
   "jiraRoutingProfile": "persistent-user-workspace-ceaia-sdlc-jira/profiles.json; settings-resolved-before-scoring; final-current-content-confirmation-before-export",
   "notes": [
+    "2026-11-05 workspace/performance fixes: only current deliverables in outputs; shared internal preparation.md and explicit internal preview/state/attempt paths; actual invocation evidence retained without no-op revision churn. Independent Q1-Q7 and required scoring/export/backend persistence gates are unchanged.",
+    "Relationship-only Epic/Parent validation accepts explicit lookup business success for the selected key/source even with empty Description/AC. Reuse verified target evidence; requirements-source and update-baseline content rules remain separate.",
+    "Reuse complete unchanged raw tool reads; independent review still inspects actual complete content. Matching SPEC headers are not rewritten. Final submission read-back, three-argument scoring and one-path production export remain required. This SDLC patch does not modify the independent generic/reviewer/review-requirements packages.",
     "Create and update both load real user-workspace profiles first. Stable same-user/source/project/type components can be reused across modes without treating create capability as edit permission; sufficient profile/baseline facts mean zero discovery queries. Necessary target baseline/attachment reads remain separate.",
     "Story business changes automatically synchronize every affected local SPEC/test/projection without separate update-SPEC wording. Related remote SPECs default to replace, the first SPEC to add, and only explicit remote-preservation intent to none; local synchronization always remains required. Replacement needs real backend support and cannot be silently skipped or declared complete without evidence.",
     "Default Jira-backed entry asks only missing identity/source/project facts after reading available configuration; tool queries resolve schema/field IDs. Missing setup never triggers a preparation-only/Jira-backed route selector. Explicit user no-export intent and final scored-content confirmation remain supported.",
@@ -26,11 +29,10 @@
     "First JSON-first preview; not merged into main and not a production integration claim.",
     "Generation resolves Jira routing/field metadata and writes the final story.json4jira before scoring. SPEC remains Markdown; the standalone STORY.md is replaced by the JSON business projection inside SPEC.",
     "User-confirmed scorer is nodejs-base-mcp.scoreUserStory with story_json_workspace_path, specFileStatus and specFilePath. This clarification supersedes the screenshot scoring one-argument example.",
-    "Export retains java-base-mcp.exportJiraByDynamicFields but uses only the same story_json_workspace_path. Backend linkage/queue replaces the old Agent B call.",
+    "Export retains java-base-mcp.exportjirabydynamicfield but uses only the same story_json_workspace_path. Backend linkage/queue replaces the old Agent B call.",
     "Story score stays in its independent report/UI. No SPEC score mutation or display-driven S2. Full responses and unknown outcomes are preserved.",
     "Shared content quality and independent review remain; destination assembly precedes scoring, final content confirmation follows scoring.",
     "Root issueIdOrKey is the confirmed update selector and must match the actual existing target/baseline. Explicit none preserves remote attachments with attachments=[] while the synchronized local SPEC uses confirmed specFilePath without extra capability proof. Actual backend rejection or unsupported replacement is a precise gap, never permission to fabricate controls, override none or create another ticket.",
-    "Independent Jira helper, Story reviewer and review-requirements directories are unchanged. Their backend compatibility was not validated here.",
     "Actual model, preview, database, attachment and asynchronous score-sync behavior requires platform integration testing."
   ],
   "preservedGenericSkill": "jira-createissue-helper",
@@ -56,7 +58,7 @@
       ]
     },
     "export": {
-      "id": "java-base-mcp.exportJiraByDynamicFields",
+      "id": "java-base-mcp.exportjirabydynamicfield",
       "arguments": [
         "story_json_workspace_path"
       ]

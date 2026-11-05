@@ -9,7 +9,7 @@
   "evidenceRevisionReason": "Initial confirmed evidence",
   "paths": {
     "historyRoot": ".ceaia-work/stories/example-story",
-    "planningPath": ".ceaia-work/stories/example-story/plan-revision-001.md",
+    "planningPath": ".ceaia-work/stories/example-story/preparation.md",
     "testCasePath": "outputs/ceaia/example-story/TEST_CASE.md",
     "specPath": "outputs/ceaia/example-story/example-story-spec.md",
     "scoreRecordPath": null,
@@ -71,7 +71,7 @@
   "exportPreparation": {
     "status": "not-prepared",
     "exportAttempt": 0,
-    "previewPath": "jira-preview.md",
+    "previewPath": ".ceaia-work/stories/example-story/jira-preview.md",
     "inputReadBack": false,
     "previewConfirmation": {
       "status": "pending",
@@ -119,7 +119,7 @@
     "unavailableFields": [],
     "assembly": {
       "status": "pending",
-      "recordPath": null,
+      "recordPath": ".ceaia-work/stories/example-story/preparation.md",
       "profileKey": null,
       "storyJsonRevision": null
     }
