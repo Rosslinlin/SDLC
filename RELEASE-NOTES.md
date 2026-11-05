@@ -1,3 +1,14 @@
+# 2026-11-06 确认 — 路径 JSON 内的附件 add/replace
+
+用户已实测截图所示旧 `attachmentsJson.add`/`replace` 格式适用于当前新路径 JSON 流程，并确认 `readJiraAttachments` 返回实际原件 ID。本次记录该确认，不另调整既有版本号或发布日期体系；以下历史章节保留当时说明，当前附件格式以本条及活动 Skill 为准。
+
+- 在评分及导出的同一 `story.json4jira` 根级写 `attachmentsJson` 对象：`add` 条目使用 `relativePath`、`fileName`；`replace` 条目再加 `attachmentId`，ID来自同source/同目标票reader返回的实际原件。原文仍须证明其为相关SPEC；非SPEC、无关和未选原件保留，不按文件名或读取顺序猜删除目标。
+- 使用该对象时，不再使用非空 `attachments` 数组重复上传。显式none维持 `attachments: []` 且省略 `attachmentsJson`；本地SPEC/测试仍同步、审查，当前SPEC仍经 `specFilePath` 评分。
+- 普通replace格式已确认，不再以schema未知或重复能力证明进入WAITING。删除是replace后端效果，不新增独立delete操作支持；真实服务错误及上传/旧件移除部分成功或未知仍逐项保留，不能虚报完成或重放成功写入/上传。
+- 导出工具仍只接收 `story_json_workspace_path`，附件对象在文件内，不恢复旧direct参数或独立API。评分三参数、Q1–Q7、当前内容确认和后端关联/队列结果核验保持不变；本次确认不代表全链后端效果均已验证。
+
+---
+
 # CEAIA SDLC v6.1.0-preview.6 — 更新复用配置与自动同步 SPEC
 
 日期：2026-11-03。工作分支：`codex/sdlc-json4jira-flow`，尚未合入 `main`。本次修正 update 模式的配置复用和 Story/SPEC 同步行为，Q1–Q7 业务判定及现有评分/导出参数保持不变。

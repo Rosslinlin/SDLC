@@ -33,7 +33,7 @@
 | J20 | 三候选按各自 JSON 路径逐票执行，不用 issuesJson；绑定每票评分、预览确认和响应。前票失败/partial/unknown 时按契约停止并保留其余待办，不静默丢项或猜返回Key。 | | |
 | J21 | 超时/断连无法确定写入结果时记 unknown，先以实际可用只读手段核对，不自动重发未知/成功的 issue、附件或数据库步骤；status=400 等业务失败不被 envelope success 掩盖。 | | |
 | J22 | 更新读取 source、目标、Description/独立AC状态和完整附件 inventory；根级 issueIdOrKey 与 baseline 一致。先读用户 profiles，按组件复用稳定配置，必要 baseline 读取不被缓存替代；相关 SPEC 默认同步，不因未说 update spec 跳过，真实能力缺口准确 WAITING_TOOL。 | | |
-| J23 | 用户明确不改远端附件时 none=attachments[]，本地 SPEC/受影响测试仍按 Story 业务变化更新并通过 specFilePath 评分；相关已有 SPEC 默认 replace，无相关 SPEC 默认 add。replace 只有真实编码/原件映射和顺序保证支持时执行，不能跳过同步后报全完成。 | | |
+| J23 | 用户明确不改远端附件时省略 attachmentsJson、保留 attachments=[]，本地 SPEC/测试仍更新并经 specFilePath 评分；有原件用已确认 attachmentsJson.replace，无原件用 add。readJiraAttachments 取得真实旧 ID，无需另问技术 ID 或重复证明格式能力。 | | |
 | J24 | 旧 v6 会话迁移保留原始状态、编号证据、修复计数及所有已知/未知远端结果；不把旧 STORY.md 评分当新 JSON 评分，不通过调用重放完成迁移，也不补旧 S2/B。 | | |
 | J25 | 按实际 metadata 取得 AC 字段 ID，根级 `acceptanceCriteria` 保存该 ID 字符串，不再使用 customFields 包装；正文从 `fields[acceptanceCriteria]` 读取且为 Jira wiki 字符串。SPEC/测试/reviewer/评分 AC 识别指向相同正文，截图示例值不被硬编码。 | | |
 | J26 | 输入旧扁平 summary/description/AC 正文或数组/bddScenarios，或旧 customFields.acceptanceCriteria 包装时，在组装/自检修正为当前结构：根级 acceptanceCriteria 仅映射字段 ID，正文在 fields。不得混用两套映射或旧评分继续导出；迁移后按当前包重新评分、确认，不重放已有远端写入。 | | |
@@ -54,10 +54,25 @@
 | J41 | update 只有同用户/source/project/type 的完整 create profile 时，复用稳定项目/type/AC ID 等组件，不因 capability 标签差异重跑三个 query；create/edit 权限、requiredness 和默认值不混用。已完成 baseline/附件读取可复用，完整事实下字段 discovery 为零次。 | | |
 | J42 | profile 仅缺 AC ID/某字段 descriptor，或收到真实 schema 错误时，只定向补该组件；已有项目/type/baseline 不重查，用户显式刷新/目标变化按实际影响处理，不按 TTL 强刷，不用 createMeta 冒充 edit 权限。 | | |
 | J43 | 用户只要求改 Story 标题/描述/AC/业务规则，没有说 update spec：自动同步本地所有相关 SPEC、受影响测试和 Markdown 投影，保留旧义务，读回并完成受影响审查/Header 同步后才评分；不能以旧 SPEC 继续导出。 | | |
-| J44 | Story 业务变化且存在相关 Jira SPEC：默认计划 replace，保留实际原件 ID/输出映射并展示最终附件预览，不额外问是否同步；原件选择歧义只问具体选择，未知替换编码/删除覆盖能力准确等待，不擅猜控制或宣称旧 SPEC 已更新。 | | |
-| J45 | 用户明确只改 Jira Story、不替换远端附件：none=attachments[] 保留远端附件，但本地 SPEC/受影响测试仍自动同步并评分；结果明确本地已更新及远端未更改，不把 none 理解为不改 SPEC。 | | |
-| J46 | 更新目标没有相关现存 SPEC：按当前 Story 生成本地 SPEC，并以 add 计划首次 SPEC 交付，保留无关附件；实际受支持的上传路径纳入 JSON、评分及最终确认，不冒充替换某个不存在原件。 | | |
+| J44 | Story 业务变化且有相关 Jira SPEC：读原件确认身份，将 readJiraAttachments 实际旧 ID 写入 attachmentsJson.replace[].attachmentId，新文件 relativePath/fileName 与受审查输出一致；不以只新增代替替换，不再因旧文档“编码未知”等待。原件歧义只问具体选择。 | | |
+| J45 | 用户明确只改 Jira Story、不替换远端附件：省略 attachmentsJson、保留 attachments=[]；本地 SPEC/受影响测试仍同步并评分，结果说明远端附件有意保留。 | | |
+| J46 | 完整清单确认无相关或待确认 SPEC：生成本地 SPEC，以 attachmentsJson.add 的 relativePath/fileName 首次交付至原票，保留所有非 SPEC；不编造 attachmentId 或创建新票。 | | |
 | J47 | 仅路由/schema 字段变化时检查 SPEC 与 Story 的业务一致性；已一致的正文不为制造更新而改动，实际评分输入变动仍按 checksum/currentness 规则处理，审核编号循环不因此扩大。 | | |
+| J48 | 混合附件包含本票 SPEC、FSD、测试报告、截图及其他票 SPEC：从原文/实际 ID/路径/source+ticket 正向识别，只映射本次受影响 SPEC；读取过的业务证据不自动成为删除目标，其余附件保留。 | | |
+| J49 | 真实旧 SPEC 名称不规范，普通资料文件名含 spec，或同名不同用途：不按名称/扩展名/MIME/位置/时间推断；以完整原文及本票关联判断，歧义时保留并只问具体选择。 | | |
+| J50 | 可能相关原件不可读、ID/正文绑定缺失或清单不全：保留旧件并准确等待补齐，不当作无 SPEC 自动 add，也不猜 ID 或仅凭父角色标签判定 preservation PASS。 | | |
+| J51 | 多份不同相关 SPEC 逐原 ID 映射当前输出并保留各自义务；未选 SPEC 不动，多对一须明确授权。完整清单仅非 SPEC 或零附件时才走首次 add，明确 none 仍保留所有远端附件。 | | |
+| J52 | 正常 add/replace 使用用户已实测确认的根级 attachmentsJson 对象：add 条目为 relativePath/fileName，replace 多实际 attachmentId；不再设未知 schema/额外能力证明 WAITING。若真实服务拒绝，按实际错误处理，不能静默改为只新增或 none。 | | |
+| J53 | 支持的替换操作按每对映射先确认新上传再删选定旧 ID；上传失败/未知绝不删旧，不按同名批量删，不删除新上传返回的 ID 或非 SPEC。最终确认展示旧件、新件、顺序与保留项。 | | |
+| J54 | 新上传已成功而旧 ID 删除失败/未知：记 partial，保留新旧实际结果，先核对后仅受支持地恢复缺失删除；不重传已成功上传、不重放 Story 更新，不报替换完成。 | | |
+| J55 | 替换完成证据覆盖新上传和每个选定旧 ID 删除（或有文档保证覆盖精确映射的原子结果）；上传列表非空、普通 success、同名新文件出现均不单独证明旧 SPEC 已替换，已知外部变化需重新协调映射。 | | |
+
+
+| J56 | readJiraAttachments 返回清单与可读原文后，直接绑定实际旧 ID/source/ticket；从同票多附件中确认正确 SPEC，将该 ID 而非文件名、新上传 ID、另一票 ID 或截图示例值写入 replace。 | | |
+| J57 | add/replace 的 attachmentsJson 为原生 JSON 对象而非字符串，条目字段和类型完整；同时出现非空旧 attachments 路径数组时先修正并重评分，防止双通道重复上传。 | | |
+| J58 | 新建模板默认 add，更新模板默认 replace；确无原 SPEC 时转 add，显式 none 则省略对象并保留 attachments=[]。score/export 均沿用同一修订文件；附件对象不作为工具额外参数。 | | |
+| J59 | 旧路径数组迁移为已确认操作对象时保留业务正文与实际原 ID 映射，JSON 字节变化使旧评分/确认失效；正常 replace 不要求重查字段或重复证明后端能力。 | | |
+| J60 | 用户确认支持 add/replace 不等于每次调用成功；真实后端错误、附件部分成功、未知删除结果仍准确保存，不发独立 delete、不重传成功上传或重放 Story。 | | |
 
 ## 后端结果证据
 

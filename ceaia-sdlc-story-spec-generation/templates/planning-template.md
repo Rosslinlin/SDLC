@@ -31,13 +31,15 @@ Fill when files exist; do not create placeholder future artifacts.
 - Clarifications / user scope decisions: [exact facts or None]
 
 - Jira assembly snapshot: [Assembly section in this same internal file and exact JSON revision; complete before scoring]
-- Update synchronization: [Story business delta → affected local SPEC/tests/projection changes or verified unchanged sections; actual related original SPEC IDs → outputs; derived add/replace or explicit none, with exact replacement capability gaps]
+- Update synchronization: [Story business delta → affected local SPEC/tests/projection changes or verified unchanged sections; actual related original SPEC IDs → outputs; confirmed add/replace object or explicit none; precise identity/content gaps or actual backend errors]
+- Update original identity: [manifest's per-original content/path/ID classification and source+ticket binding; confirmed SPEC targets versus preserved other evidence/unresolved originals; first add only after complete no-SPEC evidence]
 
 ## Assembly — storyJsonRevision [actual value]
 - Actual JSON path, mode and target: [verified current facts]
 - Source/project/type/field mapping and confirmed values: [compact schema and field-provenance rows; real profile/query/baseline references]
 - Relationship targets: [confirmed key/source, requirement-source versus relationship-only role, actual lookup status/type; empty body is not invalid]
-- Upload plan and metadata gaps: [actual file/ID mappings and supported encoding or precise gap]
+- Attachment representation: [confirmed root attachmentsJson.add entries relativePath/fileName or replace entries attachmentId/relativePath/fileName; omit legacy attachments for active operations; explicit none uses attachments=[] and omits attachmentsJson]
+- Replacement binding, when applicable: [actual readJiraAttachments original ID + read content + confirmed source/ticket → affected SPEC output; preserve other IDs and upload before deleting only that old ID; no additional proof of the confirmed schema]
 - Currentness/read-back: [actual paths/revisions and observed verification, never invented success]
 
 <!-- Initial working sections may be filled until first consumption. Later real changes append the affected version-bound section and reference unchanged prior facts. Do not duplicate complete sources, JSON bodies or raw tool responses here. -->

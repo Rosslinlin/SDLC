@@ -10,7 +10,7 @@ Tool: java-base-mcp.exportjirabydynamicfield. Every invocation has exactly one a
 }
 ```
 
-Copy the exact path from this candidate's actual passing scoreUserStory input. The file already contains the complete approved Jira fields and upload paths. Do not pass staffId, source, projectKey, content, SPEC status/path, attachment controls, requestJson, issuesJson or an association payload beside it. Identity/session context is platform-owned.
+Copy the exact path from this candidate's actual passing scoreUserStory input. The file already contains the complete approved Jira fields and root attachmentsJson operations under [attachment rules](attachments.md). attachmentsJson belongs inside that file, not beside story_json_workspace_path as a second argument. Do not pass staffId, source, projectKey, content, SPEC status/path, attachment controls, requestJson, issuesJson or an association payload beside the path. Identity/session context is platform-owned.
 
 ## Several candidates
 
@@ -42,7 +42,23 @@ The user-confirmed update JSON has root issueIdOrKey after issueType, containing
 }
 ```
 
-This is a structural example, not a real ticket or an authorized write. Its JSON target must match the actual selected baseline and confirmed update intent; use approved changed fields with preservation/omission semantics. Story business changes synchronize all related local SPECs without waiting for the words "update SPEC". Existing related Jira SPECs default to replace; no related SPEC defaults to first add using the current SPEC path in attachments. Only explicit no-attachment-change intent selects none: attachments=[] preserves remote attachments while the synchronized local SPEC is scored through specFilePath. Replacement still needs the supported encoding in [attachments](attachments.md). Missing support stays precisely pending, never silently becomes none, an unverified replacement or create fallback.
+This is a structural example, not a real ticket or an authorized write. Its JSON target must match the actual selected baseline and confirmed update intent; use approved changed fields with preservation/omission semantics. Story changes synchronize related local SPECs without waiting for the words "update SPEC". Identified related Jira SPECs use the tested root object below, assembled before scoring; each original ID comes from readJiraAttachments for this same source/ticket and its read contents positively identify the related SPEC. Example placeholders are not actual IDs or paths:
+
+```json
+{
+  "attachmentsJson": {
+    "replace": [
+      {
+        "attachmentId": "<actual old SPEC ID returned by readJiraAttachments>",
+        "relativePath": "outputs/ceaia/updates/WPB/EXAMPLE-123/current-story-spec.md",
+        "fileName": "current-story-spec.md"
+      }
+    ]
+  }
+}
+```
+
+This is a property excerpt inside the full Story JSON, not another tool invocation. With established absence of a related SPEC, use attachmentsJson.add entries containing relativePath/fileName instead. For add/replace omit the legacy attachments path list; never combine operations with a nonempty path list. Explicit remote-preservation intent uses attachments=[] without attachmentsJson, with the synchronized local SPEC still scored through specFilePath. Non-SPEC/unselected/unresolved originals remain untouched. This confirmed format needs no repeated capability proof; do not emulate replace with add or introduce standalone delete.
 
 The backend response schema is not fully supplied. Interpret and preserve the real response under [submission and recovery](jira-write-and-recovery.md); do not copy a fictional success response or send the old five-field B call.
 

@@ -27,6 +27,7 @@
 | 根级 `acceptanceCriteria` | 真实 AC 字段 ID 字符串，不是验收标准正文；不再包在 `customFields` 中，不硬编码截图中的字段 ID。 |
 | `fields.project.key`、`fields.issuetype.id` | 项目与根级一致，类型 ID 来自实际查询；保留精确大小写和对象结构。创建和更新均不提交 `fields.reporter`，更新省略它不改变 Jira 上的原 reporter。 |
 | `fields.summary`、`fields.description`、`fields[acceptanceCriteria]` | 标题保持原文；描述与 AC 正文为 Jira wiki 字符串。其他获准自定义业务值也放在 `fields[实际字段ID]`，只对 metadata 确认的可写富文本应用对应格式。 |
+| 根级 `attachmentsJson` | 2026-11-06 用户实测确认旧 `add`/`replace` 格式适用于新路径流程：对象内 `add` 条目使用 `relativePath`、`fileName`，`replace` 条目另含 `attachmentId`。该对象保存在评分及导出的同一文件内，不是额外工具参数；不同时使用非空 `attachments` 数组重复上传。 |
 
 生成阶段、评分之前就完成 Jira wiki 编码：描述标题使用 `h1. 标题`、`h2. 标题`；AC 例如 `* *AC-001*: Given ... When ... Then ...`，以 Jira 列表和单星号粗体保留每条 AC 的声明。JSON 字符串解码后有真实换行，普通正文与代码内容保真；不对 summary、路由/身份/选项、附件路径或更新中未改动字段做格式转换。SPEC 仍为 Markdown，从这些字段的相同语义生成可读投影，不能直接贴入 wiki 标记。导出只提交已评分的原文件，不再临时转换格式。
 
@@ -53,7 +54,9 @@
 
 Story 的标题、描述、AC 或其他业务内容一旦改变，generation 自动更新本地 SPEC、受影响测试与 Story 投影，保留原票及相关 SPEC 的原有义务；无需用户另外说“update spec”。每个相关 SPEC 都要读回并核对当前 Story，完成审查及 Header 同步后再评分。纯路由/schema 变更只核对业务一致性，不为制造文件变化而重写正确内容。
 
-SDLC 默认将远端 SPEC 一起纳入更新计划：已有相关 SPEC 时使用 `replace` 并保留实际原件 ID/输出映射；没有相关 SPEC 时使用 `add` 首次交付；不因用户没提附件而默认 `none`。只有用户明确要求保留远端附件时才用 `none`，此时 `attachments: []` 只控制远端附件，本地 SPEC 仍必须同步，并通过既有 `specFilePath` 评分。多个相关原件无法确定映射时，只询问原件选择，不询问是否要同步 SPEC。最终预览展示实际附件计划；replace 的编码及上传后删除/覆盖保证必须有真实后端依据，缺少能力时准确记录 `WAITING_TOOL`，不能跳过旧 SPEC 后宣称整条流程完成，不能猜控制、调用旧 API 或回退创建。字段确认和本地检查不代表真实后端更新已集成验证。
+SDLC 默认将远端 SPEC 一起纳入更新计划：已有相关 SPEC 时使用 `replace` 并保留实际原件 ID/输出映射；没有相关 SPEC 时使用 `add` 首次交付；不因用户没提附件而默认 `none`。2026-11-06 用户已实测确认：根级 `attachmentsJson` 是对象，`add` 条目含 `relativePath`/`fileName`，`replace` 条目再加 `attachmentId`；`readJiraAttachments` 返回真实原件 ID。每个替换 ID 必须绑定同一 source/目标票据的实际原文、已确认相关 SPEC 身份和对应新文件，不能按文件名或读取过就替换；非 SPEC、无关和未选原件保留。多个相关原件无法确定映射时，只询问原件选择，不询问是否要同步 SPEC。
+
+使用 `attachmentsJson` 时，不再以非空 `attachments` 数组重复上传同一计划。只有用户明确要求保留远端附件时才用 `none`：维持 `attachments: []`，省略 `attachmentsJson`；本地 SPEC 仍同步，并通过既有 `specFilePath` 评分。最终预览展示原件 ID→新文件及保留项。普通 `replace` 不再因格式未知或重复能力证明进入等待；删除是 `replace` 的后端效果，不新增独立 delete 操作。仍按真实服务响应分别核对新上传和旧件移除；失败、部分成功或未知结果准确保留，不重放已成功写入/上传、不猜恢复操作或回退创建。本次附件格式确认不代表全部后端效果均已验证。
 
 安装与验证：
 
