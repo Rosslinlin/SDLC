@@ -25,4 +25,5 @@ The example row is not mandatory filler. Keep only evidenced cases and align IDs
 Draft-only To Confirm is permitted while asking for the exact missing negative outcome; it must not remain in final passing output.
 Retain supplied Author/external IDs; omit optional unknown values rather than inventing them.
 Standalone file is user-visible but never a Jira attachment. Embed only this executable table in SPEC.
+Keep 11 cells in the header, separator and each row. Escape literal pipe characters and use <br> for within-cell step breaks; check the source table once before embedding it exactly, without changing test meaning.
 -->

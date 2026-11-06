@@ -133,15 +133,17 @@ Description、AC 及 metadata 明确允许的其他新编写富文本在生成�
 
 按实质不同条件/结果拆分用例；等价且来源支持的数据可明确参数化。单词 `or` 本身不构成缺陷，也不能按词数或组合数虚构案例。不能编造错误消息、阈值、权限、端点、日志、表或观察位置来让用例看起来完整。
 
-从 JSON 的真实 Jira wiki 业务字段生成可读 Markdown Story 投影，放入每个相关 SPEC。保留所有业务段落、AC ID、文字、顺序、BDD、代码和链接；用一个 AC 标题展示实际正文，不把路由、身份、字段 ID、原始 JSON 或内部控制信息复制成需求。SPEC 是权威 JSON 的视图，不能另写一份不同 Story。
+从 JSON 的真实 Jira wiki 业务字段生成可读 Markdown Story 投影，放入每个相关 SPEC 的 Jira Story 节内；投影标题从 `###` 起，不嵌入 `#` 主标题或 `##` 同级章节。仅下调标题层级，保留所有业务小节内容、顺序、AC ID、文字、BDD、代码和链接；用一个 AC 标题展示实际正文，不把路由、身份、字段 ID、原始 JSON 或内部控制信息复制成需求。SPEC 是权威 JSON 的视图，不能另写一份不同 Story。
 
-SPEC 必须包含 Summary、Jira Story 投影、与独立文件完全相同的可执行测试表、Functional Requirements 和 Measurable Success Criteria。按证据保留相关 Edge Cases、Key Entities、上下文及流程；有意义时用受支持 Mermaid，简单流程可以文字说明。不能给图补未提供的系统、重试、持久化或错误分支，不能编造量化目标。
+SPEC 必须包含 Summary、Jira Story 投影、与独立文件完全相同的可执行测试表、Functional Requirements 和 Measurable Success Criteria。按证据保留相关 Edge Cases、Key Entities、上下文及流程。有证据支持用户动作或状态转换时，User Flow 一律使用一个非空、闭合并标记 `mermaid` 的代码块；简单流程也画最小图，不以纯叙述替代。确实不适用时写 `Not applicable` 和简短事实理由；缺少业务事实仍须精确等待，不能伪装成不适用，或给图补未提供的系统、重试、持久化、后端及错误分支。不能编造量化目标。
 
 SPEC 文件名用安全小写 kebab-case 并以 `-spec.md` 结尾。文件顶部第一条独立 `---` 前只放 `Result` 和 `Reviewer Notes`，初始为 Not Reviewed，审查后 Notes 标记实际 Attempt 和证据支持的简述。保留真实日期和用户提供的作者、Branch、Requirement ID、Parent Requirement ID、Market/Channel/客户分类等；未知可选项省略。批准提供的 commit-specific general-spec 与 architecture.md 业务链接可以保留，内部 source register、Workspace 证据路径、私有下载/token URL、原始响应、审计标识和凭据不得泄漏。不得向 JSON 或 SPEC 写 Story Score。
 
 独立 `TEST_CASE.md` 可保留实际 Related Story JSON、Related SPEC 等 Workspace 追踪信息，但 SPEC 只嵌入其可执行表，不嵌入追踪 metadata。测试文件不作为 Jira 附件。
 
-完成保存后做一次生产自检：核对 JSON schema/实际映射/可写字段/类型/真实换行/无占位；创建或更新目标准确；实际路径和附件文件存在且与授权计划一致；每个 SPEC 的业务投影、FR/SC/流程和测试当前；嵌入测试表与独立文件一致；引用可解析；对原文完成 Q1–Q7 自检。机械格式问题在所属生产层有界修正；自检标记不能替代独立审查。
+完成保存后做一次生产自检，复用已读取的当前文件：核对 JSON schema/实际映射/可写字段/类型/真实换行；创建或更新目标准确；实际路径和附件文件存在且与授权计划一致；每个 SPEC 的业务投影、FR/SC/流程和测试当前；引用可解析；对原文完成 Q1–Q7 自检。在同一次检查中核对 Mermaid 非空、标记正确且围栏闭合、投影标题从 `###` 起、无未替换模板占位（保留真实业务字面量）、测试表 11 列且管道/换行有效、嵌入表与独立文件一致。
+
+纯机械缺陷只局部有界修正，不新增 Q 项、角色、工具、独立审核报告、评分调用或修复循环，也不无故全量业务重审；真实业务流程变化仍走现有受影响内容独立复核。评分后任何 SPEC 改动仍按既有规则重新评分并确认。自检标记不能替代独立审查。
 
 ## 9. 共享 Q1–Q7 内容标准
 
