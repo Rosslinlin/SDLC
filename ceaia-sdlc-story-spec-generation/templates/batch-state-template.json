@@ -1,5 +1,5 @@
 {
-  "contractVersion": 6,
+  "contractVersion": 7,
   "selectedCandidateIds": [],
   "candidates": [],
   "globalCoverage": {
@@ -10,6 +10,6 @@
     "supportedExclusions": [],
     "evidenceRevisionBindings": []
   },
-  "jiraPreviewPath": "jira-preview.md",
+  "jiraPreviewPath": ".ceaia-work/jira-preview.md",
   "latestJiraExportRecordPath": null
 }

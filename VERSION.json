@@ -1,6 +1,6 @@
 {
-  "bundleVersion": "6.0.0",
-  "releaseDate": "2026-10-31",
+  "bundleVersion": "6.1.0-preview.7",
+  "releaseDate": "2026-11-05",
   "executionProfile": "text-only",
   "activeSkills": [
     "ceaia-sdlc-story-spec-generation",
@@ -11,31 +11,64 @@
   "jiraGateway": "ceaia-sdlc-jira-export/SKILL.md",
   "taskFile": "SDLC-workflow-v5.task.json",
   "taskHelperSkillId": "REPLACE_WITH_PLATFORM_CEAIA_SDLC_JIRA_EXPORT_SKILL_ID",
-  "scoreRecordFormat": "numbered-markdown-with-complete-raw-json",
-  "outputPolicy": "latest-deliverables",
-  "internalHistoryPolicy": "numbered-and-retained",
-  "specHeaderPolicy": "synchronize-readback-verify-before-jira-ready",
-  "jiraDescriptionFormat": "jira-wiki-transport-rendering-for-sdlc-and-generic-non-test-rich-text",
-  "jiraWritePolicy": "validated-sdlc-direct-export-after-final-preview-readback-preflight",
-  "markdownReviewBindingPolicy": "second-export-call-after-confirmed-jira-and-attachment-success-with-five-required-fields-per-ticket",
-  "jiraRoutingProfile": "persistent-user-workspace-ceaia-sdlc-jira/profiles.json-with-per-export-settings-confirmation",
+  "scoreRecordFormat": "numbered-markdown-with-complete-raw-response-json-or-text",
+  "outputPolicy": "only-current-json-tests-specs; all-process-records-under-internal-historyRoot",
+  "internalHistoryPolicy": "shared-internal-preparation-sections; numbered-records-only-for-actual-review-score-export-invocations",
+  "specHeaderPolicy": "synchronize-review-result-and-notes-before-scoring; no-story-score-display",
+  "jiraDescriptionFormat": "jira-wiki-strings-in-description-and-mapped-ac-before-scoring; spec-markdown-semantic-projection",
+  "jiraWritePolicy": "same-scored-json-path-only-after-explicit-current-content-confirmation",
+  "jiraRoutingProfile": "persistent-user-workspace-ceaia-sdlc-jira/profiles.json; settings-resolved-before-scoring; final-current-content-confirmation-before-export",
   "notes": [
-    "Text-only runtime; no executable scripts are required or shipped.",
-    "Generation and independent review read identical versioned Q1-Q7 content standards before authoring and review.",
-    "Task and ordinary chat use one workflow contract; file name remains SDLC-workflow-v5.task.json for installation compatibility, with display_name SDLC-workflow-v6.",
-    "All ten named Task tools and their order are preserved. Scoring persistence, final SPEC metadata calls, Jira A and each separate five-field binding B remain required.",
-    "Generic helper, standalone Story reviewer and original review-requirements business flows are preserved independently.",
-    "Platform integration and actual database persistence require live validation; offline checks are not production proof."
+    "2026-11-07: promoted codex/sdlc-json4jira-flow to main by a history-preserving merge. main now runs this JSON-first bundle; featureBranch records the originating development branch. The preview version and recorded platform-validation status are unchanged.",
+    "2026-11-06 user-tested confirmation: the existing attachmentsJson.add/replace format works inside the root of the path-based story.json4jira, and readJiraAttachments returns actual original attachment IDs. add entries use relativePath/fileName; replace entries additionally use attachmentId from the same source/ticket original, bound to its readable maintained-SPEC content and mapped output. The export tool still takes only story_json_workspace_path.",
+    "Use the confirmed attachmentsJson object without a nonempty parallel attachments upload array. Explicit none keeps attachments=[] and omits attachmentsJson, while the synchronized local SPEC still uses specFilePath for scoring. Ordinary replace no longer waits for an unknown schema or repeated capability proof. Removal is a replace backend effect, not newly confirmed standalone delete support; actual service errors and partial/unknown effects remain separately recorded without replaying confirmed writes/uploads.",
+    "2026-11-05 workspace/performance fixes: only current deliverables in outputs; shared internal preparation.md and explicit internal preview/state/attempt paths; actual invocation evidence retained without no-op revision churn. Independent Q1-Q7 and required scoring/export/backend persistence gates are unchanged.",
+    "Relationship-only Epic/Parent validation accepts explicit lookup business success for the selected key/source even with empty Description/AC. Reuse verified target evidence; requirements-source and update-baseline content rules remain separate.",
+    "Reuse complete unchanged raw tool reads; independent review still inspects actual complete content. Matching SPEC headers are not rewritten. Final submission read-back, three-argument scoring and one-path production export remain required. This SDLC patch does not modify the independent generic/reviewer/review-requirements packages.",
+    "Create and update both load real user-workspace profiles first. Stable same-user/source/project/type components can be reused across modes without treating create capability as edit permission; sufficient profile/baseline facts mean zero discovery queries. Necessary target baseline/attachment reads remain separate.",
+    "Story business changes automatically synchronize every affected local SPEC/test/projection without separate update-SPEC wording. Related remote SPECs default to replace through the confirmed root attachmentsJson object, the first SPEC to add, and only explicit remote-preservation intent to none; local synchronization always remains required. Original content/ID/source/ticket bindings, non-SPEC preservation and actual replacement results remain required.",
+    "Default Jira-backed entry asks only missing identity/source/project facts after reading available configuration; tool queries resolve schema/field IDs. Missing setup never triggers a preparation-only/Jira-backed route selector. Explicit user no-export intent and final scored-content confirmation remain supported.",
+    "2026-11-03 latest developer/user confirmation: root acceptanceCriteria directly maps the actual AC field ID, without customFields or fields.reporter/root staffId. AC text lives at fields[acceptanceCriteria]. Updates add root issueIdOrKey after issueType; creates omit it. Query/profile identity remains for actual discovery schemas. Description/AC use Jira wiki before scoring and SPEC stays Markdown. Tool arguments and Q1-Q7 business criteria are unchanged.",
+    "JSON-first preview promoted to main on 2026-11-07; promotion is not a production integration claim.",
+    "Generation resolves Jira routing/field metadata and writes the final story.json4jira before scoring. SPEC remains Markdown; the standalone STORY.md is replaced by the JSON business projection inside SPEC.",
+    "User-confirmed scorer is nodejs-base-mcp.scoreUserStory with story_json_workspace_path, specFileStatus and specFilePath. This clarification supersedes the screenshot scoring one-argument example.",
+    "Export retains java-base-mcp.exportjirabydynamicfield but uses only the same story_json_workspace_path. Backend linkage/queue replaces the old Agent B call.",
+    "Story score stays in its independent report/UI. No SPEC score mutation or display-driven S2. Full responses and unknown outcomes are preserved.",
+    "Shared content quality and independent review remain; destination assembly precedes scoring, final content confirmation follows scoring.",
+    "Root issueIdOrKey is the confirmed update selector and must match the actual existing target/baseline. Explicit none preserves remote attachments with attachments=[] and no attachmentsJson while the synchronized local SPEC uses confirmed specFilePath without extra capability proof. Actual backend rejection or unavailable focused recovery is a precise gap, never permission to fabricate controls, override none or create another ticket.",
+    "Actual model, preview, database, attachment and asynchronous score-sync behavior requires platform integration testing."
   ],
   "preservedGenericSkill": "jira-createissue-helper",
-  "internalContractVersion": 6,
+  "internalContractVersion": 7,
   "runtimeModels": [
     "gpt-5.6-luna",
     "gpt-6-luna"
   ],
-  "qualityContractVersion": "6.0.0",
+  "qualityContractVersion": "6.1.0-preview.6",
   "qualityContractSource": "ceaia-sdlc-story-spec-generation/references/quality-contract.md",
   "qualityContractPackagedCopy": "ceaia-spec-review/references/quality-contract.md",
   "contentRepairPolicy": "two-shared-content-batches-per-candidate-evidence-revision; one-mechanical-correction-per-cause; external-write-retry-policy-unchanged",
-  "specMetadataPolicy": "preserve-existing-post-display-normal-cache-metadata-invocation-and-complete-response-records"
+  "specMetadataPolicy": "scoreUserStory-JSON-path-plus-spec-status-and-path; frozen-SPEC-after-scoring; no-display-driven-S2",
+  "databaseLinkagePolicy": "backend-verified-score-match-and-jira-writeback-plus-sync-queue; no-separate-agent-five-field-call",
+  "featureBranch": "codex/sdlc-json4jira-flow",
+  "toolContracts": {
+    "score": {
+      "id": "nodejs-base-mcp.scoreUserStory",
+      "arguments": [
+        "story_json_workspace_path",
+        "specFileStatus",
+        "specFilePath"
+      ]
+    },
+    "export": {
+      "id": "java-base-mcp.exportjirabydynamicfield",
+      "arguments": [
+        "story_json_workspace_path"
+      ]
+    }
+  },
+  "storyJsonFormat": "jira-fields-with-root-ac-id-map; update-only-issueIdOrKey; no-reporter; confirmed-root-attachmentsJson-object-with-add-relativePath-fileName-and-replace-plus-reader-original-attachmentId; no-parallel-nonempty-attachments; explicit-none-attachments-empty-and-no-attachmentsJson",
+  "entryPolicy": "default-jira-backed; reuse-configuration; ask-only-missing-setup-facts; no-entry-route-selector",
+  "jiraMetadataReusePolicy": "profile-first-for-create-and-update; cross-mode-stable-components; operation-scoped-permissions; query-only-missing-or-explicit-refresh-or-actual-schema-error",
+  "storySpecSyncPolicy": "automatic-local-spec-tests-for-story-business-change; related-jira-spec-replace; first-spec-add; explicit-remote-preservation-only-none"
 }

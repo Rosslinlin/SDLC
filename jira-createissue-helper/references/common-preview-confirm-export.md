@@ -1,230 +1,64 @@
-# Common Preview Confirm Export
+# Preview, one-path submission and recovery
 
-## Preview Before Confirmation
+Use after final files are prepared. [Assessment evidence](story-assessment-evidence.md) is optional upstream context, not a universal Story gate. [The JSON contract](common-json4jira-contract.md) defines the only content invocation; [Test Case](flow-testcase-source-export.md) owns its mode-specific integrity/shape.
 
-After metadata is retrieved and fields are assembled, or after an update/association payload draft is completed, generate the preview before showing a generic-flow confirmation popup or submitting through the validated SDLC route.
+## Read and preview the actual package
 
-The preview stage must include:
+Read the actual saved issue file, or manifest plus every child and intended upload. Validate the selected operation, source/project/type, exact update target, actual metadata types and supported attachment/association plan. Reuse verified unchanged reads and completed source checks; never regenerate business content from a summary or rendered view.
 
-- conversational Jira summary
-- workspace Markdown preview file: `jira-preview.md`
-- the complete payload as a valid JSON code block
-- required-field status
-- optional fields
-- requested or required labels, if any; `CEAIA_GEN` is added by the backend and omitted from the payload
-- content provenance for Jira-visible fields: generated, source-preserved, transport-rendered, metadata-selected, user-provided, or unchanged
-- for every non-Test Markdown-authored rich-text value, the exact Jira-wiki transport rendering and conversion-validation status from `common-jira-text-rendering.md`
+Show the platform's native file/content preview with full final JSON available. It must identify create/update, actual paths, targets, generated versus preserved content, approved changes/intentional clears, fields and attachments. For a batch, show every selected child, order, per-item operation/target and any actual relevant assessment evidence, distinguishing individual Story calls from non-Story manifests. Test Case adds source/selected IDs, mode, source-to-file/table mapping, applicable steps/data/results, explicit labels, newline checks and deliberate single-mode column exclusions. Visual abbreviations must be labeled and must not shorten saved values.
 
-Overwrite the same `jira-preview.md` whenever the preview changes. Do not create scattered preview Markdown files. Do not replace the payload JSON block with a separate payload file.
-
-## Empty-Value Preflight
-
-Before preview and again immediately before `exportJiraByDynamicFields`:
-
-1. Apply `common-field-assembly.md`'s Mandatory Empty-Value Contract to the actual tool arguments, including direct inputs, dynamic fields, parsed active JSON payloads, and effective batch items after inheritance.
-2. Verify that unused included optional strings use `""` where supported, empty arrays/objects retain their declared types, and no generated `"."` or other missing-value placeholder remains. Omit unused fields excluded by a specialised payload shape; preserve literal periods in evidence.
-3. Distinguish an unused optional JSON-string parameter with an accepted `""` sentinel from active operation data. Do not parse the inactive sentinel as JSON or activate an operation merely because its key exists. Active JSON payloads must parse and satisfy the selected flow's schema; required data cannot use an empty sentinel or collection.
-4. Validate required values and ensure unspecified update inputs have not become changes or field clears through empty values or inherited defaults.
-5. Show intentional empty values, omitted unused parameters, and explicitly requested field clears in the preview. Submit exactly the normalized values that were approved; do not insert placeholders afterward.
+A single optional derived `jira-preview.md` can retain these facts, exact invocation, score/confirmation bindings and result evidence. It is an audit view, not a second payload or scoring input. Never substitute its path for an issue/manifest path. Do not require extra HTML, state, handoff or duplicated source files.
 
-Block submission on any failed check. In a generic route, if a correction changes a confirmed payload, regenerate `jira-preview.md` and obtain fresh explicit confirmation using that route's confirmation mechanism. For SDLC, `sdlc-gateway.md` controls the stricter preview and direct-export preflight; regenerate the preview and repeat final read-back instead of invoking an approval tool.
+Resolve blocked fields/operations before requesting final confirmation. Unsupported attachment replacement/relationship encoding is not a reason to omit that requested effect silently; show the precise gap and retain the prepared package.
 
-## Jira-Visible Content Integrity Preflight
+## Current explicit confirmation
 
-Before preview and again immediately before `exportJiraByDynamicFields`:
+Obtain real explicit content/write confirmation through supported platform UI after the current package is available for review. Current user selection of source/destination alone is not final content approval. Reuse a prior actual confirmation only when it covers these same unchanged JSON/manifest children, target, selected order, scoring SPEC and intended uploads/operations. Do not reopen confirmation merely to use a cache or proceed to the next already approved item.
 
-1. Apply `common-field-assembly.md`'s Jira-Visible Content Preservation Contract to direct fields, `dynamicFieldsJson`, parsed `issuesJson`, parsed active `attachmentsJson` descriptions if any, and `testDetailsJson`.
-2. Verify source-derived or user-approved content has not been summarized, paraphrased, shortened, expanded, reordered, renumbered, merged, split, or replaced by a pointer.
-3. Verify all changes are limited to allowed transport formatting, field mapping, JSON serialization/escaping, schema formatting, and safe line-break normalization.
-4. Verify generated content is used only when the selected flow permits generation from a raw business request or unresolved required metadata, and that the generated value is shown in preview.
-5. Block export if any Jira-visible field contains unapproved rewritten business content or a placeholder/reference instead of the actual content.
+If the user changes content, destination, type, target, selected subset/order or participating file/attachment plan, return to preparation, mark affected old assessments historical, then show the changed package and obtain renewed confirmation. Do not mutate, rename, reserialize or rich-text-render a scored/confirmed file at submission.
 
-If this preflight changes any payload value, regenerate `jira-preview.md` and repeat the route's confirmation or SDLC read-back procedure before export.
+If the platform lacks supported preview/confirmation, retain actual files and report that exact capability gap. An agent-written approved flag, previous version's approval or broad initial export intent does not substitute for current content confirmation.
 
-## Attachment Payload Preflight in the Preview Gate
+## Submit each approved unit once
 
-Apply this section when attachment operations are planned or required, or when the final export payload contains a non-empty `attachmentsJson`. An accepted `attachmentsJson: ""` with no planned or required operations is an inactive sentinel, not a plan to parse. It must never bypass a required attachment.
+Immediately before submission read back the approved issue/manifest and children, confirm no intervening change, target switch or participating-file mismatch, and preserve the exact request in current context/the existing record. For inputs reported as assessed, preserve the actual current/historical distinction. Missing scoring is not a global blocker and does not trigger scoring. Reject a manifest containing a Story; submit Stories individually under the approved plan. No silent omission or type relabeling.
 
-Before showing a confirmation popup, complete and show all of the following checks:
+Call `java-base-mcp.exportjirabydynamicfield` once per approved submission unit with exactly the actual `story_json_workspace_path`. A non-Story batch, including Test Case multiple, submits its manifest once. Multiple Stories use one individual file call each, in planned order. Follow [batch planning](flow-batch-export.md), stop further units after a failed/partial/unknown required synchronous outcome and preserve remaining selections. No other business/routing/identity/SPEC/batch arguments are sent.
 
-1. State every planned `add`, `replace`, and `delete` operation separately.
-2. For every upload (`add` and the upload component of `replace`), show the exact Workspace-relative `relativePath` and `fileName`.
-3. Confirm that every upload file was successfully read from the applicable Workspace scope immediately before payload assembly, and that the returned Workspace-relative path exactly equals the planned `relativePath`.
-4. Confirm that each returned filename equals the planned `fileName` and the approved/reviewed attachment mapping.
-5. Confirm that the complete outer export payload is valid JSON.
-6. Build the attachment plan as an object internally, then serialize it exactly once into `attachmentsJson`.
-7. Confirm that the outer `attachmentsJson` value is a JSON string, not a JSON object, array, or null.
-8. Parse the `attachmentsJson` string once and confirm that it recreates the same authorised operations, paths, and filenames displayed in the preview.
-9. Confirm that no attachment payload-affecting change occurs after the preview binding. In generic routes, any such change requires fresh confirmation. In the validated SDLC route, it requires a regenerated preview and a repeated final read-back/preflight before direct export.
+After a call, retain its complete returned text/object and transport wrapper before interpreting it. Preserve unknown fields/errors/IDs and raw text when available; otherwise serialize the complete decoded response and label that representation. Do not truncate or replace it with selected success fields. An unknown timeout is an actual unknown attempt, not proof that no write occurred. A missing local record never authorizes blind remote replay.
 
-If any attachment preflight check fails, do not request confirmation and do not call `exportJiraByDynamicFields`. Report the exact failed Workspace-relative path or payload field, preserve the returned transport error where safe to display, and request correction, a separately previewed retry, deferment, or an explicit stop decision. Do not guess a nearby path, substitute a similarly named file, or automatically retry.
+Save received results to the next unused `jira-export-result.md`, `jira-export-result-v2.md`, etc. alongside the selected package, or append this actual attempt to the existing operation record. Preserve prior attempts and exact path/input/confirmation evidence. A result is written only for an actual invocation/outcome; local save failure retries that save only, while conversation evidence retains the received result. Do not invent IDs or a fictitious successful response.
 
-## `jira-preview.md` Content Requirements
+## Interpret each effect separately
 
-For new Jira issues, include:
+Inspect business status inside the actual transport result; MCP `isError=false` or a generic success envelope does not override a nested rejection such as actual status=400. Use the real response schema/guarantees, not mandatory invented property names:
 
-- project key / project name
-- issue type
-- generated `summary`
-- generated `description`
-- content provenance and whether the values are generated from a raw request or source-preserved
-- source-to-Jira rendering status for eligible non-Test rich-text fields
-- acceptance criteria, when applicable
-- required-field status
-- optional fields
-- labels
-- attachment preflight status, when `attachmentsJson` is used
-- complete `exportJiraByDynamicFields` payload JSON block
+| Effect | Evidence/reporting |
+| --- | --- |
+| Issue create/update | Actual success with unambiguous ticket key/URL when returned; an update's returned target must agree. A mismatch is a material failed/unknown binding, never a guessed success. |
+| Test Details | Actual step-upload result or a documented guarantee covering the selected native array. Single-mode Test Case has none by design. A created issue alone does not prove steps uploaded. |
+| Attachments/relationships | Each requested effect's actual result or explicit documented atomic guarantee; none is N/A only when no such operation was requested. |
+| Story database association | Actual response/contract evidence that this JSON assessment was linked to its ticket. A conflicting same-kind assessment ID/path leaves this association unconfirmed; preserve the actual issue result and mismatch, without replay. Non-Story and unscored/exempt projects do not need score association. |
+| Score-sync queue where applicable | Actual acceptance/enqueue evidence or documented guarantee; retain returned ID when available. Missing an optional ID or an exempt project's queue evidence is not failure. |
+| Jira score fields | Actual completed/failed/pending/unreported evidence. Queue acceptance proves scheduling, not finished Jira UI updates. |
 
-For Jira updates, include:
+Report each observed state, including unknown/unreported; don't manufacture database/queue success from a ticket key. Conversely, a missing optional downstream property is not proof of failure and does not trigger another call. No polling loop, old four/five-field binding, ticket/source sync or repeated export is used to nudge asynchronous processing.
 
-- current Jira information summary
-- proposed changes
-- content provenance for each changed Jira-visible field and confirmation that untouched fields are unchanged
-- source-to-Jira rendering status for each requested non-Test rich-text replacement; untouched fields are not reformatted
-- fields to update
-- labels
-- attachment preflight status, when `attachmentsJson` is used
-- complete update payload JSON block
+For batch item results, map actual returned indexes/identities to the approved child order. Report each child/source Test Case ID, path/index, actual key/URL, status and error. Do not invent sequential keys, collapse them into a range, or assign a top-level key to every child. Partial/truncated or ambiguous item results leave unmatched items unknown; never resubmit the whole manifest.
 
-For association updates, include:
+After confirmed eligible writes, update only actual `lastSuccess` facts under [profiles](common-state-and-user-info.md), preserving other profiles. Verified schema facts may already be cached independently. Saving profiles/results is separate from external success and never causes a Jira replay.
 
-- source Jira
-- target Jira
-- normalized link type
-- source metadata validation summary
-- complete association payload JSON block
+## Resume only the unresolved layer
 
-For batch exports, include:
+| Actual condition | Next action |
+| --- | --- |
+| Local result/profile save failed | Retry that save from the received evidence, without discovery, rescoring or export. |
+| Issue succeeded but steps/attachment/link/Story association/queue failed | Retain ticket and every successful effect. Use only an actually supported focused recovery for the failed layer; never recreate or resend confirmed content/files. |
+| Request timed out or ended without a known outcome | Preserve unknown. Reconcile with supported read-only evidence before any user-directed retry; no automatic replay. Jira reads can establish ticket/attachment facts, not database/queue state. |
+| Manifest partially succeeded | Preserve exact per-item outcomes and unresolved subset. Never rerun all children. Any supported subset retry needs known unapplied operations, an explicit selected subset and its current preview/confirmation. |
+| Backend rejects missing/stale score, checksum, threshold or schema | Preserve exact error and any actual effect evidence. Return the exact missing preparation or project-specific assessment requirement; do not drop required fields, guess a score, change type or repeatedly score/export. Any later attempt needs an explicitly resolved prerequisite/correction, no prior uncertain effect and current confirmation. This helper does not automatically assess or impose a global scoring prerequisite. |
+| Accepted queue is still pending | Report pending; use a supported read-only status capability only when actually available/requested. Do not wait endlessly, score again or re-export. |
+| No supported recovery/encoding exists | Report the precise pending effect/capability, with all confirmed outcomes retained. A vague continue does not establish safe replay. |
 
-- batch operation type
-- top-level defaults
-- item count
-- per-item summary, target project/type or `issueIdOrKey`, required-field status, labels, Test Details summary, and attachment operation summary
-- per-item content provenance and preservation status for Jira-visible fields
-- per-item rendering status for eligible non-Test rich text, with an explicit statement that Test Case items were excluded from common rendering
-- per-item attachment preflight status when attachments are used
-- complete batch `exportJiraByDynamicFields` payload with `issuesJson` as a valid JSON code block
-- a clear note that the export tool will be called once for the whole batch after confirmation
-
-For Test Case source exports, also include:
-
-- source artifact or structured source identifier
-- selected Test Case count and selected Test Case IDs
-- omitted Test Case IDs and technical reasons, if any
-- selected export behavior
-- selected `uploadType` mode: `single` or `multiple`, plus the user-facing label selected by the user; this is previewed as routing state, not as a final tool payload field
-- source-to-payload integrity status for execution fields
-- line-break validation status confirming Jira-visible Test Case fields keep required breaks as newline characters and contain no literal or escaped HTML break tags
-- for `multiple`, Test Case ID to payload item mapping and confirmation that item `description` and `testDetailsJson` values preserve required line breaks
-- for `single`, Test Case ID to aggregate table row mapping and confirmation that `description` contains only the clean Test Case table with no Markdown separator row, extra text, or literal line-break tags
-
-## Generic-flow confirmation
-
-For generic create, update, association, batch and Test Case routes, call `exportJiraByDynamicFields` only after explicit user confirmation.
-
-For a `ceaia-sdlc-validated` handoff, `sdlc-gateway.md` is controlling. No approval tool or final confirmation popup exists in this route. Once the complete preview, payload read-back and attachment preflight pass, call `exportJiraByDynamicFields` directly.
-
-User phrases such as `create`, `export`, or `go ahead` only allow preview generation unless they are clearly responding to an already shown confirmation request. They do not bypass confirmation.
-
-If confirmation is unclear, do not call `exportJiraByDynamicFields`.
-
-The generated-content confirmation popup for new Jira issues must show:
-
-- generated `summary`
-- generated `description`
-- required-field status list
-- key optional fields
-- payload summary or a reference to the `jira-preview.md` path
-- required confirmation control asking whether the content meets the user's expectation
-
-Recommended confirmation text for a new Jira issue:
-
-> Please confirm whether the generated Jira content meets your expectation. I will call exportJiraByDynamicFields to create the Jira issue only after you confirm.
-
-Recommended confirmation text for a Jira update:
-
-> Please confirm whether the current Jira information summary and proposed changes are correct. I will call exportJiraByDynamicFields to update this Jira issue only after you confirm.
-
-Bind generic-route confirmation to the complete preview payload. Regenerate `jira-preview.md` and obtain fresh explicit confirmation after any generic payload-affecting change. For SDLC, the same kinds of changes invalidate the preview binding and require a new preview plus final read-back/preflight, without a confirmation tool.
-
-## Submission Parameters
-
-The lists below describe active parameters. Unused optional inputs follow the Mandatory Empty-Value Contract: omit them or pass accepted typed empty values, never `"."`. An accepted `attachmentsJson: ""` represents no attachment operation only; it cannot substitute for a validated required plan.
-
-New issue parameters may include:
-
-- `staffId`
-- `almType`
-- `projectKey`
-- `summary`
-- `issueType`
-- `description`
-- `projectName`
-- `epicName`
-- `epicLink`
-- `parentLink`
-- `dynamicFieldsJson`
-- `attachmentsJson`, only as a validated serialized JSON string when attachments are authorised
-
-Update issue parameters may include:
-
-- `staffId`
-- `almType`
-- `issueIdOrKey`
-- `summary`
-- `description`
-- `dynamicFieldsJson`
-- `testDetailsJson`
-- `epicLink`
-- `parentLink`
-- `attachmentsJson`, only as a validated serialized JSON string when attachments are authorised
-
-Association update parameters may include:
-
-- `staffId`
-- `almType`
-- `issueIdOrKey`
-- `linkedIssueKeys`
-- `linkType`
-- `dynamicFieldsJson`, only for other validated fields such as labels
-
-`linkedIssueKeys` and `linkType` must remain top-level export parameters and must not be nested inside `dynamicFieldsJson`.
-
-Batch parameters may include:
-
-- `staffId`
-- `almType`
-- top-level defaults such as `projectKey`, `issueType`, `description`, `dynamicFieldsJson`, and `conversationId`
-- `issuesJson`
-- item-level `attachmentsJson` inside `issuesJson` when attachments are authorised; top-level attachments are not inherited by batch items
-
-For Test Case export, `uploadType` must be collected before preview, but it is not submitted as a final `exportJiraByDynamicFields` parameter. Use it only to choose between the `multiple` payload shape with `issuesJson` and the `single` payload shape with top-level `summary` and `description`; include JSON-encoded `dynamicFieldsJson` only when other validated fields are needed. The backend supplies `CEAIA_GEN` in both modes.
-
-For Test Case export, the submitted payload must be self-contained. Preview text may identify the source artifact, but the final payload JSON block must not place source-file references, preview-file references, attachment references, generated-document references, or other file pointers inside Jira-visible fields instead of the complete Test Case content.
-
-## Result Handling
-
-For a successful **single non-SDLC generic Story content create/update** whose exported revision has a completed current Workspace assessment or known pending binding, execute the post-write step in [generic Story score binding](generic-story-score-binding.md) before finishing the item. Use the current assessment's actual input path and returned Ticket Key; a previous version's association is insufficient. If prerequisite evidence is missing, preserve the write success and pending binding rather than silently skipping it. Check its recorded outcome so this result handler cannot repeat an association already confirmed for that assessment.
-
-This hook applies only to that content-write result. It does not run for genuinely unscored Stories, other issue types, Test Case, association-only operations, Jira-mode four-field triggers, binding-only responses or SDLC handoffs. Batch exports retain their existing per-item binding step; do not run an additional single-item hook for the batch response.
-
-On success, show:
-
-- `ticketKey`
-- `ticketUrl`
-
-For batch responses, show per-item `index`, `status`, `ticketKey`, `ticketUrl`, and sanitized `error` when present, plus `successCount` and `failureCount` if returned.
-
-For Test Case batch responses, preserve the selected Test Case to Jira issue mapping. For `uploadType: "multiple"`, show one result line per selected Test Case when a returned item has a Test Case ID and a Jira key or URL. For `uploadType: "single"`, show the selected Test Case ID list or aggregate identifier with the single returned Jira issue key or URL. Do not collapse sequential Jira keys into ranges or shorthand.
-
-After a successful validated SDLC create/export/update response, write or update the SDLC-only `jira-user-info.md` section described in `common-state-and-user-info.md`. Generic create, update, association, batch and Test Case routes must not read, create or update that file. SDLC persistence happens only after the Jira write succeeds, never before the SDLC defaults confirmation or submission.
-
-For attachment operations, report the Jira issue result and attachment result independently. Include the confirmed Workspace-relative path and filename used for each upload. Preserve the exact returned attachment transport error where safe to display.
-
-On failure:
-
-- Show the sanitized Jira/tool error.
-- Ask whether the user wants to revise inputs or fields.
-- Do not resubmit the same payload unless the user explicitly requests a retry.
-- Do not update the SDLC user info Markdown file for a failed Jira write. Generic and Test Case failures have no `jira-user-info.md` persistence behavior.
+The backend remains authoritative for stored score/currentness, supported mutations, association and queue effects. Local records are audit evidence, not remote locks or proof of database writes.

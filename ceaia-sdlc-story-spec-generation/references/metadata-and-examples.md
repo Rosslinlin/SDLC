@@ -1,6 +1,6 @@
 # Metadata and worked authoring examples
 
-Read when filling Story, Test Case or SPEC templates. Examples are illustrative only, not default source facts.
+Read when assembling Story JSON and deriving its Test Case and SPEC projection. Examples are illustrative only, not default source facts.
 
 ## Metadata retention
 
@@ -14,17 +14,15 @@ SPEC also retains:
 
 Include these only when supplied and intended for the business deliverable; otherwise remove the fields. These explicit approved design references are exceptions to the ban on leaking internal evidence locators. Do not leak workspace paths, private download/token URLs, source registers or arbitrary provenance URLs. Test Case Related SPEC remains a workspace reference in the standalone workspace file, never an additional Jira attachment.
 
-## Parser-safe Story example
+## Canonical business behavior and SPEC projection
 
 Assume source explicitly says a permitted reviewer can open an existing application and see supplied details:
 
-```markdown
-## Acceptance Criteria
-
-- **AC-001**: Given a permitted reviewer and an existing application, when the reviewer opens the application, then the details panel displays the supplied application details.
+```text
+* *AC-001*: Given a permitted reviewer and an existing application, when the reviewer opens the application, then the details panel displays the supplied application details.
 ```
 
-Use exactly this section heading; add as many real criteria as needed. Stable AC IDs and Given/When/Then preserve BDD without a combined heading. Never create a second AC section just for the scorer.
+Resolve the real AC field ID into acceptanceCriteria, then store this Jira wiki string in fields[that ID], preserving stable IDs and supported Given/When/Then detail. Use [text encoding](jira-text-format.md) before scoring. Derive the SPEC projection as Markdown with one Acceptance Criteria heading and - **AC-001**: for this same behavior. The mapping ID is not AC text, and there is no top-level acceptanceCriteria/bddScenarios array. No additional exact-heading parser rule is established by this example.
 
 ## Correct negative dispositions
 
@@ -47,19 +45,20 @@ Do not hard-code messages, permission rules, field formats, thresholds or notifi
 
 ## Diagram example
 
-For the display-only source above, a sufficient Mermaid shape is:
+For the display-only source above, even this simple flow uses a minimal Mermaid diagram:
 ```mermaid
 flowchart TD
   A[Permitted reviewer opens existing application] --> B[Details panel displays supplied details]
 ```
 
-This is not a default diagram to paste into other Stories. Add error, empty, permission or dependency branches only when evidence supports them, and retain all branches the source explicitly requires.
+Use this fenced structure with the current Story's actual supported labels, not a default diagram to paste into other Stories. Keep the mermaid language marker and closing fence; do not wrap the block in another text/code fence or replace a simple flow with prose. Add error, empty, permission or dependency branches only when supported, and retain every source-required branch. If no user action/state transition applies, write Not applicable with a brief factual reason; missing business facts are not a reason to fabricate a graph or silently declare N/A.
 
 ## Recovery examples
 
-- Correct Story, incorrect SPEC diagram: repair diagram, independently review affected consistency, synchronize SPEC Result, then submit final Story plus current SPEC metadata. If Story is unchanged, the scorer may reuse its cached content score.
-- Correct AC, missing test: repair tests and embedded SPEC tables, independently review affected consistency, then submit final Story plus current SPEC metadata; unchanged Story content may use normal cache.
-- Wrong Story requirement: repair from evidence, update impacted tests/SPEC, independently review current content, then score the final Story.
-- "No Acceptance Criteria section found." with combined heading: correct to canonical heading, preserve business meaning, recheck impacted content and assess the changed final Story after content review.
-- Canonical heading still unrecognized: technical recovery, not endless business rewrites.
-- Missing approved design: ask for the design or a supported scope decision, not invented UI details.
+- Correct JSON, incorrect SPEC diagram syntax/fence: repair only that presentation under the existing mechanical allowance; unchanged business meaning needs no full business re-review. If nodes/branches/outcomes change meaning, independently verify the affected consistency. Any change to an already scored SPEC still requires the existing current package score and fresh confirmation; do not rewrite correct JSON or repeat unrelated checks.
+- Correct JSON AC, missing test: repair tests and embedded tables, independently verify affected content, synchronize headers and assess the changed package. SPEC content now participates in currentness; do not assume an old cached score is valid.
+- Wrong Story requirement: repair the canonical JSON from evidence, align tests/SPEC, independently review and score the final files. Keep path identity unchanged where possible; do not score a report or an old Markdown file.
+- A VALIDATION_FAILED result points to a JSON field/type: correct only that supported representation. Missing real business values require clarification, not guessed defaults.
+- Actual canonical ACs still unrecognized: technical diagnosis, not endless rewording or an invented score.
+- Preview changes business content: update JSON and dependent artifacts, review affected content, score and ask for fresh confirmation.
+- After scoring, preserve SPEC byte content; display the actual numeric score in its independent record/UI. There is no score-header write or display-driven S2 call.

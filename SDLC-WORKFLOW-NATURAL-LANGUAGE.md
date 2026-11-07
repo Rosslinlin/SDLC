@@ -1,8 +1,6 @@
 # CEAIA SDLC：用于生成 Workflow 的完整自然语言说明
 
-整理日期：2026-11-04。发布日期：2026-11-05。依据：`codex/sdlc-json4jira-flow` 分支的 `6.1.0-preview.6`，状态契约版本为 7；固定来源快照为 [055f92d](https://github.com/Rosslinlin/SDLC/commit/055f92d0523b562567e668c95cd2004f5a27348f)。
-
-本文是 v6.1 JSON 预览流程的独立自然语言说明，供平台生成 workflow 试验使用。发布本文到 `main` 不改变该分支现有 Skills 和 Task 的运行版本；全部来源链接固定到上述快照，不随 `main` 或功能分支的后续变动切换规则。
+最初整理日期：2026-11-04。当前依据：本仓库 `main` 的 `6.1.0-preview.7` JSON 流程，状态契约版本为 7；原 `codex/sdlc-json4jira-flow` 重构版本于 2026-11-07 合入主线。
 
 本文可以整体作为平台“自然语言生成 workflow”的输入。它描述期望生成的工作流，不表示已经执行其中的 Jira、评分或上传操作。工具参数和后端能力仍以平台实际开放的 schema 为准；未确认的能力必须保留为明确的等待项。
 
@@ -112,7 +110,8 @@ requiredness、可写操作、权限和默认值必须保留原操作证据范�
 | 根级 `acceptanceCriteria` | metadata/profile 确认的真实 AC 字段 ID 字符串。它是映射，不是 AC 正文、数组或 descriptor。 |
 | `fields[acceptanceCriteria]` | 对应实际字段中的非空 AC Jira wiki 正文，包含稳定唯一 AC ID、条件、动作及可观察结果。 |
 | `fields[其他实际字段 ID]` | 仅加入批准且对本操作可写的业务值，使用真实类型、选项和编码，不复制未批准 baseline/profile 字段。 |
-| 根级 `attachments` | 完整、获准、真实可读的当前 SPEC 上传路径列表。新建 Story 列入已审查主 SPEC；更新按 add/replace/explicit none 计划。只评分的本地 SPEC 不因存在就必须上传。 |
+| 根级 `attachmentsJson` | 用户已实测适用于路径流程的 JSON 对象，非字符串：`add` 数组条目为 `relativePath/fileName`；`replace` 数组条目还包含实际旧 `attachmentId`。新建用 add，更新按已确认原件选择 replace 或首次 add，不再用裸路径数组表达替换。 |
+| 明确不改远端附件 | 省略 `attachmentsJson`，维持 `attachments=[]`；本地 SPEC 仍同步并通过 `specFilePath` 评分。add/replace 时省略旧 `attachments` 路径数组，避免重复上传。 |
 
 创建和更新均不生成根级 `staffId`、根级 `summary/description/bddScenarios`、`customFields` 包装或 `fields.reporter`。staffId 可继续用于真实查询及 profile 身份，但不进入 Story 根级、评分参数或导出参数。更新省略 reporter 不表示清空远端值。BDD 细节放在真实 AC 正文中，不维护独立 BDD 对象。
 
@@ -134,15 +133,17 @@ Description、AC 及 metadata 明确允许的其他新编写富文本在生成�
 
 按实质不同条件/结果拆分用例；等价且来源支持的数据可明确参数化。单词 `or` 本身不构成缺陷，也不能按词数或组合数虚构案例。不能编造错误消息、阈值、权限、端点、日志、表或观察位置来让用例看起来完整。
 
-从 JSON 的真实 Jira wiki 业务字段生成可读 Markdown Story 投影，放入每个相关 SPEC。保留所有业务段落、AC ID、文字、顺序、BDD、代码和链接；用一个 AC 标题展示实际正文，不把路由、身份、字段 ID、原始 JSON 或内部控制信息复制成需求。SPEC 是权威 JSON 的视图，不能另写一份不同 Story。
+从 JSON 的真实 Jira wiki 业务字段生成可读 Markdown Story 投影，放入每个相关 SPEC 的 Jira Story 节内；投影标题从 `###` 起，不嵌入 `#` 主标题或 `##` 同级章节。仅下调标题层级，保留所有业务小节内容、顺序、AC ID、文字、BDD、代码和链接；用一个 AC 标题展示实际正文，不把路由、身份、字段 ID、原始 JSON 或内部控制信息复制成需求。SPEC 是权威 JSON 的视图，不能另写一份不同 Story。
 
-SPEC 必须包含 Summary、Jira Story 投影、与独立文件完全相同的可执行测试表、Functional Requirements 和 Measurable Success Criteria。按证据保留相关 Edge Cases、Key Entities、上下文及流程；有意义时用受支持 Mermaid，简单流程可以文字说明。不能给图补未提供的系统、重试、持久化或错误分支，不能编造量化目标。
+SPEC 必须包含 Summary、Jira Story 投影、与独立文件完全相同的可执行测试表、Functional Requirements 和 Measurable Success Criteria。按证据保留相关 Edge Cases、Key Entities、上下文及流程。有证据支持用户动作或状态转换时，User Flow 一律使用一个非空、闭合并标记 `mermaid` 的代码块；简单流程也画最小图，不以纯叙述替代。确实不适用时写 `Not applicable` 和简短事实理由；缺少业务事实仍须精确等待，不能伪装成不适用，或给图补未提供的系统、重试、持久化、后端及错误分支。不能编造量化目标。
 
 SPEC 文件名用安全小写 kebab-case 并以 `-spec.md` 结尾。文件顶部第一条独立 `---` 前只放 `Result` 和 `Reviewer Notes`，初始为 Not Reviewed，审查后 Notes 标记实际 Attempt 和证据支持的简述。保留真实日期和用户提供的作者、Branch、Requirement ID、Parent Requirement ID、Market/Channel/客户分类等；未知可选项省略。批准提供的 commit-specific general-spec 与 architecture.md 业务链接可以保留，内部 source register、Workspace 证据路径、私有下载/token URL、原始响应、审计标识和凭据不得泄漏。不得向 JSON 或 SPEC 写 Story Score。
 
 独立 `TEST_CASE.md` 可保留实际 Related Story JSON、Related SPEC 等 Workspace 追踪信息，但 SPEC 只嵌入其可执行表，不嵌入追踪 metadata。测试文件不作为 Jira 附件。
 
-完成保存后做一次生产自检：核对 JSON schema/实际映射/可写字段/类型/真实换行/无占位；创建或更新目标准确；实际路径和附件文件存在且与授权计划一致；每个 SPEC 的业务投影、FR/SC/流程和测试当前；嵌入测试表与独立文件一致；引用可解析；对原文完成 Q1–Q7 自检。机械格式问题在所属生产层有界修正；自检标记不能替代独立审查。
+完成保存后做一次生产自检，复用已读取的当前文件：核对 JSON schema/实际映射/可写字段/类型/真实换行；创建或更新目标准确；实际路径和附件文件存在且与授权计划一致；每个 SPEC 的业务投影、FR/SC/流程和测试当前；引用可解析；对原文完成 Q1–Q7 自检。在同一次检查中核对 Mermaid 非空、标记正确且围栏闭合、投影标题从 `###` 起、无未替换模板占位（保留真实业务字面量）、测试表 11 列且管道/换行有效、嵌入表与独立文件一致。
+
+纯机械缺陷只局部有界修正，不新增 Q 项、角色、工具、独立审核报告、评分调用或修复循环，也不无故全量业务重审；真实业务流程变化仍走现有受影响内容独立复核。评分后任何 SPEC 改动仍按既有规则重新评分并确认。自检标记不能替代独立审查。
 
 ## 9. 共享 Q1–Q7 内容标准
 
@@ -192,7 +193,9 @@ SPEC 文件名用安全小写 kebab-case 并以 `-spec.md` 结尾。文件顶部
 
 每个 source+ticket 是独立目标，分别保留 baseline、规划、manifest、审查、评分和外部结果。当前 baseline 的 intake 完成一次即可复用，不因调用另一个 Skill 或新会话而例行重读；已知外部变更时必须重新核对，不能覆盖新内容。
 
-更新读取完整 Description、单独 AC 结果和完整附件 inventory（包括零附件），保存实际原件 ID、名称、相关性和跳过理由；读取所有相关可读附件。重要附件不可读/跳过必须得到有依据的处理决定。Description 不可用或相关清单不全阻塞该目标。
+更新读取完整 Description、单独 AC 结果，并通过 `java-base-mcp.readJiraAttachments` 读取完整附件 inventory（包括零附件）、实际原件 ID 和可读内容。这个工具已提供旧 ID，不再要求用户填写或猜测。保存实际 ID、名称、相关性和跳过理由；读取所有相关可读附件。重要附件不可读/跳过必须得到有依据的处理决定。Description 不可用或相关清单不全阻塞该目标。
+
+替换前必须把每个候选原件的完整正文、reader 返回的实际附件 ID/路径与当前 source+ticket 对上，依据文档用途、原业务义务及本票关联确认它确实是受影响 SPEC。在现有 manifest 中区分“确认相关 SPEC / 其他证据或无关附件 / 待确认”，只把确认的 SPEC 原 ID 纳入替换映射。名称含 spec、扩展名、MIME、清单位置、新旧顺序或曾被读取都不能单独证明身份；旧 SPEC 无需符合当前命名或模板。FSD、测试报告、截图、其他票的 SPEC 等资料保留。不可读、同名或关联不明的候选先保留并补原文/精确选择，不能把待确认当作无 SPEC 而直接 add。
 
 建立 `update-manifest.md`：真实 source/target、baseline 路径、每项原义务保留/明确变更/待澄清、获准 delta、Summary 决定、实际附件原件到输出的映射和问题。保留原标题及 priority、assignee、labels、自定义字段、status、links、Epic/Parent，除非对应变更被明确授权；设置默认值不能扩大授权。评分/审计资料另存内部记录。
 
@@ -200,15 +203,33 @@ Story 的标题、描述、AC、范围或其他业务内容改变，自动同步
 
 | 真实情况 | 默认远端附件计划 | 必须保留的边界 |
 | --- | --- | --- |
-| 已有相关 Jira SPEC | `replace` | 自动纳入相关原件及实际 ID→当前输出映射，保留原件相关义务和无关附件；多个候选原件有歧义时只问选哪个。 |
-| 没有相关 Jira SPEC | `add` | 生成并上传首份当前 SPEC 到原票；不创建另一 Story，不冒充替换不存在原件。 |
-| 用户明确要求不改远端附件 | `none`，JSON 中 `attachments=[]` | 本地 SPEC/测试仍同步、审查及通过 `specFilePath` 评分；明确报告远端有意保留。 |
+| 已有相关 Jira SPEC | `attachmentsJson.replace` | 每条写入 readJiraAttachments 返回的实际旧 `attachmentId`、当前新文件 `relativePath/fileName`；保留原件义务和无关附件，原件歧义只问具体选择。 |
+| 完整清单确认没有相关或待确认 SPEC | `attachmentsJson.add` | 条目为新 SPEC 的实际 `relativePath/fileName`；保留所有现有非 SPEC 附件，不创建另一 Story。 |
+| 用户明确要求不改远端附件 | `none`：省略 `attachmentsJson`，`attachments=[]` | 本地 SPEC/测试仍同步、审查及通过 `specFilePath` 评分；明确报告远端有意保留。 |
 
 用户只提 Story/AC 不构成 none，也不需要额外询问是否进行普通本地同步。最终当前内容确认展示实际 add/replace/none 计划和文件映射。
 
-replace 必须有真实后端支持的原件选择/替换编码，并保证新文件上传确认成功后才删除所选旧文件。附件路径列表只证明计划上传，不能证明替换或删除。不能仅按文件名选旧附件、合并不同义务、编造 replace/delete 字段或调用旧上传删除 API。明确获准的多对一替换也须保留每个原件相关义务。缺替换能力时保留当前本地包和精确 WAITING_TOOL，不能悄悄变 none、把 add 当 replace 或宣称远端同步完成。
+2026-11-06 用户提供了旧接口 add/replace 截图，并确认已实测同样用法适用于新路径流程。生成阶段在 `story.json4jira` 内写原生对象，例如下面的替换片段（ID、路径、名称均须换成真实值）：
 
-普通更新目标的 `issueIdOrKey` 已是确认格式，不再因旧文档称目标编码未知而阻塞基本更新；附件替换能力另行判断。明确 none 使用空上传列表及当前本地 SPEC 评分，不增加额外 score-only 能力证明门槛。若后端真实拒绝，保存精确错误并等待，不能覆盖用户 none、删目标改创建或回退旧接口。
+```json
+{
+  "attachmentsJson": {
+    "replace": [
+      {
+        "attachmentId": "<readJiraAttachments返回且确认为本票SPEC的原ID>",
+        "relativePath": "outputs/ceaia/updates/<SOURCE>/<TICKET-KEY>/current-spec.md",
+        "fileName": "current-spec.md"
+      }
+    ]
+  }
+}
+```
+
+新增用同一对象的 `add` 数组，每条只有新文件 `relativePath/fileName`；不要给 add 编造旧 ID。add/replace 不再附带旧 `attachments` 路径数组。附件操作在文件内，不成为导出工具的第二个参数。只有确认本票 SPEC 原件后才把其实际 ID 放入 replace；不能按名称删附件或把非 SPEC 证据也列入。独立 delete 参数不在本次确认范围，不能自动组合额外删除调用。
+
+在 Assembly、审查和评分前完成操作对象与原件映射核对，然后冻结文件。已确认的 add/replace 不再重复索取能力证明或因为旧文档写“编码未知”而等待。替换仍要求先上传确认成功再删除所选旧 ID，最终预览展示旧件、新件和保留项；本次用户测试不替代每次执行的真实结果证据。只上传成功或旧件删除失败/未知仍为 partial，核对后仅用受支持恢复处理缺失删除，不能重传新文件或重放 Story 更新。
+
+普通更新目标的 `issueIdOrKey` 和上述附件对象均已确认。明确 none 保留空上传列表及当前本地 SPEC 评分，不增加额外能力证明门槛。若后端真实拒绝，保存精确错误再定向处理，不能覆盖用户 none、删目标改创建或回退旧接口。
 
 ## 12. SPEC Header 同步和真实评分
 
@@ -261,7 +282,7 @@ replace 必须有真实后端支持的原件选择/替换编码，并保证新�
 
 每个候选分配 `jira-export-attempt-<nnn>.md`，保存当前评分记录/输入、assembly/review/coverage、预览确认、提交前读回、准确单参数请求和完整响应。提交前再核对实际 JSON 和 SPEC 未改变、目标和确认一致。
 
-真正调用 `java-base-mcp.exportJiraByDynamicFields`，恰好一个参数 `story_json_workspace_path`，逐字复制当前通过评分输入及 `paths.storyJsonPath` 的值。不能改名、规范化、重新序列化或重建文件，不能额外传 Summary、Description、issueIdOrKey、staffId、conversationId、SPEC 参数、requestJson、dynamicFieldsJson、attachmentsJson、issuesJson、数组批量 wrapper 或内部状态信息。更新票号已在已评分 JSON 内。
+真正调用 `java-base-mcp.exportJiraByDynamicFields`，恰好一个参数 `story_json_workspace_path`，逐字复制当前通过评分输入及 `paths.storyJsonPath` 的值。不能改名、规范化、重新序列化或重建文件，不能额外传 Summary、Description、issueIdOrKey、staffId、conversationId、SPEC 参数、requestJson、dynamicFieldsJson、attachmentsJson、issuesJson、数组批量 wrapper 或内部状态信息。更新票号和 `attachmentsJson.add/replace` 已在已评分 JSON 内；禁止额外工具参数不表示禁止文件内的附件对象。
 
 默认按确认的候选顺序，每候选一个文件、一次顺序导出，不假设批量原子性。第一个必需同步结果失败、部分成功或未知时停止后续写入，保留后续选择。确认入队且异步同步尚 pending 本身不是同步提交失败。
 
@@ -337,7 +358,7 @@ profile 保留可信用户范围、source/project/type 绑定、适用字段 des
 2. 未确认 source 的多个 Jira 票各有独立选择；空独立 AC 配合可读 Description 能继续；真正票/source 错误不自动换源。
 3. 新建没有 issueIdOrKey；更新使用准确目标；根级 AC 是实际字段 ID，正文从实际 fields 映射读取；无 root staffId/customFields/reporter。
 4. Jira wiki 在评分前完成，SPEC Markdown 投影、AC 顺序/ID/代码/链接及测试保持一致，评分后导出无文件转换。
-5. Story-only 业务更新自动同步所有本地 SPEC/测试；已有远端 SPEC→replace，无 SPEC→add，明确保留远端→none 但本地仍同步；缺替换能力准确等待。
+5. Story-only 业务更新自动同步所有本地 SPEC/测试；已有 SPEC 用 attachmentsJson.replace 并携带 readJiraAttachments 实际旧 ID，无 SPEC 用 add，明确保留远端省略对象且 attachments=[]。保护非 SPEC，不因已确认格式重复等待；真实服务拒绝和部分结果准确记录。
 6. 审查先读原文，reviewer 只读不评分；合理 or/N/A/拒绝型 AC 不因旧模板规则误失败；真遗漏和无依据承诺被发现。
 7. 内容修复共享两批、每机械原因一次，续跑不清零；真实新事实只影响对应候选。
 8. 评分恰三参且发生于 Header 完成后；75、SKIPPED、VALIDATION_FAILED、AC 识别冲突、响应未保存均不能导出；分数不写 SPEC，无 S2/B。
@@ -352,11 +373,11 @@ profile 保留可信用户范围、source/project/type 绑定、适用字段 des
 
 本节用于维护追溯。以上正文已展开工作流规则，平台不应只加载本索引而省略正文。
 
-- [仓库说明与活动范围](https://github.com/Rosslinlin/SDLC/blob/055f92d0523b562567e668c95cd2004f5a27348f/README.md)、[当前 Task](https://github.com/Rosslinlin/SDLC/blob/055f92d0523b562567e668c95cd2004f5a27348f/SDLC-workflow-v5.task.json)、[工具契约](https://github.com/Rosslinlin/SDLC/blob/055f92d0523b562567e668c95cd2004f5a27348f/TOOLS-REFERENCE-2026-10-26.md)。
-- [生成角色入口](https://github.com/Rosslinlin/SDLC/blob/055f92d0523b562567e668c95cd2004f5a27348f/ceaia-sdlc-story-spec-generation/SKILL.md)、[编排/状态/失效/修复](https://github.com/Rosslinlin/SDLC/blob/055f92d0523b562567e668c95cd2004f5a27348f/ceaia-sdlc-story-spec-generation/references/workflow-contract.md)、[Q1–Q7 权威标准](https://github.com/Rosslinlin/SDLC/blob/055f92d0523b562567e668c95cd2004f5a27348f/ceaia-sdlc-story-spec-generation/references/quality-contract.md)。
-- [来源摄取](https://github.com/Rosslinlin/SDLC/blob/055f92d0523b562567e668c95cd2004f5a27348f/ceaia-sdlc-story-spec-generation/references/source-enrichment.md)、[现有票更新](https://github.com/Rosslinlin/SDLC/blob/055f92d0523b562567e668c95cd2004f5a27348f/ceaia-sdlc-story-spec-generation/references/existing-jira-update.md)、[前置字段组装](https://github.com/Rosslinlin/SDLC/blob/055f92d0523b562567e668c95cd2004f5a27348f/ceaia-sdlc-story-spec-generation/references/jira-json-assembly.md)、[Jira wiki 编码](https://github.com/Rosslinlin/SDLC/blob/055f92d0523b562567e668c95cd2004f5a27348f/ceaia-sdlc-story-spec-generation/references/jira-text-format.md)。
-- [产物规则](https://github.com/Rosslinlin/SDLC/blob/055f92d0523b562567e668c95cd2004f5a27348f/ceaia-sdlc-story-spec-generation/references/artifact-generation-rules.md)、[metadata/示例边界](https://github.com/Rosslinlin/SDLC/blob/055f92d0523b562567e668c95cd2004f5a27348f/ceaia-sdlc-story-spec-generation/references/metadata-and-examples.md)、[评分契约](https://github.com/Rosslinlin/SDLC/blob/055f92d0523b562567e668c95cd2004f5a27348f/ceaia-sdlc-story-spec-generation/references/scoring-tool-contract.md)、[澄清与续跑](https://github.com/Rosslinlin/SDLC/blob/055f92d0523b562567e668c95cd2004f5a27348f/ceaia-sdlc-story-spec-generation/references/user-clarification-and-resume.md)。
-- [生成模板目录](https://github.com/Rosslinlin/SDLC/tree/055f92d0523b562567e668c95cd2004f5a27348f/ceaia-sdlc-story-spec-generation/templates/)，含 create/update JSON、Story 投影、测试、SPEC、规划、score record、candidate state、batch state 模板。
-- [独立审查入口](https://github.com/Rosslinlin/SDLC/blob/055f92d0523b562567e668c95cd2004f5a27348f/ceaia-spec-review/SKILL.md)、[审查契约](https://github.com/Rosslinlin/SDLC/blob/055f92d0523b562567e668c95cd2004f5a27348f/ceaia-spec-review/references/review-contract.md)、[审查报告模板](https://github.com/Rosslinlin/SDLC/blob/055f92d0523b562567e668c95cd2004f5a27348f/ceaia-spec-review/references/review-report-template.md)、[审查包同文质量副本](https://github.com/Rosslinlin/SDLC/blob/055f92d0523b562567e668c95cd2004f5a27348f/ceaia-spec-review/references/quality-contract.md)。
-- [导出入口](https://github.com/Rosslinlin/SDLC/blob/055f92d0523b562567e668c95cd2004f5a27348f/ceaia-sdlc-jira-export/SKILL.md)、[交接门禁](https://github.com/Rosslinlin/SDLC/blob/055f92d0523b562567e668c95cd2004f5a27348f/ceaia-sdlc-jira-export/references/handoff-and-content.md)、[附件边界](https://github.com/Rosslinlin/SDLC/blob/055f92d0523b562567e668c95cd2004f5a27348f/ceaia-sdlc-jira-export/references/attachments.md)、[预览/写入/恢复](https://github.com/Rosslinlin/SDLC/blob/055f92d0523b562567e668c95cd2004f5a27348f/ceaia-sdlc-jira-export/references/jira-write-and-recovery.md)、[用户级配置保存](https://github.com/Rosslinlin/SDLC/blob/055f92d0523b562567e668c95cd2004f5a27348f/ceaia-sdlc-jira-export/references/workspace-profile.md)、[调用示例](https://github.com/Rosslinlin/SDLC/blob/055f92d0523b562567e668c95cd2004f5a27348f/ceaia-sdlc-jira-export/references/call-examples.md)、[profile 模板](https://github.com/Rosslinlin/SDLC/blob/055f92d0523b562567e668c95cd2004f5a27348f/ceaia-sdlc-jira-export/templates/profile-template.json)。
-- [平台验收清单及已记录验证范围](https://github.com/Rosslinlin/SDLC/blob/055f92d0523b562567e668c95cd2004f5a27348f/PLATFORM-TEST-CHECKLIST.md)、[功能归属与隔离边界](https://github.com/Rosslinlin/SDLC/blob/055f92d0523b562567e668c95cd2004f5a27348f/FUNCTIONAL-COVERAGE.md)。
+- [仓库说明与活动范围](README.md)、[当前 Task](SDLC-workflow-v5.task.json)、[工具契约](TOOLS-REFERENCE-2026-10-26.md)。
+- [生成角色入口](ceaia-sdlc-story-spec-generation/SKILL.md)、[编排/状态/失效/修复](ceaia-sdlc-story-spec-generation/references/workflow-contract.md)、[Q1–Q7 权威标准](ceaia-sdlc-story-spec-generation/references/quality-contract.md)。
+- [来源摄取](ceaia-sdlc-story-spec-generation/references/source-enrichment.md)、[现有票更新](ceaia-sdlc-story-spec-generation/references/existing-jira-update.md)、[前置字段组装](ceaia-sdlc-story-spec-generation/references/jira-json-assembly.md)、[Jira wiki 编码](ceaia-sdlc-story-spec-generation/references/jira-text-format.md)。
+- [产物规则](ceaia-sdlc-story-spec-generation/references/artifact-generation-rules.md)、[metadata/示例边界](ceaia-sdlc-story-spec-generation/references/metadata-and-examples.md)、[评分契约](ceaia-sdlc-story-spec-generation/references/scoring-tool-contract.md)、[澄清与续跑](ceaia-sdlc-story-spec-generation/references/user-clarification-and-resume.md)。
+- [生成模板目录](ceaia-sdlc-story-spec-generation/templates/)，含 create/update JSON、Story 投影、测试、SPEC、规划、score record、candidate state、batch state 模板。
+- [独立审查入口](ceaia-spec-review/SKILL.md)、[审查契约](ceaia-spec-review/references/review-contract.md)、[审查报告模板](ceaia-spec-review/references/review-report-template.md)、[审查包同文质量副本](ceaia-spec-review/references/quality-contract.md)。
+- [导出入口](ceaia-sdlc-jira-export/SKILL.md)、[交接门禁](ceaia-sdlc-jira-export/references/handoff-and-content.md)、[附件边界](ceaia-sdlc-jira-export/references/attachments.md)、[预览/写入/恢复](ceaia-sdlc-jira-export/references/jira-write-and-recovery.md)、[用户级配置保存](ceaia-sdlc-jira-export/references/workspace-profile.md)、[调用示例](ceaia-sdlc-jira-export/references/call-examples.md)、[profile 模板](ceaia-sdlc-jira-export/templates/profile-template.json)。
+- [平台验收清单及已记录验证范围](PLATFORM-TEST-CHECKLIST.md)、[功能归属与隔离边界](FUNCTIONAL-COVERAGE.md)。

@@ -1,33 +1,34 @@
 ---
 name: ceaia-sdlc-jira-export
-description: Export validated CEAIA SDLC Stories and reviewed SPECs to Jira, reuse user-workspace field profiles, and separately bind every successful ticket to its final Workspace score. Story create/update only.
+description: Export a reviewed and scored CEAIA story.json4jira through its unchanged Workspace path after frontend content confirmation. Verify ticket, attachment, database association and score-sync outcomes without rebuilding the JSON or issuing a separate binding call.
 ---
 
-# CEAIA SDLC Story Export
+# CEAIA JSON Story Export
 
-Version: 6.0.0 — 2026-10-31. Runtime: GPT-5.6 Luna or GPT-6 Luna. Execution: text-only.
+Version: 6.1.0-preview.7 — 2026-11-05. State contract: 7. Runtime: GPT-5.6 Luna or GPT-6 Luna. Execution: text-only.
 
-Own transport and Jira operations after generation, content review, SPEC synchronization and final Workspace scoring. Use existing platform Workspace, popup and Jira tools; no scripts, new tools, content generation, scoring or generic helper workflow.
-
-## Boundaries
-
-- Accept one or more validated Story create/update items. Continue an authorized bundled handoff unless preparation-only/no-Jira or stopped; never bypass a failed gate through generic export.
-- Generation owns business quality and parent readiness. Check current evidence and mappings without repeating quality review. Preserve business content; only field partition, Jira rendering and serialization change its representation.
-- Reuse upstream update baselines/inventories and matching complete user-workspace profiles. New stages/sessions do not require routine remote rereads or rediscovery.
-- **A writes the Story and required attachments. B is a separate five-field call binding each successful ticket to its final Workspace score. Both are required. A or attachment success never substitutes for B.**
-- Story only. Existing Epic/Parent relationships are supported; Test Case export, other issue types and standalone association are outside this skill.
+Generation owns project/type/field discovery, configuration, JSON assembly, content repair, review and scoreUserStory. This skill consumes their current evidence, obtains the scored file's frontend upload confirmation and invokes the exporter with one path. Use existing platform capabilities; no scripts, new tools, business generation or scoring here.
 
 ## Execute in order
 
-1. Read [handoff and content](references/handoff-and-content.md). Validate selected items against current parent state and saved evidence; return stale/missing content evidence upstream.
-2. Read [workspace profile](references/workspace-profile.md). Reuse matching components; query only missing/inapplicable facts, explicit changes/refresh, or supported schema-error recovery.
-3. Read [fields and rendering](references/fields-and-rendering.md). Resolve allowed values and obtain one Use/Change settings confirmation for this export, including first use. Changes invalidate affected confirmation/preview bindings.
-4. For attachment operations, read [attachments](references/attachments.md). Apply only the reviewed plan. none is a valid zero-upload update.
-5. Read [Jira write and recovery](references/jira-write-and-recovery.md). Preserve/read back the exact A preview and numbered attempt, preflight, call A, then separately preview/call B for each eligible returned ticket. No additional final approval popup follows settings confirmation.
-6. Persist eligible profile facts and report issue, attachment, binding and profile results separately. Complete only after every selected required A/attachment/B operation succeeds; explicitly stopped or pending work remains reported as such.
+1. Read [current handoff](references/handoff-and-content.md). Inspect actual saved story.json4jira, current SPECs and referenced review/score/global-coverage evidence. Reuse complete current tool snapshots with actual path/revision evidence; a new Skill/stage alone does not require another fetch. Return missing, stale or inconsistent evidence upstream. Final pre-submission read-back remains mandatory.
+2. Read [SPEC synchronization and confirmed attachment operations](references/attachments.md). Verify current local SPECs and the scored root attachmentsJson object: add uses relativePath/fileName; replace also has actual attachmentId returned by readJiraAttachments for positively identified same-source/ticket SPEC originals. Preserve non-SPEC, unselected and unresolved attachments. This tested path-JSON format is established; do not block normal replace for fresh capability proof. Existing related SPECs default to replace; a first SPEC to add; explicit remote preservation uses attachments=[] without attachmentsJson. Never also keep a nonempty attachments list. Updates use root issueIdOrKey; creates omit it. Missing targets, invalid mappings or actual service rejection return upstream or remain precise pending work.
+3. Read [preview, submission and recovery](references/jira-write-and-recovery.md). Show the final scored .json4jira through the platform frontend and obtain actual content/upload confirmation bound to the current JSON and SPEC files. Earlier settings confirmation is insufficient. Save the compact preview at the fully resolved internal path; record a numbered attempt only for the actual invocation and submit the same unchanged JSON path.
+4. Inspect and retain the complete actual response. Record ticket, each attachment, database association, queue acceptance and eventual score synchronization separately; missing evidence stays pending. Do not repeat a successful or unknown operation to repair another stage.
+5. After confirmed issue/required-attachment success, follow [profile persistence](references/workspace-profile.md) to create or upsert the verified upstream snapshot in the real user workspace, including a deleted file/parent, and verify it by read-back. A failed save remains separate profile-only pending work without replaying Jira. Report confirmed results and pending work using current deliverable/Jira links by default; internal evidence links are for requested detail or diagnosis. A local record or generic tool success is not database proof.
 
-## Tools and context
+## Fixed tool boundary
 
-Normal profile-hit export uses Workspace reads/writes, ask_user_question, and java-base-mcp.exportJiraByDynamicFields. Discovery/recovery also uses java-base-mcp.queryJiraProjectsByName, java-base-mcp.queryJiraIssueTypesByProject and java-base-mcp.queryJiraCreateMetaFields. java-base-mcp.getJiraInfos verifies a newly selected Epic once or reconciles necessary exceptions. readJiraAttachments belongs to upstream intake or necessary exception reconciliation. Follow live schemas; do not invent pagination, edit-metadata, checksum or bulk-binding capabilities.
+The only create or update export invocation is java-base-mcp.exportjirabydynamicfield with exactly one argument: story_json_workspace_path, copied from paths.storyJsonPath and the actual passing score input. For updates, issueIdOrKey is already inside the scored JSON after issueType; attachmentsJson is also inside that file. Neither is an extra tool argument. Do not pass business fields, identity values, attachment controls, batch arguments or a separate association payload beside the path. Backend association/queue work is required and must be evidenced, but there is no second five-field binding call in this JSON route.
 
-Load each reference when needed. Reuse verified unchanged reads; keep current pointers/bindings in state and complete numbered attempts in files. Conversation artifacts and persistent user profiles have different scopes. Never put workflow metadata, diagnostics or internal paths into Jira-visible business fields.
+Do not query projects/types/metadata, repeat normal Jira intake, render/partition Story text or rebuild the JSON during export. A defect or requested change returns to generation's assembly/review/scoring procedure. Test Case export, other issue types, generic helper/legacy routes and automatic fallback are outside this skill. Default multi-item execution is one confirmed file and one export call per candidate, stopping on failed/partial/unknown required outcomes.
+
+The bundled workflow continues to this stage unless preparation-only/no-Jira or stopped. It must still obtain the current frontend content confirmation before writing. See [call examples](references/call-examples.md) for the one-argument shape; examples are not real paths or result schemas.
+
+## Internal files and delivery view
+
+`paths.historyRoot` is the canonical internal root supplied by generation: `.ceaia-work/stories/<slug>` or `.ceaia-work/updates/<SOURCE>/<TICKET-KEY>`. Resolve every generated preview/attempt save inside that root before writing; use the full Workspace-relative path and verify the returned save path. Never use a bare basename, current directory or deliverable folder as a fallback. Missing internal write support is a precise WAITING_TOOL; it does not authorize saving records beside the scored JSON.
+
+New planning and assembly evidence share `<historyRoot>/preparation.md` with separate version-bound sections. Read the shared file once when current full contents are available and select the actual Assembly section for this JSON revision; existing legacy internal record paths remain readable. Phase transitions, resume and save retries do not create preparation revisions or numbered export attempts. Preserve actual remote outcomes and scored file paths during any internal-directory cleanup.
+
+Only current Story JSON, TEST_CASE.md and named SPECs belong in the deliverable root. Default final responses show those deliverables, actual Jira keys/status and a precise blocker/next action. Keep state, preparation, baselines, review/score/export attempts and preview links internal unless requested or needed to locate a diagnostic. The Skill controls paths and the links it presents; it does not claim to hide a platform file sidebar.

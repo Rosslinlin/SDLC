@@ -1,0 +1,21 @@
+{
+  "jiraInstance": "<confirmed lowercase source>",
+  "projectKey": "<actual project key>",
+  "issueType": "<confirmed Story type name>",
+  "acceptanceCriteria": "<actual AC field ID>",
+  "fields": {
+    "project": {"key": "<actual project key>"},
+    "issuetype": {"id": "<actual Story type ID>"},
+    "summary": "<supported Story title>",
+    "description": "h2. User Story\nAs a <evidenced role>, I want <supported goal>, so that <supported value>.\n\nh2. Business Context\n<supported context, scope and material dependencies>",
+    "<actual AC field ID>": "* *AC-001*: Given <supported condition>, when <action>, then <observable result>."
+  },
+  "attachmentsJson": {
+    "add": [
+      {
+        "relativePath": "outputs/ceaia/<candidate>/final-story-name-spec.md",
+        "fileName": "final-story-name-spec.md"
+      }
+    ]
+  }
+}

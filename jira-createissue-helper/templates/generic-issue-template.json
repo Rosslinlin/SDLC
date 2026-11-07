@@ -1,0 +1,15 @@
+{
+  "jiraInstance": "<confirmed lowercase source>",
+  "projectKey": "<actual project key>",
+  "issueType": "<actual issue type name>",
+  "fields": {
+    "project": {
+      "key": "<actual project key>"
+    },
+    "issuetype": {
+      "id": "<actual issue type ID>"
+    },
+    "summary": "<source or user-requested generated title>",
+    "description": "<complete selected business content in final Jira presentation>"
+  }
+}

@@ -1,3 +1,131 @@
+# 2026-11-07 — JSON4Jira 重构版本合入 main
+
+将 `codex/sdlc-json4jira-flow` 合入 `main`，保留双方提交历史。主线采用重构分支的 JSON-first Skills/Task，包括附件 add/replace、SPEC 格式及状态/用户配置持久化修复。版本仍为 `6.1.0-preview.7`，平台验证结果不因合并而变更；以下记录保留各版本发布时的分支状态。
+
+---
+
+# 2026-11-06 — 轻量 SPEC 格式稳定性修复
+
+将格式核对并入现有一次生产自检，复用已读取文件，不新增角色、工具、独立审核报告、评分调用或修复循环；版本号及历史说明保持原样。
+
+- 有证据支持的 User Flow 使用一个非空、闭合并标记 `mermaid` 的代码块，简单流程也画最小图；确实不适用时写 `Not applicable` 和事实理由，不以缺事实或虚构分支替代。
+- SPEC 内 Jira Story 投影从 `###` 起，仅下调标题层级，保留原业务小节内容、顺序、ID、代码和链接；同次自检核对围栏、标题层级、未替换模板占位和 11 列/嵌入测试表一致性，保留真实业务字面量。
+- 机械缺陷局部有界修正，不增加 Q 项或无故全量重审；业务流程变化仍复核受影响内容，评分后 SPEC 改动仍重新评分及确认。平台清单新增待执行回归，不宣称已经平台实测通过。
+
+---
+
+# 2026-11-06 确认 — 路径 JSON 内的附件 add/replace
+
+用户已实测截图所示旧 `attachmentsJson.add`/`replace` 格式适用于当前新路径 JSON 流程，并确认 `readJiraAttachments` 返回实际原件 ID。本次记录该确认，不另调整既有版本号或发布日期体系；以下历史章节保留当时说明，当前附件格式以本条及活动 Skill 为准。
+
+- 在评分及导出的同一 `story.json4jira` 根级写 `attachmentsJson` 对象：`add` 条目使用 `relativePath`、`fileName`；`replace` 条目再加 `attachmentId`，ID来自同source/同目标票reader返回的实际原件。原文仍须证明其为相关SPEC；非SPEC、无关和未选原件保留，不按文件名或读取顺序猜删除目标。
+- 使用该对象时，不再使用非空 `attachments` 数组重复上传。显式none维持 `attachments: []` 且省略 `attachmentsJson`；本地SPEC/测试仍同步、审查，当前SPEC仍经 `specFilePath` 评分。
+- 普通replace格式已确认，不再以schema未知或重复能力证明进入WAITING。删除是replace后端效果，不新增独立delete操作支持；真实服务错误及上传/旧件移除部分成功或未知仍逐项保留，不能虚报完成或重放成功写入/上传。
+- 导出工具仍只接收 `story_json_workspace_path`，附件对象在文件内，不恢复旧direct参数或独立API。评分三参数、Q1–Q7、当前内容确认和后端关联/队列结果核验保持不变；本次确认不代表全链后端效果均已验证。
+
+---
+
+# CEAIA SDLC v6.1.0-preview.6 — 更新复用配置与自动同步 SPEC
+
+日期：2026-11-03。工作分支：`codex/sdlc-json4jira-flow`，尚未合入 `main`。本次修正 update 模式的配置复用和 Story/SPEC 同步行为，Q1–Q7 业务判定及现有评分/导出参数保持不变。
+
+- 创建、更新都先读取真实用户 Workspace 的 `ceaia-sdlc-jira/profiles.json`。同用户/source/project/Story type 的稳定项目/类型/AC 映射按组件跨模式复用，不因 profile 只有 create capability 而重跑三个 query。create/edit 权限、requiredness、操作和默认值仍分别保留；已有 baseline 可补实际目标信息，缺项、不适用、显式刷新/目标变化或真实 schema 错误才定向查询，不按 TTL 强刷。
+- 更新原票的 Description/AC 和完整附件 inventory 仍通过实际 baseline 读取取得；这些读取不由配置 profile 替代，也不能误记为重复字段 discovery。
+- Story 业务变更自动同步本地 SPEC、受影响测试和业务投影，不等待用户额外说“update spec”。每个相关 SPEC 保留其原有义务并核对当前 JSON，完成受影响审查及 Header 同步后评分；纯路由/schema 变化只核对业务一致性，不制造文件改动。
+- 默认远端 SPEC 同步计划为相关已有 SPEC→`replace`、无相关 SPEC→`add`；用户明确不改远端附件才 `none`，本地 SPEC 仍必须同步。原件歧义只问具体选择，最终预览包含真实附件计划；替换编码及上传后删除/覆盖保证不足时准确等待，不编造控制或旧 API，不跳过同步后宣布全完成。
+- 根级 AC 映射、无 reporter/root staffId、更新 issueIdOrKey、评分三参数、导出单路径、完整原始响应及数据库结果职责继续保留。三个独立包不改，新增平台场景结果留空；本次规则变更不代表真实后端已验证。
+
+---
+
+# 历史记录：v6.1.0-preview.5 — AC 映射修正与现有 Story 更新
+
+以下保留当时发布说明；当前 profile 复用与 SPEC 同步规则以本文顶部 preview.6 和活动 Skill 为准。
+
+日期：2026-11-03。工作分支：`codex/sdlc-json4jira-flow`，尚未合入 `main`。按用户转述的最新后端确认修正文件协议，Q1–Q7 业务判定保持不变；质量契约读取说明同步为 preview.5。
+
+- 将实际 AC 字段 ID 字符串放在 JSON 根级 `acceptanceCriteria`，移除旧 `customFields` 包装；验收标准正文仍是 `fields[acceptanceCriteria]` 的 Jira wiki 字符串，不恢复旧 AC 正文/数组结构。
+- 创建和更新 JSON 均移除 `fields.reporter`，不从旧模板或 profile 重新加入；根级 `staffId` 继续省略。现有查询工具与身份配置所需 staffId 保留，更新省略 reporter 不清空 Jira 上的原值。
+- 创建与更新共用生成、独立审查、评分及单路径导出主链。更新在 `issueType` 之后加入根级 `issueIdOrKey`（大写 I），值为已确认实际票号，与可信 source/target/baseline 一致；创建直接省略，不填空值或示例票号。更新模板及返回 key 核对防止误建新票；工具参数不额外增加票号。
+- 更新保留原始义务和获准增量。普通 none 使用 `attachments: []` 保留远端附件，本地 SPEC 通过既有 `specFilePath` 评分后正常确认/导出，不再先要求目标编码或 score-only 能力证明。replace 的具体编码和顺序保证仍需真实后端依据；实际明确拒绝或对应替换能力缺失时才记录准确缺口，不猜控制、追加上传或回退创建。
+- Description/AC 在生成阶段完成 Jira wiki 编码，SPEC 仍为 Markdown 投影。评分三参数、导出单路径、当前文件冻结与确认、原始响应及数据库结果保存职责保持原协议。
+- 旧 JSON 迁移字段后重新评估当前包并确认，不重放已成功或未知的外部写入。三个独立包保持不改；新增平台场景结果留空，不宣称真实后端已验证。
+
+---
+
+# 历史记录：v6.1.0-preview.4 — Jira 文本格式与身份字段修正
+
+以下保留当时发布说明；当前 AC 映射、reporter 和更新目标规则以本文顶部 preview.6 和活动 Skill 为准。
+
+日期：2026-11-03。工作分支：`codex/sdlc-json4jira-flow`，尚未合入 `main`。本次调整 Story JSON 的提交格式，Q1–Q7 业务判定保持不变；质量契约的读取说明同步为 preview.4。
+
+- Story JSON 模板与组装规则移除根级 `staffId`，保留 `jiraInstance`、`projectKey`、`issueType`。身份配置及现有查询工具所需的员工号按实际 schema 保留；`fields.reporter.name` 仍按 metadata 要求与授权使用真实身份，不依赖根级字段。
+- 在生成、评分之前将 `fields.description` 和 `fields[customFields.acceptanceCriteria]` 写成 Jira wiki 字符串：标题使用 `h1.` / `h2.`，AC 例如 `* *AC-001*: Given ... When ... Then ...`。其他获准富文本遵从 metadata，保留措辞、顺序、换行、代码和 AC；不转换 summary、路由/身份/选项、普通文本或更新中未改动的字段。
+- SPEC 保留 Markdown 格式，从 JSON 中同一业务语义生成可读投影。生成、自检、reviewer 与评分继续解析同一动态 AC 映射，不新增评分门槛；导出阶段不再转换文字。
+- 评分仍为 `scoreUserStory` 三参数，导出仍为 `exportJiraByDynamicFields` 单路径，提交与评分相同的当前文件。旧 JSON 删除字段或转换格式后需重新评分和内容确认，不能沿用旧 checksum 或重放已成功/未知写入。
+- 三个独立包保持不改。平台清单补充字段移除、wiki 编码和 Markdown 投影场景，真实平台结果留空，历史本地及隔离验证不作为本次后端实测。
+
+---
+
+# 历史记录：v6.1.0-preview.3 — 默认 Jira 入口与缺项补齐
+
+以下保留当时发布说明；当前 JSON 字段与文本格式以本文顶部 preview.6 和活动 Skill 为准。
+
+日期：2026-11-03。工作分支：`codex/sdlc-json4jira-flow`，尚未合入 `main`。本次调整入口行为，JSON fields 结构和 Q1–Q7 质量标准保持 preview.2 的规则。
+
+- 所有用户默认继续 Jira-backed 完整流程，入口不提供 Preparation-only / Jira-backed 路线选择。缺少配置或身份不取消默认 Jira 意图，不推荐 preparation-only 作为替代路线。
+- 先读取真实用户 Workspace 中适用的已确认配置与可信身份，只询问尚缺的来源、staffId、项目名称/已知 key，或让用户从工具返回的实际项目中选择。已确认项直接复用。
+- Story 类型、字段 schema 与 AC 字段 ID 通过现有查询工具取得，不要求业务用户填写技术 ID。元数据未补齐时保留明确待办，不能伪造完整可评分 JSON。
+- 仅在用户主动明确要求“只准备/不导出”时遵从；完整流程仍须评分后的当前内容预览和实际用户确认，再以同一 JSON 路径导出。评分三参数、导出单路径和后端分项结果规则不变。
+- 平台清单新增首次无配置、已有配置、用户主动不导出三类场景，真实结果留空。preview.2 本地/隔离记录保留为历史，不代表本次入口行为已经平台实测。
+
+---
+
+# 历史记录：v6.1.0-preview.2（入口行为由 preview.3 补充）
+
+以下保留当时发布说明；当前规则以本文顶部 preview.6 和活动 Skill 为准。
+
+# CEAIA SDLC v6.1.0-preview.2 — fields 结构修正
+
+日期：2026-11-03。工作分支：`codex/sdlc-json4jira-flow`，尚未合入 `main`。按开发截图及用户后续确认修正 JSON 组装/读取约定，不表示新 schema 已通过真实评分或后端集成测试。
+
+- 根级保留实际 `staffId`、`jiraInstance`、`projectKey`、`issueType`；实际 Jira 写入业务字段放入 `fields`。`fields.project.key` 对应根级项目，`fields.issuetype.id` 使用查询到的 Story 类型 ID，`fields.reporter.name` 对应实际 `staffId`。
+- `customFields.acceptanceCriteria` 仅存实际字段 ID 映射；AC 正文存放在 `fields[customFields.acceptanceCriteria]`，值为 Markdown 字符串。其他已获准的自定义业务值也按实际字段 ID 放入 `fields`，不把映射 ID 当正文或 AC 数量依据。
+- `fields.summary` 为标题，`fields.description` 为 Markdown 字符串；删除旧顶层 `summary`、`description`、`acceptanceCriteria`、`bddScenarios`。员工号、项目、类型 ID 与自定义字段 ID 全部来自实际上下文/metadata，不硬编码截图示例。
+- 生成模板、组装自检、SPEC/测试投影、reviewer 读取及评分 AC 识别按同一字段结构处理。缺失映射、数组描述、目标/身份冲突等属于结构问题，Q1–Q7 业务审查标准不加严。
+- 评分仍为 `scoreUserStory` 三参数，导出仍为 `exportJiraByDynamicFields` 单路径；SPEC 不写分数、后端关联/队列分项记录和失败恢复规则不变。转换旧 JSON 后须重新评分并确认当前内容，不重放已成功或未知的远端写入。
+- 本次仍不修改三个独立包；平台清单补充新字段结构场景，真实平台结果留空。preview.1 的本地检查和 mock 轨迹属于历史证据，不能替代本次 schema 验证。
+
+---
+
+# 历史记录：v6.1.0-preview.1（JSON 字段约定已由 preview.2 修正）
+
+以下保留当时发布说明；当前字段结构以本文顶部 preview.6 和活动 Skill 为准。
+
+# CEAIA SDLC v6.1.0-preview.1 — JSON4Jira flow
+
+日期：2026-11-02。工作分支：`codex/sdlc-json4jira-flow`，尚未合入 `main`。运行目标仍为平台 GPT-5.6 Luna / GPT-6 Luna，纯文本执行。本预览按新接口重构活动三 Skill，不表示后端集成或两种模型已完成实测。
+
+- 每候选的最终 `story.json4jira` 成为唯一 Story 业务源及提交文件。取消独立 `STORY.md`，SPEC 中 Story 投影来自 JSON；`TEST_CASE.md` 保留。
+- 项目、Story 类型、字段 metadata 查询和跨会话配置复用前移至 generation，在最终 JSON 写成前完成。成功后保存已确认 profile，export 不再另组装一套提交字段。
+- 评分改用 `nodejs-base-mcp.scoreUserStory`，仅传 `story_json_workspace_path`、`specFileStatus`（精确 `Pass` / `Fail`）和 `specFilePath`。完整响应与真实输入/标识保留；主链内容 PASS 不代替真实评分及持久化。
+- 分数不写 SPEC，取消旧显示字段及仅为显示引起的 S2。导出工具仍为 `java-base-mcp.exportJiraByDynamicFields`，但**仅传 `story_json_workspace_path`**；评分与导出使用同一候选最终 JSON 路径。
+- 真实评分通过后，先展示当前业务内容、目标与附件操作的前端 HTML 预览，用户明确确认当前内容后才导出。内容变化使旧评分/确认失效，必须重新完成相应步骤。
+- 后端导出负责校验 score checksum/threshold、写入 Jira 与所需附件、回填数据库关联并入异步队列。前端不再执行旧五字段 B；分别记录 issue、attachments、linkage、queue、async sync 真实证据，不能把普通 success 或入队当作数据库/Jira UI 分数全部完成。
+- 批量仍为每候选一个 JSON，默认逐票调用，不使用旧 `issuesJson`。外部未知/部分结果先核对，不能为修复关联或队列状态重建已成功票据。
+- Q1–Q7 标准保持，审查对象更新为 JSON 业务内容与 SPEC 投影；review/score 共享两批内容修复、机械 cause 一次的规则保留。
+- 更新 `none` / `replace` 业务语义保留，但 live schema 未暴露 target/replace 时明确 `WAITING_TOOL`。不猜新字段、不改成 create、不上传 score-only SPEC；预览版不冒称更新后端已集成。
+- `jira-createissue-helper`、`user-story-reviewer`、`review-requirements` 三个独立包完全不改，不为旧工具所有路由新增兼容代码或脚本。
+
+Task 兼容文件名仍为 `SDLC-workflow-v5.task.json`，显示名改为 `SDLC-workflow-v6.1 JSON preview`；schema 与原 10 工具顺序保留，最后评分工具 ID 替换为 `nodejs-base-mcp.scoreUserStory`。现有 generation/review ID 与 exporter 占位仍须核对实际安装结果，不能伪造平台 ID。
+
+当前行为以 [workflow-contract](ceaia-sdlc-story-spec-generation/references/workflow-contract.md)、[评分契约](ceaia-sdlc-story-spec-generation/references/scoring-tool-contract.md) 与 [导出协议](ceaia-sdlc-jira-export/references/jira-write-and-recovery.md) 为准。新接口平台结果在 [测试清单](PLATFORM-TEST-CHECKLIST.md) 留空等待实测；旧 v6 本地、旧 S1–S2–A–B 验证仅为历史，不适用于新调用形态。
+
+---
+
+# 历史发布记录：v6.0 及更早版本（不作为 v6.1 运行指令）
+
+以下原文包含旧工具、Markdown Story、SPEC 分数显示、S2 和五字段 B 等当时协议，均不适用于当前 JSON 主链；只保留版本历史。其“当前”“默认”“本次”等词仅指当时版本。
+
 # CEAIA SDLC v6.0.0
 
 发布日期：2026-10-31。运行目标：平台 GPT-5.6 Luna / GPT-6 Luna；纯文本执行。

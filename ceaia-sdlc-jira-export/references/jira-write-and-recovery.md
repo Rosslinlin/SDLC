@@ -1,59 +1,51 @@
-# Jira A, database binding B and recovery
+# Preview, path-only submission and backend recovery
 
-Execute only with a current validated handoff, applicable field evidence, settings confirmation and preflight. The tool is `java-base-mcp.exportJiraByDynamicFields`; use its live direct-argument schema. No scripts or new tools.
+Use a [current validated handoff](handoff-and-content.md), verified assembly and authorized [attachments](attachments.md). Tool: java-base-mcp.exportjirabydynamicfield. The user-confirmed interface has exactly one argument, story_json_workspace_path. There is no separate five-field B call. See [examples](call-examples.md).
 
-## A — Write the Story and required attachments
+## 1. Preview the actual scored package and obtain confirmation
 
-| Argument | Use |
+1. Inspect the exact saved .json4jira and every scored/intended-upload SPEC, reusing complete unchanged tool-returned contents with actual path/revision evidence where available. Verify review/score/header/currentness and selected global coverage under the handoff without repeating content-quality review. A new stage/Skill alone is not a reason to re-fetch the same full data. Do not serialize a replacement request or query metadata here; final pre-submission read-back is still required.
+2. Present that actual .json4jira using the platform's native frontend preview. Show create/update operation, source/project/Story type, the update's exact root issueIdOrKey, full business content, synchronized local SPECs and the saved root attachmentsJson add/replace entries or explicitly requested none. For replace, identify each selected old SPEC/actual readJiraAttachments ID and new file, the upload-confirm-then-delete order, and retained attachments. Verify the [confirmed format and mappings](attachments.md), without reopening schema/capability proof or substituting append-only paths. Story-only wording does not exclude SPEC synchronization. Create files omit issueIdOrKey. The platform may render HTML; this is not an instruction to generate another HTML upload file or invent a preview tool. If native preview/current-content confirmation is unavailable, retain the prepared files and return the precise WAITING_TOOL.
+3. Obtain an explicit user content/upload confirmation for this current package through the supported platform confirmation capability. Initial SDLC intent, earlier destination settings, a previous revision's confirmation or a model-written label does not count. Reuse an existing actual confirmation only when it binds these same current files and revisions. The user may confirm several clearly identified current packages together.
+4. Resolve `exportPreparation.previewPath` to `<paths.historyRoot>/jira-preview.md` before saving. Keep this compact internal record: exact one-argument invocation, JSON path/revision, SPEC paths/file revisions, target/attachment summary and actual native-preview/confirmation evidence. Use the full resolved Workspace-relative path and verify the returned save path is inside historyRoot. Record exportPreparation.previewConfirmation as status=confirmed with storyJsonPath, storyJsonRevision, specFileRevisions entries {path,fileRevision}, and this actual recordPath. Native preview already exposes the full saved business content; do not copy/re-author JSON/SPEC bodies into another preview artifact. Never use a bare jira-preview.md or outputRoot fallback. If internal storage is unavailable, preserve the prepared package and return that precise WAITING_TOOL.
+
+An edit in the frontend changes the submission input. Return it to generation, align affected tests/SPEC/projection, independently verify changed business content, synchronize headers and obtain a new score and current-content confirmation. Destination/attachment/schema-only JSON edits still invalidate score and confirmation. Never modify, rename, normalize or reserialize JSON/SPEC between passing score and submission.
+
+## 2. Record the actual invocation and submit the unchanged path
+
+Resolve `paths.historyRoot` before any attempt save. When the export invocation is actually issued, allocate its next unused `<historyRoot>/jira-export-attempt-<nnn>.md` and increment exportAttempt once. Bind current scoreRecordPath/scoreAttempt, actual score input, matching Assembly section in preparation.md (or actual legacy record), review/global-coverage records, exact preview/confirmation and final read-back observations. Preserve the exact one-argument request and complete actual response/error in this same attempt and verify the returned save path. Completed attempts are immutable. Previewing, inspecting an old result, waiting/resuming and retrying a local save do not create another numbered attempt; a tool call never made has no export-attempt record.
+
+Immediately before submission read back the actual approved JSON and every scored/intended-upload SPEC and verify they still match those bindings and the confirmation. An immediately preceding complete current read can satisfy this check; neither stale snapshots nor counters alone do. Do not repeat another identical fetch without an intervening write or currentness gap. An update's root issueIdOrKey must be nonempty and equal the confirmed saved target; never remove it to pass create validation or redirect to another issue. Copy story_json_workspace_path unchanged from the passing score input and paths.storyJsonPath. attachmentsJson remains a native object in that file; do not pass it, issueIdOrKey or other direct content/routing/identity/attachment fields, SPEC parameters, requestJson/issuesJson or internal handoff/state metadata as extra tool arguments. Platform identity/session headers are not caller-generated arguments.
+
+Call the exporter once for this candidate. The backend must validate the stored score/current checksum/threshold, execute the supported issue/attachment operation, link the score record to the Jira ticket in the database and enqueue asynchronous Jira score synchronization. Agent-side PASS or a saved local report does not replace those backend effects. Do not issue B to perform them again.
+
+Multiple candidates use one path per sequential call, in confirmed selection order. Each has its own score and current-content confirmation. Stop further writes at the first failed/partial/unknown required synchronous outcome, preserving every remaining selected candidate. Confirmed queue acceptance with asynchronous sync still pending is not itself a submission failure.
+
+## 3. Read the complete response and record each effect
+
+Preserve the full raw result before interpreting it, including unknown fields/errors and returned service IDs. For an already decoded object serialize the whole object and label that mode; do not claim byte-verbatim text. Inspect nested business failures even when an MCP envelope has isError=false; status=400 or a checksum/threshold rejection is not success.
+
+Use the actual live response schema/guarantees. These are local observation categories, not invented backend field names:
+
+| Outcome | Evidence required |
 | --- | --- |
-| staffId, almType | Real nonempty staff ID and confirmed lowercase source. |
-| projectKey, issueType, summary, description | Create values; updates include only applicable authorized changes. issueTypeId is not an exposed export argument. |
-| issueIdOrKey | Exact reviewed update target. |
-| dynamicFieldsJson | Once-serialized supported fields, including separately mapped AC. |
-| attachmentsJson | Once-serialized authorized attachment plan; omit for none. |
-| issuesJson | Once-serialized nonempty item array for supported batch mode. |
-| conversationId | Real current context for Workspace attachment transport/binding. |
-| epicLink, parentLink | Dedicated direct relationship fields; omit Epic for explicit no-Epic. Updates change only reviewed authorized relationships. |
-| linkedIssueKeys, linkType | Dedicated direct fields only for reviewed authorized relationships; keys are a native string array. No standalone association flow. |
+| issue | Actual supported create/update success and unambiguous returned ticket identity/URL when exposed. An update's returned key must match its reviewed target. Do not infer keys from positions or ambiguous numbers. |
+| attachments | Each new upload and each selected old-ID removal, or a documented atomic guarantee covering those exact mapped operations. A new upload alone does not prove replacement; removal of an unselected/non-SPEC attachment is outside the approved plan. Zero uploads is N/A only when the authorized plan is empty. |
+| databaseLink | Explicit association evidence or a documented response guarantee proving score-record-to-ticket linkage. A ticket key alone does not prove it. |
+| scoreSyncQueue | Actual accepted/enqueued result or a documented guarantee. Keep the real queue/score record ID when returned; do not manufacture one. |
+| jiraScoreSync | Actual completed/failed/pending evidence. Queue PENDING/accepted proves scheduling, not a Jira UI score-field update. Without completion evidence report pending/unknown. |
 
-Single create uses direct fields; multiple creates use issuesJson with each item's own fields/attachments. Ordinary updates run one ticket at a time in preview order; stop on the first failed/partial/unknown operation. Only an explicitly requested mixed create/update batch may use integrated issuesJson; otherwise use separate previews. Never invent issues, requestJson or testDetailsJson arguments. **A never includes markdownReviewRelativePath.**
+An authoritative response may prove several effects when its documented semantics guarantee them; record that basis. A generic success with no such guarantee does not prove every effect. Missing optional IDs alone are not failure, but required effects without evidence remain unknown/pending.
 
-Before A:
+Preserve the full raw response once in the internal attempt record; save compact observed states/evidence pointers in state.writeResults rather than copying the response into several reports. Report confirmed keys/URLs, current deliverables, local SPEC synchronization, each required Jira SPEC upload/replacement outcome, linkage, queue, async state and exact pending work. Keep process-file links out of the default delivery list; provide them when requested or needed for diagnosis. Synchronous submission is complete only with confirmed issue, required attachments, linkage and enqueue; it may finish with score synchronization pending. A current local SPEC does not prove the remote SPEC changed, and a pending required SPEC operation prevents claiming full Story/SPEC synchronization. Explicit none reports remote attachments intentionally unchanged. Never state the Jira UI score is synchronized merely because the call returned or a queue row exists.
 
-1. Write/read back the single current `jira-preview.md`: candidate/operation/destination/update keys, applicable profile and settings confirmation, full effective Summary/non-AC Description/AC field mapping, metadata provenance, attachment operations/IDs/paths/names and serialized strings, and the exact complete direct-arguments payload. Do not duplicate full business bodies outside the payload.
-2. Save the exact preview, payload, current file bindings and preflight in the next numbered immutable A-attempt record under `.ceaia-work`. Preserve the complete actual response in that record after the call. Never overwrite a completed attempt.
-3. Immediately before calling, reread the exact payload and intended upload files; verify they match the preview. A change invalidates affected preparation: rebuild the current preview, retain prior attempt evidence and repeat preflight with a new numbered attempt. No internal handoff/score/state/profile metadata enters tool arguments.
-4. Call A directly after preflight; no additional final-approval popup follows settings confirmation. Inspect the returned issue and each requested attachment result separately. A's confirmed successful upload must never be uploaded again.
+## 4. Partial, failed or unknown outcomes
 
-## B — Bind each eligible ticket to its final saved score
+- A failed local response save retries that save, not the external operation. Preserve a received response even if later interpretation fails.
+- Known issue success with attachment, linkage or queue failure keeps the ticket and all confirmed uploads. Do not recreate/update it again or resend confirmed files to repair another effect. There is no automatic legacy B, generic-helper fallback or standalone upload/delete bypass.
+- Unknown timeout/connection loss is unknown, not not-started. Use only actually available supported read-only reconciliation. A Jira read may establish ticket/attachment state; it does not establish database/queue state. Without an unambiguous outcome or supported recovery interface, return WAITING_TOOL with exact pending effects; a vague continue does not establish idempotency.
+- A validation/checksum/threshold rejection requires actual evidence of whether any effect occurred. Return stale/invalid inputs upstream for bounded correction, affected review/scoring and fresh confirmation. Do not drop fields or alter a scored file at the submission step. Only documented failure proving no external effect permits a new attempt after the required correction/confirmation; no blind automatic retry.
+- Replacement removes only the selected old attachmentId after confirmed new upload. Failed/unknown upload retains its old originals. Confirmed upload with failed/unknown old-ID removal is partial: preserve successful uploads and remaining originals, reconcile uncertain removals through supported read-only evidence, and report unresolved selected IDs. Never re-export/re-upload confirmed success or delete non-SPEC/unselected files. The confirmed replace format introduces no standalone delete; absent an actually supported focused recovery contract, preserve both files and return precise WAITING_TOOL rather than invent a delete call.
+- Asynchronous queue processing is backend-owned. Do not invent polling/recovery tools, loop waiting for completion or re-export to nudge a job. Report actual pending/failed sync and a supported next action if one exists.
 
-A successful issue **and all requested attachments** are prerequisites. For each eligible item, match its actual returned ticketKey to the reviewed candidate and final Workspace score path; an update's returned key must equal its intended key. A missing, numeric-only, ambiguous or mismatched key blocks B; never infer keys from URLs or batch positions.
-
-**Call the same tool separately for every eligible ticket, with exactly these five nonempty direct strings:**
-
-```json
-{
-  "staffId": "<real current staff ID>",
-  "almType": "<confirmed lowercase source>",
-  "issueIdOrKey": "<A's actual returned Ticket Key>",
-  "conversationId": "<real current conversation ID>",
-  "markdownReviewRelativePath": "<this candidate's final scored STORY.md relativePath>"
-}
-```
-
-The path is the final scoring input Story, never a score-record file or another candidate's path. Match it to current score/state/review evidence. B has no content, attachment, dynamic-field, batch or relationship argument; do not substitute the standalone reviewer's four-field sync.
-
-The current numbered export attempt binds the final scoreRecordPath/scoreAttempt. A prior binding for the same path/Key is historical and cannot complete a new assessment/content operation. Keep the old outcomes; mark the new operation's binding pending until its own eligible B succeeds. Resuming the unchanged existing operation reuses confirmed A/attachments and performs only its missing B, without another score call.
-
-Preserve A's preview/payload/result in its attempt before replacing current jira-preview.md with B's exact five-field preview. Allocate/read back a separate numbered B-attempt record, call B and preserve its complete response. Batch A success still requires one B per eligible returned key/path; no top-level batch Story path is inherited. **B succeeds only when returned markdownReview explicitly confirms association.** Generic success or A success is insufficient. Item completion requires A, every required attachment, and B; profile persistence is reported separately.
-
-## Failure and recovery
-
-- Preserve distinct issue, per-attachment and binding results in writeResults and numbered attempt evidence. Report every real key/URL, pending operation and sanitized error; failed/partial/unknown is never complete.
-- Do not automatically resend external writes, uploads or bindings. Reconcile partial/unknown outcomes through supported read-only means before a bounded recovery decision. Numeric status=400 is business failure even when isError=false.
-- A success plus B failure/unknown keeps the ticket/attachments intact and binding pending. Recovery is B-only with a fresh exact five-field preview and new B-attempt; never recreate/rewrite the issue or re-upload to repair binding.
-- Issue success plus failed/unknown attachment preserves the issue, reconciles only that attachment, and does not enter B. For replace, old deletion waits for confirmed new upload. Never replay confirmed success.
-- Only documented field-validation failure proving no external write permits one affected metadata refresh. Rebuild/preview; any further write waits for the user's bounded recovery decision and a new read-back/preflight attempt. No automatic retry or generic fallback.
-- Persist eligible reusable profile facts only after issue plus all required attachments succeed. B pending may coexist with that valid profile; profile-write failure never causes replay. Follow workspace-profile.md.
-
-If the tool contract cannot establish the result or a supported recovery method, record the exact WAITING_TOOL/user decision; never fabricate service IDs, database success or a replacement schema. Local records are audit evidence, not proof of a remote operation. Whether create metadata establishes edit capability, which final score row B selects, and unknown-operation idempotency require actual platform evidence; do not remove calls or invent capabilities to resolve these uncertainties.
+Local records/counters are audit evidence, not remote locks or database proof. Missing schema/result/recovery capability is a precise tool gap, not permission to fabricate success. Preserve all known/unknown outcomes on resume. After independently eligible issue/required-attachment success, save only the upstream profile snapshot under [profile persistence](workspace-profile.md); its save failure is separate from the remote operation.

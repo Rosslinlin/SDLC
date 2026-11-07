@@ -1,58 +1,24 @@
-# Flow Create Issue
+# Create a Jira issue
 
-## Scope
+Use for a new ordinary Jira issue or an authorized request to generate its content. Structured Test Case sources use [their own flow](flow-testcase-source-export.md).
 
-Use this module when the user asks to create, generate, export, or submit a new Jira issue, including a user story, task, bug, epic, or similar issue type.
+## Reuse a prepared issue file
 
-Also load:
+Read the complete selected JSON and its actual Workspace path under [the file contract](common-json4jira-contract.md). If its create intent, destination, type and required field facts are established, retain it unchanged and skip project/type/metadata discovery. Do not regenerate its Summary, Description, AC or Jira-wiki presentation.
 
-- `common-tools-and-inputs.md`
-- `common-state-and-user-info.md`
-- `common-project-issue-type-validation.md`
-- `common-field-assembly.md`
-- `common-jira-text-rendering.md`
-- `common-preview-confirm-export.md`
-- `common-guardrails.md`
+A create file omits root `issueIdOrKey`. A file that already names an actual update target needs the [update flow](flow-update-issue.md) and matching user intent; never delete its target merely to make it export as create. Resolve a destination or operation conflict before submission.
 
-## Recognize New-Issue Intent
+## Prepare only missing inputs
 
-Treat these expressions as new Jira issue intent:
+1. Read current confirmed context and the real user-workspace profile under [configuration reuse](common-state-and-user-info.md).
+2. Resolve only missing project, issue type or field facts under [discovery](common-project-issue-type-validation.md). A known complete file/profile does not need a fresh query chain.
+3. Assemble one real `.json4jira` under [field preparation](common-field-assembly.md). Preserve supplied export-ready business content. Generate new content only within the user's actual generation request; identify it as generated in the preview. Do not invent unknown business rules to satisfy required fields.
+4. Complete applicable non-Test [Jira text rendering](common-jira-text-rendering.md) during this preparation. Save and read back the final file before preview and confirmation.
 
-- create Jira issue / generate Jira / export Jira / submit Jira
-- Create a user story about ...
-- write a user story for ...
-- generate a story / task / bug / epic from a business request
+## Confirm and submit
 
-After recognizing new-issue intent, generate content and a preview first. Final submission still requires explicit confirmation.
+Use [assessment evidence](story-assessment-evidence.md) when an upstream Story result is present. Keep current evidence accurate and identify an old result as historical; the project/backend decides whether scoring is required. This helper does not preblock an unscored Story, impose a threshold, or automatically invoke scoring/reviewer before export.
 
-## Known-State Shortcut
+Use [attachments](common-attachments.md) only for actual selected uploads; ordinary issue creation does not generate or require a SPEC. Establish the final upload list before current-content confirmation. If it changes an assessed input, do not claim that earlier assessment is still current.
 
-If conversation state already has `staffId`, `almType`, and selected `projectKey`:
-
-1. Do not ask for source or project keyword again.
-2. Do not call `queryJiraProjectsByName` again.
-3. Directly call `queryJiraIssueTypesByProject` with `staffId`, `almType`, and the selected `projectKey`.
-4. Continue with issue type selection, metadata, field assembly, preview, and confirmation.
-
-Follow `common-state-and-user-info.md` before any popup.
-
-## Standard Flow
-
-1. Collect or reuse `staffId`, Jira source, and project keyword according to `common-state-and-user-info.md`.
-2. Validate and select the project according to `common-project-issue-type-validation.md`.
-3. Query and select issue type according to `common-project-issue-type-validation.md`.
-4. Call `queryJiraCreateMetaFields` with `staffId`, `almType`, selected `projectKey`, and selected `issueType` or `issueTypeId`.
-5. Assemble required fields, optional fields, summary, description, labels, and `dynamicFieldsJson` according to `common-field-assembly.md`.
-6. For a non-Test issue, render Markdown-authored Jira-visible rich text according to `common-jira-text-rendering.md`. Do not apply that module to Test Case content or fields.
-7. For a Story with prior Workspace scoring evidence, read [generic Story score binding](generic-story-score-binding.md) before preview and bind only after a successful export.
-8. Write `jira-preview.md`, show the exact transport-rendered values in the conversational preview, ask for confirmation, submit, and handle results according to `common-preview-confirm-export.md`.
-
-## User Story Generation Requirements
-
-When the user asks to create a user story, generate Jira-friendly content:
-
-- `summary`: Cover the core business capability clearly and concisely.
-- `description`: Use `As a [persona], I want [feature], so that [benefit].`.
-- `acceptance criteria`: Cover key paths while avoiding unsupported business assumptions.
-- metadata-derived fields: Assemble automatically from metadata.
-- labels: Include other requested or required labels only; the backend adds `CEAIA_GEN`.
+Follow [preview, confirmation, submission and recovery](common-preview-confirm-export.md). Present the actual saved file, obtain/reuse confirmation for this current content, and call `java-base-mcp.exportjirabydynamicfield` with only its `story_json_workspace_path`. Every Story uses its own issue-file path and individual call; multiple Stories follow [the ordered submission plan](flow-batch-export.md), never a manifest. Preserve the actual response and each observed outcome. A backend score-required rejection remains precise pending work; refer to reviewer when the user requests assessment, without an automatic score/export loop. No additional score-binding or ticket/source synchronization call follows this JSON export.

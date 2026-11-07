@@ -1,61 +1,56 @@
-# Existing-ticket updates
+# Preserve existing-ticket intent in the JSON route
 
-Read workflow-contract.md for source-qualified latest-output paths and retained internal records. Preserve each target's baseline plus supported requested delta; never merge tickets or implicitly create new tickets.
+Read [workflow](workflow-contract.md) and [assembly](jira-json-assembly.md). An explicit update never becomes a create; preserve each source+ticket identity and original obligations unless the user approves a specific change.
 
-## U1 — Intake
+## Intake once per current baseline
 
-1. Confirm source independently for each ticket before reads.
-2. Request description and AcceptanceCriteria separately through java-base-mcp.getJiraInfos.
-3. Read all attachment inventory through java-base-mcp.readJiraAttachments before planning/selecting replacements. Reuse one completed intake result per target/current baseline, not one call forever. A technical failure or reconciliation after partial write may require a supported, bounded re-read.
-4. Read every returned imported readable attachment at its workspace-relative path. Record relevance or reason for non-applicability for each; preserve every skipped file and reason.
-5. Store original description and AC result under <internalRoot>/intake/. Imported files remain at returned paths, unmodified as source evidence.
+1. Confirm each source before Jira reads. Use getJiraInfos for Description and Acceptance Criteria separately; use readJiraAttachments for the complete inventory, including zero attachments.
+2. Preserve returned baseline/inventory and generated evidence copies under this candidate's historyRoot, using actual full Workspace-relative paths. Preserve original user-provided evidence at its own source path. Keep actual attachment IDs/names/relevance/skip reasons. Read every relevant readable attachment once; material skipped/unreadable evidence needs a supported handling decision.
+3. Save baseline paths/statuses and actual target project/type/relationships/fields in exportContext. Reuse completed intake; do not repeat remote reads merely because another Skill/stage is invoked. Missing unsupported remote fields remain unavailable, not fabricated.
+4. A usable Description with empty/unavailable separate AC can proceed after inspecting embedded criteria. Unusable Description or incomplete relevant inventory blocks that target. Known external changes require reconciliation before overwriting.
 
-Retain exportContext pointers to this completed Description/AC and attachment inventory. Record actual returned or explicitly confirmed target project/Story type and known current Epic/Parent/metadata values with retrieval/confirmation status; mark unavailable facts explicitly. Do not add unsupported Jira field arguments or invent missing values. These facts accompany the final reviewed handoff so export reuses intake instead of repeating remote reads. Missing destination facts may be clarified at export; an unknown unchanged field remains untouched.
+Before field discovery, read the real user-workspace profiles under [assembly](jira-json-assembly.md). Reuse same-user/source/project/type stable components even when their successful profile was recorded for create. Use actual baseline project/type facts as additional evidence. Switching to update is not a reason to repeat the three discovery queries. Profiles never replace reading this ticket's current Description/AC and relevant attachments, nor prove edit permission.
 
-Reader input follows the live schema, with ticketKey, source, and current conversationId only when runtime requires it. It returns relativePath, attachment ID, name, MIME, size, import/skip status; do not invent missing fields. Never use download URLs, guessed IDs or user-entered IDs as substitutes.
+## Approved delta and transport support
 
-If description exists but separate AC is empty/unavailable, record empty-or-unavailable and inspect embedded criteria; continue. If AC was returned, preserve that actual status/value. Unusable description blocks baseline replacement. Failed/incomplete inventory blocks update until resolved; zero attachments is a valid completed inventory.
+Keep the Plan section of <historyRoot>/preparation.md and <historyRoot>/update-manifest.md: target/source, baseline pointers, original obligation → preserved/explicitly changed/clarification, approved delta and Summary decision, actual attachment IDs → output mappings, and material questions. Point the manifest to shared preparation facts instead of duplicating their whole tables. Reuse unchanged records on resume; a real decision updates the affected version-bound section, not another numbered plan file. Score/audit data stay in actual invocation records under historyRoot.
 
-Potentially relevant skipped attachments require readable content or an explicit evidence-supported handling decision. Do not equate unsupported file type with irrelevance.
+Preserve Summary, priority/assignee/labels/custom fields/status/links and Epic/Parent unless explicitly authorized within the reviewed delta. Settings/default adoption cannot broaden scope. Broad inherited sizing alone never authorizes new tickets or removal of requirements.
 
-## U2 — Change scope and manifest
+## Identify SPEC originals before selecting replacements
 
-Before generating a replacement, build <internalRoot>/update-manifest.md with:
-- source, exact ticketKey, source-confirmation evidence and retrieval statuses;
-- original baseline paths, incremental requirements and relevant imported/skipped inventory;
-- preservation matrix: baseline obligation → preserved/explicitly changed/clarification, with evidence;
-- summary decision (unchanged unless replacement is explicitly supplied or reliably supported);
-- attachmentAction, selected filename/returned ID, replacement SPEC path/name or none;
-- proposed current Story path, concise business change summary and unresolved decisions.
+Bind each candidate original to the confirmed source+ticket, its actual reader-returned attachment ID, name and imported path. Read that exact original's complete content and establish that it is a specification for this target and affected scope, using its purpose, business obligations and actual ticket/source context. A name containing spec, a Markdown extension, MIME, list position, apparent recency or content copied from another ticket is not sufficient. Legacy SPECs need not follow today's template or filename rules. Reading a requirements document, screenshot or test attachment as evidence does not authorize replacing it.
 
-Score paths/values/checksums/audit IDs do not belong in this manifest. They are in state.json and the score record, accessible to review via statePath.
+Keep a compact classification in the existing update manifest; reference it from preparation rather than duplicating it:
 
-The current tool contract does not guarantee current summary retrieval. Do not invent it. Never change unrelated priority, assignee, labels, custom fields, status or issue-link associations in the bundled update mode. The reviewed Acceptance Criteria field mapping remains supported. Preserve Epic/Parent by default; a relationship or required-metadata change needs explicit authorisation in the reviewed update scope before handoff. A saved create default or export settings confirmation never grants that authorisation. Unsupported fields remain untouched.
+| Original ID / name / imported path | Classification and content/source evidence | Disposition / current SPEC output |
+| --- | --- | --- |
+| Actual inventory entry | Confirmed related SPEC / other evidence or unrelated attachment / unresolved possible SPEC | Exact ID → output path/name for a selected SPEC; otherwise preserve with reason |
 
-Inherited broad baseline scope is not by itself a reason to split into newly created tickets. Preserve commitments; flag scope adjustments for a user decision when needed. Do not delete old requirements to improve the score.
+Only confirmed related SPECs with current content-to-ID bindings may enter attachmentReplacementMapping. Preserve all other IDs. A potentially relevant skipped/unreadable attachment, missing ID/content binding or ambiguous duplicate name remains unresolved: obtain readable evidence or a focused original selection, not a guessed deletion target. Do not interpret unresolved or incomplete inventory as no SPEC and fall through to add. If several confirmed SPECs have distinct relevant contents, preserve each file's obligations and map each selected original separately; many-to-one needs explicit reviewed authorization.
 
-## U3 — Attachment action
+## Story and SPEC change together
 
-Decide before Story generation:
-- `none`: no attachment write intended (including description-only/zero-attachment updates). Record an empty replacement mapping. Story Attachments says no attachment changes; it must not name the generated workspace-only SPEC as an uploaded attachment. Still generate and review the local SPEC and tests.
-- `replace`: replace each explicitly selected existing SPEC using its corresponding reviewed output SPEC. Propose a uniquely evidenced target; when ambiguous show filenames, MIME and purpose in a selector, keeping returned IDs internal. Final preview and export preflight confirm each selection.
+An SDLC Story update includes automatic consistency of its local SPEC and tests; the user does not need to say update SPEC. For changes to Summary, Description, AC, scope, behavior or other business fields, update every affected Story projection, SPEC section, FR/SC/flow and test/embedded table from the approved delta, preserving original obligations. Reuse the current local SPEC when available; otherwise derive it from the actual baseline, relevant original SPECs and approved change. No original SPEC does not waive producing a current one. Read back all related SPECs before review/score. If a field change has no SPEC meaning or the content already agrees, record the check and keep that content unchanged rather than manufacturing edits.
 
-One ticket has one current Story and Test Case set, with a primary SPEC and additional distinct replacement SPECs when requested. Do not ask the user to discard a requested replacement merely to fit a single-SPEC assumption. Different content requires separate reviewed files, not separate Jira tickets.
+Remote attachment intent is a separate decision with the following defaults for a business Story change:
 
-Before Story generation, establish all intended final basenames and explicit original attachment ID → replacement relativePath/fileName mappings. The planned SPEC files are created before independent content review and final Story scoring. Story Attachments lists only the intended uploads. Use unique filenames under the same outputRoot.
+| Actual inventory / explicit request | Internal action and plan |
+| --- | --- |
+| Related existing SPEC(s) | replace: automatically include the affected originals and their updated output mappings. User wording need not mention SPEC. Retain source-specific details and unrelated attachments. |
+| Complete inventory establishes no related SPEC and no unresolved possible SPEC | add: generate the first SPEC and use attachmentsJson.add with its actual relativePath/fileName. This does not create another Story. |
+| User explicitly asks to preserve remote attachments / no remote SPEC change | none: attachments=[] and no attachmentsJson, while the local SPEC and tests still follow the changed Story and are reviewed/scored. Report that the remote SPEC was intentionally left unchanged. |
 
-Record every current SPEC in state.specArtifacts (including the primary paths.specPath) with path, fileName, uploaded, bodyRevision, fileRevision. Keep attachmentReplacementMapping entries with attachmentId, relativePath, fileName. IDs come only from the reader. If multiple originals intentionally receive one file, require explicit many-to-one confirmation; otherwise mappings are one-to-one. Document per-original baseline preservation.
+Do not use none merely because the request mentions only the Story, Description or AC. Present the derived SPEC upload/replacement plan in the final current-content confirmation rather than asking whether ordinary local synchronization is wanted. If several originals could represent the same related SPEC, ask only which original to use; do not guess from duplicate filenames or merge distinct obligations. No new business fact may be invented to fill a SPEC.
 
-Each final SPEC follows the active template, embeds current shared Story and test table, declares shared FR coverage, and preserves its own source-specific details. Review every file and mapping; bind every SPEC body in reviewedSpecArtifacts and every final uploaded file in export preparation. A primary SPEC PASS is never sufficient for an unreviewed secondary file.
+Use [confirmed attachment operations](jira-json-assembly.md#4-confirmed-attachment-operations): root attachmentsJson.replace entries carry each selected SPEC's actual readJiraAttachments attachmentId plus reviewed output relativePath/fileName. The user has tested this format; do not block normal replacement on another schema/capability proof. The update template defaults to this replace object, not an upload-only path list. Preserve original content/ID/source+ticket bindings; the backend replaces by uploading successfully before removing only the mapped old ID and keeps unrelated originals. Failed/unknown upload leaves the old file; successful upload with failed/unknown old removal remains partial. Record separate effects and recover only pending work without replaying a successful Story write or upload; no standalone deletion or legacy API.
 
-No safe existing target when action=replace is a blocker. Do not silently switch to none, add a new attachment or delete an attachment. A requested new attachment is outside this bundled update surface and needs an explicitly chosen supported workflow.
+Use the [update JSON template](../templates/story-update-json-template.json): root issueIdOrKey, placed after jiraInstance/projectKey/issueType, is the exact confirmed existing ticket key (uppercase I in Id). This selector is user-confirmed backend support; a basic update no longer waits for an unknown target-property name. Verify it against the actual baseline and exportContext.target.ticketKey before review/scoring/export. A cited evidence ticket, key prefix or cached profile cannot select the update target. Creates omit this property; a missing/empty/mismatched update value blocks the update and never becomes a create.
 
-Reader evidence is immutable; write replacement content under outputRoot. Upload replacement first and remove the selected original only through the approved replacement API, not a separate inferred deletion.
+Both modes use root acceptanceCriteria as the real AC field-ID string and Jira wiki content at fields[acceptanceCriteria], with no customFields wrapper, fields.reporter or root staffId. Keep the scoreable supported business view and preserve unchanged baseline values; include only approved changes and fields allowed by the actual update contract. Do not copy create defaults or treat create metadata as edit permission. Omission must preserve remote values where supported, not silently clear them.
 
-## U4 — Generation, review, handoff
+Assemble the confirmed attachment representation before scoring: add/replace uses the root attachmentsJson object and omits the old attachments path array; explicit none uses attachments=[] and omits attachmentsJson, with no empty-object sentinel. The synchronized local SPEC still uses specFilePath for scoring. Missing original identity/content or ambiguous targets remain precise waits; an actual backend rejection is recorded and handled from its real error. Do not invent other controls, override an explicit none or fall back to an old field-based call. issueIdOrKey and attachmentsJson stay inside the scored JSON, never beside its path as extra score/export arguments.
 
-Use normal planning, artifact generation, independent content review, SPEC status synchronization, final Workspace Story scoring and repair gates in that order. Story changes preserve baseline and update only supported behavior. Review checks original description, available AC, every relevant readable attachment, preservation matrix and action-specific mapping.
+## Generate, review and score
 
-A none mapping is resolved and can yield updateReady=true. A replace mapping must be fully resolved before PASS. Send statePath, exportContext baseline/inventory pointers and the reviewed manifest to `ceaia-sdlc-jira-export`; generation never calls the Jira export tool directly. Normal export does not retrieve the same ticket fields or attachment inventory again. Explicit recovery or known external changes may require the bounded read-only reconciliation below.
-
-If a ticket changed externally before submission, reconcile the current baseline and rerun affected preservation/content review. Do not overwrite concurrent user changes from stale intake. Maintain ticket/source-specific status and exact affected paths.
+Assemble the confirmed update JSON and its exact attachment operations during generation; automatically synchronize tests/SPEC business views before review or scoring. Read/review every current SPEC, synchronize Result/Notes, call scoreUserStory with JSON path + status + primary SPEC path, then freeze inputs. No Story score is written into SPEC. Hand the exact package, baseline and actual original-content/ID → output mapping to the path-only exporter for final content confirmation and submission. No routine intake repeats at export, and no automatic retry after an unknown remote result.

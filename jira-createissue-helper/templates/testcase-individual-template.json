@@ -1,0 +1,17 @@
+{
+  "jiraInstance": "<confirmed lowercase source>",
+  "projectKey": "<actual project key>",
+  "issueType": "<actual Test issue type name>",
+  "fields": {
+    "summary": "<source Test Case Title exactly>",
+    "description": "<source Test Case Title exactly>",
+    "labels": ["CEAIA_GEN"]
+  },
+  "testDetailsJson": [
+    {
+      "step": "<complete source step or safely paired step block>",
+      "data": "<matching source Test Data; empty string when absent>",
+      "result": "<complete matching source expected result>"
+    }
+  ]
+}

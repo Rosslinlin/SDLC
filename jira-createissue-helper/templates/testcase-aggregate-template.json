@@ -1,0 +1,10 @@
+{
+  "jiraInstance": "<confirmed lowercase source>",
+  "projectKey": "<actual project key>",
+  "issueType": "<actual Test issue type name>",
+  "fields": {
+    "labels": ["CEAIA_GEN"],
+    "summary": "<approved aggregate title>",
+    "description": "|Test Case Id|Test Case Description|Preconditions|Test Steps|Expected Results|\n|<source ID>|<source Title>|<source Preconditions>|<source Test Steps>|<source Expected Results>|"
+  }
+}

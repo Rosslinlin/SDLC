@@ -1,24 +1,33 @@
-# v6.0 功能归属
+# v6.1 JSON4Jira flow 功能归属 — preview
 
-当前活动包：`ceaia-sdlc-story-spec-generation`、`ceaia-spec-review`、`ceaia-sdlc-jira-export`。运行目标为平台 GPT-5.6 Luna / GPT-6 Luna，全部采用文本资源和现有工具。
+版本 `6.1.0-preview.7`，当前主分支为 `main`；2026-11-07 合入原 `codex/sdlc-json4jira-flow` 重构版本。本表描述路径接口的职责与待验证边界，不代表真实后端已全部通过。
 
-| 能力 | 唯一职责 / 参考 | v6 行为 |
+| 能力 | 唯一职责 / 参考 | 当前行为与边界 |
 | --- | --- | --- |
-| 主链、状态、失效与续跑 | generation [workflow-contract](ceaia-sdlc-story-spec-generation/references/workflow-contract.md) | Task/普通对话同序；逐候选串行准备含 review/score，全部选定候选和整批覆盖通过后导出；默认全流程。 |
-| 固定内容标准 | generation [quality-contract](ceaia-sdlc-story-spec-generation/references/quality-contract.md)；review 内同文副本 | Q1–Q7 在生成前加载并供独立审查复用；不新增 Skill，不计算本地分数。 |
-| 来源与拆分 | generation [source-enrichment](ceaia-sdlc-story-spec-generation/references/source-enrichment.md) 和 [authoring](ceaia-sdlc-story-spec-generation/references/artifact-generation-rules.md) | 原始要求有明确去向；不从 UI 推断后台、不按 AC 数机械拆分、不发明缺失事实。 |
-| 现有 Jira 更新 | generation [existing-jira-update](ceaia-sdlc-story-spec-generation/references/existing-jira-update.md) | 显式 source+target、原 Description/AC 状态、完整附件清单；保留义务，主链 none/replace，多份不同替换 SPEC 独立保留。 |
-| 产物与生产检查 | generation 模板及 authoring | 最新 Story/Test Case/SPEC；11 列测试表、实际 `*-spec.md`、镜像和路径一致性集中检查，不能冒充业务审查标准。 |
-| 独立内容审查 | review [contract](ceaia-spec-review/references/review-contract.md) / [report](ceaia-spec-review/references/review-report-template.md) | 独立读来源与当前内容；Q1–Q7、具体问题、全部 SPEC 绑定/保留结论；无评分、预算、readiness兼容字段或标题禁词门禁。 |
-| 局部修复与澄清 | generation workflow-contract / [clarification](ceaia-sdlc-story-spec-generation/references/user-clarification-and-resume.md) | 每 candidate/evidenceRevision 两批内容修复共享 review/score；纯机械原因另限一次且保留失效规则。缺事实只问具体问题，续跑不重置预算。 |
-| 真实评分及完整记录 | generation [scoring-tool-contract](ceaia-sdlc-story-spec-generation/references/scoring-tool-contract.md) | Workspace Story + 主 SPEC 的 Pass/path；实际 `ok=true`、数值 76–100 与 parser/AC有效；完整原始响应单调编号保留。 |
-| SPEC 状态/分数及最终元数据 | generation [spec-score-display](ceaia-sdlc-story-spec-generation/references/spec-score-display.md) | S1 后写真实总分，仅必要时以正常缓存 S2 完成最终元数据；不以显示值替代评分，也不删除持久化调用。 |
-| handoff与字段传输 | exporter [handoff](ceaia-sdlc-jira-export/references/handoff-and-content.md) / [fields](ceaia-sdlc-jira-export/references/fields-and-rendering.md) | 核对当前证据，不重做业务review或常规远端intake；非AC与AC分字段，Jira wiki无损转换，保留AC后的章节。 |
-| 跨会话配置 | exporter [workspace-profile](ceaia-sdlc-jira-export/references/workspace-profile.md) | 真实用户工作区精简profile；完整命中跳过发现查询，不按TTL刷新；每次确认实际设置，首次create解决Epic/no-Epic。 |
-| 附件 | exporter [attachments](ceaia-sdlc-jira-export/references/attachments.md) | 仅授权的SPEC；replace先确认上传再删旧，逐原件映射，成功附件不重传。 |
-| Jira A / 数据库 B | exporter [write-and-recovery](ceaia-sdlc-jira-export/references/jira-write-and-recovery.md) | A不带评分路径；每项A及附件成功后单独五字段B，验证markdownReview；逐项记录partial/unknown，失败不重放成功步骤。 |
-| 旧状态迁移 | generation workflow-contract | 记录旧状态并保留来源、版本、计数、元数据及所有已知/未知远端结果；不靠调用重放迁移。 |
+| 主链、状态、失效与续跑 | generation [workflow-contract](ceaia-sdlc-story-spec-generation/references/workflow-contract.md) | Task/普通对话同序；所有用户默认 Jira-backed 完整流程，入口不提供路线选择；最终已评分内容仍须 HTML 预览与明确确认。逐候选准备，保持阻塞项，导出前核对全部选定范围。 |
+| 默认入口与缺项补齐 | generation intake/assembly | 先读真实 Workspace 配置/可信身份，只问尚缺的来源、staffId、项目名称/已知 key 或实际项目选择。类型/schema/AC ID 由查询工具取得，不要求业务用户填技术 ID。缺信息保留默认 Jira 意图，不推荐 preparation-only；仅遵从用户主动明确的只准备/不导出，且不伪造完整可评分 JSON。 |
+| 固定内容标准 | generation [quality-contract](ceaia-sdlc-story-spec-generation/references/quality-contract.md)；review 内同文副本 | Q1–Q7 不另增标准；检查 JSON 业务内容、SPEC 投影和测试，不增加本地评分或第四个 Skill。 |
+| 来源与拆分 | generation [source-enrichment](ceaia-sdlc-story-spec-generation/references/source-enrichment.md) / [authoring](ceaia-sdlc-story-spec-generation/references/artifact-generation-rules.md) | 原始要求有明确去向；不从 UI 推断后台，不按 AC 数拆票，不发明缺失业务事实。 |
+| 前置项目/type/meta 与缓存 | generation | create/update 均先读真实 user Workspace profiles.json，同用户/source/project/type 的稳定项目/类型/AC 映射按组件跨模式复用，不因旧 profile 只有 create capability 重跑三 query。权限、requiredness、操作/default 按模式区分；缺项、不适用、显式刷新/目标变化或真实 schema 错误才定向 query，不按 TTL 刷新。baseline/附件读取独立保留；export 不重新发现字段。 |
+| JSON 字段结构与取值 | generation assembly/precheck；reviewer 读取 | 根级为 `jiraInstance/projectKey/issueType` 和实际 AC 字段 ID 字符串 `acceptanceCriteria`；不使用 `customFields` 包装，不提交根级 `staffId` 或 `fields.reporter`。身份配置和查询工具所需员工号仍按实际 schema 保留。业务值在 `fields`；AC 正文为 `fields[acceptanceCriteria]` 的 Jira wiki 字符串。project/issuetype 与实际目标一致；取消旧顶层 summary/description/AC 正文或数组/BDD，不硬编码示例 ID。结构问题回到生成处理，不增加 Q1–Q7。 |
+| Jira 文本格式 | generation assembly/precheck | 评分前将 description、映射 AC 及 metadata 确认的其他获准富文本写成 Jira wiki：标题 `h1.`/`h2.`，AC 如 `* *AC-001*: Given ...`；保留措辞、顺序、换行、代码及每条 AC。普通文本、summary、身份/路由/选项和未改动更新字段不转换；export 不再加工。 |
+| 单一 Story 业务源 | generation 模板及 authoring | 每候选一个最终 `story.json4jira`；取消独立 `STORY.md`。业务内容和获准的提交/附件配置由 live schema 约束，不能凭旧 direct 参数猜 JSON 字段。 |
+| 创建/更新路由 | generation create/update JSON 模板；exporter 核对 | 创建省略 `issueIdOrKey`；更新在 issueType 后加入该根级字段（大写 I），值为实际已确认票号，与 source/target/baseline 一致。两种操作共用 JSON 路径评分、确认和导出；工具参数不增加票号，更新不能省略目标回退创建，返回 key 必须匹配。 |
+| 测试与 SPEC | generation | Story 业务变化自动同步本地 SPEC、受影响 TEST_CASE.md 和 Markdown 投影，无需用户提 update spec；每个相关 SPEC 保留原有义务、读回并与当前 JSON 对齐。none 仅控制远端附件，本地仍同步；纯路由/schema 只核对，不制造业务改动。SPEC 不显示分数。 |
+| 独立内容审查 | review [contract](ceaia-spec-review/references/review-contract.md) / [report](ceaia-spec-review/references/review-report-template.md) | 独立读取原来源、JSON 的实际 fields 业务值和所有当前 SPEC/测试；先解析 AC 字段映射再读正文，不将字段 ID 当业务文字；返回 Q1–Q7 内容结论及绑定，不评分、不管理预算/导出就绪、不把机械偏好升级为业务阻塞。 |
+| 局部修复与澄清 | generation workflow-contract / [clarification](ceaia-sdlc-story-spec-generation/references/user-clarification-and-resume.md) | review/score 共用两批内容修复；每个机械原因另限一次，仍保持变更失效。缺事实只问所需事实，续跑不重置计数。 |
+| 路径评分与完整记录 | generation [scoring-tool-contract](ceaia-sdlc-story-spec-generation/references/scoring-tool-contract.md) | `scoreUserStory(story_json_workspace_path, specFileStatus, specFilePath)`；真实输入/完整响应保留，同一候选的最终评分路径必须等于导出路径。 |
+| 评分与确认失效 | generation + exporter | JSON、已评分 SPEC、附件选择或目标字段改变后更新受影响投影/测试、执行所需独立复审和评分，并取得新内容确认。不得以旧 path 字符串相同代替当前内容有效。 |
+| 前端 HTML 预览与明确确认 | exporter [handoff](ceaia-sdlc-jira-export/references/handoff-and-content.md) | 展示本次已评分业务内容、目标和附件操作；用户明确确认当前内容后才导出。初始意图、缓存设置或旧确认不能替代。 |
+| 单路径导出 | exporter [write-and-recovery](ceaia-sdlc-jira-export/references/jira-write-and-recovery.md) | `exportJiraByDynamicFields` 只传 `story_json_workspace_path`；根级 `attachmentsJson` 对象在已评分文件内，不是额外工具参数。不再发送 direct fields、旧 `issuesJson`、五字段 B 或 `requestJson`。 |
+| 后端评分检查与写入 | 新导出后端 | 校验 score checksum/threshold，写入 Jira 及要求附件，回填数据库关联、入异步队列；本仓库保存真实请求/响应，不能凭一般 success 代替分项证据。 |
+| 分项结果 | exporter | issue、attachments、linkage、queue、async sync 各自记录真实成功/失败/未知/待处理。入队不等于 Jira UI 分数同步完成；后端未确认时不得补造完成状态。 |
+| 批量执行与恢复 | exporter | 每候选一个 JSON、默认逐票导出，保持选定顺序与个体结果。失败/partial/unknown 按契约停止或核对；不重放未知/成功写入，不因关联/队列问题重建票据。 |
+| 现有票与附件边界 | generation [existing-jira-update](ceaia-sdlc-story-spec-generation/references/existing-jira-update.md)；exporter | 保留 source+target、baseline/AC 状态及完整附件清单。业务 Story 变更默认相关已有 SPEC→replace、无相关 SPEC→add。2026-11-06 用户实测确认文件内根级 `attachmentsJson` 对象沿用 `add`/`replace`：条目含 `relativePath`/`fileName`，replace 另含 `attachmentId`，原ID来自 `readJiraAttachments` 的同source/同票原件。先读原文确认SPEC身份，非SPEC、无关和未选项保留；distinct原件保留各自输出映射。使用该对象时禁止再用非空 `attachments` 数组重复上传。 |
+| 显式保留远端附件 | generation + exporter | 用户明确不改远端附件才 none：`attachments: []` 且省略 `attachmentsJson`；本地SPEC/测试仍同步、审查，并通过 `specFilePath` 评分，无额外score-only能力证明。 |
+| 附件替换确认与结果 | generation assembly；exporter结果核对 | 普通replace格式已确认，不再以schema未知或重复能力证明阻塞。最终预览展示实际原ID→输出及保留项；删除属于replace后端效果，不新增独立delete操作。真实服务错误、上传/旧件移除失败或未知仍分别记录，部分成功不称全完成，不重放已成功操作、不猜恢复或回退create。 |
+| 旧会话/接口迁移 | generation workflow-contract | 保留原状态、编号记录、消耗计数及全部远端结果；旧 Markdown 评分/五字段绑定不能当新 JSON 评分证据。迁移不自动重放外部操作。 |
 
-`planning-and-scoring.md`、`business-planning-checklist.md`、`validation.md` 的活动规则已归并到对应权威文件，不再作为独立必读清单。模板负责布局，内容标准负责质量，编排负责阶段和预算，工具协议负责调用及持久化。
+移除的是独立 Story Markdown 及派生分数显示链，不是评分与数据库保存职责。新接口由后端承担的 checksum 检查、关联与队列处理必须以实际证据分别确认；不再由前端额外执行旧 S2/B。
 
-独立包保持原文件：通用 Jira/Test Case 使用 `jira-createissue-helper`，独立评分使用 `user-story-reviewer`，独立需求/任务拆分审查使用 `review-requirements`。它们不替代本链路的评分或 reviewer；旧 SDLC gateway 仅在明确选择 legacy 时使用。平台集成证据按 [测试清单](PLATFORM-TEST-CHECKLIST.md) 记录，本文件不代表已完成实测。
+三个独立包 `jira-createissue-helper`、`user-story-reviewer`、`review-requirements` 完全不改；本分支不扩写其旧工具路由。真实平台、两种 Luna 模型及后端验证结果统一记录在 [测试清单](PLATFORM-TEST-CHECKLIST.md)，旧 v6 本地检查仅为历史记录。

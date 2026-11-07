@@ -1,96 +1,31 @@
-# Common Attachments
+# Attachment preparation and recovery
 
-Use for add, delete and replace operations. Preview is mandatory. Generic routes require explicit confirmation; the validated SDLC gateway uses its final read-back/preflight and direct-export rule.
+Read only when the user selects attachment add/delete/replace. Ordinary issues do not generate a SPEC or replace attachments by default. The [Test Case flow](flow-testcase-source-export.md) omits attachment controls from its two fixed file shapes.
 
-- Process attachments only after successful issue create/update.
-- Never merge attachment instructions into dynamic fields.
-- New issues support `add` only.
-- Delete/replace require `issueIdOrKey` and validation that the attachment belongs to that issue.
-- Replace uploads the new file before deleting the old one.
+## Supported input and intent
 
-## 1. Workspace path and file preflight
+[The JSON contract](common-json4jira-contract.md) expresses ordinary new uploads as an `attachments` list of actual Workspace-relative file paths. Every listed file is an intended upload. An empty/no-upload list does not request deletion of remote files. A new issue supports add only.
 
-Every attachment `add` or replacement upload must identify a Workspace-relative `relativePath` and a matching `fileName`.
+Complete the authorized upload list before final confirmation. Reuse a valid prepared file unchanged. A changed JSON list, participating file or supported operation mapping invalidates affected prior confirmation and any claim that an upstream [assessment](story-assessment-evidence.md) is still current. Obtain updated content confirmation; do not impose rescoring or invoke scoring automatically. The project/backend decides whether the changed package requires an assessment.
 
-1. Reject URLs, absolute paths, `data:` / `file:` URIs, and `..` traversal.
-2. Before generating `jira-preview.md`, inspect the proposed file using the Workspace read capability in the applicable Workspace scope.
-3. Confirm that the returned artifact is readable and that its exact returned Workspace-relative path equals the proposed `relativePath`.
-4. Confirm that `fileName` equals the filename component of the confirmed `relativePath`.
-5. For an SDLC handoff, also confirm that the path and filename exactly match the single reviewed SPEC and any applicable update manifest.
-6. Repeat the path/filename consistency check immediately before export if the attachment Workspace artifact changed since preview.
+For delete/replace, establish the exact existing ticket/source and original attachment IDs from the actual target's inventory, using `getJiraInfos` or an actually available supported attachment-read capability. Reuse complete applicable inventory evidence. Names alone do not identify deletion targets; a profile cannot supply an attachment inventory or permission to replace a file.
 
-The `<name>-spec.md` naming rule applies only to validated SDLC SPEC uploads. It does not restrict ordinary non-SDLC attachment names or rename existing Jira attachments retained or targeted for delete/replace. SDLC filename corrections must follow the upstream preparation/review recovery in Section 2.1 of `sdlc-handoff-validation.md` before export resumes.
+## Local preflight
 
-Do not infer, normalize, relocate, or substitute an attachment path. A missing, unreadable, changed, inconsistent, or unconfirmed path blocks the attachment operation. Report the exact Workspace-relative path and the available failure detail, then request correction, a newly supplied path, or an explicit stop decision.
+Read each actual planned upload through the platform Workspace capability. Confirm its exact returned Workspace-relative path, current readable content and actual basename. Keep established paths unchanged; reject URLs, absolute paths, traversal, missing files and substituted examples. Reuse complete reads only when no file change intervened.
 
-Workspace readability is a mandatory local preflight. It does not guarantee that a later external Jira transport cannot fail, but it prevents submission of an attachment path that was not confirmed available in the Workspace.
+If an operation schema has a separate filename, it must match the actual confirmed file. Do not rename ordinary attachments to a SPEC convention or infer a conversation ID from their paths. Authentication/session identity remains platform-owned.
 
-## 2. Attachment-plan serialization contract
+## Delete and replace boundaries
 
-When no attachment operation is planned or required, omit `attachmentsJson`, or pass `""` only if the active tool accepts it as an inactive sentinel. Never use `"."`. Do not parse this unused empty sentinel as an attachment plan. The serialization and validation requirements below apply to active attachment operations; required operations, upload paths, and filenames must not be replaced by empty values or placeholders.
+Use delete/replace only when the actual production JSON contract establishes their field positions/types and supported behavior. The path list alone expresses an upload, not which original attachment to replace. An old serialized plan or the root issue target does not establish the new replacement encoding.
 
-Build the attachment plan as an object internally. The export parameter `attachmentsJson` must then be a string containing that plan serialized exactly once.
+Retain the selected original-ID-to-new-file mapping in existing preview/context. Do not invent a replace object, infer a delete API, add legacy extra tool parameters or call a separate legacy upload/delete operation. If the runtime provides the supported encoding, prepare it before preview and confirmation; otherwise report the precise pending operation and missing representation rather than silently choosing no attachment change.
 
-### Required internal plan shape
+Replacement must confirm successful new upload before deleting the selected old attachment. Keep old files on failed or unknown upload. Preserve unrelated attachments and distinct replacement contents; do not target by filename or merge mappings for convenience. A requested deletion requires the actual selected ID and its current target membership.
 
-```json
-{
-  "add": [
-    {
-      "relativePath": "outputs/ceaia/updates/WPB/AIWPB-9235/mobile-registration-entry-spec.md",
-      "fileName": "mobile-registration-entry-spec.md"
-    }
-  ]
-}
-```
+## Confirmation and outcomes
 
-The current export interface uses `add`, `deleteAttachmentIds`, and `replace`; use only the authorised operation(s) for the current item.
+Use [the common preview/submission process](common-preview-confirm-export.md). Show selected adds/deletes/replacements and their real file/ID mappings. Submit the final file path only; never send attachment arguments beside it. A scope change to defer an attachment operation must be explicit, reflected in the current file, accurate assessment-evidence status and confirmed content.
 
-### Required outer export payload shape
-
-```json
-{
-  "attachmentsJson": "{\"add\":[{\"relativePath\":\"outputs/ceaia/updates/WPB/AIWPB-9235/mobile-registration-entry-spec.md\",\"fileName\":\"mobile-registration-entry-spec.md\"}]}"
-}
-```
-
-The following is invalid and must be blocked before confirmation/export because `attachmentsJson` is an object rather than a string:
-
-```json
-{
-  "attachmentsJson": {
-    "add": [
-      {
-        "relativePath": "outputs/ceaia/updates/WPB/AIWPB-9235/mobile-registration-entry-spec.md",
-        "fileName": "mobile-registration-entry-spec.md"
-      }
-    ]
-  }
-}
-```
-
-Before preview and export, validate all of the following:
-
-1. the outer payload is valid JSON;
-2. `attachmentsJson` is a string, not an object, array, null, number or boolean;
-3. parsing `attachmentsJson` succeeds exactly once and returns an object;
-4. the parsed plan contains only the authorised attachment operation(s);
-5. every upload path in the parsed plan passed Section 1; and
-6. the serialized value in the final payload matches the validated internal plan exactly.
-
-Do not double-serialize `attachmentsJson`. Do not manually alter escaping after serialization.
-
-## 3. Batch and result handling
-
-In batches, define attachment operations per item; a top-level `conversationId` may be inherited. Report partial attachment failure separately from the Jira issue result.
-
-For each attachment operation, report:
-
-- Jira key;
-- operation type;
-- confirmed Workspace-relative path and filename for uploads;
-- preflight status;
-- export/attachment status; and
-- a sanitised error, if any.
-
-An attachment failure does not conceal a successful Jira issue create/update. Do not automatically retry, substitute a different file, or delete an existing attachment after a failed upload. Obtain the user's explicit correction, retry, defer, or stop instruction.
+Record issue success separately from each attachment effect. Preserve confirmed uploads/removals and old IDs after partial failure. Do not recreate/update a successful issue, re-upload a confirmed file or delete old content to repair an unknown effect. A local result-save failure retries only the save. Use supported read-only reconciliation and user-directed recovery for actual failed/unknown operations; do not replay the whole export.
