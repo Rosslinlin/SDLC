@@ -3,6 +3,12 @@
   "projectKey": "<actual project key>",
   "issueType": "<actual Test issue type name>",
   "fields": {
+    "project": {
+      "key": "<actual project key>"
+    },
+    "issuetype": {
+      "id": "<actual Test issue type ID>"
+    },
     "summary": "<source Test Case Title exactly>",
     "description": "<source Test Case Title exactly>",
     "labels": ["CEAIA_GEN"]

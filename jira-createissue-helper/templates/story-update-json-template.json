@@ -1,15 +1,15 @@
 {
   "jiraInstance": "<confirmed lowercase source>",
-  "projectKey": "<actual project key>",
+  "projectKey": "<required actual project key; always retain>",
   "issueType": "<actual Story type name>",
   "issueIdOrKey": "<confirmed actual existing target key>",
   "acceptanceCriteria": "<actual AC field ID>",
   "fields": {
     "project": {
-      "key": "<actual project key>"
+      "key": "<required actual project key; always retain>"
     },
     "issuetype": {
-      "id": "<actual Story type ID>"
+      "id": "<required actual Story type ID; always retain>"
     },
     "summary": "<source Summary exactly; do not invent a missing title>",
     "description": "<source Description and additional business prose in Jira wiki>",

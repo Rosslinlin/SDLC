@@ -1,3 +1,11 @@
+# 2026-11-07 — jira-createissue-helper 3.0.0-json-preview.3：路由字段始终保留
+
+每个 issue JSON 的 `fields.project.key` 和 `fields.issuetype.id` 均为必需路由字段，覆盖创建、更新、Test Case 两模式及 manifest 的每个 child；不受 metadata required 标记或“未改字段省略”的影响。其他业务字段仍按获准范围和实际要求增减，保留原更新目标，不由保留路由字段授权移动项目或改变类型。
+
+Story 更新模板明确必留提示，补齐两个 Test Case 模板的路由对象。组装保存、预览和提交前读回均核对真实非空值及 root/baseline 一致性；完整上游文件也不可跳过。缺失项回到准备阶段，补真实值并重新确认，不能在导出时临时补写或猜 ID。工具参数、Test Case 业务内容/模式、持久配置流程与远端结果不重放规则保持不变。
+
+---
+
 # 2026-11-07 — 6.1.0-preview.8：持久用户配置与提前字段确认
 
 创建和更新的用户配置读取/保存成为必达生命周期，覆盖 SDLC 和通用导出的完整上游 JSON 路径。成功 issue 后立即保存独立已验证配置，不再被附件/关联/队列的部分失败阻断；明确 profilePersistence 状态，只有真实用户 Workspace 的有意义条目读回后才报 saved。保存失败只恢复配置，不重放 Jira、附件或评分。

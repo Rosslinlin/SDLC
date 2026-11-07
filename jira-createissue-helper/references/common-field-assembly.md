@@ -8,7 +8,7 @@ Preserve supplied export-ready wording, order, identifiers, criterion grouping, 
 
 A raw request explicitly asking to generate an issue permits content derived from its supplied facts; mark generated values in preview and obtain confirmation. Exporting an authored source does not authorize polishing, invented actors/benefits/ACs or regeneration to improve scores. Business gaps remain honest assessment subjects where permitted; unresolved required export content needs clarification rather than fabrication.
 
-Resolve values from current explicit input and the selected revision first. On update preserve unchanged target values or omit unrequested fields as supported. Only then consider applicable confirmed preferences or evidenced defaults. Create defaults never overwrite target values. Omit optional fields without a requested/required value; do not add them merely because they seem relevant.
+Resolve values from current explicit input and the selected revision first. On update always retain actual `fields.project.key` and `fields.issuetype.id`, consistent with the target and root routing; these structural fields are never pruned as unchanged or unrequested. For other business fields preserve unchanged target values or omit unrequested fields as supported. Only then consider applicable confirmed preferences or evidenced defaults. Create defaults never overwrite target values. Omit optional business fields without a requested/required value; do not add them merely because they seem relevant.
 
 ## Native fields and types
 
@@ -26,7 +26,7 @@ Select allowed values by actual source/user match or applicable evidenced defaul
 
 Preserve intentional source empties only where supported. Omit unused optional fields. Do not use `"."`, `"N/A"`, string `"null"` or whitespace as missing-value substitutes. Keep collections typed and use JSON null only when supported. Do not globally replace punctuation in real content.
 
-An update omits unrelated fields; empty does not mean unchanged. A clear needs explicit intent, supported encoding and a preview identifying the clear operation. Every batch child owns its effective values; manifest/default inheritance must not change unintended fields.
+An update omits unrelated business fields while retaining both required routing objects; empty does not mean unchanged. A clear needs explicit intent, supported encoding and a preview identifying the clear operation. Neither routing object can be cleared/removed. Every batch child owns its effective values and mandatory project/type objects; manifest/default inheritance must not change unintended fields.
 
 ## Story-specific mapping
 
@@ -46,6 +46,6 @@ Paths/attachment operations and dedicated relationship controls follow [attachme
 
 ## Save once and preserve assessment provenance
 
-Complete text rendering, field mapping and authorized upload selection before saving. Read back and decode native strings once; verify actual IDs/types, source-to-field mapping, whole-criterion counts, original order, newlines, links and code. Required values remain real, supported or precisely unresolved.
+Complete text rendering, field mapping and authorized upload selection before saving. Verify both native routing objects and nonempty actual key/ID before saving an export-ready file, and again on read-back: project key equals root projectKey and type ID matches the verified root type/target. Apply this to every issue, including Test Cases and manifest children. Missing/conflicting values remain a precise preparation blocker. Decode native strings once; verify source-to-field mapping, whole-criterion counts, original order, newlines, links and code.
 
 Keep the exact path/content for any requested or upstream assessment and submission. A user-authorized change to previously assessed content makes that prior score historical and requires a fresh preview/confirmation; never represent it as a score of the changed file. A new assessment is needed only where the actual project/backend/user requires it and remains with the reviewer/upstream caller. No submission-time mutation or reserialization is permitted. Retain conversion/source mapping in existing preview/context, not another manifest or source-copy file.

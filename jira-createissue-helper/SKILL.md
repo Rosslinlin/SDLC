@@ -5,7 +5,7 @@ description: Prepare or export ordinary Jira issues and source Test Cases throug
 
 # Jira Create Issue Helper
 
-Version: 3.0.0-json-preview.2 — 2026-11-07. Runtime: GPT-5.6 Luna or GPT-6 Luna, platform text/file tools only; no scripts.
+Version: 3.0.0-json-preview.3 — 2026-11-07. Runtime: GPT-5.6 Luna or GPT-6 Luna, platform text/file tools only; no scripts.
 
 The submission source is the saved final `.json4jira`, or an approved path manifest. Production content export calls `java-base-mcp.exportjirabydynamicfield` with only `story_json_workspace_path`. Read [the JSON contract](references/common-json4jira-contract.md) and the selected flow; load preparation references only when facts/files are missing. CEAIA SDLC handoffs belong to their dedicated exporter; this helper has no legacy SDLC execution route.
 
@@ -21,7 +21,9 @@ The submission source is the saved final `.json4jira`, or an approved path manif
 | Prepare/create another ordinary issue | [Create](references/flow-create-issue.md). |
 | Requested attachments | Also read [attachments](references/common-attachments.md); Test Case source shapes omit them. |
 
-A complete trustworthy upstream JSON keeps its exact path/content and needs no discovery or text conversion just because another skill authored it. It still enters the durable profile lookup and post-write save/read-back lifecycle below. Resolve actual operation, source/type and target from the selected file and confirmed request. A missing specialized capability stays precisely pending; do not downgrade it to create or an older tool shape.
+Every issue JSON, including updates, Test Cases and manifest children, MUST contain native `fields.project.key` and `fields.issuetype.id` with nonempty real values consistent with root routing and the verified target/type. These two fields are always required, even when unchanged or metadata does not mark them required; only other business fields follow scope-based addition/omission. Validate before saving as export-ready, preview and final submission read-back. A file missing either returns to preparation and renewed confirmation, never a submission-time patch.
+
+A complete trustworthy upstream JSON keeps its exact path/content and needs no discovery or text conversion just because another skill authored it. It still passes the mandatory routing-field checks and enters durable profile lookup and post-write save/read-back. Resolve actual operation, source/type and target from the selected file and confirmed request. A missing specialized capability stays precisely pending; do not downgrade it to create or an older tool shape.
 
 ## Execute in order
 

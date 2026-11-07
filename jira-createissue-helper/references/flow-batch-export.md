@@ -6,7 +6,7 @@ Use for a selected group of independent ordinary creates/updates. Test Cases fro
 
 Read each selected actual issue file under [the file contract](common-json4jira-contract.md). Reuse complete files unchanged. Prepare missing files through [create](flow-create-issue.md) or [update](flow-update-issue.md), sharing applicable [profile facts](common-state-and-user-info.md) without inheriting business content, targets or attachment plans between items.
 
-Keep an explicit source-item-to-file mapping and stable selection order. Every child contains its own actual source/project/type and fields; every update contains its own exact root `issueIdOrKey`. No defaults may overwrite unrequested update fields. Missing targets block their updates rather than converting them to creates.
+Keep an explicit source-item-to-file mapping and stable selection order. Every child contains its own actual source/project/type and mandatory native `fields.project.key` / `fields.issuetype.id`, including update children with only one business change; the manifest never supplies inherited defaults. Every update contains its own exact root `issueIdOrKey`. No defaults may overwrite unrequested update fields. Missing/conflicting child routing or targets block preparation/submission rather than converting updates to creates or silently excluding a child.
 
 Establish actual type identity before planning calls. Scoring requirements are project/backend-owned: do not preblock an unscored Story or invoke a scorer automatically. Retain any supplied [assessment evidence](story-assessment-evidence.md) accurately; an old result is not current evidence after an input change. A manifest is not a scoring input.
 

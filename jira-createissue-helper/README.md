@@ -1,6 +1,6 @@
 # Jira Create Issue Helper
 
-Version 3.0.0-json-preview.2 prepares and exports ordinary Jira issues and source Test Cases through saved Workspace JSON. CEAIA SDLC uses its dedicated exporter; this package has no legacy SDLC gateway.
+Version 3.0.0-json-preview.3 prepares and exports ordinary Jira issues and source Test Cases through saved Workspace JSON. CEAIA SDLC uses its dedicated exporter; this package has no legacy SDLC gateway.
 
 Read [SKILL.md](SKILL.md) first. It routes to the selected business flow and loads preparation references only when needed.
 
@@ -8,6 +8,7 @@ Read [SKILL.md](SKILL.md) first. It routes to the selected business flow and loa
 - Missing setup resolves source, project/type, then optional supported fields. Existing profiles get one effective-settings check before creating; final file/content approval remains separate.
 - No global scoring prerequisite or automatic assessment is imposed. Preserve actual upstream scores when supplied; the backend decides project-specific requirements. No mandatory SPEC.
 - Preview actual files, obtain/reuse current explicit content confirmation and call production `java-base-mcp.exportjirabydynamicfield` with only `story_json_workspace_path`.
+- Every issue file, including updates and Test Case/manifest children, always contains native `fields.project.key` and `fields.issuetype.id`, consistent with verified root/target routing. Other business fields follow the approved scope; missing routing objects require preparation correction before confirmation/export.
 - Multiple Stories submit individually in approved order. Ordinary non-Story batches use a path manifest; mixed plans preserve selection order.
 - Test Case multiple uses one native issue file per case plus one path manifest; single uses one five-column aggregate file with no Test Details. Both explicitly include `CEAIA_GEN` in native labels.
 - Preserve supplied content, supported extra fields and exact update targets. Render non-Test Markdown during preparation, before Story scoring.

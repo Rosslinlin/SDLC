@@ -24,7 +24,7 @@ Only when the source genuinely supplies indivisible step/result blocks with no s
 
 ## 3. Save the selected mode's native JSON
 
-Templates are shapes only; replace every placeholder with verified source/schema facts. Each issue file carries its own `jiraInstance`, `projectKey`, actual `issueType` and native `fields`. Add genuinely required metadata fields using their real types without rewriting the mapped source content. Both modes include `CEAIA_GEN` in native `fields.labels`.
+Templates are shapes only; replace every placeholder with verified source/schema facts. Each issue file carries its own `jiraInstance`, `projectKey`, actual `issueType` and native `fields`, always including `project: {key: <actual project key>}` and `issuetype: {id: <actual Test type ID>}` consistent with root routing. This applies to both modes and every individual child, independently of metadata required flags. Add other genuinely required metadata fields with their real types without rewriting source content. Both modes include `CEAIA_GEN` in native `fields.labels`.
 
 Omit root `staffId`, session/credential overrides, workflow controls, `attachments`, inline batches, `issuesJson`, `dynamicFieldsJson` and Story AC mappings. Source Test Case IDs identify mapping records; they do not select existing Jira update targets. This flow creates new Test issues, so its files omit `issueIdOrKey`.
 
@@ -57,7 +57,7 @@ Read the saved aggregate or manifest and every child. Complete one source-to-fil
 | Check | Required observation |
 | --- | --- |
 | Selection | Exact selected source IDs, row count/order, and ID → child path/manifest index or aggregate logical row mapping. |
-| Native shape | Actual source/project/type, `CEAIA_GEN` labels and mode-specific structure. No serialized Test Details, forbidden aliases/controls, sample values or pointer substitutes. |
+| Native shape | Actual source/project/type, mandatory native `fields.project.key` / `fields.issuetype.id`, `CEAIA_GEN` labels and mode-specific structure. Nonempty routing key/ID match root facts; no serialized Test Details, forbidden aliases/controls, sample values or pointer substitutes. |
 | `multiple` | Exact source Title in both Summary/Description; one file per selected case; one native entry per identified step/result pair, full source values and actual data scope. A shared source string does not collapse separate numbered pairs. |
 | `single` | Exact five-cell header, one five-cell logical row per selected case, unchanged mapped cells, no separator/extra prose/source-only columns, and no Test Details aliases. Preserve intentional source empties. |
 | Text | Source wording, identifiers, numbering and item counts match after safe newline normalization; no collapsed numbered lists, truncation or remaining literal/escaped HTML breaks. |

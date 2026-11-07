@@ -14,9 +14,9 @@ For requested attachment changes, read the actual target's inventory as describe
 
 1. If the selected final JSON already matches the confirmed target, current approved change and file contract, retain its exact path/content. Do not query or rebuild it as a routine export step.
 2. Otherwise read [configuration](common-state-and-user-info.md) first and query only missing applicable facts under [discovery](common-project-issue-type-validation.md). Stable project/type/field facts can be reused across create/update. Create metadata does not prove edit permission.
-3. Use [field preparation](common-field-assembly.md) to include approved changes and any actual baseline values required by the file contract. Leave optional unrequested fields omitted; never turn omission or an empty template value into a field-clear operation. Saved create defaults cannot overwrite target values.
+3. Use [field preparation](common-field-assembly.md) to include both mandatory `fields.project.key` and `fields.issuetype.id` from verified target/routing facts on every update, even when changing only one business field. They agree with root project/type and are never removed as unchanged or absent from metadata-required lists. Keep other fields limited to approved changes and required baseline values; omit optional unrequested business fields, never clear them through omission/template empties. Saved create defaults cannot overwrite target values.
 4. Render only newly prepared non-Test rich-text replacements under [text rendering](common-jira-text-rendering.md). Preserve untouched fields. Finish the supported attachment/relationship plan before preview and confirmation.
-5. Save and read back the actual JSON. Root `issueIdOrKey` must remain the same exact nonempty target. A missing/mismatched target blocks the update; it never becomes create.
+5. Before saving as export-ready and on read-back, verify native `fields.project`/`fields.issuetype` with actual nonempty key/ID and consistent root/baseline binding. A root-only or sparse-delta upstream file missing either needs preparation correction and renewed confirmation, never direct export. Root `issueIdOrKey` remains the exact nonempty target; missing/conflicting routing or target blocks this update and never becomes create.
 
 ## Assessment evidence and submission
 
