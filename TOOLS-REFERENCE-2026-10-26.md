@@ -1,4 +1,4 @@
-# SDLC JSON 工具契约 — 6.1.0-preview.7
+# SDLC JSON 工具契约 — 6.1.0-preview.8
 
 主线合并日期：2026-11-07。文件路径沿用旧名；当前内容定义 main 的 SDLC JSON 路线，来源为 codex/sdlc-json4jira-flow 重构分支。目标模型为 GPT-5.6 Luna / GPT-6 Luna，纯文本调用已有平台能力，不运行脚本。
 
@@ -82,16 +82,16 @@
 | java-base-mcp.fetchConfluenceContent / fuzzyMatchingConfluence | 原始需求证据获取；遵循来源资源中的已知参数及实时schema |
 | ask_user_question | 缺失事实/真实选择/设置、当前内容确认或有界恢复决定；不伪造用户确认 |
 
-这些 query 在 generation 组装 Story 时完成。现有 query 参数 staffId 与 profile 身份保留，不写入 Story JSON 根级或评分/导出参数；创建与更新均不提交 fields.reporter，旧 profile/基线也不能把它带回。query 的 almType 不自动成为 JSON 字段名。根级 projectKey 与 fields.project.key 一致，issueType 是确认的类型名，fields.issuetype.id 是实际 ID；字段名大小写固定。根级 acceptanceCriteria 是非空字段 ID 字符串，正文放 fields[该ID]；description/AC 已是 Jira wiki，不留到导出时转换。其他获准业务字段继续按实际字段 ID/类型/选项放 fields；不再使用 customFields 包装或旧顶层 summary/description/BDD/AC 文本数组。缓存按用户/项目/type/操作能力复用，缺项定向查询，不按 TTL 强刷。规范见 [前置组装](ceaia-sdlc-story-spec-generation/references/jira-json-assembly.md) 与 [文本编码](ceaia-sdlc-story-spec-generation/references/jira-text-format.md)。
+这些 query 在 generation 组装 Story 时完成。现有 query 参数 staffId 与 profile 身份保留，不写入 Story JSON 根级或评分/导出参数；创建与更新均不提交 fields.reporter，旧 profile/基线也不能把它带回。query 的 almType 不自动成为 JSON 字段名。根级 projectKey 与 fields.project.key 一致，issueType 是确认的类型名，fields.issuetype.id 是实际 ID；字段名大小写固定。根级 acceptanceCriteria 是非空字段 ID 字符串，正文放 fields[该ID]；description/AC 已是 Jira wiki，不留到导出时转换。其他获准业务字段继续按实际字段 ID/类型/选项放 fields；不再使用 customFields 包装或旧顶层 summary/description/BDD/AC 文本数组。持久配置按用户/项目/type/操作能力复用，缺项定向查询，不按 TTL 强刷。规范见 [前置组装](ceaia-sdlc-story-spec-generation/references/jira-json-assembly.md) 与 [文本编码](ceaia-sdlc-story-spec-generation/references/jira-text-format.md)。
 
-创建与更新都先读取真实用户 Workspace 的 profiles.json，按相同用户/source/project/type 复用稳定项目、类型和 AC 字段 ID 等组件。已有 create profile 不因本次 update 就失效；权限、requiredness 与默认值保留原操作范围，不将 create metadata 当 edit 权限。缓存与 baseline 信息足够时，三个 discovery query 均不调用；只有缺失/不适用组件、明确刷新/目标变更或实际 schema 错误时定向查询。getJiraInfos/readJiraAttachments 的当前票据/原 SPEC 读取仍必要，它们不是这些字段 discovery query。
+创建与更新都先读取真实用户 Workspace 的 profiles.json，按相同用户/source/project/type 复用稳定项目、类型和 AC 字段 ID 等组件。已有 create profile 不因本次 update 就失效；权限、requiredness 与默认值保留原操作范围，不将 create metadata 当 edit 权限。配置与 baseline 信息足够时，三个 discovery query 均不调用；只有缺失/不适用组件、明确刷新/目标变更或实际 schema 错误时定向查询。getJiraInfos/readJiraAttachments 的当前票据/原 SPEC 读取仍必要，它们不是这些字段 discovery query。
 
 更新目标由用户确认的新契约确定：JSON 根级 issueIdOrKey 必须与该候选真实 source/target/baseline 一致；创建完全省略。这个值不是额外工具参数，两种模式仍按同一 JSON 路径评分、预览和导出。Story 业务变更自动同步所有受影响本地 SPEC/测试/投影，不等用户说 update spec；默认已有相关远端 SPEC→replace，无相关且无未决可能SPEC→首次add，只有明确不改远端才none。add/replace使用上述已确认文件内attachmentsJson；none使用attachments=[]并省略attachmentsJson，本地仍更新并经specFilePath评分。最终预览展示实际路径、原ID映射及保留项；原件选择歧义聚焦澄清，读取失败技术恢复，不把它们误当普通replace格式未确认。实际后端拒绝保留精确错误，不能默默跳过SPEC、猜恢复控制或回退创建。
 
-平台另需真实 Workspace 读写、独立只读 reviewer、.json4jira内容预览和当前用户确认能力。Task保留10个命名工具位置，最后评分工具替换为scoreUserStory；不为这些平台能力杜撰工具名或模型参数。
+平台另需真实会话 Workspace 读写、独立的跨 session 用户 Workspace 读写、独立只读 reviewer、.json4jira内容预览和当前用户确认能力。用户存储必须有实际暴露 read/write schema 与用户作用域/注入命名空间证据；会话文件路径、同名文件或普通 write success 不等价。创建/更新都读真实用户 profile，issue 成功后必达 fresh-read/merge/write/read-back；未暴露该能力时明确配置 unavailable，不杜撰工具名、scope 参数或数据库 ID，也不伪装已保存。Task保留10个命名工具位置，最后评分工具替换为scoreUserStory；不为这些平台能力杜撰工具名或模型参数。
 
 ## 独立包与未确认范围
 
-jira-createissue-helper、user-story-reviewer、review-requirements 的文件保持不动。其原有 Markdown、四/五字段或通用导出协议属于各自已有包，**不作为本 JSON 路线的 fallback**，也不代表已验证其对新全局后端的兼容。截图提及的全平台回归不扩大本次仅 SDLC 的修改范围。
+jira-createissue-helper 独立通用导出已同步本次用户配置读写/引导规则，共用 profiles 文件但不加入 SDLC 三 Skill Task，也不作为其 fallback。user-story-reviewer、review-requirements 未改。各包的评分及业务行为仍按其自身契约；共用配置规则不代表全平台后端集成已通过。
 
 已有票根级目标、三参数评分及2026-11-06确认的文件内attachmentsJson.add/replace格式、reader实际原ID来源均已确认；不因此推定批量原子性、幂等/超时恢复、分项返回或异步完成。真实服务错误和部分/未知结果仍准确保留，不捏造成功或独立删除支持。平台验收见 [测试清单](PLATFORM-TEST-CHECKLIST.md)。

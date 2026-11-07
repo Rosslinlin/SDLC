@@ -1,6 +1,6 @@
 # Test Case source export
 
-Use this complete flow for Test Cases selected from a readable file, pasted table, structured source or generated Test Case list. Its two business shapes take priority over generic create/batch assembly. Read the [JSON contract](common-json4jira-contract.md), [profiles and missing inputs](common-state-and-user-info.md), and [preview/submission/recovery](common-preview-confirm-export.md) only as needed. Do not apply the ordinary Markdown-to-Jira renderer to Test Case content.
+Use this complete flow for Test Cases selected from a readable file, pasted table, structured source or generated Test Case list. Its two business shapes take priority over generic create/batch assembly. Read [durable profiles and state](common-state-and-user-info.md) at entry and post-write closeout on every request, including complete files. Read the [JSON contract](common-json4jira-contract.md) and [preview/submission/recovery](common-preview-confirm-export.md) as needed. Do not apply the ordinary Markdown-to-Jira renderer to Test Case content.
 
 ## 1. Resolve this export
 
@@ -81,3 +81,5 @@ Call `java-base-mcp.exportjirabydynamicfield` once with exactly:
 Preserve the complete real response/error using the common result/recovery rules. For `multiple`, report each selected ID, child path/index and actual returned status, key/URL and error when available. If the service returns indexes, use the confirmed manifest order; never guess ticket keys or compress them into a presumed range. For `single`, report the selected ID list and actual aggregate ticket/status.
 
 Distinguish issue creation from Test Details or other returned sub-operation outcomes. Preserve partial success and unknown outcomes; no blind replay of the whole manifest, successful child or aggregate to repair another effect. Missing item evidence stays unknown. No Story-score binding or score synchronization follows this Test Case export.
+
+For every confirmed successful issue, including successful children of a partial manifest, complete [durable profile merge/write/read-back](common-state-and-user-info.md) in real user Workspace. Retain canonical issueType and applicable verified routing/schema/default facts without Story-only aliases or AC mappings, selected case content or uploadType. Separate Test Details failure never suppresses this configuration save or turns an issue-only lastSuccess into complete package success. Report profile persistence separately and resume only a pending save.

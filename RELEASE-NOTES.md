@@ -1,3 +1,17 @@
+# 2026-11-07 — 6.1.0-preview.8：持久用户配置与提前字段确认
+
+创建和更新的用户配置读取/保存成为必达生命周期，覆盖 SDLC 和通用导出的完整上游 JSON 路径。成功 issue 后立即保存独立已验证配置，不再被附件/关联/队列的部分失败阻断；明确 profilePersistence 状态，只有真实用户 Workspace 的有意义条目读回后才报 saved。保存失败只恢复配置，不重放 Jira、附件或评分。
+
+保留原路径和 profiles 数组，规范 issueType，兼容旧 Story-only storyType，新 Story 保留一致别名；多项目、类型、操作隔离。只存可复用已验证事实和用户明确要记住的字段；一次性值、baseline 和业务正文不自动成为默认。不完整 metadata 可保存已知路由事实并标 complete=false。
+
+首次设置增加 source → project → 可跳过附加字段引导；已有配置创建前展示并确认沿用/修改/切项目，当前 run 未变批次和续跑不重问。SDLC 固定 Story，通用导出保留 Epic/Bug 等实际类型；最终文件预览改为友好检查提示，明确确认门禁保留。
+
+同步 Task 与用于生成工作流的自然语言输入，移除旧 assembly 编号指令冲突。现有评分三参、导出单路径、Q1–Q7、附件保护与未知结果不重放保持不变。配置字段为 additive，旧 state 保留 contractVersion=7。通用 helper 版本为 3.0.0-json-preview.2。
+
+本次为仓库源码修改，不代表测试平台包已更新或真实数据库跨 session 验证通过。发布仍须绑定真实 exporter Skill ID 和用户 Workspace 能力；详见平台清单。
+
+---
+
 # 2026-11-07 — JSON4Jira 重构版本合入 main
 
 将 `codex/sdlc-json4jira-flow` 合入 `main`，保留双方提交历史。主线采用重构分支的 JSON-first Skills/Task，包括附件 add/replace、SPEC 格式及状态/用户配置持久化修复。版本仍为 `6.1.0-preview.7`，平台验证结果不因合并而变更；以下记录保留各版本发布时的分支状态。

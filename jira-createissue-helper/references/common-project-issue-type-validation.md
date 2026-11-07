@@ -1,6 +1,6 @@
 # Discover only missing project, type and field facts
 
-Use after [profile lookup](common-state-and-user-info.md), only when selected input/upstream evidence and applicable cache cannot establish required facts. A complete trustworthy file does not need a new query chain. Configuration discovery does not replace a current update/attachment baseline read.
+Use after [profile lookup](common-state-and-user-info.md), only when selected input/upstream evidence and durable configuration cannot establish required facts. A complete trustworthy file does not need a new query chain. Configuration discovery does not replace a current update/attachment baseline read.
 
 ## Discovery calls
 
@@ -20,7 +20,7 @@ A known exact project key can feed type/metadata discovery directly. Do not sear
 
 Read the complete actual response. An exact requested key/name matching one returned project can continue without another selection. Ambiguity needs choices showing all plausible returned keys/names. No result needs a corrected search/destination, not a guessed project.
 
-Match a requested type to actual returned name/ID or verified cached binding. Same-name IDs remain distinct. Do not use a fixed type list, misclassify a Story as Test/Bug to place it in a non-Story manifest, or assume one type ID works in every project. A Test Case's dedicated flow controls its shape; discovery does not add Story AC/SPEC fields.
+Match a requested type to actual returned name/ID or verified saved binding. Same-name IDs remain distinct. Do not use a fixed type list, misclassify a Story as Test/Bug to place it in a non-Story manifest, or assume one type ID works in every project. A Test Case's dedicated flow controls its shape; discovery does not add Story AC/SPEC fields.
 
 Use supported pagination where available and needed; never invent pagination parameters. A truncated list does not prove a missing item does not exist. Unknown completeness stays explicit. A complete upstream Test file can establish type through its verified root binding; do not add redundant `fields.issuetype.id` solely because a Story template contains it.
 

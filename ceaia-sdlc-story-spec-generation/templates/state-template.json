@@ -82,6 +82,17 @@
     }
   },
   "writeResults": [],
+  "profilePersistence": {
+    "status": "pending",
+    "scope": "user",
+    "path": "ceaia-sdlc-jira/profiles.json",
+    "profileKey": null,
+    "snapshotRecordPath": ".ceaia-work/stories/example-story/preparation.md",
+    "writeEvidence": null,
+    "readBackEvidence": null,
+    "error": null,
+    "retryUsed": false
+  },
   "bindingMethod": "readback-and-revision",
   "specArtifacts": [
     {

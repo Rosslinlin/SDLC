@@ -1,6 +1,6 @@
 # v6.1 JSON4Jira flow 平台测试清单 — preview
 
-版本 `6.1.0-preview.7`，当前主分支为 `main`；2026-11-07 合入原 `codex/sdlc-json4jira-flow` 重构版本。分别在平台 GPT-5.6 Luna 与 GPT-6 Luna 验证路径接口。下列结果栏留空表示尚未记录，合并到 main 不代表平台验证通过；不能把旧 v6 本地/旧接口检查、mock 推演或普通 tool success 当作新接口与数据库实测。
+版本 `6.1.0-preview.8`，当前主分支为 `main`；2026-11-07 合入原 `codex/sdlc-json4jira-flow` 重构版本。分别在平台 GPT-5.6 Luna 与 GPT-6 Luna 验证路径接口。下列结果栏留空表示尚未记录，合并到 main 不代表平台验证通过；不能把旧 v6 本地/旧接口检查、mock 推演或普通 tool success 当作新接口与数据库实测。
 
 ## 环境与执行记录
 
@@ -14,7 +14,7 @@
 | J01 | 三个包独立安装、资源可读，generation/review 的 Q1–Q7 同文；实际 skill IDs 已核对，exporter 占位替换。兼容 Task 文件显示 `SDLC-workflow-v6.1 JSON preview`，schema 与 10 工具顺序保留，最后一项为 scoreUserStory；模型由平台配置。 | | |
 | J02 | 所有用户未写 push/export 也默认继续 Jira-backed 完整流程，入口不提供路线选择；缺信息只补缺项，不推荐 preparation-only。仅用户主动明确只准备/不导出时遵从；阶段调用不越界。默认流程最终仍须评分后的当前内容 HTML 预览及用户明确确认。 | | |
 | J03 | 项目/type/meta 查询在生成最终 JSON 前完成；只使用 live schema 真实字段、类型、选项和必要值，不把旧 direct 参数直接猜成 JSON 字段。缓存命中复用，缺项/显式变更才查相应部分。 | | |
-| J04 | 跨会话配置由 generation 读取；票据及要求附件确认成功后仅将上游已确认快照保存到真实用户工作区 profiles.json；票据/要求附件失败、partial 或 unknown 不覆盖已保存配置，linkage/queue 待处理单独记录。完整命中不因 TTL 刷新，对话文件不冒充用户持久化，create metadata 不冒充 edit 权限。 | | |
+| J04 | 创建和更新都读真实跨 session 用户 Workspace；issue 一经确认成功便执行 populated snapshot 的 fresh-read/merge/write/read-back，附件/关联/队列失败也不跳过配置保存。失败/未知 issue 不伪造成功。saved 必须有用户作用域证据，配置/会话文件不混淆。 | | |
 | J05 | 每候选只有一个最终 story.json4jira 和保留的 TEST_CASE.md、SPEC；不生成独立 STORY.md。SPEC Story 投影与 JSON 业务字段一致，测试镜像与当前表一致；内部路由/诊断不泄露到 Jira。 | | |
 | J06 | 生成前加载 Q1–Q7；review 独立读取原来源、JSON、测试和所有 SPEC。实际遗漏/编造/不可验证行为被定位，or、机械命名/布局、负向标签位置不单独构成业务失败。 | | |
 | J07 | 新 Story 按内聚价值拆分而非 AC 数；每 AC/FR 有可执行测试，不为拒绝型 AC 编造 Positive 伴侣，不发明接口、日志、SLAs 或无来源场景。 | | |
@@ -41,8 +41,8 @@
 | J28 | 根级 `acceptanceCriteria` 的字段 ID 不被计作 AC 正文/AC 数量；读取对应 fields 值，缺少实际正文不能被映射字符串伪装成内容通过。 | | |
 | J29 | AC 映射为空/缺失、指向不存在字段，或字段值为空/非字符串时明确结构阻塞并回到生成；不猜 ID、不从旧顶层数组静默兜底、不宣称通过评分。 | | |
 | J30 | 根级 projectKey 与 `fields.project.key`、类型名/真实 `fields.issuetype.id` 一致；创建和更新 JSON 均不含 fields.reporter，不因旧模板/profile 又加入它；更新省略 reporter 不清空远端原值。冲突在评分前解决，不硬编码类型 ID 7 或照抄示例员工号/项目。 | | |
-| J31 | 首次无适用配置：先读真实 Workspace/可信身份，再只问尚缺来源、staffId、项目名称/已知 key 或实际项目选择；类型/schema/AC ID 由工具查。保留默认 Jira 意图，没有路线选择或 preparation-only 推荐；元数据未全时不伪造完整可评分 JSON。 | | |
-| J32 | 已有适用配置及可信身份：复用已确认项，不重复询问来源/员工号/项目；仅缺失或不适用部分定向查询/提问。Story 类型/schema/AC ID 从真实配置或工具取得，不让业务用户填技术 ID；继续默认流程及最终内容确认。 | | |
+| J31 | 首次无适用配置：先读真实用户 Workspace/可信身份，按缺失 source → project → 可跳过附加字段引导；仅展示实际支持的 Epic Link/custom Story Type 等。类型/schema/AC ID 由工具查，staffId 仅必要时问；保持 SDLC Story 与默认 Jira 意图。 | | |
+| J32 | 已有适用配置：生成业务文件前展示项目/Story 字段，明确确认沿用/修改/切项目或仅本次覆盖；未变当前 run 批次/续跑不重复问。完整 facts 不重复 discovery，最终评分后仍要当前文件确认。 | | |
 | J33 | 用户主动明确只准备/不导出：记录该方向，不执行导出；不把此方向变成默认入口选项。仍只用已知真实值，缺必要元数据则交付已有事实和待补项，不伪造完整可评分 JSON 或实际评分成功。 | | |
 | J34 | 模板与实际 Story JSON 不含根级 staffId 或 fields.reporter；评分仍恰三参数、导出仍仅路径。身份配置和查询工具按实际 schema 保留所需 staffId，删除提交中的 reporter 不代表清空 Jira 现有值。 | | |
 | J35 | 生成时即将 description/映射 AC 及其他获准富文本写成 Jira wiki，标题 h1./h2.、AC `* *AC-001*: Given ...`；代码、嵌套列表、链接及表格内容无损，已有 wiki 不重复转换。summary、路由/选项、普通文本及未改动更新字段不转换。评分后导出文件不被再次渲染。 | | |
@@ -87,6 +87,29 @@
 | J65 | 同次自检发现未替换模板占位、11 列表格管道/换行问题及独立表/嵌表不一致，保留真实业务字面量；只修受影响格式，不无故全量业务重审或增加 Q 项。 | | |
 | J66 | 真实业务流程改变仍独立复核受影响内容；评分前格式修正不额外发起评分，评分后任何 SPEC 改动仍执行既有当前包重评分/确认，不以机械修正绕过当前性。 | | |
 
+## preview.8 持久用户配置与引导回归（待平台执行）
+
+必须记录实际发布 Skill 版本/ID、真实用户读写工具 schema 和作用域证据。不能用仓库修改时间、写入确认或同名会话文件替代跨 session 验证。
+
+| ID | 场景及通过条件 | 5.6 Luna结果/证据 | 6 Luna结果/证据 |
+| --- | --- | --- | --- |
+| J67 | 删除用户 profile 文件及父目录后首次创建成功：通过真实用户 writer 创建有意义的路由/type/schema/default 条目并读回，非空模板；打开新 session 读取同条目，展示供沿用确认，不重新收集已有基础项。 | | |
+| J68 | 更新成功：fresh-read/merge/write/read-back 同样必达；create 稳定 facts 可复用，不套 create defaults，不以缺 update 条目重跑全部发现。保留其他项目/类型/capability。 | | |
+| J69 | issue 已成功但附件/关联/队列失败：先保存独立配置再返回部分失败；lastSuccess 只证明 issue，逐项效果不伪造，远端成功内容不重放。 | | |
+| J70 | 通用 helper 收到完整获准上游 JSON、没有完整 metadata snapshot：仍读用户 profile，成功后保存真实路由/type；缺 schema 标 complete=false，不猜权限/选项，不降级已有更完整 schema，不修改原文件/注入旧 defaults。 | | |
+| J71 | 同一用户两项目、Story/Epic/Bug 和 create/update 共存：精确选择、更新目标条目，保留其余项；旧 storyType 兼容不重复，新 Story issueType/alias 一致，冲突不猜。SDLC 只选 Story。 | | |
+| J72 | 新用户第三问只显示真实支持附加字段，跳过不阻塞、不清旧默认；单次字段不成为默认，明确记住/修改/清除默认只影响选定项目/类型/操作。custom Story Type 不切换 SDLC issue type。 | | |
+| J73 | 已有配置先展示并获本次沿用/修改/切项目决定，再生成业务文件；相同当前 run 批次/续跑不重问；最终友好文件预览与明确导出确认仍独立存在，沉默不算确认。 | | |
+| J74 | user write 返回 success 但 user read-back 拒绝/缺失/不符：profilePersistence 不为 saved，明确原因/待办；不可改存 conversation 冒充，profile-only 恢复不触发 Jira/评分/附件/正常发现。 | | |
+| J75 | 用户存储能力缺失、权限拒绝、JSON 损坏与 not-found 精确区分：不清空 uncertain profile；not-found 可初始化，有能力缺口明确 unavailable，不索取 token/数据库 ID 或杜撰工具。 | | |
+| J76 | 通用多项 manifest 部分成功：只为确认成功子项记录实际 lastSuccess/配置，不把 top-level success 分配给未知子项，不重发整批或成功子项。Test Case 特定内容/模式结构保持原样。 | | |
+| J77 | 保存时其他项目条目已改变：fresh-read 后合并保留新值；有真实 conditional-write/revision 能力时处理冲突，无能力不声称并发原子性。瞬时 profile-only 重试最多一次。 | | |
+| J78 | 平台实际载入 preview.8 generation/export 与 generic 3.0.0-json-preview.2，Task exporter 占位替换成真实返回 ID；user storage 能力实际挂载；重开 session 实读，不能把本机旧包或仓库源码当已部署。 | | |
+
+| 候选/操作 | 实际用户读写工具与作用域证据 | 实际profile路径/版本 | populated匹配条目与其他条目保留 | profilePersistence状态/错误 | 新session读回证据 |
+| --- | --- | --- | --- | --- | --- |
+| | | | | | |
+
 ## 后端结果证据
 
 后端字段名与状态语义以实际 live schema/响应为准；下表是观测类别，不是虚构的响应字段协议。
@@ -97,7 +120,7 @@
 
 ## 独立包边界回归
 
-三个独立包本次完全不改。下表验证隔离边界，不把旧接口场景当作新 JSON 主链的完成证据。
+jira-createissue-helper 独立包已同步本次持久配置生命周期，仍不加入 SDLC Task；user-story-reviewer 与 review-requirements 未改。下表保留业务格式/隔离回归，不把其他接口场景当作新 JSON 主链的完成证据。
 
 | ID | 场景及通过条件 | 5.6 Luna结果/证据 | 6 Luna结果/证据 |
 | --- | --- | --- | --- |
@@ -107,6 +130,13 @@
 | R04 | review-requirements 仍为独立需求/任务审查，不自动加入本 Task，不评分/导出，未授权不发 PR 评论。 | | |
 
 ## 当前分支验证记录
+
+### 2026-11-07 preview.8 本地检查与独立入口/保存推演
+
+本地完成：4 个 Skill 官方 quick_validate 通过（使用现有 Anaconda Python 的 PyYAML，无新增依赖），15 个 JSON 解析、250 处本地 Markdown 链接及 git diff --check 通过。核对 Task schema、10 个工具及顺序、Skill ID 绑定/阶段顺序、评分/导出入参、contractVersion=7、原创建/更新业务 JSON 模板和同文 Q1–Q7 规则未变；exporter 实际平台 ID 仍须发布时填写。
+
+两名独立子代理仅读取当前 Skill 和隔离 mock 原始事实，保存四条具体轨迹及配置结果，父代理读回并核对：通用完整已确认 JSON 只提议一次路径导出，附件失败仍保存配置，保留其他项目和已有更完整 schema/default；更新已成功后读回被拒绝，标 failed 并只保留配置恢复，无 Jira/评分/发现重放；SDLC 已有 Story/Bug 多项目配置停在本次沿用/修改/切项目确认，未将 Bug 默认混入；首次已给 source/project 后仅呈现真实附加字段问题，消费 skip 后本次 no-Epic、不自动选择唯一 subtype 或保存永久默认。四例均未调用真实平台、Jira、用户存储或数据库，不代表跨 session 集成通过；J67–J78 的平台结果继续留空。
+
 
 尚未在此表记录 v6.1 新接口的真实平台结果。填写时保存实际输入文件、评分请求/完整回应、HTML预览、明确确认、导出调用/完整回应及后续状态证据；区分本地检查、mock 推演和真实服务调用。
 

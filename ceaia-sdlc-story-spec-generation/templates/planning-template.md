@@ -36,6 +36,7 @@ Fill when files exist; do not create placeholder future artifacts.
 
 ## Assembly — storyJsonRevision [actual value]
 - Actual JSON path, mode and target: [verified current facts]
+- Persistent profile selection and settings decision: [actual user-level Workspace destination/read outcome; selected user/source/project/Story issue-type key; first-entry optional fields answer or existing-settings Use/Change/project-switch confirmation; eligible reusable defaults versus run-only overrides; preserve a populated snapshot for post-create/update read/merge/write/read-back]
 - Source/project/type/field mapping and confirmed values: [compact schema and field-provenance rows; real profile/query/baseline references]
 - Relationship targets: [confirmed key/source, requirement-source versus relationship-only role, actual lookup status/type; empty body is not invalid]
 - Attachment representation: [confirmed root attachmentsJson.add entries relativePath/fileName or replace entries attachmentId/relativePath/fileName; omit legacy attachments for active operations; explicit none uses attachments=[] and omits attachmentsJson]

@@ -4,7 +4,7 @@ Use for a confirmed existing-ticket content change. Keep the exact target in roo
 
 ## Establish the target and baseline
 
-Reuse the actual confirmed source/target mapping and trustworthy current target evidence. Source must come from confirmed context or an established Jira-host mapping, never from a ticket prefix. A profile cannot select the target.
+Read [durable user configuration](common-state-and-user-info.md) on entry, including when a complete upstream update JSON is supplied. Reuse the actual confirmed source/target mapping and trustworthy current target evidence. Source must come from confirmed context or an established Jira-host mapping, never from a ticket prefix. A profile cannot select the target or overwrite unrequested fields.
 
 Read `java-base-mcp.getJiraInfos` when the actual target's project/type, relevant current fields, relationships or preservation baseline are unavailable. Read the fields needed for the requested change; broad replacement needs a complete relevant baseline. Existing verified baseline evidence can be reused when still applicable. A prepared file with complete target/assembly evidence does not require repeating intake or field-discovery calls merely to export it.
 
@@ -25,3 +25,5 @@ Use [assessment evidence](story-assessment-evidence.md) when supplied. A ticket/
 Follow [preview and submission](common-preview-confirm-export.md): show the target, known baseline, approved differences and actual file; obtain/reuse current-content confirmation; submit the unchanged path through `java-base-mcp.exportjirabydynamicfield` with only `story_json_workspace_path`. A Story always uses its individual issue-file path, including in [a multi-item plan](flow-batch-export.md); it never enters a manifest even for a scoring-exempt project.
 
 Preserve issue success separately from attachment, association, database and queue outcomes. A backend score-required rejection remains pending; do not silently rescore or repeat export. Refer the user to the reviewer when assessment is requested. Do not repeat a confirmed update to repair another outcome, issue a separate legacy binding, or call ticket/source score synchronization after this local JSON export.
+
+After confirmed issue update success, complete the real user-Workspace merge/write/read-back under [configuration](common-state-and-user-info.md). Save verified stable facts and only actually confirmed update-scoped preferences, preserving create defaults and all other project/type entries. Do not wait for separate attachment/linkage/queue success or infer edit permissions from a successful create. Report profile persistence independently; its failure resumes only that save, never this update.
