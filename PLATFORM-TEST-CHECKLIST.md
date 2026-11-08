@@ -104,7 +104,7 @@
 | J75 | 用户存储能力缺失、权限拒绝、JSON 损坏与 not-found 精确区分：不清空 uncertain profile；not-found 可初始化，有能力缺口明确 unavailable，不索取 token/数据库 ID 或杜撰工具。 | | |
 | J76 | 通用多项 manifest 部分成功：只为确认成功子项记录实际 lastSuccess/配置，不把 top-level success 分配给未知子项，不重发整批或成功子项。Test Case 特定内容/模式结构保持原样。 | | |
 | J77 | 保存时其他项目条目已改变：fresh-read 后合并保留新值；有真实 conditional-write/revision 能力时处理冲突，无能力不声称并发原子性。瞬时 profile-only 重试最多一次。 | | |
-| J78 | 平台实际载入 preview.8 generation/export 与 generic 3.0.0-json-preview.3，Task exporter 占位替换成真实返回 ID；user storage 能力实际挂载；重开 session 实读，不能把本机旧包或仓库源码当已部署。 | | |
+| J78 | 平台实际载入 preview.8 generation/export 与 generic 3.0.0-json-preview.4，Task exporter 占位替换成真实返回 ID；user storage 能力实际挂载；重开 session 实读，不能把本机旧包或仓库源码当已部署。 | | |
 
 | 候选/操作 | 实际用户读写工具与作用域证据 | 实际profile路径/版本 | populated匹配条目与其他条目保留 | profilePersistence状态/错误 | 新session读回证据 |
 | --- | --- | --- | --- | --- | --- |
@@ -129,6 +129,7 @@ jira-createissue-helper 独立包已同步本次持久配置生命周期，仍�
 | R03 | user-story-reviewer 原评分来源/回写规则保持其包原样；新 JSON SDLC 不读取其旧四/五字段规则来补数据库操作。 | | |
 | R04 | review-requirements 仍为独立需求/任务审查，不自动加入本 Task，不评分/导出，未授权不发 PR 评论。 | | |
 | R05 | 通用 helper preview.3 的创建/仅改单字段的更新/完整上游 JSON/Test Case single 与 multiple 每个 child 都含真实非空 fields.project.key 和 fields.issuetype.id，与 root/target 一致；缺任一、null/空值/错误类型或绑定冲突均在准备或读回时阻止提交。其他业务字段可按范围省略；不在已确认/已评分后静默补字段，不改变 manifest 仅路径结构或重放写入。 | | |
+| R06 | 通用 helper preview.4：普通非 Story 批次、混合计划每个非 Story 分组（含单项）、Test Case multiple 的实际 manifest 与全部 child 均为 .json4jira，最终调用路径指向存在且已确认的同名文件。旧 .json 返回准备修正路径/引用并重新确认；不只替换调用后缀、不重放成功/未知批次，不改模板源/profiles 文件名或路径数组协议。 | | |
 
 ## 当前分支验证记录
 

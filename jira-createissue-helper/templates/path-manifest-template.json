@@ -1,6 +1,6 @@
 {
   "story_json_workspace_paths": [
-    "<actual first child Workspace-relative path>",
-    "<actual second child Workspace-relative path>"
+    "<actual first child Workspace-relative path without extension>.json4jira",
+    "<actual second child Workspace-relative path without extension>.json4jira"
   ]
 }

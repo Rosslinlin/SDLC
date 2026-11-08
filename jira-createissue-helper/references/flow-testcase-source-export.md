@@ -35,7 +35,7 @@ Use the [individual template](../templates/testcase-individual-template.json).
 - Save one actual `.json4jira` per selected case, in selected source order.
 - `fields.summary` and `fields.description` both equal that case's source **Title**, not its longer Description or other metadata. Do not append Preconditions, Steps, Results, Test Data, Priority, Requirement references or Comments to Description.
 - Root `testDetailsJson` is a **native array**, never a JSON string or `testDetails` alias. Each entry contains only `step`, `data`, `result`, all with string values holding the complete paired source content and necessary newlines.
-- Save one [manifest](../templates/path-manifest-template.json) containing only `story_json_workspace_paths`: an ordered, nonempty array of the exact child Workspace-relative paths. No duplicates, nesting, inline issues or inherited defaults. Read every child, not just the manifest.
+- Save one `.json4jira` [manifest](../templates/path-manifest-template.json), for example `outputs/jira/testcases/export-manifest.json4jira`, containing only `story_json_workspace_paths`: an ordered, nonempty array of the exact `.json4jira` child Workspace-relative paths. The manifest itself must not use `.json`, even though its packaged template source does. No duplicates, nesting, inline issues or inherited defaults. Read every child, not just the manifest.
 - The sole export input points to the manifest. Keep this approved batch in one tool invocation; do not split it into repeated creates.
 
 ### `single`: one aggregate Test issue
@@ -57,6 +57,7 @@ Read the saved aggregate or manifest and every child. Complete one source-to-fil
 | Check | Required observation |
 | --- | --- |
 | Selection | Exact selected source IDs, row count/order, and ID → child path/manifest index or aggregate logical row mapping. |
+| File extension | The actual aggregate or manifest filename and every child path end in `.json4jira`; verify saved destinations before preview and final submission, not just a renamed tool argument. |
 | Native shape | Actual source/project/type, mandatory native `fields.project.key` / `fields.issuetype.id`, `CEAIA_GEN` labels and mode-specific structure. Nonempty routing key/ID match root facts; no serialized Test Details, forbidden aliases/controls, sample values or pointer substitutes. |
 | `multiple` | Exact source Title in both Summary/Description; one file per selected case; one native entry per identified step/result pair, full source values and actual data scope. A shared source string does not collapse separate numbered pairs. |
 | `single` | Exact five-cell header, one five-cell logical row per selected case, unchanged mapped cells, no separator/extra prose/source-only columns, and no Test Details aliases. Preserve intentional source empties. |
@@ -74,7 +75,7 @@ Call `java-base-mcp.exportjirabydynamicfield` once with exactly:
 
 ```json
 {
-  "story_json_workspace_path": "<actual aggregate or multiple-mode manifest Workspace-relative path>"
+  "story_json_workspace_path": "<actual aggregate or multiple-mode manifest Workspace-relative path without extension>.json4jira"
 }
 ```
 

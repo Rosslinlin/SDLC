@@ -4,7 +4,7 @@ Read when preparing a call or diagnosing a schema gap. [The JSON contract](commo
 
 | Tool | Use and input source |
 | --- | --- |
-| `java-base-mcp.exportjirabydynamicfield` | Content create/update/supported manifest: exactly `story_json_workspace_path`, a real saved Workspace-relative issue/manifest path. |
+| `java-base-mcp.exportjirabydynamicfield` | Content create/update/supported manifest: exactly `story_json_workspace_path`, a real saved Workspace-relative `.json4jira` issue/aggregate/manifest path. Each manifest child also uses `.json4jira`. |
 | `java-base-mcp.queryJiraProjectsByName` | Missing project: actual source and user project-name search keyword; reuse trusted/injected identity required by its live schema. |
 | `java-base-mcp.queryJiraIssueTypesByProject` | Missing actual type ID/name: confirmed source/project key and actual identity context required by its schema. |
 | `java-base-mcp.queryJiraCreateMetaFields` | Missing field identities/types/options: confirmed source/project and supported actual type ID/name. It describes create metadata, not proof of update permission or available relationship types. |

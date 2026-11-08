@@ -1,3 +1,11 @@
+# 2026-11-08 — jira-createissue-helper 3.0.0-json-preview.4：批量文件统一后缀
+
+修正非 Story 批次导出示例中的 `export-manifest.json` 为 `export-manifest.json4jira`。明确普通批量、混合计划的每个非 Story 分组、Test Case multiple 的 manifest 自身及所有子文件均使用 `.json4jira`；同步入口、模板路径提示、保存/预览/最终读回规则。
+
+旧 `.json` 提交文件在准备阶段修正真实保存路径及引用、重新确认；不能只改工具参数，也不为改后缀重放已成功或结果未知的批次。打包模板源与持久配置仍按各自文件类型保存。manifest 的单属性路径数组、Story 单文件调用、导出单参数和必需 project/issuetype 字段保持原协议。
+
+---
+
 # 2026-11-07 — jira-createissue-helper 3.0.0-json-preview.3：路由字段始终保留
 
 每个 issue JSON 的 `fields.project.key` 和 `fields.issuetype.id` 均为必需路由字段，覆盖创建、更新、Test Case 两模式及 manifest 的每个 child；不受 metadata required 标记或“未改字段省略”的影响。其他业务字段仍按获准范围和实际要求增减，保留原更新目标，不由保留路由字段授权移动项目或改变类型。

@@ -29,7 +29,7 @@ No root `staffId`, credential/session overrides, `conversationId`, `customFields
 
 ## A path manifest
 
-A non-Story path manifest, including Test Case `multiple`, has exactly one property:
+Save every non-Story path manifest, including Test Case `multiple` and each non-Story run of a mixed plan, as a real `.json4jira` file, for example `outputs/jira/testcases/export-manifest.json4jira`. The manifest itself and all listed issue children MUST end in the exact `.json4jira` extension; `.json` is not an export-file extension. Packaged template source names such as `path-manifest-template.json` do not determine the runtime filename. The saved manifest has exactly one property:
 
 ```json
 {
@@ -40,9 +40,9 @@ A non-Story path manifest, including Test Case `multiple`, has exactly one prope
 }
 ```
 
-Paths are actual unique child files in approved source order. The manifest is not an inline issue array, contains no defaults/identity/attachments, and cannot nest another manifest. Each child has its own routing/fields. Example paths are not actual inputs. This format also supports ordinary non-Story types; Story children are prohibited even in projects that do not require scoring. [Batch planning](flow-batch-export.md) submits multiple Stories as individual calls and shows any mixed execution plan.
+Paths are actual unique `.json4jira` child files in approved source order. The manifest is not an inline issue array, contains no defaults/identity/attachments, and cannot nest another manifest. Each child has its own routing/fields. Example paths are not actual inputs. This format also supports ordinary non-Story types; Story children are prohibited even in projects that do not require scoring. [Batch planning](flow-batch-export.md) submits multiple Stories as individual calls and shows any mixed execution plan.
 
-Read the manifest and every child, verifying every child is actually non-Story. Do not score a manifest. The complete selected set must pass applicable preparation and current confirmation checks before submission. Do not silently remove a blocked child. Preserve any [actual upstream assessment evidence](story-assessment-evidence.md) separately; it is not a universal export prerequisite.
+Read the manifest and every child, verifying their actual saved filenames end in `.json4jira` and every child is actually non-Story. Do not score a manifest. The complete selected set must pass applicable preparation and current confirmation checks before submission. Do not silently remove a blocked child. Preserve any [actual upstream assessment evidence](story-assessment-evidence.md) separately; it is not a universal export prerequisite.
 
 ## Exact production invocation
 
@@ -50,17 +50,19 @@ Call `java-base-mcp.exportjirabydynamicfield` with exactly one direct argument:
 
 ```json
 {
-  "story_json_workspace_path": "outputs/jira/testcases/export-manifest.json"
+  "story_json_workspace_path": "outputs/jira/testcases/export-manifest.json4jira"
 }
 ```
 
-For one issue/single-mode aggregate, this value is its actual issue file path. For an approved batch, it is the manifest file path. Keep the tool's singular argument distinct from the manifest's plural property. The screenshots' `exportJiraByDynamicFieldsV2` name is a test-environment alias, not the production tool ID.
+For one issue/single-mode aggregate, this value is its actual `.json4jira` issue file path. For an approved batch, it is the actual `.json4jira` manifest file path. Confirm that exact file exists; changing a tool argument's suffix alone does not create it. Keep the tool's singular argument distinct from the manifest's plural property. The screenshots' `exportJiraByDynamicFieldsV2` name is a test-environment alias, not the production tool ID.
 
 Do not add source, staffId, ticket, fields, attachments, SPEC status/path, `requestJson`, `issuesJson`, batch arrays or workflow controls beside that path. Platform request headers supply authentication/session context; do not collect or serialize them. `uploadType` stays current-request routing state, never an issue-file/manifest/tool property.
 
 The ticket/source two-argument mode of this same tool is existing-Jira score-only synchronization owned by reviewer. It is not a second call after JSON export and cannot repair a local JSON association. No historical four/five-field binding call follows this route.
 
 ## Currentness and file use
+
+An unsubmitted upstream issue or manifest saved as `.json` needs a filename correction during preparation. Use a supported rename, or save its unchanged business/manifest content at an actual `.json4jira` path when rename is unavailable; preserve original evidence. Update affected manifest child references and preview/confirmation path bindings, verify the real saved destinations and obtain current confirmation. Any assessment claimed for changed paths must be handled under its actual binding contract. Never rename/substitute a path during submission, and never replay a successful/unknown export merely to correct a historical filename. Profile/configuration files and packaged templates remain separate from submitted files.
 
 Reuse a complete trustworthy upstream file and exact established Workspace-relative path; no duplicate export copy, late text rendering, JSON reserialization or habitual metadata discovery. Validate the selected operation/target and both mandatory routing objects in actual `fields`; a file missing either is incomplete even if its root routing is populated or it was supplied upstream. Recover actual missing values from verified input/baseline/profile or query only the missing binding; never guess an ID. Correct the file in preparation, then obtain current confirmation and any actually required reassessment. Missing or conflicting values block save-as-export-ready and submission; never silently patch an assessed/confirmed file during export. Changes to JSON, manifest membership/order or participating files invalidate affected bindings.
 

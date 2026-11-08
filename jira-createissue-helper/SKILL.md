@@ -5,9 +5,9 @@ description: Prepare or export ordinary Jira issues and source Test Cases throug
 
 # Jira Create Issue Helper
 
-Version: 3.0.0-json-preview.3 — 2026-11-07. Runtime: GPT-5.6 Luna or GPT-6 Luna, platform text/file tools only; no scripts.
+Version: 3.0.0-json-preview.4 — 2026-11-08. Runtime: GPT-5.6 Luna or GPT-6 Luna, platform text/file tools only; no scripts.
 
-The submission source is the saved final `.json4jira`, or an approved path manifest. Production content export calls `java-base-mcp.exportjirabydynamicfield` with only `story_json_workspace_path`. Read [the JSON contract](references/common-json4jira-contract.md) and the selected flow; load preparation references only when facts/files are missing. CEAIA SDLC handoffs belong to their dedicated exporter; this helper has no legacy SDLC execution route.
+Every submitted file uses the exact `.json4jira` extension: an individual issue, a single-mode aggregate, or an approved batch path manifest. Every manifest child also uses `.json4jira`; a non-Story batch is no exception. Verify actual saved filenames before preview and final submission; a `.json` manifest is not export-ready. Production content export calls `java-base-mcp.exportjirabydynamicfield` with only `story_json_workspace_path`. Read [the JSON contract](references/common-json4jira-contract.md) and the selected flow; load preparation references only when facts/files are missing. CEAIA SDLC handoffs belong to their dedicated exporter; this helper has no legacy SDLC execution route.
 
 ## Select one flow
 
