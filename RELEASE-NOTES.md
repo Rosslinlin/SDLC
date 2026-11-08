@@ -1,3 +1,13 @@
+# 2026-11-08 — 6.1.0-preview.9：SDLC 取消手工 staff ID 步骤
+
+当前创建/更新模板本已没有 staffId。此次清理入口、字段发现参数表、Task 和自然语言编排中“缺失时向用户询问”的旧兜底，评分、导出及新 SDLC profile 均不增加 staffId。查询仅依据实时 schema 使用平台实际提供的身份；实际身份注入缺失报告技术问题，不收集员工号、不解析 JWT、不猜身份值。
+
+已有 profile 不因缺少 staffId 失效或触发全量发现；保留共享文件中的旧字段和其他项目/操作，按可信认证作用域复用，不以员工号独立证明用户身份。续跑解除旧 staffId 待答问题，保留真实业务问题、状态、编号证据与所有已知/未知远端结果，不触发 Jira/附件/评分重放。
+
+仅修改身份流程和相关验收，创建/更新业务 JSON 模板、评分三参、导出单路径、Q1–Q7 与 profile 保存门禁保持原样。实时后端是否仍暴露身份参数以实际 schema 为准，不把此规则修改当作后端接口变更或平台实测通过。
+
+---
+
 # 2026-11-08 — jira-createissue-helper 3.0.0-json-preview.4：批量文件统一后缀
 
 修正非 Story 批次导出示例中的 `export-manifest.json` 为 `export-manifest.json4jira`。明确普通批量、混合计划的每个非 Story 分组、Test Case multiple 的 manifest 自身及所有子文件均使用 `.json4jira`；同步入口、模板路径提示、保存/预览/最终读回规则。

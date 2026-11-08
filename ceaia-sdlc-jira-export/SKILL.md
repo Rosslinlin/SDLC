@@ -5,9 +5,11 @@ description: Export a reviewed and scored CEAIA story.json4jira through its unch
 
 # CEAIA JSON Story Export
 
-Version: 6.1.0-preview.8 — 2026-11-07. State contract: 7 (additive profile persistence state). Runtime: GPT-5.6 Luna or GPT-6 Luna. Execution: text-only.
+Version: 6.1.0-preview.9 — 2026-11-08. State contract: 7 (additive profile persistence state). Runtime: GPT-5.6 Luna or GPT-6 Luna. Execution: text-only.
 
 Generation owns project/type/field discovery, configuration, JSON assembly, content repair, review and scoreUserStory. This skill consumes their current evidence, obtains the scored file's frontend upload confirmation and invokes the exporter with one path. Use existing platform capabilities; no scripts, new tools, business generation or scoring here.
+
+SDLC never requests staffId from the user or adds it to new profiles, business files or export arguments. Use the authenticated platform context/user-isolated namespace. A missing staffId does not invalidate a profile or block this path-only export; an actual unavailable authenticated scope is a technical integration gap, never a manual staff-ID question.
 
 ## Execute in order
 

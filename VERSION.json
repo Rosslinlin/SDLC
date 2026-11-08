@@ -1,6 +1,6 @@
 {
-  "bundleVersion": "6.1.0-preview.8",
-  "releaseDate": "2026-11-07",
+  "bundleVersion": "6.1.0-preview.9",
+  "releaseDate": "2026-11-08",
   "executionProfile": "text-only",
   "activeSkills": [
     "ceaia-sdlc-story-spec-generation",
@@ -19,6 +19,7 @@
   "jiraWritePolicy": "same-scored-json-path-only-after-explicit-current-content-confirmation",
   "jiraRoutingProfile": "durable-user-workspace-ceaia-sdlc-jira/profiles.json; shared-generic-and-sdlc; multi-project-issueType-capability; early-settings-decision; mandatory-post-issue-success-read-merge-write-readback",
   "notes": [
+    "2026-11-08 preview.9: SDLC templates already omit staffId. Removed legacy manual staff-ID intake/discovery fallback rules and fixed query documentation, Task and natural-language orchestration. Use actual platform-supplied identity under live schemas; missing identity injection is a technical gap, never a user question. New SDLC profiles need no staffId; preserve old shared data and remote outcomes, cancel only obsolete staff-ID waits. Story JSON templates, scoring/export arguments and quality rules are unchanged.",
     "2026-11-07 preview.8: durable user-Workspace profile read/write is mandatory on generic and SDLC create/update routes, including complete upstream JSON and partial downstream effects after confirmed issue success. Added early optional field guidance, current-run settings approval and multi-project/type compatible profiles. Existing scoring/review/export tool shapes remain unchanged; platform deployment and cross-session persistence still require actual integration verification.",
     "2026-11-07: promoted codex/sdlc-json4jira-flow to main by a history-preserving merge. main now runs this JSON-first bundle; featureBranch records the originating development branch. The preview version and recorded platform-validation status are unchanged.",
     "2026-11-06 user-tested confirmation: the existing attachmentsJson.add/replace format works inside the root of the path-based story.json4jira, and readJiraAttachments returns actual original attachment IDs. add entries use relativePath/fileName; replace entries additionally use attachmentId from the same source/ticket original, bound to its readable maintained-SPEC content and mapped output. The export tool still takes only story_json_workspace_path.",
@@ -69,9 +70,10 @@
     }
   },
   "storyJsonFormat": "jira-fields-with-root-ac-id-map; update-only-issueIdOrKey; no-reporter; confirmed-root-attachmentsJson-object-with-add-relativePath-fileName-and-replace-plus-reader-original-attachmentId; no-parallel-nonempty-attachments; explicit-none-attachments-empty-and-no-attachmentsJson",
-  "entryPolicy": "default-jira-backed-Story; profile-first; source-project-optional-extra-fields; existing-profile-current-run-approval; final-content-confirmation",
+  "entryPolicy": "default-jira-backed-Story; profile-first; source-project-optional-extra-fields; existing-profile-current-run-approval; final-content-confirmation; no-manual-staff-id",
   "jiraMetadataReusePolicy": "profile-first-for-create-and-update; cross-mode-stable-components; operation-scoped-permissions; query-only-missing-or-explicit-refresh-or-actual-schema-error",
   "storySpecSyncPolicy": "automatic-local-spec-tests-for-story-business-change; related-jira-spec-replace; first-spec-add; explicit-remote-preservation-only-none",
   "profilePersistencePolicy": "create-and-update-issue-success-triggers-required-closeout-even-if-downstream-partial; saved-only-after-user-scope-readback; meaningful-partial-facts-allowed; profile-only-recovery",
-  "profileSchemaPolicy": "compatible-profiles-array; canonical-issueType; consistent-Story-storyType-alias; user-source-project-type-capability-key; explicit-reusable-defaults-only"
+  "profileSchemaPolicy": "compatible-profiles-array; canonical-issueType; consistent-Story-storyType-alias; user-source-project-type-capability-key; explicit-reusable-defaults-only",
+  "sdlcIdentityPolicy": "trusted-platform-authenticated-context; no-user-staff-id-prompts; no-new-staff-profile-fields-or-fallback-keys; actual-missing-injection-is-technical-gap; preserve-legacy-shared-profile-data"
 }

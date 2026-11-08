@@ -1,6 +1,6 @@
 # CEAIA SDLC v6.1 JSON4Jira flow — preview
 
-当前主分支为 `main`，版本为 `6.1.0-preview.8`。2026-11-07 将 `codex/sdlc-json4jira-flow` 的重构版本合入主线。本项目将每个候选的最终 Jira 内容统一为一个 `story.json4jira`，从该文件生成 SPEC 中的 Story 投影，使用同一路径评分、预览和导出。运行目标为平台 GPT-5.6 Luna / GPT-6 Luna；运行时仅使用现有平台工具和 Markdown/JSON 资源，不执行本地脚本。平台集成验证状态仍以测试清单的实际记录为准。
+当前主分支为 `main`，版本为 `6.1.0-preview.9`。2026-11-07 将 `codex/sdlc-json4jira-flow` 的重构版本合入主线。本项目将每个候选的最终 Jira 内容统一为一个 `story.json4jira`，从该文件生成 SPEC 中的 Story 投影，使用同一路径评分、预览和导出。运行目标为平台 GPT-5.6 Luna / GPT-6 Luna；运行时仅使用现有平台工具和 Markdown/JSON 资源，不执行本地脚本。平台集成验证状态仍以测试清单的实际记录为准。
 
 用于平台“自然语言生成 workflow”的完整中文输入见 [SDLC 工作流自然语言说明](SDLC-WORKFLOW-NATURAL-LANGUAGE.md)，涵盖触发条件、阶段职责、工具调用、内容门禁、更新和附件规则、确认、恢复与验收条件，以本分支当前规则为准。
 
@@ -14,7 +14,7 @@
 
 唯一编排规则见 [workflow-contract](ceaia-sdlc-story-spec-generation/references/workflow-contract.md)。主链为：来源读取 → 在生成阶段解析项目/Story 类型/字段配置并复用持久配置 → 每候选生成最终 `story.json4jira`、`TEST_CASE.md`、`<name>-spec.md` → 生产自检 → 独立内容审查 → 同步并读回 SPEC review 状态 → 真实评分 → 整批覆盖核对 → 前端 HTML 预览 → 用户明确确认当前内容 → 逐候选导出。默认所有用户继续 Jira-backed 完整流程，不在入口提供 Preparation-only / Jira-backed 路线选择。缺信息时保留完整流程意图并补齐对应缺项；初始全流程意图不代替评分后的最终内容确认。
 
-入口先读真实用户 Workspace 的跨 session 配置和可信身份。首次按缺失 source → project → 可选附加字段引导，Epic Link、Story Type 等只展示 metadata 实际支持项，允许暂不设置。已有配置在生成业务文件前展示项目/Story 字段并确认沿用、修改或切项目；当前 run 已明确确认的未变批次/续跑无需重问。技术类型/schema/AC ID 由工具取得。SDLC 固定导出 Story；最终评分后仍要用户检查文件并明确确认导出。缺项保留默认 Jira 流程意图，只有用户主动要求只准备/不导出时才遵从。
+入口先读真实用户 Workspace 的跨 session 配置和可信身份。首次按缺失 source → project → 可选附加字段引导，Epic Link、Story Type 等只展示 metadata 实际支持项，允许暂不设置。已有配置在生成业务文件前展示项目/Story 字段并确认沿用、修改或切项目；当前 run 已明确确认的未变批次/续跑无需重问。技术类型/schema/AC ID 由工具取得。SDLC 不向用户索取 staff ID，也不把它加入新配置、Story JSON 或评分/导出参数；身份由可信平台上下文提供，实际缺失属于工具集成问题。SDLC 固定导出 Story；最终评分后仍要用户检查文件并明确确认导出。缺项保留默认 Jira 流程意图，只有用户主动要求只准备/不导出时才遵从。
 
 `story.json4jira` 是唯一 Story 业务源，也是最终 Jira 提交文件；**不再生成独立 `STORY.md`**。SPEC 中的 Story 展示须从该 JSON 的实际业务字段投影，不能另写一份不同内容。`TEST_CASE.md` 仍保留；仅按已确认 schema 授权的 SPEC 附件计划进入 JSON，测试与内部记录不上传。
 
@@ -31,7 +31,7 @@
 
 生成阶段、评分之前就完成 Jira wiki 编码：描述标题使用 `h1. 标题`、`h2. 标题`；AC 例如 `* *AC-001*: Given ... When ... Then ...`，以 Jira 列表和单星号粗体保留每条 AC 的声明。JSON 字符串解码后有真实换行，普通正文与代码内容保真；不对 summary、路由/身份/选项、附件路径或更新中未改动字段做格式转换。SPEC 仍为 Markdown，从这些字段的相同语义生成可读投影，不能直接贴入 wiki 标记。导出只提交已评分的原文件，不再临时转换格式。
 
-移除旧顶层 `summary` / `description` / `bddScenarios`、旧 `customFields` 映射包装、根级 `staffId` 及 `fields.reporter`。根级 `acceptanceCriteria` 仅保留实际字段 ID，旧顶层 AC 正文/数组不适用。身份配置与查询工具按实际 schema 所需的 `staffId` 仍保留；这不是评分/导出的额外入参。生成、自检、SPEC 投影、测试与 reviewer 都读取同一实际 `fields` 内容；映射缺失、类型错误或目标冲突是结构问题，不给 Q1–Q7 新增业务标准。旧 JSON 迁移字段后须重新完成当前包的评分及内容确认，不能沿用旧 checksum。
+移除旧顶层 `summary` / `description` / `bddScenarios`、旧 `customFields` 映射包装、根级 `staffId` 及 `fields.reporter`。根级 `acceptanceCriteria` 仅保留实际字段 ID，旧顶层 AC 正文/数组不适用。查询只按实时 schema 使用平台实际提供的身份；不保留手工收集 staffId 的步骤或默认必填参数，缺少身份注入不转成用户问题。生成、自检、SPEC 投影、测试与 reviewer 都读取同一实际 `fields` 内容；映射缺失、类型错误或目标冲突是结构问题，不给 Q1–Q7 新增业务标准。旧 JSON 迁移字段后须重新完成当前包的评分及内容确认，不能沿用旧 checksum。
 
 当前接口边界：
 

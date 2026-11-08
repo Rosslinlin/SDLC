@@ -1,6 +1,6 @@
 # v6.1 JSON4Jira flow 平台测试清单 — preview
 
-版本 `6.1.0-preview.8`，当前主分支为 `main`；2026-11-07 合入原 `codex/sdlc-json4jira-flow` 重构版本。分别在平台 GPT-5.6 Luna 与 GPT-6 Luna 验证路径接口。下列结果栏留空表示尚未记录，合并到 main 不代表平台验证通过；不能把旧 v6 本地/旧接口检查、mock 推演或普通 tool success 当作新接口与数据库实测。
+版本 `6.1.0-preview.9`，当前主分支为 `main`；2026-11-07 合入原 `codex/sdlc-json4jira-flow` 重构版本。分别在平台 GPT-5.6 Luna 与 GPT-6 Luna 验证路径接口。下列结果栏留空表示尚未记录，合并到 main 不代表平台验证通过；不能把旧 v6 本地/旧接口检查、mock 推演或普通 tool success 当作新接口与数据库实测。
 
 ## 环境与执行记录
 
@@ -41,10 +41,10 @@
 | J28 | 根级 `acceptanceCriteria` 的字段 ID 不被计作 AC 正文/AC 数量；读取对应 fields 值，缺少实际正文不能被映射字符串伪装成内容通过。 | | |
 | J29 | AC 映射为空/缺失、指向不存在字段，或字段值为空/非字符串时明确结构阻塞并回到生成；不猜 ID、不从旧顶层数组静默兜底、不宣称通过评分。 | | |
 | J30 | 根级 projectKey 与 `fields.project.key`、类型名/真实 `fields.issuetype.id` 一致；创建和更新 JSON 均不含 fields.reporter，不因旧模板/profile 又加入它；更新省略 reporter 不清空远端原值。冲突在评分前解决，不硬编码类型 ID 7 或照抄示例员工号/项目。 | | |
-| J31 | 首次无适用配置：先读真实用户 Workspace/可信身份，按缺失 source → project → 可跳过附加字段引导；仅展示实际支持的 Epic Link/custom Story Type 等。类型/schema/AC ID 由工具查，staffId 仅必要时问；保持 SDLC Story 与默认 Jira 意图。 | | |
+| J31 | 首次无适用配置：先读真实用户 Workspace/可信身份，按缺失 source → project → 可跳过附加字段引导；仅展示实际支持的 Epic Link/custom Story Type 等。类型/schema/AC ID 由工具查，不询问 staffId，身份由平台提供；保持 SDLC Story 与默认 Jira 意图。 | | |
 | J32 | 已有适用配置：生成业务文件前展示项目/Story 字段，明确确认沿用/修改/切项目或仅本次覆盖；未变当前 run 批次/续跑不重复问。完整 facts 不重复 discovery，最终评分后仍要当前文件确认。 | | |
 | J33 | 用户主动明确只准备/不导出：记录该方向，不执行导出；不把此方向变成默认入口选项。仍只用已知真实值，缺必要元数据则交付已有事实和待补项，不伪造完整可评分 JSON 或实际评分成功。 | | |
-| J34 | 模板与实际 Story JSON 不含根级 staffId 或 fields.reporter；评分仍恰三参数、导出仍仅路径。身份配置和查询工具按实际 schema 保留所需 staffId，删除提交中的 reporter 不代表清空 Jira 现有值。 | | |
+| J34 | 模板与实际 Story JSON 不含根级 staffId 或 fields.reporter；评分仍恰三参数、导出仍仅路径。不向用户收集 staffId、不在新 SDLC profile 建立 staffId 后备身份；查询按实时 schema 用平台提供身份，缺注入是技术问题，删除 reporter 不代表清空 Jira 现有值。 | | |
 | J35 | 生成时即将 description/映射 AC 及其他获准富文本写成 Jira wiki，标题 h1./h2.、AC `* *AC-001*: Given ...`；代码、嵌套列表、链接及表格内容无损，已有 wiki 不重复转换。summary、路由/选项、普通文本及未改动更新字段不转换。评分后导出文件不被再次渲染。 | | |
 | J36 | SPEC 的 Markdown 投影与 JSON 的 Jira wiki 语义一致，AC ID/数量/措辞/顺序保留，引用不被误算为声明；reviewer 和评分读取同一映射正文。旧 JSON 去除 staffId 或转换格式后，旧评分/确认失效；重新评分确认不重放已成功或未知的远端写入。 | | |
 | J37 | 创建模板及实际创建 JSON 使用根级 acceptanceCriteria 字段 ID，无 customFields 包装、fields.reporter 或 issueIdOrKey；实际 AC 正文在 fields[acceptanceCriteria]。字段可写性与类型在评分前核对，不从旧缓存补回 reporter。 | | |
@@ -110,6 +110,16 @@
 | --- | --- | --- | --- | --- | --- |
 | | | | | | |
 
+## preview.9 SDLC 不收集 staff ID（待平台执行）
+
+| ID | 场景及通过条件 | 5.6 Luna结果/证据 | 6 Luna结果/证据 |
+| --- | --- | --- | --- |
+| J79 | 首次无 profile、可信平台身份可用但无 staffId：仅询问未给 source/project/可选业务字段，不新增员工号步骤；按实时业务 schema 查询，身份由实际平台上下文提供。 | | |
+| J80 | 完整同用户 profile 没有 staffId：稳定配置照常复用，不判无效、不重新跑全部发现、不要求补 staffId；SDLC 固定 Story，提前设置及最终内容确认保留。 | | |
+| J81 | 实时 query schema 确有必需身份参数，但平台未提供：精确 WAITING_TOOL/集成问题，不询问用户员工号、不猜值、不解析 token、不越权读他人配置。没有实际业务缺项时不增加 query。 | | |
+| J82 | 旧会话正等待 staffId，同时另有真实业务待问/已完成评分或远端结果：只解除旧身份提问，保留其他问题与已知/未知结果，自动恢复可执行步骤，不重放 review/score/Jira/附件。 | | |
+| J83 | 成功 create/update 后配置保存不含新 staffId/default/fallback key，用户认证命名空间足够；保留共享文件旧 staffId 和其他项目/操作，不主动全库迁移或把旧员工号作为身份所有权证明。真实用户作用域读回门禁保留。 | | |
+
 ## 后端结果证据
 
 后端字段名与状态语义以实际 live schema/响应为准；下表是观测类别，不是虚构的响应字段协议。
@@ -132,6 +142,13 @@ jira-createissue-helper 独立包已同步本次持久配置生命周期，仍�
 | R06 | 通用 helper preview.4：普通非 Story 批次、混合计划每个非 Story 分组（含单项）、Test Case multiple 的实际 manifest 与全部 child 均为 .json4jira，最终调用路径指向存在且已确认的同名文件。旧 .json 返回准备修正路径/引用并重新确认；不只替换调用后缀、不重放成功/未知批次，不改模板源/profiles 文件名或路径数组协议。 | | |
 
 ## 当前分支验证记录
+
+### 2026-11-08 preview.9 本地身份流程检查
+
+三个活动 Skill 官方 quick_validate、15 个 JSON、14 个 JSON 示例、140 处本地链接和 git diff --check 通过。确认全部 generation JSON 模板、Q1–Q7 两份标准、Task 的 schema/工具顺序/Skill IDs/依赖/完成标准、评分与导出参数、state contract 7 未改。
+
+独立代理仅使用当前 Skill 原文与四组隔离 mock 事实，父代理读回并核对实际轨迹：首次无 staffId 只查询缺失 type/meta 且不加身份参数；完整已批准 profile 无 staffId 仍零 discovery；实时 schema 真需身份但平台未注入时 WAITING_TOOL、不向用户提问；续跑只撤销旧 staff 问题，保留真实业务问题、82 分/评分计数、修复计数和既有成功更新结果。统一了可选字段在真实 schema 已知后提问的概述措辞。没有真实平台、Jira、数据库或用户 Workspace 调用，J79–J83 仍待平台实测。
+
 
 ### 2026-11-07 preview.8 本地检查与独立入口/保存推演
 

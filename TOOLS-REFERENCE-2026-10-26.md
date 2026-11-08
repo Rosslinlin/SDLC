@@ -1,6 +1,6 @@
-# SDLC JSON 工具契约 — 6.1.0-preview.8
+# SDLC JSON 工具契约 — 6.1.0-preview.9
 
-主线合并日期：2026-11-07。文件路径沿用旧名；当前内容定义 main 的 SDLC JSON 路线，来源为 codex/sdlc-json4jira-flow 重构分支。目标模型为 GPT-5.6 Luna / GPT-6 Luna，纯文本调用已有平台能力，不运行脚本。
+身份规则更新：2026-11-08。主线合并日期：2026-11-07。文件路径沿用旧名；当前内容定义 main 的 SDLC JSON 路线，来源为 codex/sdlc-json4jira-flow 重构分支。目标模型为 GPT-5.6 Luna / GPT-6 Luna，纯文本调用已有平台能力，不运行脚本。
 
 ## 权威来源和边界
 
@@ -72,17 +72,17 @@
 
 ## 生成阶段的字段/证据工具
 
-| 工具 | 用途 / 已知输入 |
+| 工具 | 用途 / 业务输入（身份由平台提供） |
 | --- | --- |
-| java-base-mcp.queryJiraProjectsByName | 生成 JSON 前确认项目；staffId、almType、projectName |
-| java-base-mcp.queryJiraIssueTypesByProject | 确认真实 Story 类型；staffId、almType、projectKey |
-| java-base-mcp.queryJiraCreateMetaFields | 字段required/type/options/AC等；staffId、almType、projectKey，及issueType或issueTypeId |
+| java-base-mcp.queryJiraProjectsByName | 生成 JSON 前确认项目；almType、projectName |
+| java-base-mcp.queryJiraIssueTypesByProject | 确认真实 Story 类型；almType、projectKey |
+| java-base-mcp.queryJiraCreateMetaFields | 字段required/type/options/AC等；almType、projectKey，及实时 schema 支持的 issueType或issueTypeId |
 | java-base-mcp.getJiraInfos | 原票 Description/AC与可用事实、首次新Epic验证或必要异常核对；其余参数遵循实时schema |
 | java-base-mcp.readJiraAttachments | 更新的完整附件清单、实际原attachmentId及可读证据；2026-11-06用户已确认返回真实原ID，绑定source/目标票和原文后用于文件内attachmentsJson.replace；其余参数遵循实时schema |
 | java-base-mcp.fetchConfluenceContent / fuzzyMatchingConfluence | 原始需求证据获取；遵循来源资源中的已知参数及实时schema |
 | ask_user_question | 缺失事实/真实选择/设置、当前内容确认或有界恢复决定；不伪造用户确认 |
 
-这些 query 在 generation 组装 Story 时完成。现有 query 参数 staffId 与 profile 身份保留，不写入 Story JSON 根级或评分/导出参数；创建与更新均不提交 fields.reporter，旧 profile/基线也不能把它带回。query 的 almType 不自动成为 JSON 字段名。根级 projectKey 与 fields.project.key 一致，issueType 是确认的类型名，fields.issuetype.id 是实际 ID；字段名大小写固定。根级 acceptanceCriteria 是非空字段 ID 字符串，正文放 fields[该ID]；description/AC 已是 Jira wiki，不留到导出时转换。其他获准业务字段继续按实际字段 ID/类型/选项放 fields；不再使用 customFields 包装或旧顶层 summary/description/BDD/AC 文本数组。持久配置按用户/项目/type/操作能力复用，缺项定向查询，不按 TTL 强刷。规范见 [前置组装](ceaia-sdlc-story-spec-generation/references/jira-json-assembly.md) 与 [文本编码](ceaia-sdlc-story-spec-generation/references/jira-text-format.md)。
+这些 query 在 generation 组装 Story 时完成。SDLC 不向用户收集 staffId，不在模板或新 profile 中新增 staffId，也不创建 staff-id-fallback 身份键。表中只列业务输入，不宣称实际后端身份字段已删除：若实时 schema 需要身份，只能使用可信平台实际提供且 schema 接受的值；缺少身份注入是技术 WAITING_TOOL，不能索取员工号、解析 token、猜身份或以此重复完整查询。旧共享配置字段与其他项目条目保留，staffId 缺失不影响已验证用户作用域内的正常配置复用。身份不写入 Story JSON 根级或评分/导出参数；创建与更新均不提交 fields.reporter，旧 profile/基线也不能把它带回。query 的 almType 不自动成为 JSON 字段名。根级 projectKey 与 fields.project.key 一致，issueType 是确认的类型名，fields.issuetype.id 是实际 ID；字段名大小写固定。根级 acceptanceCriteria 是非空字段 ID 字符串，正文放 fields[该ID]；description/AC 已是 Jira wiki，不留到导出时转换。其他获准业务字段继续按实际字段 ID/类型/选项放 fields；不再使用 customFields 包装或旧顶层 summary/description/BDD/AC 文本数组。持久配置按用户/项目/type/操作能力复用，缺项定向查询，不按 TTL 强刷。规范见 [前置组装](ceaia-sdlc-story-spec-generation/references/jira-json-assembly.md) 与 [文本编码](ceaia-sdlc-story-spec-generation/references/jira-text-format.md)。
 
 创建与更新都先读取真实用户 Workspace 的 profiles.json，按相同用户/source/project/type 复用稳定项目、类型和 AC 字段 ID 等组件。已有 create profile 不因本次 update 就失效；权限、requiredness 与默认值保留原操作范围，不将 create metadata 当 edit 权限。配置与 baseline 信息足够时，三个 discovery query 均不调用；只有缺失/不适用组件、明确刷新/目标变更或实际 schema 错误时定向查询。getJiraInfos/readJiraAttachments 的当前票据/原 SPEC 读取仍必要，它们不是这些字段 discovery query。
 

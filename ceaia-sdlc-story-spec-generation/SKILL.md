@@ -5,7 +5,7 @@ description: Generate final Jira-ready Story JSON and Markdown SPECs using share
 
 # CEAIA Story JSON and SPEC Generation
 
-Version 6.1.0-preview.8. Text-only. Platform runtimes: GPT-5.6 Luna or GPT-6 Luna.
+Version 6.1.0-preview.9 — 2026-11-08. Text-only. Platform runtimes: GPT-5.6 Luna or GPT-6 Luna.
 
 ## Entry and resources
 
@@ -26,6 +26,7 @@ Version 6.1.0-preview.8. Text-only. Platform runtimes: GPT-5.6 Luna or GPT-6 Lun
 
 ## Execution
 
+- Authentication and user scope come from trusted platform context. Never ask users for staffId, make it an intake/profile prerequisite, or create a staff-ID fallback key. Use the actual live tool schema and platform-provided identity only; missing required identity injection is WAITING_TOOL, never a user question or a reason for extra discovery. A profile without staffId remains usable when its authenticated user scope and reusable facts are established. On resume supersede only obsolete staff-ID questions, preserving other pending facts, current artifacts and remote outcomes.
 - Classify new_story or existing_ticket_update. A cited evidence ticket is not an update target. Confirm each Jira source before reading it; do not infer from prefixes. UAT-only work uses its dedicated workflow.
 - SDLC always uses Story. Both modes first read real persistent user-Workspace ceaia-sdlc-jira/profiles.json; select the same-user/source/project/actual Story-type/operation entry among multiple projects/types (canonical issueType, with consistent legacy storyType alias), and confirm proposed reusable fields for this run. Reuse same-user/source/project/type components, including stable facts from a create profile during update; do not require a new update entry to reuse them. Existing baseline reads remain necessary. Query only missing/inapplicable components, explicit refresh/changed destination or actual schema-error recovery; never query create metadata as an edit-permission check.
 - Move project/type/metadata queries and final field assembly into this generation stage. Root acceptanceCriteria is the actual AC field-ID string; its Jira wiki text lives at fields[acceptanceCriteria]. Omit customFields, root staffId and fields.reporter. Creates omit issueIdOrKey entirely; updates put the exact confirmed existing target key in root issueIdOrKey after issueType and preserve the approved baseline/delta. Description and AC already contain Jira wiki (h2. headings, * *AC-001*: entries). Resolve required metadata before scoring; reuse verified profiles and actual upstream baseline reads. No older flat/Markdown template, description/AC arrays or independent BDD objects.
