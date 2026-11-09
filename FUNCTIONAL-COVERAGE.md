@@ -1,11 +1,11 @@
 # v6.1 JSON4Jira flow 功能归属 — preview
 
-版本 `6.1.0-preview.9`，当前主分支为 `main`；2026-11-07 合入原 `codex/sdlc-json4jira-flow` 重构版本。本表描述路径接口的职责与待验证边界，不代表真实后端已全部通过。
+版本 `6.1.0-preview.10`，当前主分支为 `main`；2026-11-07 合入原 `codex/sdlc-json4jira-flow` 重构版本。本表描述路径接口的职责与待验证边界，不代表真实后端已全部通过。
 
 | 能力 | 唯一职责 / 参考 | 当前行为与边界 |
 | --- | --- | --- |
 | 主链、状态、失效与续跑 | generation [workflow-contract](ceaia-sdlc-story-spec-generation/references/workflow-contract.md) | Task/普通对话同序；所有用户默认 Jira-backed 完整流程，入口不提供路线选择；最终已评分内容仍须 HTML 预览与明确确认。逐候选准备，保持阻塞项，导出前核对全部选定范围。 |
-| 默认入口与缺项补齐 | generation intake/assembly | 先读真实 Workspace 配置/可信身份，首次只补缺失来源/项目并增加可跳过附加字段引导；已有配置生成前明确确认沿用/修改/切项目。类型/schema/AC ID 由查询工具取得，不要求业务用户填技术 ID。缺信息保留默认 Jira 意图，不推荐 preparation-only；仅遵从用户主动明确的只准备/不导出，且不伪造完整可评分 JSON。 |
+| 默认入口与缺项补齐 | generation intake/assembly | 先读真实 Workspace 配置/可信身份，实际缺少适用 saved profile 即首次引导，来源/项目已给也不能代替可选字段的实际回答/明确跳过；只记录一个 optionalFieldsDecision，不新增审查循环；已有配置生成前明确确认沿用/修改/切项目。类型/schema/AC ID 由查询工具取得，不要求业务用户填技术 ID。缺信息保留默认 Jira 意图，不推荐 preparation-only；仅遵从用户主动明确的只准备/不导出，且不伪造完整可评分 JSON。 |
 | 固定内容标准 | generation [quality-contract](ceaia-sdlc-story-spec-generation/references/quality-contract.md)；review 内同文副本 | Q1–Q7 不另增标准；检查 JSON 业务内容、SPEC 投影和测试，不增加本地评分或第四个 Skill。 |
 | 来源与拆分 | generation [source-enrichment](ceaia-sdlc-story-spec-generation/references/source-enrichment.md) / [authoring](ceaia-sdlc-story-spec-generation/references/artifact-generation-rules.md) | 原始要求有明确去向；不从 UI 推断后台，不按 AC 数拆票，不发明缺失业务事实。 |
 | 前置项目/type/meta 与持久配置 | generation | create/update 均先读真实 user Workspace profiles.json，同用户/source/project/type 的稳定项目/类型/AC 映射按组件跨模式复用，不因旧 profile 只有 create capability 重跑三 query。权限、requiredness、操作/default 按模式区分；缺项、不适用、显式刷新/目标变化或真实 schema 错误才定向 query，不按 TTL 刷新。baseline/附件读取独立保留；export 不重新发现字段。 |
@@ -42,3 +42,7 @@
 ## 2026-11-08 preview.9 身份处理
 
 SDLC 入口、字段发现、评分、导出和配置持久化均不向用户索取 staff ID。查询按实时 schema 使用平台实际提供的身份，身份注入缺失属于技术缺口；已有完整配置不因无 staffId 重查。旧 staffId 待答问题解除，其他业务问题与所有远端结果保留。
+
+## 2026-11-09 preview.10 用户 Workspace 能力复用
+
+普通工具或当前代理可执行的原生文件动作支持实际用户目的地即可用于 profile；可见工具记录的有无不能单独证明能力或保存成功，复用已成功操作，读回是正常文件读；不要求专用 API 名称或 scope 返回。真实 not-found 用现有目录工具或自动父目录写入创建 populated profile。保存必须先于 issue 成功后的退出；写与读的缺口分别报告，不能按名称猜 unavailable。已创建 issue 的 profile-only 恢复不补提问、不重评分或重放 Jira。

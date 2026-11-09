@@ -132,7 +132,11 @@
       "status": "pending",
       "recordPath": ".ceaia-work/stories/example-story/preparation.md",
       "profileKey": null,
-      "storyJsonRevision": null
+      "storyJsonRevision": null,
+      "optionalFieldsDecision": {
+        "status": "pending",
+        "recordPath": null
+      }
     }
   },
   "phase": "intake"

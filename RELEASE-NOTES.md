@@ -1,3 +1,15 @@
+# 2026-11-09 — 6.1.0-preview.10：修正用户 Workspace 能力误判与首次引导
+
+普通 Workspace 工具或当前代理实际可执行的原生保存/打开/读取动作支持用户目的地，就用于 profile；复用本轮已成功的用户空间操作。读回是正常文件读，不再要求专用 user-level API、独立 read-back 工具、返回 scope 字段或数据库证明。先检查并实际使用可用操作，not-found 时用真实目录工具或自动父目录创建，不能按名称猜 unavailable。没有可见工具记录既不证明能力缺失，也不证明保存成功；聊天声明/路径/代码块不算文件证据，不虚构隐藏 API 或原生指令。写成功只证明可写；缺读能力或实际错误精准报告，未知旧文件不覆盖。
+
+真实 profile 缺失/没有适用 saved entry 时，source/project 已给也不代替第三问；在既有 assembly state/preparation 记录一个 optionalFieldsDecision，实际提供或明确跳过后才生成。现有配置仍显示字段并确认沿用。成功 issue 的 profile 保存收敛为返回前的独立收尾，停止仅指后续 Jira 提交；profile-only 恢复不补问、不重评分或重放已成功 Jira。
+
+Task 同步用户提供的 `enriched-agent.task/v3`：保留四阶段及依赖，按截图更新三个 Skill ID，增加阶段 Skill/资源/输出关联及顶层表单/资源/输出/验收定义；移除旧 display_name/tools 字段，运行能力仍按接口参考由平台配置。压缩与 Skill 重复的细则，不新增审核、评分轮次或交接文件；阶段完成条件仍按职责区分，不能把示例“评分达标”套到受理与保存阶段。新格式导入仍待平台验证。
+
+SDLC 生成/导出与通用 helper 的能力说明同步，generic 版本为 3.0.0-json-preview.5。业务 JSON 模板、评分/导出参数、附件保护、无人工 staff ID 及跨 session 配置目标保留。没有修改后端，也未在本环境调用用户测试平台；模拟成功不能当作真实读回验证。
+
+---
+
 # 2026-11-08 — 6.1.0-preview.9：SDLC 取消手工 staff ID 步骤
 
 当前创建/更新模板本已没有 staffId。此次清理入口、字段发现参数表、Task 和自然语言编排中“缺失时向用户询问”的旧兜底，评分、导出及新 SDLC profile 均不增加 staffId。查询仅依据实时 schema 使用平台实际提供的身份；实际身份注入缺失报告技术问题，不收集员工号、不解析 JWT、不猜身份值。

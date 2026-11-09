@@ -1,6 +1,6 @@
 # CEAIA SDLC v6.1 JSON4Jira flow — preview
 
-当前主分支为 `main`，版本为 `6.1.0-preview.9`。2026-11-07 将 `codex/sdlc-json4jira-flow` 的重构版本合入主线。本项目将每个候选的最终 Jira 内容统一为一个 `story.json4jira`，从该文件生成 SPEC 中的 Story 投影，使用同一路径评分、预览和导出。运行目标为平台 GPT-5.6 Luna / GPT-6 Luna；运行时仅使用现有平台工具和 Markdown/JSON 资源，不执行本地脚本。平台集成验证状态仍以测试清单的实际记录为准。
+当前主分支为 `main`，版本为 `6.1.0-preview.10`。2026-11-07 将 `codex/sdlc-json4jira-flow` 的重构版本合入主线。本项目将每个候选的最终 Jira 内容统一为一个 `story.json4jira`，从该文件生成 SPEC 中的 Story 投影，使用同一路径评分、预览和导出。运行目标为平台 GPT-5.6 Luna / GPT-6 Luna；运行时仅使用现有平台工具和 Markdown/JSON 资源，不执行本地脚本。平台集成验证状态仍以测试清单的实际记录为准。
 
 用于平台“自然语言生成 workflow”的完整中文输入见 [SDLC 工作流自然语言说明](SDLC-WORKFLOW-NATURAL-LANGUAGE.md)，涵盖触发条件、阶段职责、工具调用、内容门禁、更新和附件规则、确认、恢复与验收条件，以本分支当前规则为准。
 
@@ -14,7 +14,7 @@
 
 唯一编排规则见 [workflow-contract](ceaia-sdlc-story-spec-generation/references/workflow-contract.md)。主链为：来源读取 → 在生成阶段解析项目/Story 类型/字段配置并复用持久配置 → 每候选生成最终 `story.json4jira`、`TEST_CASE.md`、`<name>-spec.md` → 生产自检 → 独立内容审查 → 同步并读回 SPEC review 状态 → 真实评分 → 整批覆盖核对 → 前端 HTML 预览 → 用户明确确认当前内容 → 逐候选导出。默认所有用户继续 Jira-backed 完整流程，不在入口提供 Preparation-only / Jira-backed 路线选择。缺信息时保留完整流程意图并补齐对应缺项；初始全流程意图不代替评分后的最终内容确认。
 
-入口先读真实用户 Workspace 的跨 session 配置和可信身份。首次按缺失 source → project → 可选附加字段引导，Epic Link、Story Type 等只展示 metadata 实际支持项，允许暂不设置。已有配置在生成业务文件前展示项目/Story 字段并确认沿用、修改或切项目；当前 run 已明确确认的未变批次/续跑无需重问。技术类型/schema/AC ID 由工具取得。SDLC 不向用户索取 staff ID，也不把它加入新配置、Story JSON 或评分/导出参数；身份由可信平台上下文提供，实际缺失属于工具集成问题。SDLC 固定导出 Story；最终评分后仍要用户检查文件并明确确认导出。缺项保留默认 Jira 流程意图，只有用户主动要求只准备/不导出时才遵从。
+入口先读真实用户 Workspace 的跨 session 配置和可信身份。实际无 profile／无适用已存配置时，首次按缺失 source → project → 可选附加字段引导；已有 source/project 不代替第三问，需记录真实回答或明确跳过，Epic Link、Story Type 等只展示 metadata 实际支持项，允许暂不设置。已有配置在生成业务文件前展示项目/Story 字段并确认沿用、修改或切项目；当前 run 已明确确认的未变批次/续跑无需重问。技术类型/schema/AC ID 由工具取得。SDLC 不向用户索取 staff ID，也不把它加入新配置、Story JSON 或评分/导出参数；身份由可信平台上下文提供，实际缺失属于工具集成问题。SDLC 固定导出 Story；最终评分后仍要用户检查文件并明确确认导出。缺项保留默认 Jira 流程意图，只有用户主动要求只准备/不导出时才遵从。
 
 `story.json4jira` 是唯一 Story 业务源，也是最终 Jira 提交文件；**不再生成独立 `STORY.md`**。SPEC 中的 Story 展示须从该 JSON 的实际业务字段投影，不能另写一份不同内容。`TEST_CASE.md` 仍保留；仅按已确认 schema 授权的 SPEC 附件计划进入 JSON，测试与内部记录不上传。
 
@@ -48,7 +48,7 @@
 
 [Q1–Q7 共享内容标准](ceaia-sdlc-story-spec-generation/references/quality-contract.md) 及 reviewer 的同文副本继续使用：来源完整性、价值与范围、可验证 AC、相关场景、可执行测试、SPEC 一致性、已有票保留。对象改为 JSON 的业务内容、SPEC 投影和测试；机械命名/布局、`or` 或负向标签所在行不单独构成业务失败。每 candidate/evidenceRevision 仍有 **2 个共享内容修复批次**；纯机械原因另限一次，续跑保留计数和外部结果。
 
-跨会话配置统一存到真实用户 Workspace 的 `ceaia-sdlc-jira/profiles.json`，SDLC 与通用导出创建/更新都必读。保留现有 profiles 数组，按用户/source/project/实际 issueType/capability 区分多个项目、Story/Epic/Bug 等类型与操作；旧 storyType 兼容读，新 Story 同时保留一致别名。稳定项目/类型/AC 映射跨 create/update 复用，权限/default 保留操作范围，baseline 不被配置代替。issue 真实成功后即执行 fresh-read → merge → 用户作用域 write → read-back，附件/关联/队列失败也不跳过独立配置保存。只存有意义的已验证配置和明确可复用默认，一次性值和业务正文不进入 profile；不完整 metadata 可保留已知路由事实并标 complete=false。profilePersistence=saved 必须有真实用户作用域读回证据，否则明确报告配置未保存并只恢复保存，不重放 Jira。详见[持久化协议](ceaia-sdlc-jira-export/references/workspace-profile.md)。
+跨会话配置统一存到真实用户 Workspace 的 `ceaia-sdlc-jira/profiles.json`，SDLC 与通用导出创建/更新都必读。保留现有 profiles 数组，按用户/source/project/实际 issueType/capability 区分多个项目、Story/Epic/Bug 等类型与操作；旧 storyType 兼容读，新 Story 同时保留一致别名。稳定项目/类型/AC 映射跨 create/update 复用，权限/default 保留操作范围，baseline 不被配置代替。issue 真实成功后即执行 fresh-read → merge → 用户作用域 write → read-back，附件/关联/队列失败也不跳过独立配置保存。只存有意义的已验证配置和明确可复用默认，一次性值和业务正文不进入 profile；不完整 metadata 可保留已知路由事实并标 complete=false。使用实际用户目的地、当前代理可执行的 Workspace 工具或原生文件动作即可；复用本轮已成功操作，不要求专用 user-level 名称、独立 read-back API 或返回 scope 字段。读回就是正常读取已保存文件；写成功只证明可写，须读回内容才报 saved。缺读操作或实际错误单独说明，不把整套能力笼统判 unavailable；仅恢复保存，不重放 Jira。详见[持久化协议](ceaia-sdlc-jira-export/references/workspace-profile.md)。
 
 主链支持创建和更新现有 Story：创建使用 [创建模板](ceaia-sdlc-story-spec-generation/templates/story-json-template.json)，省略 `issueIdOrKey`；更新使用 [更新模板](ceaia-sdlc-story-spec-generation/templates/story-update-json-template.json)，在 `issueType` 后加入根级 `issueIdOrKey`，值为已确认的实际票号。更新先保留原始 Description/AC、附件清单、baseline 和获准增量，再按同一 JSON 路径完成评分、确认和导出；返回票号须与目标一致。目标缺失或冲突先澄清，不得通过省略目标改为新建。评分和导出工具不额外传票号参数。
 
@@ -61,9 +61,9 @@ SDLC 默认将远端 SPEC 一起纳入更新计划：已有相关 SPEC 时使用
 安装与验证：
 
 1. 分别上传三个活动 Skill，核对平台实际返回的 skill ID；保持两个包的 Q1–Q7 副本一致。
-2. 核对 Task 中 generation/review 的实际 ID；将 `REPLACE_WITH_PLATFORM_CEAIA_SDLC_JIRA_EXPORT_SKILL_ID` 替换为 exporter 的实际 ID，不伪造或填旧 helper ID。
-3. 导入兼容路径 [SDLC-workflow-v5.task.json](SDLC-workflow-v5.task.json)。文件名与 schema 保留，显示名为 `SDLC-workflow-v6.1 JSON preview`；原 10 个工具保持顺序，最后的评分 ID 替换为 `nodejs-base-mcp.scoreUserStory`。模型在平台运行配置中选择。
-4. 验证真实用户 Workspace read/write 能力及用户作用域，更新后新建 session 读回同一配置；旧本机安装包/已发布平台包不会因仓库更改自动更新。
+2. Task 的三个 Skill ID 已按 2026-11-09 用户提供的平台截图同步；重新安装到其他环境时，核对并同时更新顶层 `skills` 与阶段 `skill_ids` 的实际 ID。
+3. 导入兼容路径 [SDLC-workflow-v5.task.json](SDLC-workflow-v5.task.json)，内容已迁移为 `enriched-agent.task/v3`：阶段绑定 Skill/输出，顶层声明 `startup_form`、`reusable_resources`、`outputs` 和 `acceptance_criteria`。按截图不携带旧 `display_name`/`tools` 字段；运行工具依 [接口参考](TOOLS-REFERENCE-2026-10-26.md) 在平台配置，模型也在平台选择。输出定义引用现有文件/结果，不新增交接文档或验证调用。
+4. 使用实际支持用户目的地的工具或原生文件动作验证 profile 保存和正常读回；没有专用工具名或 scope 返回字段不构成不可用。更新后新建 session 读回同一配置；旧本机安装包/已发布平台包不会因仓库更改自动更新。
 5. 按 [平台测试清单](PLATFORM-TEST-CHECKLIST.md) 留存两种模型及真实后端证据；此前 v6 的本地/旧接口验证不代表本分支新接口已经通过。
 
 `jira-createissue-helper` 已同步本次持久用户配置规则，仍为独立通用导出包，不加入本 Task，也不是 SDLC fallback；发布通用导出修复时须单独更新其包。`user-story-reviewer`、`review-requirements` 未改。新接口不可用时停止在准确阻塞处。参见 [功能归属](FUNCTIONAL-COVERAGE.md)、[工具参考](TOOLS-REFERENCE-2026-10-26.md) 和 [发布记录](RELEASE-NOTES.md)。

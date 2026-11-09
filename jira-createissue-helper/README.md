@@ -1,6 +1,6 @@
 # Jira Create Issue Helper
 
-Version 3.0.0-json-preview.4 prepares and exports ordinary Jira issues and source Test Cases through saved Workspace JSON. CEAIA SDLC uses its dedicated exporter; this package has no legacy SDLC gateway.
+Version 3.0.0-json-preview.5 prepares and exports ordinary Jira issues and source Test Cases through saved Workspace JSON. CEAIA SDLC uses its dedicated exporter; this package has no legacy SDLC gateway.
 
 Read [SKILL.md](SKILL.md) first. It routes to the selected business flow and loads preparation references only when needed.
 
@@ -17,6 +17,6 @@ Read [SKILL.md](SKILL.md) first. It routes to the selected business flow and loa
 
 The exact shared file/call format is in [the JSON contract](references/common-json4jira-contract.md). See [optional assessment evidence](references/story-assessment-evidence.md), [Test Case source export](references/flow-testcase-source-export.md), [profiles](references/common-state-and-user-info.md) and [submission/recovery](references/common-preview-confirm-export.md) for their conditional details.
 
-Production must expose the exporter, three query tools, Jira reads and the platform file/user-Workspace/preview/input capabilities listed in SKILL.md. Request authentication/session headers remain platform-owned. Test-environment tool aliases do not replace the confirmed production tool name.
+Production must expose the exporter, three query tools, Jira reads and the Workspace file/folder/preview/input capabilities listed in SKILL.md. Profiles can use ordinary file tools with the actual user destination; read-back uses the normal reader, without a dedicated API or returned scope requirement. Request authentication/session headers remain platform-owned. Test-environment tool aliases do not replace the confirmed production tool name.
 
 Only supported operation encodings may be submitted. Non-Story path batching is confirmed; Stories never enter manifests. Standalone association and attachment delete/replace still require actual production encoding where not already established. Their missing schema is reported precisely; old direct parameters are never used as a fallback. Runtime is text/file-tool based for GPT-5.6 Luna or GPT-6 Luna; no scripts or sibling filesystem access are required.

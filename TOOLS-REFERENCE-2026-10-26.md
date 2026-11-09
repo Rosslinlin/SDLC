@@ -1,4 +1,4 @@
-# SDLC JSON 工具契约 — 6.1.0-preview.9
+# SDLC JSON 工具契约 — 6.1.0-preview.10
 
 身份规则更新：2026-11-08。主线合并日期：2026-11-07。文件路径沿用旧名；当前内容定义 main 的 SDLC JSON 路线，来源为 codex/sdlc-json4jira-flow 重构分支。目标模型为 GPT-5.6 Luna / GPT-6 Luna，纯文本调用已有平台能力，不运行脚本。
 
@@ -9,6 +9,8 @@
 - 2026-11-03 用户向开发确认的最新格式：根级 acceptanceCriteria 直接存实际 AC 字段 ID，不再有 customFields 包装或 fields.reporter/root staffId；AC Jira wiki 在 fields[acceptanceCriteria]。创建省略 issueIdOrKey；更新在 jiraInstance/projectKey/issueType 后加入根级 issueIdOrKey（大写 I），值为确认的现有票号。Description/AC 在生成时完成 Jira wiki 编码，SPEC 保留 Markdown 语义投影；字段 ID、查询身份与项目取真实上下文/metadata。
 - 2026-11-06 用户实测确认：旧 `attachmentsJson.add`/`replace` 格式适用于新路径 JSON 流程，且 `readJiraAttachments` 返回实际原件 ID。根级 `attachmentsJson` 为文件内对象；`add` 条目含 `relativePath`/`fileName`，`replace` 条目再含 `attachmentId`。这不增加导出工具参数。
 - 工具实时 schema 和以上已确认文件契约是实际调用依据，不再把普通replace格式当未知或重复索取能力证明。缺失的返回字段及恢复能力不能由调用方编造。完整后端评分权重没有提供；Q1–Q7 是共享内容标准，不是替代评分器。
+
+Task v3 采用阶段 Skill/输出关联，不内嵌旧 tools 数组；运行时仍需在平台启用本文件及自然语言编排所列的十项业务工具与实际 Workspace/预览/确认能力，接口参数未随 Task 格式迁移改变。
 
 ## 评分：nodejs-base-mcp.scoreUserStory
 
@@ -88,7 +90,7 @@
 
 更新目标由用户确认的新契约确定：JSON 根级 issueIdOrKey 必须与该候选真实 source/target/baseline 一致；创建完全省略。这个值不是额外工具参数，两种模式仍按同一 JSON 路径评分、预览和导出。Story 业务变更自动同步所有受影响本地 SPEC/测试/投影，不等用户说 update spec；默认已有相关远端 SPEC→replace，无相关且无未决可能SPEC→首次add，只有明确不改远端才none。add/replace使用上述已确认文件内attachmentsJson；none使用attachments=[]并省略attachmentsJson，本地仍更新并经specFilePath评分。最终预览展示实际路径、原ID映射及保留项；原件选择歧义聚焦澄清，读取失败技术恢复，不把它们误当普通replace格式未确认。实际后端拒绝保留精确错误，不能默默跳过SPEC、猜恢复控制或回退创建。
 
-平台另需真实会话 Workspace 读写、独立的跨 session 用户 Workspace 读写、独立只读 reviewer、.json4jira内容预览和当前用户确认能力。用户存储必须有实际暴露 read/write schema 与用户作用域/注入命名空间证据；会话文件路径、同名文件或普通 write success 不等价。创建/更新都读真实用户 profile，issue 成功后必达 fresh-read/merge/write/read-back；未暴露该能力时明确配置 unavailable，不杜撰工具名、scope 参数或数据库 ID，也不伪装已保存。Task保留10个命名工具位置，最后评分工具替换为scoreUserStory；不为这些平台能力杜撰工具名或模型参数。
+平台文件能力可以是普通 Workspace 工具或当前代理实际可执行的原生保存、打开、读取动作：只要它们按真实 schema 选择用户 Workspace，或工具默认就是当前认证用户空间，就用于 profile 读写；复用本轮已成功的用户 Workspace 操作绑定。无需名称含 user-level 的专用 API、单独 read-back 工具、额外 scope 返回字段或数据库证明；读回就是正常读取刚保存的文件。先使用可用操作读取目标，not-found 时按实际目录工具或自动建父目录能力创建有意义的 JSON；没有可见工具调用不等于不支持或已保存；聊天声明、路径和代码块不足为据，不猜隐藏 API 或原生指令。仅在检查实际可用机制及结果后报告具体 read/write/read-back 失败，不按工具命名猜 unavailable。写入成功只证明可写，未读回不能报 saved，未知旧文件不可覆盖；会话目录仍不能冒充用户空间。独立只读 reviewer、.json4jira 内容预览和当前用户确认能力保留。Task 的十个业务工具位置不变，平台文件工具遵循其实际暴露方式，不杜撰工具名/参数。
 
 ## 独立包与未确认范围
 

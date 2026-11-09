@@ -1,6 +1,6 @@
 # v6.1 JSON4Jira flow 平台测试清单 — preview
 
-版本 `6.1.0-preview.9`，当前主分支为 `main`；2026-11-07 合入原 `codex/sdlc-json4jira-flow` 重构版本。分别在平台 GPT-5.6 Luna 与 GPT-6 Luna 验证路径接口。下列结果栏留空表示尚未记录，合并到 main 不代表平台验证通过；不能把旧 v6 本地/旧接口检查、mock 推演或普通 tool success 当作新接口与数据库实测。
+版本 `6.1.0-preview.10`，当前主分支为 `main`；2026-11-07 合入原 `codex/sdlc-json4jira-flow` 重构版本。分别在平台 GPT-5.6 Luna 与 GPT-6 Luna 验证路径接口。下列结果栏留空表示尚未记录，合并到 main 不代表平台验证通过；不能把旧 v6 本地/旧接口检查、mock 推演或普通 tool success 当作新接口与数据库实测。
 
 ## 环境与执行记录
 
@@ -11,10 +11,10 @@
 
 | ID | 场景及通过条件 | 5.6 Luna结果/证据 | 6 Luna结果/证据 |
 | --- | --- | --- | --- |
-| J01 | 三个包独立安装、资源可读，generation/review 的 Q1–Q7 同文；实际 skill IDs 已核对，exporter 占位替换。兼容 Task 文件显示 `SDLC-workflow-v6.1 JSON preview`，schema 与 10 工具顺序保留，最后一项为 scoreUserStory；模型由平台配置。 | | |
+| J01 | 三个包独立安装、资源可读，Q1–Q7 同文。兼容 Task 文件可按 enriched-agent.task/v3 导入，三个 Skill ID 与平台实际安装相符，阶段 skill/resource/output 引用完整；空 startup_form 不加入口表单，outputs 不新建交接文件。十工具与模型由平台配置，评分/导出契约不变；各阶段完成条件匹配职责，不在受理阶段要求评分。 | | |
 | J02 | 所有用户未写 push/export 也默认继续 Jira-backed 完整流程，入口不提供路线选择；缺信息只补缺项，不推荐 preparation-only。仅用户主动明确只准备/不导出时遵从；阶段调用不越界。默认流程最终仍须评分后的当前内容 HTML 预览及用户明确确认。 | | |
 | J03 | 项目/type/meta 查询在生成最终 JSON 前完成；只使用 live schema 真实字段、类型、选项和必要值，不把旧 direct 参数直接猜成 JSON 字段。缓存命中复用，缺项/显式变更才查相应部分。 | | |
-| J04 | 创建和更新都读真实跨 session 用户 Workspace；issue 一经确认成功便执行 populated snapshot 的 fresh-read/merge/write/read-back，附件/关联/队列失败也不跳过配置保存。失败/未知 issue 不伪造成功。saved 必须有用户作用域证据，配置/会话文件不混淆。 | | |
+| J04 | 创建和更新都读真实跨 session 用户 Workspace；issue 一经确认成功便执行 populated snapshot 的 fresh-read/merge/write/read-back，附件/关联/队列失败也不跳过配置保存。失败/未知 issue 不伪造成功。saved 需在实际用户目的地正常读回；普通文件工具的真实选择器或隐式用户空间即可，不额外索取 scope 返回，配置/会话文件不混淆。 | | |
 | J05 | 每候选只有一个最终 story.json4jira 和保留的 TEST_CASE.md、SPEC；不生成独立 STORY.md。SPEC Story 投影与 JSON 业务字段一致，测试镜像与当前表一致；内部路由/诊断不泄露到 Jira。 | | |
 | J06 | 生成前加载 Q1–Q7；review 独立读取原来源、JSON、测试和所有 SPEC。实际遗漏/编造/不可验证行为被定位，or、机械命名/布局、负向标签位置不单独构成业务失败。 | | |
 | J07 | 新 Story 按内聚价值拆分而非 AC 数；每 AC/FR 有可执行测试，不为拒绝型 AC 编造 Positive 伴侣，不发明接口、日志、SLAs 或无来源场景。 | | |
@@ -104,7 +104,7 @@
 | J75 | 用户存储能力缺失、权限拒绝、JSON 损坏与 not-found 精确区分：不清空 uncertain profile；not-found 可初始化，有能力缺口明确 unavailable，不索取 token/数据库 ID 或杜撰工具。 | | |
 | J76 | 通用多项 manifest 部分成功：只为确认成功子项记录实际 lastSuccess/配置，不把 top-level success 分配给未知子项，不重发整批或成功子项。Test Case 特定内容/模式结构保持原样。 | | |
 | J77 | 保存时其他项目条目已改变：fresh-read 后合并保留新值；有真实 conditional-write/revision 能力时处理冲突，无能力不声称并发原子性。瞬时 profile-only 重试最多一次。 | | |
-| J78 | 平台实际载入 preview.8 generation/export 与 generic 3.0.0-json-preview.4，Task exporter 占位替换成真实返回 ID；user storage 能力实际挂载；重开 session 实读，不能把本机旧包或仓库源码当已部署。 | | |
+| J78 | 平台实际载入当前 generation/export 版本与 generic 3.0.0-json-preview.5，Task exporter 占位替换成真实返回 ID；user storage 能力实际挂载；重开 session 实读，不能把本机旧包或仓库源码当已部署。 | | |
 
 | 候选/操作 | 实际用户读写工具与作用域证据 | 实际profile路径/版本 | populated匹配条目与其他条目保留 | profilePersistence状态/错误 | 新session读回证据 |
 | --- | --- | --- | --- | --- | --- |
@@ -119,6 +119,17 @@
 | J81 | 实时 query schema 确有必需身份参数，但平台未提供：精确 WAITING_TOOL/集成问题，不询问用户员工号、不猜值、不解析 token、不越权读他人配置。没有实际业务缺项时不增加 query。 | | |
 | J82 | 旧会话正等待 staffId，同时另有真实业务待问/已完成评分或远端结果：只解除旧身份提问，保留其他问题与已知/未知结果，自动恢复可执行步骤，不重放 review/score/Jira/附件。 | | |
 | J83 | 成功 create/update 后配置保存不含新 staffId/default/fallback key，用户认证命名空间足够；保留共享文件旧 staffId 和其他项目/操作，不主动全库迁移或把旧员工号作为身份所有权证明。真实用户作用域读回门禁保留。 | | |
+
+## preview.10 普通 Workspace 工具复用与首次决定（待平台执行）
+
+| ID | 场景及通过条件 | 5.6 Luna结果/证据 | 6 Luna结果/证据 |
+| --- | --- | --- | --- |
+| J84 | 工具只有普通文件/目录命名、默认当前认证用户空间，返回不含 scope：复用本轮成功创建 user Workspace/test.md 的真实绑定，读取 profile not-found 后建父目录、写 populated JSON、用正常 reader 读回并报 saved；不再报“未暴露专用 user-level read/write/read-back”。 | | |
+| J85 | 已知可写但确实没有 reader/lookup，旧 profile 内容未知：精准报告读取缺口，保留可写事实，不覆写未知旧文件、不伪造 saved；已写但回读失败则待核验，只恢复缺失操作。 | | |
+| J86 | 实际无适用 saved profile、source/project 已给且完整输入已备：仍需实际可选字段回答/明确跳过，记录 assembly.optionalFieldsDecision 后才新生成；普通目的地确认不替代，明确 skip 或已答附加字段不重问。 | | |
+| J87 | Jira 已返回票号但附件/linkage 失败：先执行/报告 profile closeout，再停止后续 Jira 提交。历史 optional decision 缺失不让 profile-only 恢复补问/author/review/score；已有票不重放。 | | |
+| J88 | 真实平台完成一次空 user Workspace → Jira 成功 → profile 正常写/读回 → 新 session 正常 reader 复读，记录实际工具及目的地。模板/源码检查和模拟成功不代替此集成结果。 | | |
+| J89 | 没有可见工具调用，但平台实际提供当前代理可执行的原生保存/打开方式：按该方式保存和读取用户 profile，不按工具列表判 unavailable；只认实际文件及内容。聊天中的创建声明、路径或代码块不算成功，不猜隐藏 API。 | | |
 
 ## 后端结果证据
 
@@ -142,6 +153,15 @@ jira-createissue-helper 独立包已同步本次持久配置生命周期，仍�
 | R06 | 通用 helper preview.4：普通非 Story 批次、混合计划每个非 Story 分组（含单项）、Test Case multiple 的实际 manifest 与全部 child 均为 .json4jira，最终调用路径指向存在且已确认的同名文件。旧 .json 返回准备修正路径/引用并重新确认；不只替换调用后缀、不重放成功/未知批次，不改模板源/profiles 文件名或路径数组协议。 | | |
 
 ## 当前分支验证记录
+
+### 2026-11-09 preview.10 本地普通工具/首次引导检查
+
+用户补充实测：同环境未显示工具调用，仍能在 user Workspace 文件列表看到 `sdlc/test.md` 并打开内容 `test`。这确认该测试文件实际存在、平台有保存/打开途径；尚未验证自动 profile 保存和跨 session 复读，不把此观察记为 J88/J89 全流程通过。
+
+4 个 Skill 官方 quick_validate、15 个 JSON、23 个 JSON 示例、283 处本地链接和 git diff --check 通过。业务模板、Q1–Q7、评分/导出参数和四阶段顺序/依赖保持；只在现有 Assembly state 增加 optionalFieldsDecision。随后按用户五张截图迁移 Task v3，更新三个真实截图 ID，补阶段关联和顶层输出/验收声明，删除旧 display_name/tools 及重复 Skill 细则。保留各阶段实际完成条件，不复制截图中每阶段一律“评分达标”的示例；输出指向既有记录，不新增文件或验证轮次。活动三个 SDLC 包加 Task 从 240,771 字节缩至 232,394 字节（减少 8,377，约 3.48%），其中 Task 从 21,302 缩至 10,593 字节。仅为源码体积；真实 input token/耗时及 v3 导入仍待平台测量。
+
+两名独立代理按当前 Skill 与隔离工具描述输出四个实际决策，父代理读回核对：普通 docs.open/save、dirs.ensure 的隐式用户空间无需 scope 返回，已成功 issue 仅执行 read → mkdir → write → read 即保存，未补问/重放；只有 writer 且旧内容未知时明确缺 read，不覆写、不伪报 saved；profile not-found 且 source/project/完整输入已给仍等待第三问；已有明确 skip 则不重问。没有实际平台调用；没有可见工具记录时还须区分实际原生文件结果与聊天创建声明，尚未自动执行测试平台的 profile 保存/读回，也未验证跨 session 复读；J84–J89 保持待实测。
+
 
 ### 2026-11-08 preview.9 本地身份流程检查
 

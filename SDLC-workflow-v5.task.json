@@ -1,44 +1,49 @@
 {
-  "schema_version": "enriched-agent.task/v2",
-  "display_name": "SDLC-workflow-v6.1 JSON preview",
+  "schema_version": "enriched-agent.task/v3",
   "todo_list": [
     {
       "id": "classify-and-complete-intake",
       "content": "Read original sources and record selected Story targets",
       "active_form": "Reading source evidence and target baselines",
       "instructions": [
-        "Load ceaia-sdlc-story-spec-generation and its workflow-contract plus shared quality standard. This is the JSON-first route; platform runtime is GPT-5.6 Luna or GPT-6 Luna, with no scripts or unconfirmed model parameters in this Task.",
-        "Default to Jira-backed complete SDLC, fixed Story issue type. Read actual persistent user-Workspace profiles and trusted context first, never conversation storage. Do not ask the user for staffId at any point: authentication and identity come from trusted platform context, not setup questions, template fields or manually supplied tokens. If an actual live tool requires an identity input, use only a real platform-provided value accepted by its schema; unavailable injection is a technical WAITING_TOOL, never a staff-ID question. Do not parse JWTs or fabricate identity. First setup guides missing source, then project, then an optional supported-extra-fields question (Epic Link/custom Story Type if metadata exposes them; skip is allowed). With an existing profile, display the selected project/Story fields before canonical files and obtain current-run Use/Change/switch-project approval; an unchanged current-run decision covers its batch/resume. Discover technical type/schema/AC IDs through tools, not user input. Keep Jira intent while waiting; only explicit no-Jira/stop changes it. Final scored-content confirmation remains separate.",
-        "Classify new_story versus existing_ticket_update and confirm each Jira source before reads; never infer from a key or turn an update into create. Distinguish requirements-source tickets and Story update baselines from relationship-only Epic/Parent targets. Requirements-source tickets need relevant business evidence; explicit Story updates preserve original Description, separate AC retrieval status and complete attachment inventory. Relationship-only targets need no such content intake. A relationship-only target uses one lightweight supported getJiraInfos lookup; explicit business lookup success for the requested key/source accepts empty Description/AC. Preserve permission/not-found/type mismatch/unknown as distinct results; do not call an empty body an invalid link or expand it into source intake. Use java-base-mcp.readJiraAttachments to obtain the actual existing attachment IDs and content; retain same-source/ticket inventory bindings rather than asking the user to supply or guess IDs.",
-        "Retain every selected candidate as ready or precisely blocked. Intake classification can complete with pending targets recorded so unrelated ready candidates can proceed. Assign batch-unique source requirement IDs; a shortened register never replaces original evidence.",
-        "Bind outputRoot and internal historyRoot under workflow-contract before writes. outputs/ceaia contains only current story.json4jira, TEST_CASE.md and named SPECs. All generated state, preparation, baseline/inventory, preview and invocation records stay at full resolved .ceaia-work paths with actual save-path checks. Do not fall back to outputs when internal storage is unavailable. Batch state/preview stay under .ceaia-work; preserve original user sources at their actual paths. Once candidate identity and canonical paths are resolved, actually save/read back initial candidate and selected-run batch state under workflow-contract before normal generation. A confirmed missing file/parent is initialization through supported Workspace writing, not permanent unavailability. Resume reuses actual state/history without resetting counters or remote outcomes."
+        "Load ceaia-sdlc-story-spec-generation and its workflow contract, source intake and shared quality standard. Use the JSON-first Jira-backed Story route and trusted platform identity; never ask for staffId. Retained confirmed Jira success needing only profile recovery goes directly to exporter closeout, bypassing new preparation and submission gates without fabricating history or replaying Jira.",
+        "Read the persistent user Workspace profile using supported file tools or native save/open/read actions executable by this agent. A special tool name, visible call or scope marker is unnecessary. For new work with no applicable profile, ask missing source, project, then supported optional extras (explicit skip allowed); record the actual optionalFieldsDecision before authoring. Supplied source/project do not answer that question. With saved settings, obtain current-run Use/Change/project-switch approval once for the unchanged batch/resume.",
+        "Follow the generation intake/path contract: classify new_story versus existing_ticket_update, confirm sources, preserve original evidence and attachment bindings, distinguish relationship-only targets, and retain all selected ready/pending candidates. Resolve outputRoot/historyRoot and initialize/read back actual internal state before normal generation; not-found permits initialization. Resume preserves counters, scored paths and remote outcomes."
       ],
       "completion_criteria": [
-        "Selected target/source identities, original evidence and per-target ready/waiting causes are recorded without silently dropping scope.",
-        "Resolved candidate/batch control paths have actual saved/read-back initial state, or the precise persistence blocker is retained. Do not invent paths for unresolved identities or mistake hidden delivery links for missing files."
+        "Selected targets, original evidence, readiness/gaps and resolved internal state are recorded, or precise persistence blockers are retained. No Story score is required at intake; confirmed-success profile-only recovery follows the direct closeout route."
       ],
-      "depends_on": []
+      "depends_on": [],
+      "skill_ids": [
+        "4454e3c1-4982-49a5-b334-977098caeba6"
+      ],
+      "resource_ids": [],
+      "output_ids": [
+        "intake-record"
+      ]
     },
     {
       "id": "assemble-review-score-each-candidate",
       "content": "Assemble final Story JSON, review and score each ready candidate",
       "active_form": "Reusing Jira configuration, synchronizing JSON/SPEC and recording actual scores",
       "instructions": [
-        "For each ready candidate read generation jira-json-assembly.md and the real user-workspace ceaia-sdlc-jira/profiles.json first, for both create and update. Reuse same-user/source/project/type stable components even from a create profile during update; combine actual baseline facts and do not treat missing update capability as loss of stable configuration. With sufficient facts invoke none of queryJiraProjectsByName/queryJiraIssueTypesByProject/queryJiraCreateMetaFields. Query only the specific missing/inapplicable component, explicit refresh/changed destination or actual schema-error recovery. Create metadata does not prove edit permission. Necessary target getJiraInfos/readJiraAttachments baseline reads remain separate. Save profile/baseline/query provenance and resolve assembly before scoring. A confirmed missing/empty profile means no saved configuration yet; retain current verified facts and ask/query only remaining gaps. Access/service/JSON errors are not not-found and never authorize clearing existing storage. Keep the actual Assembly snapshot for eligible profile recreation after export success. The shared profiles array supports multiple source/project/issueType/capability tuples; canonical issueType reads old Story-only storyType and new Story entries preserve an identical alias. Never select an Epic/Bug profile for SDLC. Preserve operation-scoped defaults and distinguish reusable-default consent from run-only overrides. Retain actual user-scope read capability/destination and a populated configuration snapshot even for first use; incomplete metadata permits later useful partial configuration saving, never fabricated schema. New SDLC profiles do not need or create staffId or a staff-id-fallback identity key. Preserve legacy shared entries and other projects, reusing their stable facts only after independently verifying authenticated user scope; an absent staffId never invalidates an otherwise applicable profile or starts extra discovery. On resume withdraw obsolete staffId questions only, retaining genuine business questions, counters and all known/unknown remote outcomes.",
-        "Read Q1-Q7 before writing. Use generation's create or update JSON template. Root acceptanceCriteria is the actual AC field-ID string; the AC Jira wiki text is fields[acceptanceCriteria]. No customFields wrapper, root staffId or fields.reporter in either mode; trusted platform context owns query identity, without collecting staffId from the user or adding it to templates. Keep jiraInstance/projectKey/issueType. For update, put exact nonempty issueIdOrKey (uppercase I) after issueType, matching the confirmed source, actual baseline and target ticketKey; create omits this key entirely, never null/empty. Do not let an evidence-only key or cached profile select the target. fields.project.key and issuetype.id match the actual destination/type. Complete Jira wiki description/AC encoding before review/score, then derive Markdown SPEC and executable tests with the same wording, order, IDs, code and links. Root AC text/arrays, summary/description/bddScenarios, screenshot IDs and description arrays are not valid. Check submitted fields against applicable writable metadata and preserve baseline/approved update scope; no create defaults or reporter copied into updates.",
-        "Story business changes automatically synchronize every affected local SPEC/projection/test before review/score, even when the request mentions only Story/AC. Apply generation existing-jira-update original classification: bind complete original content to the actual readJiraAttachments ID and confirmed source+ticket; names, extensions or reading evidence do not identify deletion targets. Preserve other/unresolved attachments; an unresolved possible SPEC cannot become no-SPEC/add. Write the user-tested root attachmentsJson object inside story.json4jira: add entries have relativePath/fileName; replace entries also have attachmentId copied from the selected reader original. New Story or fully established no-SPEC inventory uses add; affected existing SPECs use replace. For add/replace omit the legacy attachments array to avoid duplicate uploads; explicit remote preservation omits attachmentsJson and retains attachments=[]. Complete mappings before review/score and do not request another schema/capability proof for this confirmed format. Keep non-SPECs untouched, expected upload-before-delete behavior and actual error/result checks. Pure routing/schema edits require consistency checks, not artificial body rewrites.",
-        "Use the existing single production precheck and already-read current files for SPEC format checks. Every evidence-supported user action/state flow has one nonempty closed ```mermaid block, including minimal simple flows; do not substitute prose. Only a genuinely inapplicable flow uses Not applicable plus a factual reason; missing business facts still wait and never justify invented backend/error branches. Inside the SPEC Jira Story section, projection headings start at ###, never # or ##; demote heading levels only and preserve section order, wording, IDs, code and links. Check Mermaid marker/fence closure, projection heading levels, unreplaced template placeholders (preserving genuine business literals), and 11-column table pipes/newlines plus exact embedded-table agreement. Correct only local mechanical defects under the existing bounded policy, not a new Q criterion/full business re-review. Add no role, tool, separate report, score call or repair loop for these checks. Real business changes still receive affected independent verification; any post-score SPEC edit follows existing reassessment/confirmation rules.",
-        "Invoke a fresh read-only ceaia-spec-review with original complete evidence, actual JSON/tests/all SPECs, field meanings and current path/revision evidence. Full original tool snapshots already supplied can be inspected independently without another fetch; summaries/self-checks never replace actual content. Parent saves only the returned report at the allocated historyRoot/review-attempt-<nnn>.md for this actual invocation, without another prose copy. Repair only affected content and preserve blocked scope.",
-        "After content PASS compare all SPEC Result/Reviewer Notes and write only actual changes; already matching headers get no write/revision increment. Verify unchanged business bodies using complete current reads and reuse those reads for pre-score checks. Actually call nodejs-base-mcp.scoreUserStory with exactly story_json_workspace_path, specFileStatus=Pass, specFilePath for a new required assessment. Save/read back the complete response and exact input/revision binding under historyRoot, allocating one numbered attempt per actual call only. Resume or response-save retries reuse that attempt, not another score call. Retain 76-100 numeric/ok/parser policy and handle validation-failed strings or SKIPPED honestly.",
-        "Keep scores in the independent record/UI, never SPEC or JSON. Complete all affected SPEC content and review headers before scoring, then freeze JSON/SPECs through confirmation/export. Later changed scoring inputs require a current assessment and fresh confirmation. Do not force unchanged rescoring, mutate files at export, override explicit remote preservation, invent replacement controls or retry an update as create.",
-        "For new candidates, paths.planningPath and assembly.recordPath share <historyRoot>/preparation.md with separate Plan/evidenceRevision and Assembly/storyJsonRevision sections. Fill working sections once; after use by review/score/export preserve them, appending an affected section only on a real fact/content change. No new numbered plan/assembly file per phase/resume and no extra preparation-handoff. Reuse unchanged profile and Epic validation evidence across candidates; keep real review/score/export attempts numbered internally. Old internal numbered pointers remain usable without renaming scored inputs."
+        "Follow generation assembly and production rules using actual profile/baseline facts. Query only missing, changed or genuinely rejected configuration; reuse current metadata across candidates without treating create metadata as edit permission. Honor optionalFieldsDecision before authoring, fixed Story type, mandatory fields.project/issuetype, exact update target and confirmed attachment mappings. Synchronize authoritative story.json4jira, Markdown SPECs and tests before review/score.",
+        "Use the existing production precheck once and invoke the bundled read-only ceaia-spec-review with complete original evidence and actual current artifacts. Do not add a second Task-level content validator, report or repair loop. Apply only the existing bounded repair policy, synchronize review headers before scoring, and avoid rewriting already matching content.",
+        "Call nodejs-base-mcp.scoreUserStory only for a required assessment with exactly story_json_workspace_path, specFileStatus=Pass and specFilePath. Persist the complete actual response and input/revision binding, then freeze JSON/SPECs. Reuse current reads, scores and the existing preparation.md Plan/Assembly sections; number only actual review/score/export invocations. Resume/save retries never cause unchanged rescoring."
       ],
       "completion_criteria": [
-        "Every selected candidate has current complete JSON/assembly, independent content PASS and a passing persisted JSON+SPEC assessment, or its scope was explicitly changed/stopped. Pending candidates prevent full stage completion but not unrelated preparation.",
-        "Current source/review/score records and consumed repair state are retained. There is no Jira write or legacy five-field call in this stage."
+        "Every selected unsubmitted candidate has complete current JSON/tests/SPECs, actual setup decision, independent content PASS and a persisted passing 76-100 assessment, or its scope was explicitly changed/stopped. Preserve all pending scope and real attempt state. Confirmed-success profile-only recovery does not require reconstructed preparation/review/score evidence."
       ],
       "depends_on": [
         "classify-and-complete-intake"
+      ],
+      "skill_ids": [
+        "4454e3c1-4982-49a5-b334-977098caeba6",
+        "ac449698-dd2b-4f79-8790-9ea9ff4b1366"
+      ],
+      "resource_ids": [],
+      "output_ids": [
+        "reviewed-scored-handoff"
       ]
     },
     {
@@ -46,15 +51,22 @@
       "content": "Reconcile selected scope and obtain current upload-content confirmation",
       "active_form": "Checking global coverage and presenting scored JSON previews",
       "instructions": [
-        "Reconcile original in-scope obligations with every selected current candidate, supported exclusions and pending items in actual batchStatePath. Require zero pending obligations and current evidence-revision bindings before integrated export. Do not silently omit blocked candidates or change scope.",
-        "Verify current review/score/JSON/SPEC/assembly evidence without rerunning unchanged tools, then set parent jiraReady/updateReady only where applicable. Preparation-only ends here with actual artifacts and score results, without Jira success. Reuse complete unchanged tool-returned content already available with current path/revision evidence; do not fetch the same files once for each criterion or stage. Missing/truncated/changed or uncertain content still requires an actual read.",
-        "For export intent, use exporter handoff and preview procedure to present the actual scored .json4jira content and attachments in the platform preview. Obtain explicit user confirmation bound to the current JSON path/revision and SPEC file revisions. Earlier destination settings confirmation is insufficient. A user edit returns to affected generation/review/scoring and requires fresh confirmation; do not alter content at submission. Use friendly review wording with actual file links: 请先看看这些 Story 和 SPEC，确认内容、项目和附件操作是否合适；没问题就确认导出，需要调整也可以直接告诉我。 Silence is never confirmation."
+        "Reconcile every selected obligation, supported exclusion and pending item using actual batch state. Do not silently omit blocked candidates or change scope; integrated export requires zero pending obligations and current evidence bindings.",
+        "Verify current review/score/JSON/SPEC/assembly evidence by reusing complete unchanged reads rather than rerunning Skill checks. Preparation-only ends with actual artifacts and score results. Load the exporter handoff/preview procedure for export intent; changed content returns only to affected upstream work.",
+        "Present actual scored .json4jira files and attachment operations; obtain explicit confirmation bound to current JSON/SPEC revisions, separate from earlier settings approval. Use actual file links and friendly wording: 请先看看这些 Story 和 SPEC，确认内容、项目和附件操作是否合适；没问题就确认导出，需要调整也可以直接告诉我。 Silence is never confirmation."
       ],
       "completion_criteria": [
-        "Every selected obligation is reconciled and, for export intent, actual content/upload confirmation matches the frozen current scored package. No confirm event is invented."
+        "Selected scope is reconciled and, for export intent, the user has explicitly confirmed the current frozen scored files and attachment operations. No additional score invocation is required for unchanged inputs."
       ],
       "depends_on": [
         "assemble-review-score-each-candidate"
+      ],
+      "skill_ids": [
+        "4454e3c1-4982-49a5-b334-977098caeba6"
+      ],
+      "resource_ids": [],
+      "output_ids": [
+        "reviewed-scored-handoff"
       ]
     },
     {
@@ -62,47 +74,74 @@
       "content": "Submit only the JSON path and verify backend operation results",
       "active_form": "Exporting frozen JSON packages and recording backend persistence",
       "instructions": [
-        "Load ceaia-sdlc-jira-export only. Reuse current confirmation and handoff; no project/type/metadata queries, field partition, Markdown-to-wiki conversion, payload regeneration or generic-helper fallback at export. Read back the exact canonical JSON and scored SPECs; if changed, return upstream. Verify internal preview/attempt save paths. Native preview uses actual scored files; any audit preview is compact internal confirmation/path evidence, not a duplicate business payload. Final pre-submission actual read-back remains mandatory.",
-        "Actually call java-base-mcp.exportjirabydynamicfield with exactly one argument: story_json_workspace_path copied unchanged from the passing score input. No other direct fields, staffId/conversationId, attachmentsJson/issuesJson, spec parameters or separate five-field association call. Batch selected files execute one at a time and stop further writes on failed/partial/unknown results. The reviewed attachmentsJson.add/replace object is already inside the scored file; it is not a second tool argument. Do not rebuild it during export or add a standalone delete call.",
-        "The new backend validates the stored score/checksum/threshold, writes the ticket/attachments and owns database linkage plus sync queueing. Replacement must confirm the mapped new upload before deleting only the selected old SPEC ID; preserve every other original. Preserve the complete actual response and separate issue, each upload/old-ID removal, database-link, queue and async Jira-score-sync evidence. Upload-only success is not replacement; failed/unknown deletion remains partial and never permits replaying a confirmed upload or Story write. A ticket key or generic success does not prove every effect. Confirmed synchronous submission may report Jira score synchronization pending; never claim asynchronous completion without evidence.",
-        "Unknown/partial results require supported reconciliation; never replay successful or unknown issue/upload operations. In both create and update, any confirmed issue success MUST enter profile closeout before final or partial-result return, even if attachments/linkage/queue failed. Fresh-read actual authenticated user Workspace ceaia-sdlc-jira/profiles.json, upsert meaningful verified routing/type/schema and explicitly reusable defaults from the Assembly snapshot, preserving every other project/type/capability, write through actual user-scope capability and read the same destination back. Missing schema saves only known useful facts with metadata.complete=false, never guessed metadata or an empty template. Record profilePersistence pending|saved|failed|unavailable|not_eligible plus actual scope/destination/snapshot/write/read-back/error evidence. saved needs matching populated entry and preservation checks; unavailable/failed remains explicit. Resume only this missing save/read-back without Jira/scoring/uploads/discovery. No actual result may be replaced with fabricated success.",
-        "Final user-facing results list only current deliverables with labels plus actual Jira/score/status or precise pending work. Do not surface plan/assembly/state/attempt/baseline/preview files as deliverables. Internal history is available on explicit diagnostics request; do not promise unavailable file-browser hiding. No metadata, business or mandatory persistence gate is skipped for speed."
+        "Execute ceaia-sdlc-jira-export. For retained confirmed issue success needing only profile recovery, go directly to workspace-profile.md using known verified facts; do not require a new handoff, preview, JSON/SPEC reread, score or Jira call. For new submissions, reuse current confirmation, perform the required final read-back and submit the unchanged scored JSON path without discovery, conversion or payload regeneration.",
+        "Call java-base-mcp.exportjirabydynamicfield with only story_json_workspace_path, identical to the passing score input. Process confirmed files serially; preserve actual issue, attachment/replacement, database-link, queue and async score-sync outcomes under the exporter recovery policy. Never replay successful/unknown remote writes or add the legacy association call.",
+        "After confirmed issue create/update, complete profile closeout before returning or starting another Jira item, even if downstream effects are partial: fresh-read the actual user destination, preserve other entries, merge useful verified configuration, write populated JSON and read it back through supported tools/native actions. Report saved only after verifying contents; identify the actual failed/missing operation, never infer unavailable from tool names or hidden calls. Recovery retries only persistence. Stop later Jira submissions for unresolved required effects; return current deliverables and precise statuses, keeping internal records out of the default deliverable list."
       ],
       "completion_criteria": [
-        "Every intended synchronous issue/attachment/database-link/queue requirement has actual confirmation, or remains explicitly pending/unknown. Async Jira score synchronization is reported separately; no legacy B call is sent and no failed operation is hidden by a completed summary.",
-        "Latest actual candidate state and required phase records are saved/verified under historyRoot; changed selected-run batch state is saved at its actual batchStatePath. Reuse current read-back evidence; uncalled tools have no record. Report remote success and any local/profile persistence pending separately, without claiming fully complete local recovery or replaying remote operations.",
-        "Every eligible successful create/update has profilePersistence=saved with actual user-scope populated-entry read-back evidence, or an explicitly reported persistence-incomplete status/error/next action; never silently complete with an unattempted save. Attachment/backend partial failure does not skip profile closeout. A profile-only retry never replays any remote operation."
+        "Actual Jira/attachment/linkage/queue outcomes and async synchronization status are recorded separately; required local/profile persistence is verified or precisely reported pending/failed/unavailable. No fully complete claim hides missing effects, and no remote operation is replayed to repair persistence."
       ],
       "depends_on": [
         "reconcile-and-confirm-scored-content"
+      ],
+      "skill_ids": [
+        "a9220020-0bc2-4d5d-a7e0-9c36fed9e478"
+      ],
+      "resource_ids": [],
+      "output_ids": [
+        "jira-export-and-binding-results"
       ]
     }
   ],
-  "description": "JSON-first CEAIA SDLC preview for GPT-5.6 Luna / GPT-6 Luna: query/assemble final Story JSON during generation, independently review JSON and Markdown SPEC, call scoreUserStory with JSON path and SPEC status/path, confirm the scored content, then export only the unchanged JSON path. Backend linkage/queue and async Jira score-sync outcomes remain separate.",
   "skills": [
     {
-      "skill_id": "96c6bb68-ab4c-4a34-a634-3fb5c66c96d8",
+      "skill_id": "4454e3c1-4982-49a5-b334-977098caeba6",
       "skill_name": "ceaia-sdlc-story-spec-generation"
     },
     {
-      "skill_id": "670e4bce-cfcd-4883-824d-2fdfc9092d76",
+      "skill_id": "ac449698-dd2b-4f79-8790-9ea9ff4b1366",
       "skill_name": "ceaia-spec-review"
     },
     {
-      "skill_id": "REPLACE_WITH_PLATFORM_CEAIA_SDLC_JIRA_EXPORT_SKILL_ID",
+      "skill_id": "a9220020-0bc2-4d5d-a7e0-9c36fed9e478",
       "skill_name": "ceaia-sdlc-jira-export"
     }
   ],
-  "tools": [
-    "java-base-mcp.queryJiraProjectsByName",
-    "java-base-mcp.queryJiraIssueTypesByProject",
-    "java-base-mcp.queryJiraCreateMetaFields",
-    "java-base-mcp.exportjirabydynamicfield",
-    "java-base-mcp.getJiraInfos",
-    "java-base-mcp.fetchConfluenceContent",
-    "java-base-mcp.fuzzyMatchingConfluence",
-    "java-base-mcp.readJiraAttachments",
-    "ask_user_question",
-    "nodejs-base-mcp.scoreUserStory"
+  "startup_form": [],
+  "reusable_resources": [],
+  "outputs": [
+    {
+      "id": "intake-record",
+      "name": "Intake record",
+      "description": "Selected targets, original evidence and readiness in existing internal state/preparation records."
+    },
+    {
+      "id": "reviewed-scored-handoff",
+      "name": "Reviewed and scored handoff",
+      "description": "The current scored Story JSON, SPEC and test package with existing review/score evidence; a logical output, not an extra handoff file."
+    },
+    {
+      "id": "jira-export-and-binding-results",
+      "name": "Jira export results",
+      "description": "Verified Jira, attachment, linkage, queue, score-sync and profile-persistence outcomes in existing result/state records."
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "score-threshold",
+      "description": "Newly prepared selected Story packages meet the required current independent review and 76-100 score threshold; profile-only recovery preserves confirmed historical results without rerunning scoring.",
+      "output_ids": [
+        "reviewed-scored-handoff"
+      ],
+      "resource_ids": []
+    },
+    {
+      "id": "confirmed-export-and-profile-closeout",
+      "description": "For export intent, only current user-confirmed packages are submitted, and actual remote outcomes plus meaningful profile read-back or precise persistence blockers are reported. Preparation-only makes no Jira-success claim.",
+      "output_ids": [
+        "jira-export-and-binding-results"
+      ],
+      "resource_ids": []
+    }
   ]
 }
