@@ -16,7 +16,7 @@ Resolve blocked fields/operations before requesting final confirmation. Unsuppor
 
 Obtain real explicit content/write confirmation through supported platform UI after the current package is available for review. Current user selection of source/destination alone is not final content approval. Reuse a prior actual confirmation only when it covers these same unchanged JSON/manifest children, target, selected order, scoring SPEC and intended uploads/operations. Do not reopen confirmation merely to read saved configuration or proceed to the next already approved item.
 
-Use a friendly review prompt tied to actual deliverables, for example: “请先查看这些文件和字段，确认内容是否 OK；没问题就按上面的项目和类型导出。需要修改也可以直接告诉我。” Include real file links, create/update target and intended uploads/relationships. The earlier settings check is not this file/content approval, and silence or opening a file is not confirmation.
+Use a friendly review prompt tied to actual deliverables, for example: “Please review these files and fields. If everything looks right, confirm export using the project and issue type shown above. You can also tell me what you would like to change.” Include real file links, create/update target and intended uploads/relationships. The earlier settings check is not this file/content approval, and silence or opening a file is not confirmation.
 
 If the user changes content, destination, type, target, selected subset/order or participating file/attachment plan, return to preparation, mark affected old assessments historical, then show the changed package and obtain renewed confirmation. Do not mutate, rename, reserialize or rich-text-render a scored/confirmed file at submission.
 

@@ -53,7 +53,7 @@
       "instructions": [
         "Reconcile every selected obligation, supported exclusion and pending item using actual batch state. Do not silently omit blocked candidates or change scope; integrated export requires zero pending obligations and current evidence bindings.",
         "Verify current review/score/JSON/SPEC/assembly evidence by reusing complete unchanged reads rather than rerunning Skill checks. Preparation-only ends with actual artifacts and score results. Load the exporter handoff/preview procedure for export intent; changed content returns only to affected upstream work.",
-        "Present actual scored .json4jira files and attachment operations; obtain explicit confirmation bound to current JSON/SPEC revisions, separate from earlier settings approval. Use actual file links and friendly wording: 请先看看这些 Story 和 SPEC，确认内容、项目和附件操作是否合适；没问题就确认导出，需要调整也可以直接告诉我。 Silence is never confirmation."
+        "Present actual scored .json4jira files and attachment operations; obtain explicit confirmation bound to current JSON/SPEC revisions, separate from earlier settings approval. Use actual file links and friendly wording: Please review these Story and SPEC files, including the content, project and attachment operations. Confirm export when everything looks right, or tell me what you would like to change. Silence is never confirmation."
       ],
       "completion_criteria": [
         "Selected scope is reconciled and, for export intent, the user has explicitly confirmed the current frozen scored files and attachment operations. No additional score invocation is required for unchanged inputs."
