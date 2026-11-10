@@ -2,6 +2,8 @@
 
 This step moves the former export-time project/type/field discovery, value resolution and payload assembly **before final scoring**. The exporter will only transmit the saved path. Use existing tools, no scripts, speculative fields or new query APIs.
 
+Only profile operations on `ceaia-sdlc-jira/profiles.json` use user Workspace. Save all generated JSON, SPECs, tests, Assembly snapshots and other process records in the current **session Workspace** under the workflow contract; profile lookup must not switch their destination to user storage. Reuse a working operation only with the appropriate destination binding, and keep scoring/export paths unchanged and session-relative.
+
 ## 1. Reuse profile components, then query only missing facts
 
 ### First entry and settings confirmation

@@ -131,6 +131,13 @@
 | J88 | 真实平台完成一次空 user Workspace → Jira 成功 → profile 正常写/读回 → 新 session 正常 reader 复读，记录实际工具及目的地。模板/源码检查和模拟成功不代替此集成结果。 | | |
 | J89 | 没有可见工具调用，但平台实际提供当前代理可执行的原生保存/打开方式：按该方式保存和读取用户 profile，不按工具列表判 unavailable；只认实际文件及内容。聊天中的创建声明、路径或代码块不算成功，不猜隐藏 API。 | | |
 
+## Session / user Workspace 隔离（待平台执行）
+
+| ID | 场景及通过条件 | 5.6 Luna结果/证据 | 6 Luna结果/证据 |
+| --- | --- | --- | --- |
+| J90 | 同一文件工具可选 session/user 且默认 user：完整 SDLC 的 outputs/ceaia、.ceaia-work、state、preparation、baseline/inventory、提取副本、review/score/export 记录和 preview 均实际存于当前 session；目录名不充当范围证明。成功后仅 ceaia-sdlc-jira/profiles.json 写入 user 并读回，随后状态/操作记录返回 session；不增加验证轮次或改变评分/导出参数。 | | |
+| J91 | 只有 user 可写、session 不可用：准确报告受影响的 session 保存缺口，不将任何交付物/中间文件回退保存到 user。已成功 Jira 的 profile-only 收尾仍可独立读/合并/写/读回 user profile，不补生成、不重评分、不重放 Jira；原始用户文件与既有 profile 保留。 | | |
+
 ## 后端结果证据
 
 后端字段名与状态语义以实际 live schema/响应为准；下表是观测类别，不是虚构的响应字段协议。

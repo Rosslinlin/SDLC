@@ -47,7 +47,7 @@
 | `ask_user_question` | 缺失事实、实际选项、来源错误、设置决定、业务澄清、有限恢复授权或平台支持的确认交互时 | 问精确缺项；不能伪造用户答复或用旧确认代替当前上传确认。业务澄清时尽量合并不超过三个相关问题。 |
 | `nodejs-base-mcp.scoreUserStory` | 当前独立内容 PASS，全部 SPEC Header 已同步并读回后 | 恰好三个参数：`story_json_workspace_path`、`specFileStatus`、`specFilePath`。正常主链传大小写严格的 `specFileStatus=Pass`。 |
 
-另外，使用平台实际提供且当前代理可执行的 Workspace 文件/目录操作，包括工具或原生保存/打开/读取动作；按真实 schema 选择用户空间，或采用工具默认认证用户命名空间，并复用本轮已成功的相同用户目的地操作。无需专用 user-level 工具名、额外 scope 返回或独立 read-back API；正常文件读取即可读回。先检查并使用实际操作，没有可见工具调用或专用名称不表示不可用，也不证明已保存；只有聊天声明/路径/代码块时保持未验证，不虚构隐藏 API 或原生指令；写成功不等于已读回，确实缺少的操作单独报告，未知旧文件不覆盖。独立只读代理、原生 `.json4jira` 预览和当前用户确认能力仍必需，不编造 API。业务澄清弹窗不可用时可在文本中准确提问一次并等待；这不能代替缺失的原生预览或上传确认能力。
+另外，使用平台实际提供且当前代理可执行的 Workspace 文件/目录操作，包括工具或原生保存/打开/读取动作；按文件用途选择实际存储范围：全部生成交付物和中间文件使用当前 session Workspace，只有 ceaia-sdlc-jira/profiles.json 使用跨 session 的 user Workspace；工具默认认证用户空间仅适用于该 profile，不能沿用为产物目的地。只复用相同存储范围的实际操作绑定。无需专用 user-level 工具名、额外 scope 返回或独立 read-back API；正常文件读取即可读回。先检查并使用实际操作，没有可见工具调用或专用名称不表示不可用，也不证明已保存；只有聊天声明/路径/代码块时保持未验证，不虚构隐藏 API 或原生指令；写成功不等于已读回，确实缺少的操作单独报告，未知旧文件不覆盖。独立只读代理、原生 `.json4jira` 预览和当前用户确认能力仍必需，不编造 API。业务澄清弹窗不可用时可在文本中准确提问一次并等待；这不能代替缺失的原生预览或上传确认能力。
 
 所有实际调用遵循实时 schema，表中仅列业务输入，不代表已删除后端可能存在的身份参数。SDLC 不向用户索取 staffId，不解析 JWT/token，也不把旧参数表当作人工填写要求。若实际工具仍需要身份入参，只能采用可信平台上下文实际提供且该 schema 接受的值；身份未注入或能力不兼容时准确记录技术 WAITING_TOOL，不能反问用户员工号、虚构身份或绕到旧接口。会话身份和请求 Header 由平台提供，不能自造 session、Conversation-ID 或 Header。
 
@@ -320,7 +320,7 @@ Story 的标题、描述、AC、范围或其他业务内容改变，自动同步
 
 ## 17. 文件、状态、续跑和配置保存
 
-新候选用户文件目录为 `outputs/ceaia/<slug>/`，内部目录为 `.ceaia-work/stories/<slug>/`。更新用户目录为 `outputs/ceaia/updates/<SOURCE>/<TICKET-KEY>/`，内部目录为 `.ceaia-work/updates/<SOURCE>/<TICKET-KEY>/`，不同 source 的同号票不能混用目录。
+所有 AI 生成的交付物和中间产物必须放在当前 session Workspace（会话空间）：新候选交付目录为 `outputs/ceaia/<slug>/`，内部目录为 `.ceaia-work/stories/<slug>/`；更新交付目录为 `outputs/ceaia/updates/<SOURCE>/<TICKET-KEY>/`，内部目录为 `.ceaia-work/updates/<SOURCE>/<TICKET-KEY>/`。目录名本身不决定存储范围；不能在 user Workspace 创建这些目录或文件，也不能因 session 写入失败而回退到 user Workspace。只有 `ceaia-sdlc-jira/profiles.json` 保留在 user Workspace，配置保存后的状态、快照及操作证据仍写回 session。沿用已有路径保存/读回检查，不新增探测文件、验证调用或报告；不虚构 scope 参数或 session 路径前缀。原始用户来源按实际位置读取，不移动或改写；不同 source 的同号票不能混用目录。
 
 用户文件保留当前 `story.json4jira`、`TEST_CASE.md`、`<name>-spec.md` 及确实需要的不同 SPEC。内部保存 `state.json`，更新另有 `update-manifest.md`；Plan/Assembly 共用 `preparation.md` 的修订绑定 section，不新建编号 plan/assembly。只有实际 review、score、export 调用保留三位编号记录，不覆盖已完成记录；旧编号指针仍可读。保留原始来源；不堆历史用户交付文件副本，完整响应和输入读回证据存编号记录，不重复塞满 state。
 

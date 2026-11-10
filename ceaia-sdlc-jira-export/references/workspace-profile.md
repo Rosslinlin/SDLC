@@ -2,6 +2,8 @@
 
 `ceaia-sdlc-jira/profiles.json` is durable configuration in the authenticated **user Workspace**, shared across sessions by SDLC and ordinary Jira exports. It is not an optional cache, conversation artifact or process history. Keep this existing path for compatibility. The platform owns its database implementation; no database ID, token or direct database access is required from the user.
 
+The user destination in this procedure applies only to that configuration file. Do not create outputs/ceaia, .ceaia-work, business artifacts, state, snapshots or attempt/verification records there. Keep those generated files in the current **session Workspace** and use its destination binding again when recording profilePersistence evidence. The state field scope=user identifies the profile target, not the storage scope of the state file.
+
 Generation owns configuration selection, metadata, reusable-default consent and the revision-bound Assembly snapshot. Read its `references/jira-json-assembly.md` through supported Skill-resource access or the parent's applicable full text; do not assume sibling filesystem access. Export never repeats discovery or modifies scored business files to save a profile.
 
 ## 1. Use the actual Workspace file operations
