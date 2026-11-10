@@ -15,7 +15,7 @@
 | J02 | 所有用户未写 push/export 也默认继续 Jira-backed 完整流程，入口不提供路线选择；缺信息只补缺项，不推荐 preparation-only。仅用户主动明确只准备/不导出时遵从；阶段调用不越界。默认流程最终仍须评分后的当前内容 HTML 预览及用户明确确认。 | | |
 | J03 | 项目/type/meta 查询在生成最终 JSON 前完成；只使用 live schema 真实字段、类型、选项和必要值，不把旧 direct 参数直接猜成 JSON 字段。缓存命中复用，缺项/显式变更才查相应部分。 | | |
 | J04 | 创建和更新都读真实跨 session 用户 Workspace；issue 一经确认成功便执行 populated snapshot 的 fresh-read/merge/write/read-back，附件/关联/队列失败也不跳过配置保存。失败/未知 issue 不伪造成功。saved 需在实际用户目的地正常读回；普通文件工具的真实选择器或隐式用户空间即可，不额外索取 scope 返回，配置/会话文件不混淆。 | | |
-| J05 | 每候选只有一个最终 story.json4jira 和保留的 TEST_CASE.md、SPEC；不生成独立 STORY.md。SPEC Story 投影与 JSON 业务字段一致，测试镜像与当前表一致；内部路由/诊断不泄露到 Jira。 | | |
+| J05 | 每候选只有一个最终 story.json4jira 和保留的 test-case.md、SPEC；不生成独立 STORY.md。SPEC Story 投影与 JSON 业务字段一致，测试镜像与当前表一致；内部路由/诊断不泄露到 Jira。 | | |
 | J06 | 生成前加载 Q1–Q7；review 独立读取原来源、JSON、测试和所有 SPEC。实际遗漏/编造/不可验证行为被定位，or、机械命名/布局、负向标签位置不单独构成业务失败。 | | |
 | J07 | 新 Story 按内聚价值拆分而非 AC 数；每 AC/FR 有可执行测试，不为拒绝型 AC 编造 Positive 伴侣，不发明接口、日志、SLAs 或无来源场景。 | | |
 | J08 | review/score 共用两批内容修复；机械 cause 一次独立，变更仍使受影响 review/score/确认失效。续跑保留计数，无进展提前停止，外部操作不由本地额度授权重发。 | | |
@@ -28,7 +28,7 @@
 | J15 | exportJiraByDynamicFields 实际只传 story_json_workspace_path，且等于该候选最终通过评分的路径。不传 direct fields、旧 B 五字段、issuesJson、requestJson 或内部 handoffType。 | | |
 | J16 | 后端真实执行已评分内容 checksum/threshold 校验；缺评分、低分、未保存或内容不匹配明确拒绝。记录实际服务错误和已知/未知写入结果，不宣称本地检查等同后端校验。 | | |
 | J17 | 正常 create 分别记录真实 issue key/URL、每项附件结果、数据库 linkage、queue 以及 async sync 结果；普通 success 或只有 ticketKey 不足以宣布全部完成。 | | |
-| J18 | queue 已接受但 async sync 未完成时明确待处理；只有后端真实完成证据才报告 Jira UI 分数已同步。不臆造查询工具、任务ID或完成字段。 | | |
+| J18 | queue 已接受但 async sync 未完成时内部记为待处理；常规最终回复不列同步状态，只有后端真实完成证据才可声称 Jira UI 分数已同步。不臆造查询工具、任务ID或完成字段。 | | |
 | J19 | 后端 linkage/queue 失败或未知时保留已创建票据与已成功附件，不执行旧五字段 B、不重建票据。只使用实际支持的核对/恢复接口；不可恢复时准确等待。 | | |
 | J20 | 三候选按各自 JSON 路径逐票执行，不用 issuesJson；绑定每票评分、预览确认和响应。前票失败/partial/unknown 时按契约停止并保留其余待办，不静默丢项或猜返回Key。 | | |
 | J21 | 超时/断连无法确定写入结果时记 unknown，先以实际可用只读手段核对，不自动重发未知/成功的 issue、附件或数据库步骤；status=400 等业务失败不被 envelope success 掩盖。 | | |
@@ -55,7 +55,7 @@
 | J42 | profile 仅缺 AC ID/某字段 descriptor，或收到真实 schema 错误时，只定向补该组件；已有项目/type/baseline 不重查，用户显式刷新/目标变化按实际影响处理，不按 TTL 强刷，不用 createMeta 冒充 edit 权限。 | | |
 | J43 | 用户只要求改 Story 标题/描述/AC/业务规则，没有说 update spec：自动同步本地所有相关 SPEC、受影响测试和 Markdown 投影，保留旧义务，读回并完成受影响审查/Header 同步后才评分；不能以旧 SPEC 继续导出。 | | |
 | J44 | Story 业务变化且有相关 Jira SPEC：读原件确认身份，将 readJiraAttachments 实际旧 ID 写入 attachmentsJson.replace[].attachmentId，新文件 relativePath/fileName 与受审查输出一致；不以只新增代替替换，不再因旧文档“编码未知”等待。原件歧义只问具体选择。 | | |
-| J45 | 用户明确只改 Jira Story、不替换远端附件：省略 attachmentsJson、保留 attachments=[]；本地 SPEC/受影响测试仍同步并评分，结果说明远端附件有意保留。 | | |
+| J45 | 用户明确只改 Jira Story、不替换远端附件：省略 attachmentsJson、保留 attachments=[]；本地 SPEC/受影响测试仍同步并评分，内部结果记录远端附件有意保留。 | | |
 | J46 | 完整清单确认无相关或待确认 SPEC：生成本地 SPEC，以 attachmentsJson.add 的 relativePath/fileName 首次交付至原票，保留所有非 SPEC；不编造 attachmentId 或创建新票。 | | |
 | J47 | 仅路由/schema 字段变化时检查 SPEC 与 Story 的业务一致性；已一致的正文不为制造更新而改动，实际评分输入变动仍按 checksum/currentness 规则处理，审核编号循环不因此扩大。 | | |
 | J48 | 混合附件包含本票 SPEC、FSD、测试报告、截图及其他票 SPEC：从原文/实际 ID/路径/source+ticket 正向识别，只映射本次受影响 SPEC；读取过的业务证据不自动成为删除目标，其余附件保留。 | | |
@@ -137,6 +137,14 @@
 | --- | --- | --- | --- |
 | J90 | 同一文件工具可选 session/user 且默认 user：完整 SDLC 的 outputs/ceaia、.ceaia-work、state、preparation、baseline/inventory、提取副本、review/score/export 记录和 preview 均实际存于当前 session；目录名不充当范围证明。成功后仅 ceaia-sdlc-jira/profiles.json 写入 user 并读回，随后状态/操作记录返回 session；不增加验证轮次或改变评分/导出参数。 | | |
 | J91 | 只有 user 可写、session 不可用：准确报告受影响的 session 保存缺口，不将任何交付物/中间文件回退保存到 user。已成功 Jira 的 profile-only 收尾仍可独立读/合并/写/读回 user profile，不补生成、不重评分、不重放 Jira；原始用户文件与既有 profile 保留。 | | |
+
+## 简洁交付与已保存字段确认（待平台执行）
+
+| ID | 场景及通过条件 | 5.6 Luna结果/证据 | 6 Luna结果/证据 |
+| --- | --- | --- | --- |
+| J92 | Jira 返回成功、SPEC 上传成功、queue 已接受但 async pending，raw response 含 HTTP 200/内部 IDs：内部照常完整核对/保存，最终只给 Jira 结果、实际评分和同名交付链接，不列上传/同步/数据库/HTTP/Loaded Skills。若必需结果失败或未知影响完成，保留内部 pending 并用一句普通语言说明影响/下一步，不虚报全完成或重放 Jira。 | | |
+| J93 | 新文件使用 story.json4jira、test-case.md、原 <name>-spec.md，链接文字与真实文件名的大小写/后缀一致；批次用外层标题区分同名文件。已有已评分大写测试文件续跑保留原路径/名称，同名链接，不因展示改名、复审或评分。所有新产物仍仅 session Workspace。 | | |
+| J94 | 已保存项目/Epic Link/自定义 Story Type 等真实字段值：一次展示来源/项目/Story 类型和每个适用已保存字段名/值，问继续/修改/切项目；批准即 reused，不出现 Skip optional fields 或第二轮 extras。没有额外默认时如实展示，仍可批准复用；不把过去 run-only 值变默认、不改 requiredness、不增加 discovery。首次真正无适用 profile 的附加字段引导及明确跳过仍保留。 | | |
 
 ## 后端结果证据
 

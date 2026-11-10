@@ -1,6 +1,6 @@
 # Jira text in the canonical JSON
 
-Read during [JSON assembly](jira-json-assembly.md), before independent review and scoring. The JSON already contains the values Jira will receive. SPEC and TEST_CASE.md stay Markdown. This restores the former exporter's presentation conversion at generation time; export never renders or rewrites the scored file.
+Read during [JSON assembly](jira-json-assembly.md), before independent review and scoring. The JSON already contains the values Jira will receive. SPEC and test-case.md stay Markdown. This restores the former exporter's presentation conversion at generation time; export never renders or rewrites the scored file.
 
 ## Fields and examples
 

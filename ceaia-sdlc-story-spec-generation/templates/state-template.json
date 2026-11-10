@@ -10,7 +10,7 @@
   "paths": {
     "historyRoot": ".ceaia-work/stories/example-story",
     "planningPath": ".ceaia-work/stories/example-story/preparation.md",
-    "testCasePath": "outputs/ceaia/example-story/TEST_CASE.md",
+    "testCasePath": "outputs/ceaia/example-story/test-case.md",
     "specPath": "outputs/ceaia/example-story/example-story-spec.md",
     "scoreRecordPath": null,
     "storyJsonPath": "outputs/ceaia/example-story/story.json4jira"

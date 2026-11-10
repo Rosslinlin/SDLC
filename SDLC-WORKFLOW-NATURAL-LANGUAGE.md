@@ -55,7 +55,7 @@
 
 先盘点用户提供的业务需求、UX/UI、FSD、API、数据资料、Jira、Confluence、附件、Workspace 文件和明确澄清。保留原始来源，区分直接需求、背景资料和待确认内容。内部记录精确来源位置；Jira 业务文档不能泄漏内部证据路径。
 
-先读取真实跨 session 用户 Workspace 的适用配置、可信身份和当前设置，核对工具的用户作用域；聊天文件和内存不能替代。在新准备/首次提交前，实际 profile 不存在或没有适用已存配置时，按 source → project → 可选附加字段引导；已提供 source/project 只跳过对应问题，不能代替第三问的实际回答或明确跳过。把该决定记录为 assembly.optionalFieldsDecision，未变当前决定不重复问；任何阶段都不询问 staffId；可信平台身份缺失属于技术集成缺口，不能成为用户设置问题。取得真实 metadata 后第三问可提示 Epic Link、Story Type 等该项目实际支持的字段，允许“暂不设置”；Story Type 如为自定义字段不改变 SDLC 固定 Story 的 issue type。未知可选值省略，必填事实另行补齐；明确区分可复用默认与仅本次使用。已有配置先展示实际 source/项目/Story 类型和字段，生成业务文件前确认沿用、修改或切项目；当前 run 明确确认可覆盖未变批次和续跑，不逐候选重问。用户不必填写技术类型 ID、schema 或 AC 字段 ID。
+先读取真实跨 session 用户 Workspace 的适用配置、可信身份和当前设置，核对工具的用户作用域；聊天文件和内存不能替代。在新准备/首次提交前，实际 profile 不存在或没有适用已存配置时，按 source → project → 可选附加字段引导；已提供 source/project 只跳过对应问题，不能代替第三问的实际回答或明确跳过。把该决定记录为 assembly.optionalFieldsDecision，未变当前决定不重复问；任何阶段都不询问 staffId；可信平台身份缺失属于技术集成缺口，不能成为用户设置问题。取得真实 metadata 后第三问可提示 Epic Link、Story Type 等该项目实际支持的字段，允许“暂不设置”；Story Type 如为自定义字段不改变 SDLC 固定 Story 的 issue type。未知可选值省略，必填事实另行补齐；明确区分可复用默认与仅本次使用。已有配置先展示实际 source/项目/Story 类型，以及已保存字段的名称和实际值，一次确认继续使用、修改字段或切项目；不再并列询问 Use saved settings / Skip optional fields，也不补一轮附加字段问卷。该次确认即 optionalFieldsDecision=reused；没有额外已保存值时也须如实展示，不能杜撰旧单次值为默认，不改变 metadata requiredness。当前 run 明确确认可覆盖未变批次和续跑，不逐候选重问。用户不必填写技术类型 ID、schema 或 AC 字段 ID。
 
 第一次读取任何 Jira 票前，必须有该票被明确提供或确认的 source，选项严格为 `WPB`、`ALM`、`DATA`、`FCR`、`GO`。多个未确认票在弹窗中各有独立选择，等待答复。不能按前缀、项目、组织、另一个票推断 source，不能自动轮询不同 source，也不能索取 Jira URL 代替 source 确认。已有适用的明确确认可以复用，不反复询问。
 
@@ -125,7 +125,7 @@ Description、AC 及 metadata 明确允许的其他新编写富文本在生成�
 
 ## 8. 测试、SPEC 和一次生产自检
 
-读取已保存 JSON，为实际 AC 分配有依据的 FR，并生成 `TEST_CASE.md`。每个 AC/声明的 FR 都有可执行测试，包含证据支持的入口状态、数据、按序动作、实际观察位置和可观察预期，不能只写“验证成功”或换句话重复 AC。
+读取已保存 JSON，为实际 AC 分配有依据的 FR，并生成 `test-case.md`。每个 AC/声明的 FR 都有可执行测试，包含证据支持的入口状态、数据、按序动作、实际观察位置和可观察预期，不能只写“验证成功”或换句话重复 AC。
 
 测试表保留以下 11 列：Test Case Id；AC / Requirement Ref；Scenario Type；Negative Coverage Status；Coverage Rationale / To Confirm；Priority；Test Case Description；Preconditions；Test Data；Test Steps；Expected Results。每行引用一个 AC，可附相关 FR；按真实场景类型分类，按风险使用 P0/P1/P2，不机械复制优先级。测试编号稳定，Markdown 表格中的管道与换行有效。
 
@@ -139,7 +139,7 @@ SPEC 必须包含 Summary、Jira Story 投影、与独立文件完全相同的�
 
 SPEC 文件名用安全小写 kebab-case 并以 `-spec.md` 结尾。文件顶部第一条独立 `---` 前只放 `Result` 和 `Reviewer Notes`，初始为 Not Reviewed，审查后 Notes 标记实际 Attempt 和证据支持的简述。保留真实日期和用户提供的作者、Branch、Requirement ID、Parent Requirement ID、Market/Channel/客户分类等；未知可选项省略。批准提供的 commit-specific general-spec 与 architecture.md 业务链接可以保留，内部 source register、Workspace 证据路径、私有下载/token URL、原始响应、审计标识和凭据不得泄漏。不得向 JSON 或 SPEC 写 Story Score。
 
-独立 `TEST_CASE.md` 可保留实际 Related Story JSON、Related SPEC 等 Workspace 追踪信息，但 SPEC 只嵌入其可执行表，不嵌入追踪 metadata。测试文件不作为 Jira 附件。
+独立 `test-case.md` 可保留实际 Related Story JSON、Related SPEC 等 Workspace 追踪信息，但 SPEC 只嵌入其可执行表，不嵌入追踪 metadata。测试文件不作为 Jira 附件。
 
 完成保存后做一次生产自检，复用已读取的当前文件：核对 JSON schema/实际映射/可写字段/类型/真实换行；创建或更新目标准确；实际路径和附件文件存在且与授权计划一致；每个 SPEC 的业务投影、FR/SC/流程和测试当前；引用可解析；对原文完成 Q1–Q7 自检。在同一次检查中核对 Mermaid 非空、标记正确且围栏闭合、投影标题从 `###` 起、无未替换模板占位（保留真实业务字面量）、测试表 11 列且管道/换行有效、嵌入表与独立文件一致。
 
@@ -302,7 +302,7 @@ Story 的标题、描述、AC、范围或其他业务内容改变，自动同步
 
 若权威响应的明确语义保证多个结果，可记录该依据。一般 success、MCP `isError=false` 或“票已创建”不能证明全部步骤；还要检查嵌套业务失败、400、checksum 或阈值拒绝。可选 ID 缺失不自动算失败，必需效果缺证据则保留 unknown/pending。
 
-同步提交完整需要 issue、要求附件、databaseLink 和 queue 均已确认；此时可以报告提交完成、Jira 分数同步待处理。不能因为工具返回或队列存在就说 Jira UI 分数已更新。某必需 SPEC 未确认时不能称整条 Story/SPEC 同步完成；明确 none 时说明远端附件有意不变。
+同步提交完整仍需内部确认 issue、要求附件、databaseLink 和 queue；常规最终回复不逐项展示技术状态，正常异步处理不新增待处理提示。不能因为工具返回或队列存在就说 Jira UI 分数已更新。某必需 SPEC 未确认时不能称整条 Story/SPEC 同步完成；明确 none 时内部记录远端附件有意不变。
 
 ## 16. 写入失败、部分成功和未知结果恢复
 
@@ -316,19 +316,19 @@ Story 的标题、描述、AC、范围或其他业务内容改变，自动同步
 
 替换的新上传未知时保留旧附件；只有新上传已确认成功才允许受支持后端继续删除所选旧附件。不能按名称删、重放成功上传或把追加文件说成已替换。
 
-异步任务由后端处理。不要编造 polling/recovery 工具、循环等待或重导出来推动队列。报告真实 pending/failed 和存在的受支持下一步。缺后端 schema、恢复能力或结果证据是明确工具缺口，不等于成功。
+异步任务由后端处理。不要编造 polling/recovery 工具、循环等待或重导出来推动队列。真实 pending/failed 与受支持恢复步骤保留在内部记录；影响交付或完成的问题才用简短普通语言说明实际影响和下一步。缺后端 schema、恢复能力或结果证据是明确工具缺口，不等于成功。
 
 ## 17. 文件、状态、续跑和配置保存
 
 所有 AI 生成的交付物和中间产物必须放在当前 session Workspace（会话空间）：新候选交付目录为 `outputs/ceaia/<slug>/`，内部目录为 `.ceaia-work/stories/<slug>/`；更新交付目录为 `outputs/ceaia/updates/<SOURCE>/<TICKET-KEY>/`，内部目录为 `.ceaia-work/updates/<SOURCE>/<TICKET-KEY>/`。目录名本身不决定存储范围；不能在 user Workspace 创建这些目录或文件，也不能因 session 写入失败而回退到 user Workspace。只有 `ceaia-sdlc-jira/profiles.json` 保留在 user Workspace，配置保存后的状态、快照及操作证据仍写回 session。沿用已有路径保存/读回检查，不新增探测文件、验证调用或报告；不虚构 scope 参数或 session 路径前缀。原始用户来源按实际位置读取，不移动或改写；不同 source 的同号票不能混用目录。
 
-用户文件保留当前 `story.json4jira`、`TEST_CASE.md`、`<name>-spec.md` 及确实需要的不同 SPEC。内部保存 `state.json`，更新另有 `update-manifest.md`；Plan/Assembly 共用 `preparation.md` 的修订绑定 section，不新建编号 plan/assembly。只有实际 review、score、export 调用保留三位编号记录，不覆盖已完成记录；旧编号指针仍可读。保留原始来源；不堆历史用户交付文件副本，完整响应和输入读回证据存编号记录，不重复塞满 state。
+新交付文件统一为简短小写 `story.json4jira`、`test-case.md`，SPEC 保持现有 `<name>-spec.md`，交付链接直接显示真实文件名。续跑时遵从实际已记录文件名，包括旧版大写测试文件；不为本次展示优化重命名已评分文件或触发重新评分。用户文件保留当前这三类文件及确实需要的不同 SPEC。内部保存 `state.json`，更新另有 `update-manifest.md`；Plan/Assembly 共用 `preparation.md` 的修订绑定 section，不新建编号 plan/assembly。只有实际 review、score、export 调用保留三位编号记录，不覆盖已完成记录；旧编号指针仍可读。保留原始来源；不堆历史用户交付文件副本，完整响应和输入读回证据存编号记录，不重复塞满 state。
 
 整批状态为 `.ceaia-work/batch-state.json`，包含有序 selectedCandidateIds、candidateId/statePath、整批 SR 覆盖、批准排除和 evidenceRevision 绑定。传交接时必须提供实际 batchStatePath。
 
 候选 state 的 contractVersion=7，至少维护：身份/模式/source/ticket、evidenceRevision、phase/status/nextAction、Jira 意图；真实文件路径和已观察 JSON/test/SPEC body/file revisions；assembly 快照；review attempt/报告/全部 SPEC 绑定及 Header 读回；score attempt/实际输入/完整响应指针及当前性；修复累计和每原因机械恢复；pending 用户问题；当前预览确认；独立的实际 writeResults。
 
-状态使用 IN_PROGRESS、READY、WAITING_USER、WAITING_TOOL、STOPPED、COMPLETE。未知值用 null/pending，不把模板示例写成成功。`specArtifacts.uploaded` 只是计划上传标志，真正远端结果放 writeResults。COMPLETE 可以描述同步提交已确认、异步 Jira 分数仍 pending，但最终报告必须说明这个区别；同步必需结果未知不能被 COMPLETE 掩盖。
+状态使用 IN_PROGRESS、READY、WAITING_USER、WAITING_TOOL、STOPPED、COMPLETE。未知值用 null/pending，不把模板示例写成成功。`specArtifacts.uploaded` 只是计划上传标志，真正远端结果放 writeResults。COMPLETE 可以描述同步提交已确认、异步 Jira 分数仍 pending，这个区别保留在内部状态；最终回复无需另列异步技术状态，同步必需结果未知仍不能被 COMPLETE 掩盖。
 
 续跑先读取最新实际文件和编号记录，检查绑定后才复用已完成门禁，不因新会话重置修复计数、忽略 pending 或把未知写入变未开始。确定未变且有完整读回时复用；本地计数不是远端锁或数据库证据。旧流程遗留的 staffId 待答问题已不适用，撤销该问题后按真实上下文恢复；保留其他业务待问、修复计数和所有已知/未知远端结果。身份注入仍有实际缺口时记技术等待，不能再向用户索取 staffId。
 
@@ -348,9 +348,9 @@ profile 保留可信用户范围、source/project/规范 issueType（Story 保�
 
 未提交的旧 JSON/Markdown 包迁移时，先保留原始状态、来源、评分记录、修复计数和全部已知/未知远端结果，再用实际 metadata 生成当前 fields + 根级 AC ID 格式，移除旧包装/staffId/reporter、补真实更新目标并完成 Jira wiki 编码，按受影响内容同步、复核、重新评分与当前确认。不能把旧评分或旧 checksum 当当前授权。已提交或结果未知的操作先核对，不能为迁移重建/重导出，也不补旧 B/S2。
 
-最终回复必须给实际文件路径、各候选状态、已确认票号/URL、独立审查结论、真实评分、来源覆盖、当前本地 SPEC 与远端附件结果、数据库关联、队列、异步同步状态、配置保存情况，以及每个剩余阻塞和一个明确下一步。缺失结果准确写未确认，不补造成功。
+最终回复保持简短：给已确认 Jira 票号/链接、真实评分和当前交付文件链接。链接文字必须与 Workspace 真实文件名完全一致；新文件为 story.json4jira、test-case.md，SPEC 保持现有 <name>-spec.md。已核验配置保存可简短提示下次可复用。常规回复不再列 SPEC upload、score synchronization、database linkage、队列、HTTP 状态、任务/记录 ID、Q1–Q7 清单或 Loaded Skills；这些结果仍在内部完整核对和记录，用户明确诊断时再提供。真正影响交付或完成的失败/未解决要求，用一句普通语言说明影响和下一步，不能虚报全部成功。
 
-完整导出模式只有全部选定必需同步效果经证据确认才报告同步提交完成；异步 Jira 分数字段另报。用户明确停止则保留文件、未解决项和所有远端结果。只准备模式按用户意图结束并交付实际产物。等待输入、工具缺失、低分、拒绝确认、部分失败和未知写入都是可恢复状态，不能因达到尝试次数伪装成功或擅自取消。
+完整导出模式只有全部选定必需同步效果经证据确认才记录同步提交完成；异步 Jira 分数字段状态保留在内部。用户明确停止则保留文件、未解决项和所有远端结果。只准备模式按用户意图结束并交付实际产物。等待输入、工具缺失、低分、拒绝确认、部分失败和未知写入都是可恢复状态，不能因达到尝试次数伪装成功或擅自取消。
 
 ## 19. 生成 Workflow 后的验收条件
 

@@ -33,7 +33,7 @@
 
 ## Test Cases *(mandatory)*
 
-[Insert exactly the current TEST_CASE.md executable table, including header/separator/rows. Omit tracking metadata.]
+[Insert exactly the current test-case.md executable table, including header/separator/rows. Omit tracking metadata.]
 
 ## Edge Cases
 [Source-supported relevant boundary/error/dependency/permission outcomes, or explicit Not applicable with rationale.]

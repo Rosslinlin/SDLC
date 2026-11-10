@@ -14,7 +14,7 @@ Return one JSON conclusion using the fields below. Replace examples with observe
   "reviewResult": "NEEDS_REVISION",
   "artifactPaths": {
     "storyJsonPath": "outputs/ceaia/example-story/story.json4jira",
-    "testCasePath": "outputs/ceaia/example-story/TEST_CASE.md",
+    "testCasePath": "outputs/ceaia/example-story/test-case.md",
     "sourcesRead": []
   },
   "reviewedBindings": {
