@@ -1,6 +1,6 @@
 # scoreUserStory calls and result records
 
-Version: 3.0.0-json-preview.2. Use the actual content source selected under SKILL.md. A requested assessment invokes nodejs-base-mcp.scoreUserStory; a sync-only request instead follows [synchronization and recovery](jira-score-sync.md) without rescoring.
+Version: 3.0.0-json-preview.3. Use the actual content source selected under SKILL.md. A requested assessment invokes nodejs-base-mcp.scoreUserStory; a sync-only request instead follows [synchronization and recovery](jira-score-sync.md) without rescoring.
 
 ## Two mutually exclusive routes
 
@@ -77,3 +77,23 @@ Use these concise sections in the existing Markdown result:
 - Persistence, score synchronization and any requested handoff: actual observed score-save/linkage/queue/Jira-sync evidence or not returned/unknown, plus the exact selected JSON/SPEC paths and known target when relevant. These are observations, not mandatory invented response keys. Follow [synchronization and handoff](jira-score-sync.md).
 
 Read the saved result back. Report the requested Story or ticket/source, exact returned score/status, actual synchronization outcome, material recognition limitations and full-result link; combine independent batch results for the user. A failure for one independent target does not block the others. Missing optional sync evidence does not turn a completed assessment into a score failure or justify duplicate sync calls. Only the direct Jira route has a two-argument score-sync follow-up; no legacy four/five-field trigger or business-content export follows scoring here.
+
+## User-facing score presentation
+
+For a completed numeric assessment, render each target in readable Markdown with its actual Story title (and actual Jira key when known), then these three sections in order: **1. Evaluation**, **2. Recommendations**, **3. Clarifying questions**. Use UK English unless the user requests another language. Evaluation contains one table with columns `Section | Score | Max | Notes` and the following rows in order. The Max values are the six dimension weights in the supplied 100-point rubric; they are display metadata, not instructions to score or adjust content.
+
+| Section | Returned Score field | Max |
+| --- | --- | ---: |
+| Description format | `description_format_score` | 3 |
+| Acceptance criteria format | `acceptance_criteria_format_score` | 3 |
+| Description understandability | `description_understandability_score` | 25 |
+| Acceptance criteria specificity | `acceptance_criteria_specificity_score` | 29 |
+| Acceptance criteria testability and coverage | `acceptance_criteria_testability_coverage_score` | 25 |
+| Scope | `scope_score` | 15 |
+| Overall | `finalScore` | 100 |
+
+Read the six section scores from the returned `sectionScores` or `scoreBreakdown` object; the observed response contains both with matching values. If both are present and disagree, disclose the conflicting field instead of choosing one. Use the returned `finalScore` for Overall, not a sum or `overall_score` replacement. Never infer a missing section score, change a returned number, or rescore to populate the grid. If a section value is absent, show `—` in Score and say it was not returned. If a returned value exceeds its displayed Max, show the actual value and flag the scoring-contract discrepancy in Notes; do not silently cap it. Preserve the complete response in the result record.
+
+Keep Notes brief and supported by the returned summary, substantive diagnostics or assessed Story; do not expose internal rule codes or raw JSON in the user-facing grid. Put the returned `qualityBand` and a concise overall observation in Overall Notes when available. Derive recommendations from material gaps and ask only useful unresolved business questions; use `None identified.` in an otherwise empty required section. Do not manufacture a Jira key for a new local Story or a title missing from the actual input/result. For failed, skipped or unknown assessments, explain the actual outcome without a fabricated numeric grid.
+
+Within Evaluation, after the table, include the existing concise assessment/synchronization status, material recognition limitation and full-result link where applicable. Keep score quality distinct from whether Jira score fields have actually updated. For a batch, repeat the same format per target. This presentation rule does not change score calls, result persistence, Jira synchronization, recovery or export behavior.

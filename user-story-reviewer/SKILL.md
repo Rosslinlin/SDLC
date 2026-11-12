@@ -5,7 +5,7 @@ description: Score current Jira Stories or selected local Story JSON through sco
 
 # User Story Reviewer
 
-Version: 3.0.0-json-preview.2 — 2026-11-04. Runtime: GPT-5.6 Luna or GPT-6 Luna, text-only platform tools; no scripts.
+Version: 3.0.0-json-preview.3 — 2026-11-12. Runtime: GPT-5.6 Luna or GPT-6 Luna, text-only platform tools; no scripts.
 
 A new assessment request calls nodejs-base-mcp.scoreUserStory for each selected target. A prior report or model judgment does not replace that call; the service decides cache reuse. Current-Jira review includes score-only synchronization after a valid numeric result, unless the user requests assessment only or no Jira writes. Review does not export business content, rewrite requirements, generate SPEC/Test Case artifacts or run the SDLC workflow.
 
@@ -39,7 +39,7 @@ No independent SDLC content-review agent, script or sibling Skill is required. R
 4. Resolve optional SPEC inputs before the call. With no SPEC, omit both specFileStatus and specFilePath. When a real SPEC is selected for assessment, use its real path and evidenced exact Pass/Fail status as a pair; never invent Pass, use Fail to mean absent, or create an empty SPEC. Unknown selected SPEC status needs a focused clarification. Direct Jira passes neither SPEC argument.
 5. Read back the exact current inputs, record the source/conversion basis, then call scoreUserStory once per target with that route's arguments. A failure does not authorize switching routes. Handle actual structural validation errors under the scoring reference; do not loop to raise a low or cached score.
 6. Save the complete actual response/error in the next result record and read it back. Preserve a real low score including 0. For direct Jira with ok=true and finite numeric finalScore, follow the synchronization reference and call exportjirabydynamicfield once with the same two arguments, including for a cache hit, unless the user excluded writes or this assessment's synchronization was already submitted. A local JSON result does not trigger this call, even when its JSON contains issueIdOrKey.
-7. Retain the full synchronization response/error separately from the scoring response in the matching record. Report score completion, synchronization submission and any confirmed Jira-field completion separately. A sync failure or unknown outcome never triggers rescoring, business-content export or automatic replay. Report the score, material diagnostics and result link even when synchronization is blocked.
+7. Retain the full synchronization response/error separately from the scoring response in the matching record. Present completed scores using the six-row grid and fixed display maxima under [calls/results](references/scoring-and-results.md). Report score completion, synchronization submission and any confirmed Jira-field completion separately. A sync failure or unknown outcome never triggers rescoring, business-content export or automatic replay. Report the score, material diagnostics and result link even when synchronization is blocked.
 
 ## Files and continuity
 
