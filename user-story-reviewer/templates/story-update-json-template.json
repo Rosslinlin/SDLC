@@ -12,7 +12,7 @@
       "id": "<actual Story type ID>"
     },
     "summary": "<source Summary exactly; do not invent a missing title>",
-    "description": "<source Description and additional business prose in Jira wiki>",
+    "description": "<complete non-AC Story body in Jira wiki, including Business Context, Pre-conditions and separately authored BDD sections>",
     "<actual AC field ID>": "<complete source criteria in Jira wiki; preserve existing labels and gaps>"
   },
   "attachments": []
