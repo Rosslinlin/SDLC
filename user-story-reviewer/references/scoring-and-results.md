@@ -80,6 +80,8 @@ Read the saved result back. Report the requested Story or ticket/source, exact r
 
 ## User-facing score presentation
 
+The final conversation message is the delivery surface for every completed numeric assessment. Show the full grid, recommendations and clarifying questions there even when the Workspace result already has the desired format. A result-file link, score-only status or prose summary is not the score presentation; include the full-result link as supporting evidence. For a batch, show each completed target in the conversation.
+
 For a completed numeric assessment, render each target in readable Markdown with its actual Story title (and actual Jira key when known), then these three sections in order: **1. Evaluation**, **2. Recommendations**, **3. Clarifying questions**. Use UK English unless the user requests another language. Evaluation contains one table with columns `Section | Score | Max | Notes` and the following rows in order. The Max values are the six dimension weights in the supplied 100-point rubric; they are display metadata, not instructions to score or adjust content.
 
 | Section | Returned Score field | Max |
