@@ -4,7 +4,7 @@ Read only for local JSON preparation. Direct existing-Jira assessment uses its t
 
 ## 1. Read known facts first
 
-Use current confirmed context and the real persistent user-workspace `ceaia-sdlc-jira/profiles.json`, not a conversation-local cache. Match authenticated user, confirmed Jira source, project and actual issue type ID. Read either legacy `storyType` or compatible `issueType` records; if both exist they must agree, otherwise resolve that conflict instead of choosing a convenient ID. For Story facts, retain the existing `storyType` shape when saving so SDLC readers keep working; preserve unrelated records and do not rename the shared file or rewrite its schema.
+Use current confirmed context and the real persistent user-workspace `ceaia-sdlc-jira/profiles.json`, not a conversation-local cache. Before any discovery query, read that file through an actual supported user-Workspace file operation, or reuse a verified read of the same file from the current creation handoff/preparation. Resolve the user-Workspace destination separately from the session Workspace; a missing session copy, a path mentioned in chat or an unattempted read is not a profile cache miss. Keep the read result for the current batch so each candidate does not repeat it. Match authenticated user, confirmed Jira source, project and actual issue type ID. Read either legacy `storyType` or compatible `issueType` records; if both exist they must agree, otherwise resolve that conflict instead of choosing a convenient ID. For Story facts, retain the existing `storyType` shape when saving so SDLC readers keep working; preserve unrelated records and do not rename the shared file or rewrite its schema.
 
 Reuse components independently across create/local-update preparation:
 
@@ -16,7 +16,7 @@ Reuse components independently across create/local-update preparation:
 
 Trusted opaque platform identity has priority; never parse/store tokens. A staff-ID fallback must remain inside the same authenticated user's scope, not match another user by staff ID alone. A genuinely isolated user workspace may use `identityScope.kind=user-workspace-isolated` without inventing a value. If real persistence is unavailable, report that limitation and reuse current verified facts for this run; do not pretend a conversation file persists across sessions.
 
-With sufficient input/profile facts, call none of the three discovery tools. Do not refresh by TTL, request mode or habit. Query only a genuinely missing/inapplicable component, an explicit refresh/changed destination or a precise actual schema-error recovery. Record the missing fact and avoid re-querying already known project/type merely to complete an operation-capability label.
+With sufficient input/profile facts, call none of the three discovery tools. Do not refresh by TTL, request mode or habit. A confirmed not-found or no applicable profile permits querying only missing facts. If the user-Workspace read fails or is unavailable, retain that actual limitation and use verified current-run facts before querying only what remains missing; do not silently treat a skipped or uncertain read as not-found. Query only a genuinely missing/inapplicable component, an explicit refresh/changed destination or a precise actual schema-error recovery. Record the missing fact and avoid re-querying already known project/type merely to complete an operation-capability label.
 
 ## 2. Query only the missing component
 
