@@ -49,13 +49,13 @@
 
 另外，使用平台实际提供且当前代理可执行的 Workspace 文件/目录操作，包括工具或原生保存/打开/读取动作；按文件用途选择实际存储范围：全部生成交付物和中间文件使用当前 session Workspace，只有 ceaia-sdlc-jira/profiles.json 使用跨 session 的 user Workspace；工具默认认证用户空间仅适用于该 profile，不能沿用为产物目的地。只复用相同存储范围的实际操作绑定。无需专用 user-level 工具名、额外 scope 返回或独立 read-back API；正常文件读取即可读回。先检查并使用实际操作，没有可见工具调用或专用名称不表示不可用，也不证明已保存；只有聊天声明/路径/代码块时保持未验证，不虚构隐藏 API 或原生指令；写成功不等于已读回，确实缺少的操作单独报告，未知旧文件不覆盖。独立只读代理、原生 `.json4jira` 预览和当前用户确认能力仍必需，不编造 API。业务澄清弹窗不可用时可在文本中准确提问一次并等待；这不能代替缺失的原生预览或上传确认能力。
 
-所有实际调用遵循实时 schema，表中仅列业务输入，不代表已删除后端可能存在的身份参数。SDLC 不向用户索取 staffId，不解析 JWT/token，也不把旧参数表当作人工填写要求。若实际工具仍需要身份入参，只能采用可信平台上下文实际提供且该 schema 接受的值；身份未注入或能力不兼容时准确记录技术 WAITING_TOOL，不能反问用户员工号、虚构身份或绕到旧接口。会话身份和请求 Header 由平台提供，不能自造 session、Conversation-ID 或 Header。
+所有实际调用遵循实时 schema，表中仅列业务输入，不代表已删除后端可能存在的身份参数。正常 SDLC 流程不向用户索取 staffId，不解析 JWT/token，也不把旧工具参数表当作人工填写要求；实际必需 Reporter 缺值时的一次业务澄清与工具身份入参分开处理。若实际工具仍需要身份入参，只能采用可信平台上下文实际提供且该 schema 接受的值；身份未注入或能力不兼容时准确记录技术 WAITING_TOOL，不能用用户提供的 Reporter 身份替代工具身份、虚构身份或绕到旧接口。会话身份和请求 Header 由平台提供，不能自造 session、Conversation-ID 或 Header。
 
 ## 4. 入口、来源和原始证据
 
 先盘点用户提供的业务需求、UX/UI、FSD、API、数据资料、Jira、Confluence、附件、Workspace 文件和明确澄清。保留原始来源，区分直接需求、背景资料和待确认内容。内部记录精确来源位置；Jira 业务文档不能泄漏内部证据路径。
 
-先读取真实跨 session 用户 Workspace 的适用配置、可信身份和当前设置，核对工具的用户作用域；聊天文件和内存不能替代。在新准备/首次提交前，实际 profile 不存在或没有适用已存配置时，按 source → project → 可选附加字段引导；已提供 source/project 只跳过对应问题，不能代替第三问的实际回答或明确跳过。把该决定记录为 assembly.optionalFieldsDecision，未变当前决定不重复问；任何阶段都不询问 staffId；可信平台身份缺失属于技术集成缺口，不能成为用户设置问题。取得真实 metadata 后第三问可提示 Epic Link、Story Type 等该项目实际支持的字段，允许“暂不设置”；Story Type 如为自定义字段不改变 SDLC 固定 Story 的 issue type。未知可选值省略，必填事实另行补齐；明确区分可复用默认与仅本次使用。已有配置先展示实际 source/项目/Story 类型，以及已保存字段的名称和实际值，一次确认继续使用、修改字段或切项目；不再并列询问 Use saved settings / Skip optional fields，也不补一轮附加字段问卷。该次确认即 optionalFieldsDecision=reused；没有额外已保存值时也须如实展示，不能杜撰旧单次值为默认，不改变 metadata requiredness。当前 run 明确确认可覆盖未变批次和续跑，不逐候选重问。用户不必填写技术类型 ID、schema 或 AC 字段 ID。
+先读取真实跨 session 用户 Workspace 的适用配置、可信身份和当前设置，核对工具的用户作用域；聊天文件和内存不能替代。在新准备/首次提交前，实际 profile 不存在或没有适用已存配置时，按 source → project → 可选附加字段引导；已提供 source/project 只跳过对应问题，不能代替第三问的实际回答或明确跳过。把该决定记录为 assembly.optionalFieldsDecision，未变当前决定不重复问。取得真实 metadata 后第三问可提示 Epic Link、Story Type 等该项目实际支持的字段，允许“暂不设置”；用户提供的受支持字段默认视为该项目后续 Story 的设置，明确“仅本次”时才只用于本票，并在同一 Assembly 记录区分。Story Type 如为自定义字段不改变 SDLC 固定 Story 的 issue type。未知可选值省略，必填事实另行补齐。已有配置先展示实际 source/项目/Story 类型，以及已保存字段的名称和实际值，一次确认继续使用、修改字段或切项目；不再并列询问 Use saved settings / Skip optional fields，也不补一轮附加字段问卷。该次确认即 optionalFieldsDecision=reused；没有额外已保存值时也须如实展示，不能杜撰旧单次值为默认，不改变 metadata requiredness。当前 run 明确确认可覆盖未变批次和续跑，不逐候选重问。用户不必填写技术类型 ID、schema 或 AC 字段 ID。正常流程不问 staffId；仅实际 Reporter 必需且无已验证可用值时，问一次所需身份并解析为该字段的原生表示。工具身份仍由可信平台提供，其注入缺失是技术集成缺口。
 
 第一次读取任何 Jira 票前，必须有该票被明确提供或确认的 source，选项严格为 `WPB`、`ALM`、`DATA`、`FCR`、`GO`。多个未确认票在弹窗中各有独立选择，等待答复。不能按前缀、项目、组织、另一个票推断 source，不能自动轮询不同 source，也不能索取 Jira URL 代替 source 确认。已有适用的明确确认可以复用，不反复询问。
 
@@ -113,7 +113,7 @@ requiredness、可写操作、权限和默认值必须保留原操作证据范�
 | 根级 `attachmentsJson` | 用户已实测适用于路径流程的 JSON 对象，非字符串：`add` 数组条目为 `relativePath/fileName`；`replace` 数组条目还包含实际旧 `attachmentId`。新建用 add，更新按已确认原件选择 replace 或首次 add，不再用裸路径数组表达替换。 |
 | 明确不改远端附件 | 省略 `attachmentsJson`，维持 `attachments=[]`；本地 SPEC 仍同步并通过 `specFilePath` 评分。add/replace 时省略旧 `attachments` 路径数组，避免重复上传。 |
 
-创建和更新均不生成根级 `staffId`、根级 `summary/description/bddScenarios`、`customFields` 包装或 `fields.reporter`。认证身份由可信平台上下文处理，不在本流程收集 staffId，也不把它加入新 profile、Story、评分或导出参数。更新省略 reporter 不表示清空远端值。BDD 细节放在真实 AC 正文中，不维护独立 BDD 对象。
+创建和更新均不生成根级 `staffId`、根级 `summary/description/bddScenarios` 或 `customFields` 包装。`fields.reporter` 仅在当前项目/操作 schema 要求且有已验证值，或用户明确要求修改时，以实际支持的原生表示加入；更新省略它不表示清空远端值。正常流程不收集 staffId；必需 Reporter 缺值时仅问一次所需身份，不能把它用于 profile 身份键、根级 Story、评分或导出参数。工具认证身份由可信平台上下文处理。BDD 细节放在真实 AC 正文中，不维护独立 BDD 对象。
 
 先确认实际 AC 字段 ID，再将同一精确字符串放在根级映射和 fields 的键中。不得硬编码截图 ID，不能把映射 ID 当 AC 文本/数量，不能从旧根级 AC 数组静默兜底。映射缺失、指向不存在字段、正文为空或类型错误，均回到生产/组装阶段处理。
 
@@ -330,11 +330,11 @@ Story 的标题、描述、AC、范围或其他业务内容改变，自动同步
 
 状态使用 IN_PROGRESS、READY、WAITING_USER、WAITING_TOOL、STOPPED、COMPLETE。未知值用 null/pending，不把模板示例写成成功。`specArtifacts.uploaded` 只是计划上传标志，真正远端结果放 writeResults。COMPLETE 可以描述同步提交已确认、异步 Jira 分数仍 pending，这个区别保留在内部状态；最终回复无需另列异步技术状态，同步必需结果未知仍不能被 COMPLETE 掩盖。
 
-续跑先读取最新实际文件和编号记录，检查绑定后才复用已完成门禁，不因新会话重置修复计数、忽略 pending 或把未知写入变未开始。确定未变且有完整读回时复用；本地计数不是远端锁或数据库证据。旧流程遗留的 staffId 待答问题已不适用，撤销该问题后按真实上下文恢复；保留其他业务待问、修复计数和所有已知/未知远端结果。身份注入仍有实际缺口时记技术等待，不能再向用户索取 staffId。
+续跑先读取最新实际文件和编号记录，检查绑定后才复用已完成门禁，不因新会话重置修复计数、忽略 pending 或把未知写入变未开始。确定未变且有完整读回时复用；本地计数不是远端锁或数据库证据。旧流程遗留的常规 staffId 待答问题在无必需 Reporter 时撤销；确实必需且无已验证值时只问一次 Reporter 所需身份，再按真实上下文恢复。保留其他业务待问、修复计数和所有已知/未知远端结果。工具身份注入仍有实际缺口时记技术等待，不能用 Reporter 的回答代替。
 
 创建和更新只要真实 issue 成功，就必须先完成或明确报告配置保存结果，再返回/停止下一票；“停止写入”仅指后续 Jira 提交，不能跳过 profile 收尾。配置保存为：fresh-read 真实用户 Workspace 的 `ceaia-sdlc-jira/profiles.json` → 合并有意义的已验证配置 → 用户作用域写入 → 同一用户作用域读回，核对目标条目及其他条目保留。附件、关联、队列、异步失败不阻止独立配置保存，也不因配置保存变为成功；issue 失败/未知不能记录新成功。没有完整快照时只存已验证 source/project/type 等有用事实并标 metadata.complete=false，不猜 schema，不存空模板或只存 lastSuccess。
 
-profile 保留可信用户范围、source/project/规范 issueType（Story 保留一致 storyType 别名）、适用字段 descriptor、实际 AC ID、按操作区分的能力及用户明确确认的可复用默认。本次覆盖和 baseline 值不自动成为默认，明确删除的默认不从旧条目复活。descriptor 保留真实 ID/name/schema/required/operations/default 和实际选项编码。不得保存 Story/AC 正文、payload、附件内容/路径、register、凭据、session ID 或会话路径；reporter 不进入提交。保存必须保留其他项目、类型及 capability，读回才可报成功。
+profile 保留可信用户范围、source/project/规范 issueType（Story 保留一致 storyType 别名）、适用字段 descriptor、实际 AC ID、按操作区分的能力和 `confirmedDefaults`。首次提供的受支持附加字段默认作为后续同项目/类型/操作设置；明确仅本次的值不保存，后续临时覆盖不替换原默认，明确删除的默认不从旧条目复活。默认值按真实字段 ID 记录字段名和已解析的 Jira 值，不能只写“有 Epic Link”或依赖聊天记录；保存前核对当前成功票实际使用的字段值，读回再验证。descriptor 保留真实 ID/name/schema/required/operations/default 和实际选项编码。不得保存 Story/AC 正文、payload、附件内容/路径、register、凭据、session ID 或会话路径；Reporter 只在实际必需/明确修改且有效时进入提交，staffId 不作 profile 身份键。保存必须保留其他项目、类型及 capability，读回才可报成功。
 
 已确认 Jira 成功且只恢复 profile 保存时，直接进入保存/读回；旧 optionalFieldsDecision 缺失保持历史未知，不补第三问、不返回生成/审查/评分，不重放 Jira。在既有 state 增加 profilePersistence：status 为 pending/saved/failed/unavailable/not_eligible，保留 scope/path/profileKey、snapshotRecordPath、writeEvidence/readBackEvidence/error/retryUsed。旧状态懒补字段，不重置远端结果。使用普通 Workspace 文件/目录工具的实际用户目的地即可，读回是正常文件读，不另索取 scope 标记或专用能力；saved 仅在同一用户目的地读回有意义条目后设置；其余未完成状态不能被完整完成状态掩盖。无法用户级持久化或保存失败时单独报告原因，只恢复缺失保存/读回，绝不重放 Jira/附件/评分或正常发现查询。瞬时错误最多一次有界 profile-only 重试，每次合并前重读。工具名和 scope 参数依据真实 schema；平台注入用户命名空间时使用其契约证据，不要求数据库 ID。
 
@@ -346,7 +346,7 @@ profile 保留可信用户范围、source/project/规范 issueType（Story 保�
 
 `jira-createissue-helper`、`user-story-reviewer`、`review-requirements` 是本仓库独立包，不加入当前三 Skill Task，也不作为新接口不可用时的 fallback。其独立请求按各包原规则执行，不能用旧调用形态证明当前 JSON 后端集成通过。
 
-未提交的旧 JSON/Markdown 包迁移时，先保留原始状态、来源、评分记录、修复计数和全部已知/未知远端结果，再用实际 metadata 生成当前 fields + 根级 AC ID 格式，移除旧包装/staffId/reporter、补真实更新目标并完成 Jira wiki 编码，按受影响内容同步、复核、重新评分与当前确认。不能把旧评分或旧 checksum 当当前授权。已提交或结果未知的操作先核对，不能为迁移重建/重导出，也不补旧 B/S2。
+未提交的旧 JSON/Markdown 包迁移时，先保留原始状态、来源、评分记录、修复计数和全部已知/未知远端结果，再用实际 metadata 生成当前 fields + 根级 AC ID 格式，移除旧包装/根级 staffId，按实际字段要求和有效编码处理旧 reporter，补真实更新目标并完成 Jira wiki 编码，按受影响内容同步、复核、重新评分与当前确认。不能把旧评分或旧 checksum 当当前授权。已提交或结果未知的操作先核对，不能为迁移重建/重导出，也不补旧 B/S2。
 
 最终回复保持简短：给已确认 Jira 票号/链接、真实评分和当前交付文件链接。链接文字必须与 Workspace 真实文件名完全一致；新文件为 story.json4jira、test-case.md，SPEC 保持现有 <name>-spec.md。已核验配置保存可简短提示下次可复用。常规回复不再列 SPEC upload、score synchronization、database linkage、队列、HTTP 状态、任务/记录 ID、Q1–Q7 清单或 Loaded Skills；这些结果仍在内部完整核对和记录，用户明确诊断时再提供。真正影响交付或完成的失败/未解决要求，用一句普通语言说明影响和下一步，不能虚报全部成功。
 
@@ -356,9 +356,9 @@ profile 保留可信用户范围、source/project/规范 issueType（Story 保�
 
 生成结果至少应覆盖以下可验证行为。以下是待执行的验收要求，不表示已经完成平台实测。
 
-1. 无配置先用可用 Workspace 操作读真实用户目的地；实际 not-found 触发首次附加字段引导，不因 source/project 已提供而漏问，须有实际回答/明确跳过证据；再按剩余缺项继续，任何阶段都不向用户索取 staffId；真实身份注入缺失报告技术等待。已有配置在生成前展示并确认沿用/修改/切项目。完整 facts 不重复 discovery query，当前 run 已明确确认则不逐候选/续跑重问；SDLC 固定 Story，不出现流程路线选择。
+1. 无配置先用可用 Workspace 操作读真实用户目的地；实际 not-found 触发首次附加字段引导，不因 source/project 已提供而漏问，须有实际回答/明确跳过证据；受支持的已填字段默认记住，明确仅本次除外。正常流程不问 staffId；仅必需 Reporter 缺可用值时问一次并按 schema 编码，工具身份注入缺失仍报告技术等待。已有配置在生成前展示并确认沿用/修改/切项目。完整 facts 不重复 discovery query，当前 run 已明确确认则不逐候选/续跑重问；SDLC 固定 Story，不出现流程路线选择。
 2. 未确认 source 的多个 Jira 票各有独立选择；空独立 AC 配合可读 Description 能继续；真正票/source 错误不自动换源。
-3. 新建没有 issueIdOrKey；更新使用准确目标；根级 AC 是实际字段 ID，正文从实际 fields 映射读取；无 root staffId/customFields/reporter。
+3. 新建没有 issueIdOrKey；更新使用准确目标；根级 AC 是实际字段 ID，正文从实际 fields 映射读取；无 root staffId/customFields，Reporter 仅在实际必需或明确修改时按 schema 加入。
 4. Jira wiki 在评分前完成，SPEC Markdown 投影、AC 顺序/ID/代码/链接及测试保持一致，评分后导出无文件转换。
 5. Story-only 业务更新自动同步所有本地 SPEC/测试；已有 SPEC 用 attachmentsJson.replace 并携带 readJiraAttachments 实际旧 ID，无 SPEC 用 add，明确保留远端省略对象且 attachments=[]。保护非 SPEC，不因已确认格式重复等待；真实服务拒绝和部分结果准确记录。
 6. 审查先读原文，reviewer 只读不评分；合理 or/N/A/拒绝型 AC 不因旧模板规则误失败；真遗漏和无依据承诺被发现。

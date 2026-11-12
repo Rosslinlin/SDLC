@@ -14,6 +14,8 @@ Resolve values from current explicit input and the selected revision first. On u
 
 Put Jira-visible values directly in native `fields` using actual field IDs. Do not assemble `dynamicFieldsJson`, a `customFields` wrapper or old direct tool arguments. Root routing/type and the update target follow the file contract and agree with included field values.
 
+Omit root `staffId`. For any issue type, include `fields.reporter` only when a submitted value is required by applicable operation evidence after valid update omission/baseline rules or explicitly requested, with its actual supported value/encoding resolved; do not copy platform/query identity into it by assumption. If a submitted Reporter is required and has no verified current or remembered value, ask once for the needed staff ID and resolve it through the supported field contract; unresolved mapping remains a precise blocker. Omit unrequested Reporter on update without clearing the remote value.
+
 | Actual schema | Representation rule |
 | --- | --- |
 | Text | Complete source or approved generated JSON string; rich text uses [preparation rendering](common-jira-text-rendering.md). |
@@ -34,7 +36,7 @@ An update omits unrelated business fields while retaining both required routing 
 - Map real Title/Summary to `fields.summary` once. Preserve non-AC Description and additional sections in `fields.description` in original order. Do not duplicate Title as H1 or repeat the extracted AC body in Description.
 - Preserve whole criteria, existing labels/IDs and Given/When/Then/And/But relationships. BDD steps within one scenario remain one criterion. Do not invent AC-001 labels, merge criteria or complete missing steps to raise a score.
 - Create omits `issueIdOrKey`; update uses the exact confirmed actual target at the root. Parent/Epic/reference keys or profile history never select it.
-- Omit root `staffId` and Story `fields.reporter`. Platform/profile identity is not business payload. Do not generate SPEC/Test Case files or add attachments solely to satisfy scoring.
+- Do not generate SPEC/Test Case files or add attachments solely to satisfy scoring.
 
 Other types use only applicable actual fields. Do not add Story AC/BDD/SPEC obligations to Bug/Task/Test/Epic or misclassify the actual type to put a Story in a non-Story manifest. Use [assessment evidence](story-assessment-evidence.md) when supplied or actually required; this helper neither imposes universal Story scoring nor calls the scorer.
 

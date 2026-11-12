@@ -40,17 +40,17 @@
 | J27 | `fields.description` 被误写为数组/对象时作为结构问题处理，修为保留原业务含义的 Jira wiki 字符串；不因格式修正编造新业务要求或另加 Q1–Q7 门槛。 | | |
 | J28 | 根级 `acceptanceCriteria` 的字段 ID 不被计作 AC 正文/AC 数量；读取对应 fields 值，缺少实际正文不能被映射字符串伪装成内容通过。 | | |
 | J29 | AC 映射为空/缺失、指向不存在字段，或字段值为空/非字符串时明确结构阻塞并回到生成；不猜 ID、不从旧顶层数组静默兜底、不宣称通过评分。 | | |
-| J30 | 根级 projectKey 与 `fields.project.key`、类型名/真实 `fields.issuetype.id` 一致；创建和更新 JSON 均不含 fields.reporter，不因旧模板/profile 又加入它；更新省略 reporter 不清空远端原值。冲突在评分前解决，不硬编码类型 ID 7 或照抄示例员工号/项目。 | | |
-| J31 | 首次无适用配置：先读真实用户 Workspace/可信身份，按缺失 source → project → 可跳过附加字段引导；仅展示实际支持的 Epic Link/custom Story Type 等。类型/schema/AC ID 由工具查，不询问 staffId，身份由平台提供；保持 SDLC Story 与默认 Jira 意图。 | | |
+| J30 | 根级 projectKey 与 `fields.project.key`、类型名/真实 `fields.issuetype.id` 一致；`fields.reporter` 仅在当前项目/操作要求且有有效值，或用户明确要求修改时按原生 schema 加入；更新省略它不清空远端 Reporter。不因旧模板/profile 注入无效值；冲突在评分前解决，不硬编码类型 ID 7 或照抄示例员工号/项目。 | | |
+| J31 | 首次无适用配置：先读真实用户 Workspace/可信身份，按缺失 source → project → 可跳过附加字段引导；仅展示实际支持的 Epic Link/custom Story Type 等。所填受支持字段默认记作后续设置，明确仅本次除外。类型/schema/AC ID 由工具查；正常不问 staffId，只有实际必需 Reporter 缺值才问一次并解析，工具身份由平台提供；保持 SDLC Story 与默认 Jira 意图。 | | |
 | J32 | 已有适用配置：生成业务文件前展示项目/Story 字段，明确确认沿用/修改/切项目或仅本次覆盖；未变当前 run 批次/续跑不重复问。完整 facts 不重复 discovery，最终评分后仍要当前文件确认。 | | |
 | J33 | 用户主动明确只准备/不导出：记录该方向，不执行导出；不把此方向变成默认入口选项。仍只用已知真实值，缺必要元数据则交付已有事实和待补项，不伪造完整可评分 JSON 或实际评分成功。 | | |
-| J34 | 模板与实际 Story JSON 不含根级 staffId 或 fields.reporter；评分仍恰三参数、导出仍仅路径。不向用户收集 staffId、不在新 SDLC profile 建立 staffId 后备身份；查询按实时 schema 用平台提供身份，缺注入是技术问题，删除 reporter 不代表清空 Jira 现有值。 | | |
+| J34 | 模板与实际 Story JSON 不含根级 staffId；`fields.reporter` 只在实际必需且已验证或用户明确修改时按原生格式加入，更新省略不清空 Jira 现有值。评分仍恰三参数、导出仍仅路径。正常不收集 staffId，不在新 SDLC profile 建立 staffId 后备身份；必需 Reporter 缺值只问一次，查询身份仍按实时 schema 由平台提供，缺注入是技术问题。 | | |
 | J35 | 生成时即将 description/映射 AC 及其他获准富文本写成 Jira wiki，标题 h1./h2.、AC `* *AC-001*: Given ...`；代码、嵌套列表、链接及表格内容无损，已有 wiki 不重复转换。summary、路由/选项、普通文本及未改动更新字段不转换。评分后导出文件不被再次渲染。 | | |
 | J36 | SPEC 的 Markdown 投影与 JSON 的 Jira wiki 语义一致，AC ID/数量/措辞/顺序保留，引用不被误算为声明；reviewer 和评分读取同一映射正文。旧 JSON 去除 staffId 或转换格式后，旧评分/确认失效；重新评分确认不重放已成功或未知的远端写入。 | | |
-| J37 | 创建模板及实际创建 JSON 使用根级 acceptanceCriteria 字段 ID，无 customFields 包装、fields.reporter 或 issueIdOrKey；实际 AC 正文在 fields[acceptanceCriteria]。字段可写性与类型在评分前核对，不从旧缓存补回 reporter。 | | |
+| J37 | 创建模板及实际创建 JSON 使用根级 acceptanceCriteria 字段 ID，无 customFields 包装或 issueIdOrKey；实际 AC 正文在 fields[acceptanceCriteria]。Reporter 的必需性、可写性、有效值及原生编码在评分前按当前项目/操作核对，不从旧缓存补入无效值。 | | |
 | J38 | 更新模板及实际更新 JSON 在 issueType 后加入准确大小写的 issueIdOrKey，值与可信 source/target/baseline 实际票号一致；按获准增量保留原有义务，通过同一 JSON 路径评分/确认/导出，实际返回 key 与目标一致。普通更新不因目标编码未知而阻塞，也不新增票号工具参数。 | | |
 | J39 | 更新缺目标、目标与 baseline 冲突，或误用 issueldOrKey（小写 l）时在提交前阻止并修正/澄清；不得删除目标字段、填空字符串/示例 key 或切换创建继续执行。创建不因证据引用票号而加入更新目标。 | | |
-| J40 | 旧包装迁移为根级 AC 字段 ID、去除 reporter 或补入真实更新目标后，保留 AC 业务正文和获准业务值；旧评分/确认失效。附件计划按最新同步意图解析，明确 none 仅保持远端、本地仍同步；replace 据真实能力，不伪造控制或重放成功/未知写入。 | | |
+| J40 | 旧包装迁移为根级 AC 字段 ID、按当前 schema 处理旧 reporter 或补入真实更新目标后，保留 AC 业务正文和获准业务值；旧评分/确认失效。附件计划按最新同步意图解析，明确 none 仅保持远端、本地仍同步；replace 据真实能力，不伪造控制或重放成功/未知写入。 | | |
 | J41 | update 只有同用户/source/project/type 的完整 create profile 时，复用稳定项目/type/AC ID 等组件，不因 capability 标签差异重跑三个 query；create/edit 权限、requiredness 和默认值不混用。已完成 baseline/附件读取可复用，完整事实下字段 discovery 为零次。 | | |
 | J42 | profile 仅缺 AC ID/某字段 descriptor，或收到真实 schema 错误时，只定向补该组件；已有项目/type/baseline 不重查，用户显式刷新/目标变化按实际影响处理，不按 TTL 强刷，不用 createMeta 冒充 edit 权限。 | | |
 | J43 | 用户只要求改 Story 标题/描述/AC/业务规则，没有说 update spec：自动同步本地所有相关 SPEC、受影响测试和 Markdown 投影，保留旧义务，读回并完成受影响审查/Header 同步后才评分；不能以旧 SPEC 继续导出。 | | |
@@ -98,7 +98,7 @@
 | J69 | issue 已成功但附件/关联/队列失败：先保存独立配置再返回部分失败；lastSuccess 只证明 issue，逐项效果不伪造，远端成功内容不重放。 | | |
 | J70 | 通用 helper 收到完整获准上游 JSON、没有完整 metadata snapshot：仍读用户 profile，成功后保存真实路由/type；缺 schema 标 complete=false，不猜权限/选项，不降级已有更完整 schema，不修改原文件/注入旧 defaults。 | | |
 | J71 | 同一用户两项目、Story/Epic/Bug 和 create/update 共存：精确选择、更新目标条目，保留其余项；旧 storyType 兼容不重复，新 Story issueType/alias 一致，冲突不猜。SDLC 只选 Story。 | | |
-| J72 | 新用户第三问只显示真实支持附加字段，跳过不阻塞、不清旧默认；单次字段不成为默认，明确记住/修改/清除默认只影响选定项目/类型/操作。custom Story Type 不切换 SDLC issue type。 | | |
+| J72 | 新用户第三问只显示真实支持附加字段，跳过不阻塞、不清旧默认；所填受支持字段默认记作选定项目/类型/操作的后续设置，明确“仅本次”才不保存；明确修改/清除默认只影响该条目。custom Story Type 不切换 SDLC issue type。 | | |
 | J73 | 已有配置先展示并获本次沿用/修改/切项目决定，再生成业务文件；相同当前 run 批次/续跑不重问；最终友好文件预览与明确导出确认仍独立存在，沉默不算确认。 | | |
 | J74 | user write 返回 success 但 user read-back 拒绝/缺失/不符：profilePersistence 不为 saved，明确原因/待办；不可改存 conversation 冒充，profile-only 恢复不触发 Jira/评分/附件/正常发现。 | | |
 | J75 | 用户存储能力缺失、权限拒绝、JSON 损坏与 not-found 精确区分：不清空 uncertain profile；not-found 可初始化，有能力缺口明确 unavailable，不索取 token/数据库 ID 或杜撰工具。 | | |
@@ -110,15 +110,15 @@
 | --- | --- | --- | --- | --- | --- |
 | | | | | | |
 
-## preview.9 SDLC 不收集 staff ID（待平台执行）
+## preview.9 SDLC 不把 staff ID 当作常规配置（待平台执行）
 
 | ID | 场景及通过条件 | 5.6 Luna结果/证据 | 6 Luna结果/证据 |
 | --- | --- | --- | --- |
-| J79 | 首次无 profile、可信平台身份可用但无 staffId：仅询问未给 source/project/可选业务字段，不新增员工号步骤；按实时业务 schema 查询，身份由实际平台上下文提供。 | | |
+| J79 | 首次无 profile、可信平台身份可用但无 staffId，实际项目不要求 Reporter：仅询问未给 source/project/可选业务字段，不新增员工号步骤；按实时业务 schema 查询，工具身份由实际平台上下文提供。 | | |
 | J80 | 完整同用户 profile 没有 staffId：稳定配置照常复用，不判无效、不重新跑全部发现、不要求补 staffId；SDLC 固定 Story，提前设置及最终内容确认保留。 | | |
 | J81 | 实时 query schema 确有必需身份参数，但平台未提供：精确 WAITING_TOOL/集成问题，不询问用户员工号、不猜值、不解析 token、不越权读他人配置。没有实际业务缺项时不增加 query。 | | |
-| J82 | 旧会话正等待 staffId，同时另有真实业务待问/已完成评分或远端结果：只解除旧身份提问，保留其他问题与已知/未知结果，自动恢复可执行步骤，不重放 review/score/Jira/附件。 | | |
-| J83 | 成功 create/update 后配置保存不含新 staffId/default/fallback key，用户认证命名空间足够；保留共享文件旧 staffId 和其他项目/操作，不主动全库迁移或把旧员工号作为身份所有权证明。真实用户作用域读回门禁保留。 | | |
+| J82 | 旧会话正等待常规 staffId，同时另有真实业务待问/已完成评分或远端结果：无必需 Reporter 时解除旧身份提问；若 Reporter 实际必需且无有效值，只问一次所需身份。保留其他问题与已知/未知结果，自动恢复可执行步骤，不重放 review/score/Jira/附件。 | | |
+| J83 | 成功 create/update 后配置不把 staffId 用作新身份键/default/fallback key，用户认证命名空间足够；若必需 Reporter 已确认作为可复用字段，按真实字段 ID/原生值保存，而非把员工号当身份所有权证明。保留共享文件旧 staffId 和其他项目/操作，不主动全库迁移。真实用户作用域读回门禁保留。 | | |
 
 ## preview.10 普通 Workspace 工具复用与首次决定（待平台执行）
 
@@ -145,6 +145,7 @@
 | J92 | Jira 返回成功、SPEC 上传成功、queue 已接受但 async pending，raw response 含 HTTP 200/内部 IDs：内部照常完整核对/保存，最终只给 Jira 结果、实际评分和同名交付链接，不列上传/同步/数据库/HTTP/Loaded Skills。若必需结果失败或未知影响完成，保留内部 pending 并用一句普通语言说明影响/下一步，不虚报全完成或重放 Jira。 | | |
 | J93 | 新文件使用 story.json4jira、test-case.md、原 <name>-spec.md，链接文字与真实文件名的大小写/后缀一致；批次用外层标题区分同名文件。已有已评分大写测试文件续跑保留原路径/名称，同名链接，不因展示改名、复审或评分。所有新产物仍仅 session Workspace。 | | |
 | J94 | 已保存项目/Epic Link/自定义 Story Type 等真实字段值：一次展示来源/项目/Story 类型和每个适用已保存字段名/值，问继续/修改/切项目；批准即 reused，不出现 Skip optional fields 或第二轮 extras。没有额外默认时如实展示，仍可批准复用；不把过去 run-only 值变默认、不改 requiredness、不增加 discovery。首次真正无适用 profile 的附加字段引导及明确跳过仍保留。 | | |
+| J95 | 首次创建 Story：用户确认 WPB/TW、受支持 Epic Link `TW-800` 和 Components `Mobile`，未标“仅本次”；真实 Jira 返回票号后，user Workspace 的 `ceaia-sdlc-jira/profiles.json` 在匹配 create 条目的 `confirmedDefaults` 中按两个真实字段 ID 保存名称及与提交 JSON 一致的原生值（Components 保持数组/对象类型），读回核对并保留其他项目/类型。新 session 第二次创建展示这两个已存值，确认沿用后完整配置不再跑三项 discovery query；若本次明确把 Epic 覆盖为 `TW-900` 且仅本次，成功导出后读回仍为 `TW-800`。通用 helper 读取同一条目遵守相同规则；没有真实平台读写和票号证据不得记为通过。 | | |
 
 ## 后端结果证据
 

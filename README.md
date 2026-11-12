@@ -14,7 +14,7 @@
 
 唯一编排规则见 [workflow-contract](ceaia-sdlc-story-spec-generation/references/workflow-contract.md)。主链为：来源读取 → 在生成阶段解析项目/Story 类型/字段配置并复用持久配置 → 每候选生成最终 `story.json4jira`、`test-case.md`、`<name>-spec.md` → 生产自检 → 独立内容审查 → 同步并读回 SPEC review 状态 → 真实评分 → 整批覆盖核对 → 前端 HTML 预览 → 用户明确确认当前内容 → 逐候选导出。默认所有用户继续 Jira-backed 完整流程，不在入口提供 Preparation-only / Jira-backed 路线选择。缺信息时保留完整流程意图并补齐对应缺项；初始全流程意图不代替评分后的最终内容确认。
 
-入口先读真实用户 Workspace 的跨 session 配置和可信身份。实际无 profile／无适用已存配置时，首次按缺失 source → project → 可选附加字段引导；已有 source/project 不代替第三问，需记录真实回答或明确跳过，Epic Link、Story Type 等只展示 metadata 实际支持项，允许暂不设置。已有配置在生成业务文件前展示项目/Story 字段并确认沿用、修改或切项目；当前 run 已明确确认的未变批次/续跑无需重问。技术类型/schema/AC ID 由工具取得。SDLC 不向用户索取 staff ID，也不把它加入新配置、Story JSON 或评分/导出参数；身份由可信平台上下文提供，实际缺失属于工具集成问题。SDLC 固定导出 Story；最终评分后仍要用户检查文件并明确确认导出。缺项保留默认 Jira 流程意图，只有用户主动要求只准备/不导出时才遵从。
+入口先读真实用户 Workspace 的跨 session 配置和可信身份。实际无 profile／无适用已存配置时，首次按缺失 source → project → 可选附加字段引导；已有 source/project 不代替第三问，需记录真实回答或明确跳过，Epic Link、Story Type 等只展示 metadata 实际支持项，允许暂不设置。用户提供的受支持附加字段默认作为此项目后续 Story 的设置，明确说“仅本次”时才只用于当前票。已有配置在生成业务文件前展示项目/Story 字段及已保存的字段值，并确认沿用、修改或切项目；当前 run 已明确确认的未变批次/续跑无需重问。技术类型/schema/AC ID 由工具取得。正常流程不询问 staff ID；仅当实际项目/操作要求 Reporter 且没有已验证的可用值时，询问一次所需身份，再按真实 schema 解析为 Reporter 字段。根级 `staffId` 不进入 Story JSON、profile 身份键或评分/导出参数；工具身份仍由可信平台上下文提供。SDLC 固定导出 Story；最终评分后仍要用户检查文件并明确确认导出。缺项保留默认 Jira 流程意图，只有用户主动要求只准备/不导出时才遵从。
 
 `story.json4jira` 是唯一 Story 业务源，也是最终 Jira 提交文件；**不再生成独立 `STORY.md`**。SPEC 中的 Story 展示须从该 JSON 的实际业务字段投影，不能另写一份不同内容。`test-case.md` 仍保留；仅按已确认 schema 授权的 SPEC 附件计划进入 JSON，测试与内部记录不上传。
 
@@ -25,13 +25,13 @@
 | 根级 `jiraInstance`、`projectKey`、`issueType` | 已确认来源/项目和 Story 类型名；不再生成根级 `staffId`，不把截图示例值当默认值。 |
 | 更新专用根级 `issueIdOrKey` | 仅更新现有 Story 时，在 `issueType` 之后加入已确认的实际 Ticket Number；大小写固定为 `issueIdOrKey`（大写 I）。与本候选可信 source/target/baseline 完全一致；创建直接省略此键，不传空值或示例票号。 |
 | 根级 `acceptanceCriteria` | 真实 AC 字段 ID 字符串，不是验收标准正文；不再包在 `customFields` 中，不硬编码截图中的字段 ID。 |
-| `fields.project.key`、`fields.issuetype.id` | 项目与根级一致，类型 ID 来自实际查询；保留精确大小写和对象结构。创建和更新均不提交 `fields.reporter`，更新省略它不改变 Jira 上的原 reporter。 |
+| `fields.project.key`、`fields.issuetype.id` | 项目与根级一致，类型 ID 来自实际查询；保留精确大小写和对象结构。仅当实际字段要求且已解析出有效值，或用户明确要求更改 Reporter 时，按真实 schema 添加 `fields.reporter`；更新省略它不改变 Jira 上的原 Reporter。 |
 | `fields.summary`、`fields.description`、`fields[acceptanceCriteria]` | 标题保持原文；描述与 AC 正文为 Jira wiki 字符串。其他获准自定义业务值也放在 `fields[实际字段ID]`，只对 metadata 确认的可写富文本应用对应格式。 |
 | 根级 `attachmentsJson` | 2026-11-06 用户实测确认旧 `add`/`replace` 格式适用于新路径流程：对象内 `add` 条目使用 `relativePath`、`fileName`，`replace` 条目另含 `attachmentId`。该对象保存在评分及导出的同一文件内，不是额外工具参数；不同时使用非空 `attachments` 数组重复上传。 |
 
 生成阶段、评分之前就完成 Jira wiki 编码：描述标题使用 `h1. 标题`、`h2. 标题`；AC 例如 `* *AC-001*: Given ... When ... Then ...`，以 Jira 列表和单星号粗体保留每条 AC 的声明。JSON 字符串解码后有真实换行，普通正文与代码内容保真；不对 summary、路由/身份/选项、附件路径或更新中未改动字段做格式转换。SPEC 仍为 Markdown，从这些字段的相同语义生成可读投影，不能直接贴入 wiki 标记。导出只提交已评分的原文件，不再临时转换格式。
 
-移除旧顶层 `summary` / `description` / `bddScenarios`、旧 `customFields` 映射包装、根级 `staffId` 及 `fields.reporter`。根级 `acceptanceCriteria` 仅保留实际字段 ID，旧顶层 AC 正文/数组不适用。查询只按实时 schema 使用平台实际提供的身份；不保留手工收集 staffId 的步骤或默认必填参数，缺少身份注入不转成用户问题。生成、自检、SPEC 投影、测试与 reviewer 都读取同一实际 `fields` 内容；映射缺失、类型错误或目标冲突是结构问题，不给 Q1–Q7 新增业务标准。旧 JSON 迁移字段后须重新完成当前包的评分及内容确认，不能沿用旧 checksum。
+移除旧顶层 `summary` / `description` / `bddScenarios`、旧 `customFields` 映射包装及根级 `staffId`；旧 `fields.reporter` 只有经当前项目/操作 schema 确认有效时才保留。根级 `acceptanceCriteria` 仅保留实际字段 ID，旧顶层 AC 正文/数组不适用。查询只按实时 schema 使用平台实际提供的工具身份；缺少该身份注入是技术问题，不以 Reporter 的一次性身份澄清替代。生成、自检、SPEC 投影、测试与 reviewer 都读取同一实际 `fields` 内容；映射缺失、类型错误或目标冲突是结构问题，不给 Q1–Q7 新增业务标准。旧 JSON 迁移字段后须重新完成当前包的评分及内容确认，不能沿用旧 checksum。
 
 当前接口边界：
 
@@ -48,7 +48,7 @@
 
 [Q1–Q7 共享内容标准](ceaia-sdlc-story-spec-generation/references/quality-contract.md) 及 reviewer 的同文副本继续使用：来源完整性、价值与范围、可验证 AC、相关场景、可执行测试、SPEC 一致性、已有票保留。对象改为 JSON 的业务内容、SPEC 投影和测试；机械命名/布局、`or` 或负向标签所在行不单独构成业务失败。每 candidate/evidenceRevision 仍有 **2 个共享内容修复批次**；纯机械原因另限一次，续跑保留计数和外部结果。
 
-跨会话配置统一存到真实用户 Workspace 的 `ceaia-sdlc-jira/profiles.json`，SDLC 与通用导出创建/更新都必读。保留现有 profiles 数组，按用户/source/project/实际 issueType/capability 区分多个项目、Story/Epic/Bug 等类型与操作；旧 storyType 兼容读，新 Story 同时保留一致别名。稳定项目/类型/AC 映射跨 create/update 复用，权限/default 保留操作范围，baseline 不被配置代替。issue 真实成功后即执行 fresh-read → merge → 用户作用域 write → read-back，附件/关联/队列失败也不跳过独立配置保存。只存有意义的已验证配置和明确可复用默认，一次性值和业务正文不进入 profile；不完整 metadata 可保留已知路由事实并标 complete=false。使用实际用户目的地、当前代理可执行的 Workspace 工具或原生文件动作即可；复用本轮已成功操作，不要求专用 user-level 名称、独立 read-back API 或返回 scope 字段。读回就是正常读取已保存文件；写成功只证明可写，须读回内容才报 saved。缺读操作或实际错误单独说明，不把整套能力笼统判 unavailable；仅恢复保存，不重放 Jira。详见[持久化协议](ceaia-sdlc-jira-export/references/workspace-profile.md)。
+跨会话配置统一存到真实用户 Workspace 的 `ceaia-sdlc-jira/profiles.json`，SDLC 与通用导出创建/更新都必读。保留现有 profiles 数组，按用户/source/project/实际 issueType/capability 区分多个项目、Story/Epic/Bug 等类型与操作；旧 storyType 兼容读，新 Story 同时保留一致别名。稳定项目/类型/AC 映射跨 create/update 复用，权限/default 保留操作范围，baseline 不被配置代替。issue 真实成功后即执行 fresh-read → merge → 用户作用域 write → read-back，附件/关联/队列失败也不跳过独立配置保存。`confirmedDefaults` 按实际字段 ID 保存用户选择留给后续创建的字段值及可显示名称；首次提供的受支持字段默认记住，明确仅本次的值不保存，下一次临时覆盖也不替换旧默认。保存时核对实际写入的字段值，读回验证对应条目；不完整 metadata 可保留已知路由事实并标 complete=false，业务正文不进入 profile。使用实际用户目的地、当前代理可执行的 Workspace 工具或原生文件动作即可；复用本轮已成功操作，不要求专用 user-level 名称、独立 read-back API 或返回 scope 字段。读回就是正常读取已保存文件；写成功只证明可写，须读回内容才报 saved。缺读操作或实际错误单独说明，不把整套能力笼统判 unavailable；仅恢复保存，不重放 Jira。详见[持久化协议](ceaia-sdlc-jira-export/references/workspace-profile.md)。
 
 主链支持创建和更新现有 Story：创建使用 [创建模板](ceaia-sdlc-story-spec-generation/templates/story-json-template.json)，省略 `issueIdOrKey`；更新使用 [更新模板](ceaia-sdlc-story-spec-generation/templates/story-update-json-template.json)，在 `issueType` 后加入根级 `issueIdOrKey`，值为已确认的实际票号。更新先保留原始 Description/AC、附件清单、baseline 和获准增量，再按同一 JSON 路径完成评分、确认和导出；返回票号须与目标一致。目标缺失或冲突先澄清，不得通过省略目标改为新建。评分和导出工具不额外传票号参数。
 

@@ -25,7 +25,7 @@ For ordinary non-Test preparation, use the [generic issue shape](../templates/ge
 
 Templates describe shape only. Replace every instruction/example with verified source or metadata before submission. Preserve supported intentional empty business values; an unspecified update business field is omitted, not cleared. This omission rule never removes `fields.project` or `fields.issuetype`. Their key/ID cannot be absent, null, empty, whitespace, placeholders or fabricated punctuation. Literal punctuation in source content is not a placeholder.
 
-No root `staffId`, credential/session overrides, `conversationId`, `customFields` wrapper, independent BDD object or `fields.reporter` is generated. Do not copy old `dynamicFieldsJson`, `attachmentsJson`, `issuesJson` or write-tool argument objects into the file as a migration shortcut. Supported extensions need actual production schema evidence; do not strip an unknown business field to pass validation.
+No root `staffId`, credential/session overrides, `conversationId`, `customFields` wrapper or independent BDD object is generated. `fields.reporter` is included only when a submitted Reporter value is actually required after valid update omission/baseline rules or the user explicitly requests it, and its supported native value has been resolved; otherwise omit it. Never assume a staff ID directly equals a Jira Reporter `name` or account ID. Do not copy old `dynamicFieldsJson`, `attachmentsJson`, `issuesJson` or write-tool argument objects into the file as a migration shortcut. Supported extensions need actual production schema evidence; do not strip an unknown business field to pass validation.
 
 ## A path manifest
 

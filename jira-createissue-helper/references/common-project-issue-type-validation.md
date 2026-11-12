@@ -28,7 +28,7 @@ Use supported pagination where available and needed; never invent pagination par
 
 Decode the actual outer response first. If `result` is a JSON string, decode that returned string once. Where `result.fields.values[]` exists, read its actual descriptors. Preserve wrapper/business errors; MCP transport success is not proof of successful metadata discovery.
 
-Read fieldId/name, schema.type/items/system/custom, required, operations, defaults and allowed values where returned. Establish full-list completeness from the actual response contract or closed pagination such as total/isLast. Missing requiredness, operations or options remain unknown, not fabricated false/empty values.
+Read fieldId/name, schema.type/items/system/custom, required, operations, defaults and allowed values where returned. Establish full-list completeness from the actual response contract or closed pagination such as total/isLast. Missing requiredness, operations or options remain unknown, not fabricated false/empty values. Reporter is a metadata-scoped field decision: ask for a staff ID only if a submitted Reporter value is actually required after valid update omission/baseline rules, no verified applicable or trusted platform value is available, and that ID is needed to resolve its supported native encoding. Do not assume the ID itself is the accepted Reporter object. Normal optional-field intake never asks for it.
 
 `queryJiraCreateMetaFields` describes create metadata. Reuse stable IDs, schemas and applicable option encodings on update while preserving operation-specific limits. It is not an edit-permission check. Do not require a synthetic update capability record or treat create defaults as authority to overwrite target values.
 
