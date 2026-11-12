@@ -19,6 +19,14 @@ For raw text or Markdown, prepare one final JSON using the [new Story template](
 
 Keep a compact field map, actual criteria count, source provenance, conversion changes and known target in current context until scoring returns. No separate source copy or manifest is required.
 
+## Creation handoff check
+
+Use this check only when this reviewer is loaded to assess a complete Story draft authored by a creation workflow in the same task. The authored Story package is the source; the `.json4jira` is its scoring carrier. A structurally valid JSON is not a complete, trustworthy representation merely because its Summary and ACs match.
+
+Before scoring each Story, compare its title, Story statement, business context, preconditions, AC identifiers/count/order/full text, BDD scenarios, scope, assumptions, dependencies, exclusions, deferred candidates, open questions, notes and other supplied business sections with the candidate JSON. Compare meaning after the required Jira wiki conversion, not cosmetic Markdown. Keep review findings, scores, loaded-skill lists and other workflow reporting outside the Story-content comparison. Preserve authored non-AC sections as named sections in `fields.description` when no actual Jira field mapping exists; retain ACs only in their mapped AC field, without duplicating them as BDD. Do not invent or rewrite business content to make the two versions agree.
+
+If the candidate JSON omits or materially changes authored Story content, complete the source-preserving mapping at its established path and read it back before calling scoreUserStory. After a supported revision, assess the current JSON. Before claiming that a score applies to the final displayed Story, compare its business content with that assessed JSON again. If they differ materially, prepare and assess the changed content as a new revision; if the complete draft or final display cannot be checked, state precisely that the score applies only to the selected JSON and identify any known unassessed sections. Do not rerun scoring merely to improve a low score. A standalone JSON-only request has no unseen draft to infer or reconstruct.
+
 ## Whole criteria, original labels
 
 Identify criteria from actual IDs/numbers/titles, scenario headings, complete table rows or clearly separate source statements. Preserve each criterion's full conditions/action/results and original And/But text together. Given/When/Then bullets under one scenario are one criterion, not three. Do not add missing steps, change a When to Given, merge independent criteria to lower the count or invent AC-001 labels.
