@@ -64,7 +64,13 @@ A transport envelope indicating success can contain a business rejection; inspec
 
 ## Return the scored JSON without changing it
 
-Only when the user or caller requests export/update, return the following facts from the actual result/context to the separately maintained JSON-capable export workflow:
+For a requested export/update of a local Story through this reviewer, the current saved file must have a successful numeric JSON-path assessment before handoff. Apply this check independently for each Story:
+
+1. Read back the actual selected file and compare its exact Workspace-relative path and saved contents with the input used by the successful assessment. Verify the optional scoring SPEC pair and any participating files against that assessment when used. Use actual saved contents or trustworthy platform revision evidence. The same path, ticket, score or decoded field values alone do not establish an unchanged file. A returned checksum may support the binding when available.
+2. Keep that input frozen. Read it for the Story display and export preview without writing it back. Changing defaults or routing, adding attachments to the JSON, renaming/copying the input, or reserializing even equivalent JSON requires assessing the resulting input again. Display-only formatting and separate result/profile saves leave the assessment current when the scored inputs stay unchanged.
+3. If the selected input changed or its match cannot be verified, withhold the export handoff. Preserve the prior assessment against its own input. Finish any authorized edits, read back the final file and obtain a successful numeric assessment of that exact input through `scoreUserStory` before handing it off. If scoring fails, is skipped or remains unknown, report the blocker and keep the handoff pending. Reconcile an unknown prior attempt under the recovery rules below.
+
+Return the following facts from the actual result/context to the separately maintained JSON-capable export workflow once the check passes:
 
 - The identical scored JSON Workspace-relative path and current content/revision; never a result, preview, SPEC or newly copied payload path.
 - The exact scoring arguments, assessment result-file/version and actual service/checksum identifiers when returned.
@@ -72,9 +78,7 @@ Only when the user or caller requests export/update, return the following facts 
 - The confirmed source and known intended update ticket, if any, with their actual evidence. A ticket referenced inside business prose cannot select an update target.
 - Any observed successful/failed/unknown downstream outcome and the actual current export intent.
 
-The reviewer does not perform JSON-path business-content export or assume an older helper understands the new JSON contract. Local JSON scoring does not authorize immediate Jira creation/update. Leave preview, final content confirmation, content writing and local-JSON association handling to the export owner. The direct-Jira score-only call above is separate from that workflow.
-
-Keep the JSON path and actual scoring inputs unchanged for later export. Do not render rich text again, reserialize the file, rename it or append a score. Any JSON change, or change to a SPEC/attachment participating in that assessment, makes the old result historical for the changed package. The user/caller must obtain a current assessment before using the changed package for export; do not silently reuse an existing-Jira score for a new local JSON revision or automatically rescore just to repair a record.
+The export owner previews and confirms the current package, then submits only `story_json_workspace_path` using the exact scored path. Include the scored input binding for the export owner's final read-back before submission. If that check finds a change, return the file to reviewer for a current score and renew confirmation for the changed package before submission. Jira issue write success and score synchronization are separate outcomes. The reviewer performs the assessment and handoff. The export owner handles the content write and local JSON association.
 
 ## Recover the failed layer only
 
