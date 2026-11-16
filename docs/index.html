@@ -77,6 +77,10 @@
     .plain-label { margin: 0 0 12px; }
     .plain-label:last-child { margin-bottom: 0; }
     .plain-label strong { display: inline-block; min-width: 54px; }
+    .story-content { margin-bottom: 30px; }
+    .story-content section + section { margin-top: 30px; }
+    .story-content h2 { margin: 0 0 10px; }
+    .story-content .summary-value { margin: 0; font-size: 16px; line-height: 1.55; }
     .wiki-content h3 {
       margin: 0 0 10px;
       font-size: 18px;
@@ -84,11 +88,14 @@
       font-weight: 600;
     }
     .wiki-content h3:not(:first-child) { margin-top: 22px; }
+    .story-content .wiki-content h2 + h3 { margin-top: 0; }
     .wiki-content p { margin: 0 0 13px; }
     .wiki-content p:last-child { margin-bottom: 0; }
     .wiki-content ul { margin: 0; padding-left: 21px; }
     .wiki-content li + li { margin-top: 12px; }
-    .references { margin-top: 30px; }
+    .references { margin-top: 30px; font-size: 16px; line-height: 1.55; }
+    .references p { margin: 0 0 14px; overflow-wrap: anywhere; }
+    .references strong { font-weight: 600; }
     code, pre { font-family: SFMono-Regular, Consolas, "Liberation Mono", monospace; }
     .references code { font-size: 14px; }
     .demo-note {
@@ -118,6 +125,7 @@
       table { font-size: 14px; }
       th, td { padding: 12px; }
       th { width: 30%; }
+      .story-content .summary-value, .references { font-size: 14px; }
       .wiki-content h3 { font-size: 16px; }
       .code-view pre { padding: 14px; font-size: 12px; }
     }
@@ -143,34 +151,28 @@
         <p><strong>Issue Type:</strong> Story</p>
       </div>
 
-      <table aria-label="Story content preview">
-        <tbody>
-          <tr>
-            <th scope="row">Summary:</th>
-            <td>Display Open Term Deposit confirmation details and next-step actions</td>
-          </tr>
-          <tr>
-            <th scope="row">Description:</th>
-            <td class="wiki-content">
-              <h3>Summary</h3>
-              <p>Provide the customer with a clear confirmation of a successfully created Open Term Deposit, the key details, and the next-step actions.</p>
-              <h3>User Story</h3>
-              <p>As an Open Term Deposit customer, I want to see a confirmation page after I confirm my reviewed term deposit, so that I understand the result and what to do next.</p>
-              <h3>Business Context</h3>
-              <p>The confirmation page presents the outcome and the key information the customer needs to continue.</p>
-            </td>
-          </tr>
-          <tr>
-            <th scope="row">Acceptance Criteria:</th>
-            <td class="wiki-content">
-              <ul>
-                <li><strong>AC-001:</strong> Given the customer has confirmed the reviewed term deposit, when the request succeeds, then the confirmation page displays the outcome and key details.</li>
-                <li><strong>AC-002:</strong> Given the confirmation page is displayed, when the customer reviews it, then the available next-step actions are visible.</li>
-              </ul>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="story-content" aria-label="Story content preview">
+        <section aria-labelledby="story-summary">
+          <h2 id="story-summary">Summary:</h2>
+          <p class="summary-value">Display Open Term Deposit confirmation details and next-step actions</p>
+        </section>
+        <section class="wiki-content" aria-labelledby="story-description">
+          <h2 id="story-description">Description:</h2>
+          <h3>Summary</h3>
+          <p>Provide the customer with a clear confirmation of a successfully created Open Term Deposit, the key details, and the next-step actions.</p>
+          <h3>User Story</h3>
+          <p>As an Open Term Deposit customer, I want to see a confirmation page after I confirm my reviewed term deposit, so that I understand the result and what to do next.</p>
+          <h3>Business Context</h3>
+          <p>The confirmation page presents the outcome and the key information the customer needs to continue.</p>
+        </section>
+        <section class="wiki-content" aria-labelledby="story-ac">
+          <h2 id="story-ac">Acceptance Criteria:</h2>
+          <ul>
+            <li><strong>AC-001:</strong> Given the customer has confirmed the reviewed term deposit, when the request succeeds, then the confirmation page displays the outcome and key details.</li>
+            <li><strong>AC-002:</strong> Given the confirmation page is displayed, when the customer reviews it, then the available next-step actions are visible.</li>
+          </ul>
+        </section>
+      </div>
 
       <h2>Fields:</h2>
       <table aria-label="Other Jira fields">
@@ -190,26 +192,12 @@
         </tbody>
       </table>
 
-      <table class="references" aria-label="Field mapping, content paths, and attachments">
-        <tbody>
-          <tr>
-            <th scope="row">acceptanceCriteria:</th>
-            <td><code>customfield_27708</code></td>
-          </tr>
-          <tr>
-            <th scope="row">acPath:</th>
-            <td><code>output/pp/app-ac.jirawiki</code></td>
-          </tr>
-          <tr>
-            <th scope="row">descPath:</th>
-            <td><code>output/pp/app-description.jirawiki</code></td>
-          </tr>
-          <tr>
-            <th scope="row">attachments:</th>
-            <td><code>[]</code></td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="references" aria-label="Field mapping, content paths, and attachments">
+        <p><strong>acceptanceCriteria:</strong> <code>customfield_27708</code></p>
+        <p><strong>acPath:</strong> <code>output/pp/app-ac.jirawiki</code></p>
+        <p><strong>descPath:</strong> <code>output/pp/app-description.jirawiki</code></p>
+        <p><strong>attachments:</strong> <code>[]</code></p>
+      </div>
       <p class="demo-note">Demo content and paths are illustrative. Description and Acceptance Criteria are shown as rendered Jira Wiki content.</p>
     </section>
 
