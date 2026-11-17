@@ -13,7 +13,7 @@ A create file omits root `issueIdOrKey`. A file that already names an actual upd
 1. Read current confirmed context and the real user-workspace profile under [configuration reuse](common-state-and-user-info.md).
 2. Resolve only missing project, issue type or field facts under [discovery](common-project-issue-type-validation.md). Follow the source → project/type → optional supported fields guidance; for an existing matching profile confirm its effective settings once before authoring, unless already explicitly answered for this request. A complete file/profile does not need a fresh query chain.
 3. Assemble one real `.json4jira` under [field preparation](common-field-assembly.md). Preserve supplied export-ready business content. Generate new content only within the user's actual generation request; identify it as generated in the preview. Do not invent unknown business rules to satisfy required fields.
-4. Complete applicable non-Test [Jira text rendering](common-jira-text-rendering.md) during this preparation. Save and read back the final file before preview and confirmation.
+4. Complete applicable non-Test [Jira text rendering](common-jira-text-rendering.md) during this preparation. For a newly prepared Story, save and read back its JSON plus the two distinct referenced Wiki files; for other issue types, keep their existing file shapes. Do this before preview and confirmation.
 
 ## Confirm and submit
 

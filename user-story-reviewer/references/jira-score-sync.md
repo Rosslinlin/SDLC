@@ -9,7 +9,7 @@ Bind each result to the input actually sent to nodejs-base-mcp.scoreUserStory:
 | Assessment source | Evidence to retain |
 | --- | --- |
 | Existing Jira | Exact jira_number and confirmed source, complete response/error and actual returned identifiers/cache information. A source-file carrier is provenance only, not the scoring input. |
-| Workspace JSON | Exact story_json_workspace_path and observed saved content/revision; actual optional SPEC input pair and file binding when used; complete response/error and returned identifiers/cache/checksum information. Retain a known intended Ticket/source separately. |
+| Workspace JSON | Exact story_json_workspace_path and observed saved content/revision; for a path-based Story, both distinct root Wiki paths and observed file revisions; actual optional SPEC input pair and file binding when used; complete response/error and returned identifiers/cache/checksum information. Retain a known intended Ticket/source separately. |
 
 Use the existing versioned score-result file and conversation context. Preserve every earlier assessment; do not create an extra state, manifest or handoff file. Keep the complete response unchanged. Parse it for the report without dropping unknown fields, truncating diagnostics, selecting a favorable nested result or recalculating finalScore. Preserve raw returned text when available; otherwise serialize the complete decoded object and label that representation honestly.
 
@@ -66,19 +66,20 @@ A transport envelope indicating success can contain a business rejection; inspec
 
 For a requested export/update of a local Story through this reviewer, the current saved file must have a successful numeric JSON-path assessment before handoff. Apply this check independently for each Story:
 
-1. Read back the actual selected file and compare its exact Workspace-relative path and saved contents with the input used by the successful assessment. Verify the optional scoring SPEC pair and any participating files against that assessment when used. Use actual saved contents or trustworthy platform revision evidence. The same path, ticket, score or decoded field values alone do not establish an unchanged file. A returned checksum may support the binding when available.
-2. Keep that input frozen. Read it for the Story display and export preview without writing it back. Changing defaults or routing, adding attachments to the JSON, renaming/copying the input, or reserializing even equivalent JSON requires assessing the resulting input again. Display-only formatting and separate result/profile saves leave the assessment current when the scored inputs stay unchanged.
+1. Read back the actual selected JSON and compare its exact Workspace-relative path and saved contents with the input used by the successful assessment. For root `descPath`/`acPath`, verify the two distinct Wiki paths and current file contents/revisions also match that assessment. Verify the optional scoring SPEC pair and any participating files against that assessment when used. Use actual saved contents or trustworthy platform revision evidence. The same path, ticket, score or decoded field values alone do not establish an unchanged package. A returned checksum may support the binding when available, without assuming its coverage.
+2. Keep the scored input package frozen. Read it for the Story display and export preview without writing it back. Changing either Wiki body, defaults or routing, adding attachments to the JSON, renaming/copying an input, or reserializing even equivalent JSON requires assessing the resulting package again. Display-only formatting and separate result/profile saves leave the assessment current when the scored inputs stay unchanged.
 3. If the selected input changed or its match cannot be verified, withhold the export handoff. Preserve the prior assessment against its own input. Finish any authorized edits, read back the final file and obtain a successful numeric assessment of that exact input through `scoreUserStory` before handing it off. If scoring fails, is skipped or remains unknown, report the blocker and keep the handoff pending. Reconcile an unknown prior attempt under the recovery rules below.
 
 Return the following facts from the actual result/context to the separately maintained JSON-capable export workflow once the check passes:
 
 - The identical scored JSON Workspace-relative path and current content/revision; never a result, preview, SPEC or newly copied payload path.
+- Both distinct `descPath`/`acPath` Wiki files and their observed revisions when the JSON uses path-based Story content; the exporter receives these as package evidence, not extra tool arguments.
 - The exact scoring arguments, assessment result-file/version and actual service/checksum identifiers when returned.
 - The real optional SPEC status/path and file binding when used; without a SPEC, keep that pair absent.
 - The confirmed source and known intended update ticket, if any, with their actual evidence. A ticket referenced inside business prose cannot select an update target.
 - Any observed successful/failed/unknown downstream outcome and the actual current export intent.
 
-The export owner previews and confirms the current package, then submits only `story_json_workspace_path` using the exact scored path. Include the scored input binding for the export owner's final read-back before submission. If that check finds a change, return the file to reviewer for a current score and renew confirmation for the changed package before submission. Jira issue write success and score synchronization are separate outcomes. The reviewer performs the assessment and handoff. The export owner handles the content write and local JSON association.
+The export owner previews and confirms the current package, including both resolved Wiki bodies when referenced, then submits only `story_json_workspace_path` using the exact scored path. Include the JSON/Wiki/SPEC input bindings for the export owner's final currentness check before submission. If that check finds a change, return the package to reviewer for a current score and renew confirmation for the changed package before submission. Jira issue write success and score synchronization are separate outcomes. The reviewer performs the assessment and handoff. The export owner handles the content write and local JSON association.
 
 ## Recover the failed layer only
 
