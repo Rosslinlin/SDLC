@@ -55,8 +55,8 @@
 Only Result and Reviewer Notes appear above the first standalone --- separator; Notes identify the actual review attempt. Valid verdicts: Not Reviewed, PASS, NEEDS_REVISION, NEEDS_HUMAN_CLARIFICATION, FINAL_WITH_UNRESOLVED.
 SPEC File Name equals the actual saved <name>-spec.md basename. The parent synchronizes review fields and reads back the full file before scoring, without changing its reviewed business body.
 For scoreUserStory, map actual Result PASS to exact specFileStatus Pass and use the actual specFilePath plus canonical story_json_workspace_path.
-The Jira Story section is the JSON business projection, never a separate requirement source or raw upload-payload dump. Embed exactly the saved executable Test Case table.
+The Jira Story section projects fields.summary and the two Jira wiki files referenced by the JSON, never a separate requirement source or raw upload-payload dump. Embed exactly the saved executable Test Case table.
 In the existing production precheck, check the flow's mermaid fence/closing delimiter and nonempty flowchart, embedded heading levels, removed authoring placeholders and valid 11-column test tables. Preserve actual code/literals; do not add a separate format-review stage or report.
 Retain supplied metadata and approved general-spec/architecture links; omit optional unknown values. Do not leak source registers, internal paths, raw responses, audit IDs, credentials or unresolved business promises.
-Do not add Story Score or any numeric score to this file. Scores remain in the independent report/UI. Freeze SPEC and canonical JSON after scoring; any later change requires current scoring and a fresh content/upload confirmation.
+Do not add Story Score or any numeric score to this file. Scores remain in the independent report/UI. Freeze SPEC, canonical JSON and both referenced Jira wiki files after scoring; any later change requires current scoring and a fresh content/upload confirmation.
 -->
