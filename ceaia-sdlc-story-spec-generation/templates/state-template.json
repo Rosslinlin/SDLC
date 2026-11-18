@@ -13,7 +13,9 @@
     "testCasePath": "outputs/ceaia/example-story/test-case.md",
     "specPath": "outputs/ceaia/example-story/example-story-spec.md",
     "scoreRecordPath": null,
-    "storyJsonPath": "outputs/ceaia/example-story/story.json4jira"
+    "storyJsonPath": "outputs/ceaia/example-story/story.json4jira",
+    "descWikiPath": "outputs/ceaia/example-story/example-story-description.jirawiki",
+    "acWikiPath": "outputs/ceaia/example-story/example-story-ac.jirawiki"
   },
   "status": "IN_PROGRESS",
   "nextAction": "plan",
@@ -28,7 +30,11 @@
     "scoreAttempt": 0,
     "responseReadBack": false,
     "storyJsonRevision": null,
-    "storyJsonPath": null
+    "storyJsonPath": null,
+    "descWikiPath": null,
+    "descWikiRevision": null,
+    "acWikiPath": null,
+    "acWikiRevision": null
   },
   "review": {
     "result": "Not Reviewed",
@@ -46,7 +52,9 @@
       "retryUsed": false
     },
     "evidenceRevision": null,
-    "storyJsonRevision": null
+    "storyJsonRevision": null,
+    "descWikiRevision": null,
+    "acWikiRevision": null
   },
   "repair": {
     "defaultRoundLimit": 2,
@@ -77,6 +85,10 @@
       "status": "pending",
       "storyJsonPath": null,
       "storyJsonRevision": null,
+      "descWikiPath": null,
+      "descWikiRevision": null,
+      "acWikiPath": null,
+      "acWikiRevision": null,
       "specFileRevisions": [],
       "recordPath": null
     }
@@ -107,7 +119,9 @@
   "executionProfile": "text-only",
   "artifactRevisions": {
     "testCaseRevision": 0,
-    "storyJsonRevision": 0
+    "storyJsonRevision": 0,
+    "descWikiRevision": 0,
+    "acWikiRevision": 0
   },
   "exportContext": {
     "target": {

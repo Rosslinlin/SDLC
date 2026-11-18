@@ -22,7 +22,7 @@ Assume source explicitly says a permitted reviewer can open an existing applicat
 * *AC-001*: Given a permitted reviewer and an existing application, when the reviewer opens the application, then the details panel displays the supplied application details.
 ```
 
-Resolve the real AC field ID into acceptanceCriteria, then store this Jira wiki string in fields[that ID], preserving stable IDs and supported Given/When/Then detail. Use [text encoding](jira-text-format.md) before scoring. Derive the SPEC projection as Markdown with one Acceptance Criteria heading and - **AC-001**: for this same behavior. The mapping ID is not AC text, and there is no top-level acceptanceCriteria/bddScenarios array. No additional exact-heading parser rule is established by this example.
+Resolve the real AC field ID into acceptanceCriteria, then store this Jira wiki string in the file referenced by root acPath, preserving stable IDs and supported Given/When/Then detail. Store Description in the distinct root descPath file; omit both bodies from fields. Use [text encoding](jira-text-format.md) before scoring. Derive the SPEC projection as Markdown with one Acceptance Criteria heading and - **AC-001**: for this same behavior. The mapping ID is not AC text, and there is no top-level acceptanceCriteria/bddScenarios array. No additional exact-heading parser rule is established by this example.
 
 ## Correct negative dispositions
 
@@ -56,9 +56,9 @@ Use this fenced structure with the current Story's actual supported labels, not 
 ## Recovery examples
 
 - Correct JSON, incorrect SPEC diagram syntax/fence: repair only that presentation under the existing mechanical allowance; unchanged business meaning needs no full business re-review. If nodes/branches/outcomes change meaning, independently verify the affected consistency. Any change to an already scored SPEC still requires the existing current package score and fresh confirmation; do not rewrite correct JSON or repeat unrelated checks.
-- Correct JSON AC, missing test: repair tests and embedded tables, independently verify affected content, synchronize headers and assess the changed package. SPEC content now participates in currentness; do not assume an old cached score is valid.
-- Wrong Story requirement: repair the canonical JSON from evidence, align tests/SPEC, independently review and score the final files. Keep path identity unchanged where possible; do not score a report or an old Markdown file.
+- Correct acPath wiki AC, missing test: repair tests and embedded tables, independently verify affected SPEC content, synchronize headers and assess the changed package. SPEC content now participates in currentness; do not assume an old cached score is valid.
+- Wrong Story requirement: repair the affected canonical JSON or wiki file from evidence, align tests/SPEC, independently review affected SPEC content and score the final package. Keep path identity unchanged where possible; do not score a report or an old Markdown file.
 - A VALIDATION_FAILED result points to a JSON field/type: correct only that supported representation. Missing real business values require clarification, not guessed defaults.
 - Actual canonical ACs still unrecognized: technical diagnosis, not endless rewording or an invented score.
-- Preview changes business content: update JSON and dependent artifacts, review affected content, score and ask for fresh confirmation.
+- Preview changes business content: update the affected JSON or wiki file and dependent artifacts, review affected SPEC content, score and ask for fresh confirmation.
 - After scoring, preserve SPEC byte content; display the actual numeric score in its independent record/UI. There is no score-header write or display-driven S2 call.

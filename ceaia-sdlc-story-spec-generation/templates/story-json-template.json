@@ -3,12 +3,12 @@
   "projectKey": "<actual project key>",
   "issueType": "<confirmed Story type name>",
   "acceptanceCriteria": "<actual AC field ID>",
+  "acPath": "outputs/ceaia/<candidate>/<name>-ac.jirawiki",
+  "descPath": "outputs/ceaia/<candidate>/<name>-description.jirawiki",
   "fields": {
     "project": {"key": "<actual project key>"},
     "issuetype": {"id": "<actual Story type ID>"},
-    "summary": "<supported Story title>",
-    "description": "h2. User Story\nAs a <evidenced role>, I want <supported goal>, so that <supported value>.\n\nh2. Business Context\n<supported context, scope and material dependencies>",
-    "<actual AC field ID>": "* *AC-001*: Given <supported condition>, when <action>, then <observable result>."
+    "summary": "<supported Story title>"
   },
   "attachmentsJson": {
     "add": [

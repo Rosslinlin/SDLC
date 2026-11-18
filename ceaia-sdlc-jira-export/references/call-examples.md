@@ -10,7 +10,7 @@ Tool: java-base-mcp.exportJiraByDynamicFieldsV2. Every invocation has exactly on
 }
 ```
 
-Copy the exact path from this candidate's actual passing scoreUserStory input. The file already contains the complete approved Jira fields and root attachmentsJson operations under [attachment rules](attachments.md). attachmentsJson belongs inside that file, not beside story_json_workspace_path as a second argument. Do not pass staffId, source, projectKey, content, SPEC status/path, attachment controls, requestJson, issuesJson or an association payload beside the path. Identity/session context is platform-owned.
+Copy the exact path from this candidate's actual passing scoreUserStory input. The file already contains root descPath/acPath references to two distinct scored Jira Wiki files, other approved Jira fields and root attachmentsJson operations under [attachment rules](attachments.md). The backend resolves the Wiki files when exporting; the agent still sends only the JSON path. attachmentsJson belongs inside that file, not beside story_json_workspace_path as a second argument. Do not pass staffId, source, projectKey, content, SPEC status/path, attachment controls, requestJson, issuesJson or an association payload beside the path. Identity/session context is platform-owned.
 
 ## Several candidates
 
@@ -30,7 +30,7 @@ Only after its required synchronous outcomes are confirmed, submit the next conf
 }
 ```
 
-Each file has its own actual review, score and current-content confirmation. Each actual invocation gets one numbered export record under its `paths.historyRoot`; a resume/read/save retry does not allocate another. Do not join paths into an array/string wrapper or substitute one candidate's score for another. Stop further writes after a failed/partial/unknown required outcome; accepted async score synchronization may remain pending.
+Each file has its own actual SPEC review, score and current-content confirmation bound to its JSON, both Wiki files and SPECs. Each actual invocation gets one numbered export record under its `paths.historyRoot`; a resume/read/save retry does not allocate another. Do not join paths into an array/string wrapper or substitute one candidate's score for another. Stop further writes after a failed/partial/unknown required outcome; accepted async score synchronization may remain pending.
 
 ## Existing-ticket updates
 

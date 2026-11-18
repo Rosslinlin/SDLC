@@ -27,12 +27,12 @@
       "content": "Assemble final Story JSON, review and score each ready candidate",
       "active_form": "Reusing Jira configuration, synchronizing JSON/SPEC and recording actual scores",
       "instructions": [
-        "Follow generation assembly and production rules using actual profile/baseline facts. Query only missing, changed or genuinely rejected configuration; reuse current metadata across candidates without treating create metadata as edit permission. Honor optionalFieldsDecision before authoring, fixed Story type, mandatory fields.project/issuetype, exact update target and confirmed attachment mappings. New files use story.json4jira, test-case.md and the existing descriptive <name>-spec.md; preserve actual resumed filenames and never rename frozen files for display. Synchronize authoritative Story JSON, Markdown SPECs and tests before review/score.",
-        "Use the existing production precheck once and invoke the bundled read-only ceaia-spec-review with complete original evidence and actual current artifacts. Do not add a second Task-level content validator, report or repair loop. Apply only the existing bounded repair policy, synchronize review headers before scoring, and avoid rewriting already matching content.",
-        "Call nodejs-base-mcp.scoreUserStory only for a required assessment with exactly story_json_workspace_path, specFileStatus=Pass and specFilePath. Persist the complete actual response and input/revision binding, then freeze JSON/SPECs. Reuse current reads, scores and the existing preparation.md Plan/Assembly sections; number only actual review/score/export invocations. Resume/save retries never cause unchanged rescoring."
+        "Follow generation assembly and production rules using actual profile/baseline facts. Query only missing, changed or genuinely rejected configuration; reuse current metadata across candidates without treating create metadata as edit permission. Honor optionalFieldsDecision before authoring, fixed Story type, mandatory fields.project/issuetype, exact update target and confirmed attachment mappings. New Story files use story.json4jira plus distinct root descPath/acPath references to <name>-description.jirawiki and <name>-ac.jirawiki in the session Workspace. Keep project, issuetype, summary and approved fields in fields; omit inline Description and mapped AC bodies. Other deliverables use test-case.md and the existing descriptive <name>-spec.md; preserve actual resumed filenames and never rename frozen files for display. Synchronize the authoritative Story JSON and both referenced Wiki files, Markdown SPECs and tests before review/score.",
+        "Use the existing production precheck once and invoke the bundled read-only ceaia-spec-review with complete original evidence and every current SPEC. The reviewer returns SPEC-only conclusions and reads the Story JSON, referenced Wiki bodies and Test Case as needed for SPEC alignment. Do not add a second Task-level content validator, report or repair loop. Apply only the existing bounded repair policy, synchronize review headers before scoring, and avoid rewriting already matching content.",
+        "Call nodejs-base-mcp.scoreUserStory only for a required assessment with exactly story_json_workspace_path, specFileStatus=Pass and specFilePath. Persist the complete actual response and input/revision binding, then freeze JSON, both referenced Wiki files and SPECs. Changes to either Wiki body invalidate the prior scoring input binding even when JSON bytes and paths remain identical. Reuse current reads, scores and the existing preparation.md Plan/Assembly sections; number only actual review/score/export invocations. Resume/save retries never cause unchanged rescoring."
       ],
       "completion_criteria": [
-        "Every selected unsubmitted candidate has complete current JSON/tests/SPECs, actual setup decision, independent content PASS and a persisted passing 76-100 assessment, or its scope was explicitly changed/stopped. Preserve all pending scope and real attempt state. Confirmed-success profile-only recovery does not require reconstructed preparation/review/score evidence."
+        "Every selected unsubmitted candidate has complete current JSON, two distinct referenced Wiki files, tests and SPECs, actual setup decision, independent SPEC content PASS and a persisted passing 76-100 assessment, or its scope was explicitly changed/stopped. Preserve all pending scope and real attempt state. Confirmed-success profile-only recovery does not require reconstructed preparation/review/score evidence."
       ],
       "depends_on": [
         "classify-and-complete-intake"
@@ -52,8 +52,8 @@
       "active_form": "Checking global coverage and presenting scored JSON previews",
       "instructions": [
         "Reconcile every selected obligation, supported exclusion and pending item using actual batch state. Do not silently omit blocked candidates or change scope; integrated export requires zero pending obligations and current evidence bindings.",
-        "Verify current review/score/JSON/SPEC/assembly evidence by reusing complete unchanged reads rather than rerunning Skill checks. Preparation-only ends with actual artifacts and score results. Load the exporter handoff/preview procedure for export intent; changed content returns only to affected upstream work.",
-        "Present actual scored .json4jira files and attachment operations; obtain explicit confirmation bound to current JSON/SPEC revisions, separate from earlier settings approval. Use actual file links and friendly wording: Please review these Story and SPEC files, including the content, project and attachment operations. Confirm export when everything looks right, or tell me what you would like to change. Silence is never confirmation."
+        "Verify current review/score/JSON/Wiki/SPEC/assembly evidence by reusing complete unchanged reads rather than rerunning Skill checks. Preparation-only ends with actual artifacts and score results. Load the exporter handoff/preview procedure for export intent; changed content returns only to affected upstream work.",
+        "Present actual scored .json4jira files with Description and AC resolved from their two Wiki references, and attachment operations; obtain explicit confirmation bound to current JSON, both Wiki files and SPEC revisions, separate from earlier settings approval. Use actual file links and friendly wording: Please review these Story and SPEC files, including the content, project and attachment operations. Confirm export when everything looks right, or tell me what you would like to change. Silence is never confirmation."
       ],
       "completion_criteria": [
         "Selected scope is reconciled and, for export intent, the user has explicitly confirmed the current frozen scored files and attachment operations. No additional score invocation is required for unchanged inputs."
@@ -74,7 +74,7 @@
       "content": "Submit only the JSON path and verify backend operation results",
       "active_form": "Exporting frozen JSON packages and recording backend persistence",
       "instructions": [
-        "Execute ceaia-sdlc-jira-export. For retained confirmed issue success needing only profile recovery, go directly to workspace-profile.md using known verified facts; do not require a new handoff, preview, JSON/SPEC reread, score or Jira call. For new submissions, reuse current confirmation, perform the required final read-back and submit the unchanged scored JSON path without discovery, conversion or payload regeneration.",
+        "Execute ceaia-sdlc-jira-export. For retained confirmed issue success needing only profile recovery, go directly to workspace-profile.md using known verified facts; do not require a new handoff, preview, JSON/SPEC reread, score or Jira call. For new submissions, reuse current confirmation, perform the required final read-back of JSON and verify both referenced Wiki bodies/revisions against the score and confirmation, then submit the unchanged scored JSON path without discovery, conversion or payload regeneration.",
         "Call java-base-mcp.exportJiraByDynamicFieldsV2 with only story_json_workspace_path, identical to the passing score input. Process confirmed files serially; preserve actual issue, attachment/replacement, database-link, queue and async score-sync outcomes under the exporter recovery policy. Never replay successful/unknown remote writes or add the legacy association call.",
         "After confirmed issue create/update, complete profile closeout before returning or starting another Jira item, even if downstream effects are partial: fresh-read the actual user destination, preserve other entries, merge useful verified configuration and every explicitly remembered field ID/value, write populated JSON and read those values back through supported tools/native actions. Report saved only after verifying contents; identify the actual failed/missing operation, never infer unavailable from tool names or hidden calls. Recovery retries only persistence. Return to the session Workspace destination for state/attempt records; only profiles.json is saved to user Workspace. Stop later Jira submissions for unresolved required effects; return a brief confirmed Jira result, available score and deliverable links labelled with exact actual filenames. Omit routine SPEC-upload, score-synchronization, database-linkage, queue/HTTP/task-ID and loaded-Skill sections; keep technical outcomes internal. Explain any real completion limitation briefly in plain language without claiming full success."
       ],
@@ -118,7 +118,7 @@
     {
       "id": "reviewed-scored-handoff",
       "name": "Reviewed and scored handoff",
-      "description": "The current scored Story JSON, SPEC and test package with existing review/score evidence; a logical output, not an extra handoff file."
+      "description": "The current scored Story JSON, its two distinct referenced Jira Wiki files, SPEC and test package with current review/score evidence; a logical output, not an extra handoff file."
     },
     {
       "id": "jira-export-and-binding-results",
@@ -129,7 +129,7 @@
   "acceptance_criteria": [
     {
       "id": "score-threshold",
-      "description": "Newly prepared selected Story packages meet the required current independent review and 76-100 score threshold; profile-only recovery preserves confirmed historical results without rerunning scoring.",
+      "description": "Newly prepared selected Story packages meet the required current independent SPEC review and 76-100 score threshold; profile-only recovery preserves confirmed historical results without rerunning scoring.",
       "output_ids": [
         "reviewed-scored-handoff"
       ],
