@@ -5,7 +5,7 @@
 ## 权威来源和边界
 
 - 新后端截图说明 `.json4jira` 文件驱动、服务端格式校验/checksum/评分保存、创建时自动关联及异步同步队列。
-- 用户随后明确：评分工具改名 **scoreUserStory**，仍传 **JSON 路径 + SPEC 状态 + SPEC 路径**；导出工具仍为 **exportJiraByDynamicFields**，只传该 JSON 路径；Story 分数暂不写入 SPEC。这些澄清优先于截图中的评分单参数样例及示意名称 create_jira。
+- 用户随后明确：评分工具改名 **scoreUserStory**，仍传 **JSON 路径 + SPEC 状态 + SPEC 路径**；导出工具仍为 **exportJiraByDynamicFieldsV2**，只传该 JSON 路径；Story 分数暂不写入 SPEC。这些澄清优先于截图中的评分单参数样例及示意名称 create_jira。
 - 2026-11-03 用户向开发确认的最新格式：根级 acceptanceCriteria 直接存实际 AC 字段 ID，不再有 customFields 包装或 fields.reporter/root staffId；AC Jira wiki 在 fields[acceptanceCriteria]。创建省略 issueIdOrKey；更新在 jiraInstance/projectKey/issueType 后加入根级 issueIdOrKey（大写 I），值为确认的现有票号。Description/AC 在生成时完成 Jira wiki 编码，SPEC 保留 Markdown 语义投影；字段 ID、查询身份与项目取真实上下文/metadata。
 - 2026-11-06 用户实测确认：旧 `attachmentsJson.add`/`replace` 格式适用于新路径 JSON 流程，且 `readJiraAttachments` 返回实际原件 ID。根级 `attachmentsJson` 为文件内对象；`add` 条目含 `relativePath`/`fileName`，`replace` 条目再含 `attachmentId`。这不增加导出工具参数。
 - 工具实时 schema 和以上已确认文件契约是实际调用依据，不再把普通replace格式当未知或重复索取能力证明。缺失的返回字段及恢复能力不能由调用方编造。完整后端评分权重没有提供；Q1–Q7 是共享内容标准，不是替代评分器。
@@ -30,7 +30,7 @@ Task v3 采用阶段 Skill/输出关联，不内嵌旧 tools 数组；运行时�
 
 新 checksum 涉及 JSON 和评分 SPEC。评分后冻结两者；预览编辑、字段变化或附件内容变化都需要当前包重新校验/评分。分数只在独立报告/UI显示，**不写 SPEC、不触发旧的显示分数 S2**。缓存命中是否另写审计/版本按实际返回，不沿用旧接口每次调用必新增审计的假设。完整规则见 [评分契约](ceaia-sdlc-story-spec-generation/references/scoring-tool-contract.md)。
 
-## 导出：java-base-mcp.exportJiraByDynamicFields
+## 导出：java-base-mcp.exportJiraByDynamicFieldsV2
 
 前端呈现已评分内容并取得当前版本的实际上传确认后，只传同一路径：
 

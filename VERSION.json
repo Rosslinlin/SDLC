@@ -35,7 +35,7 @@
     "JSON-first preview promoted to main on 2026-11-07; promotion is not a production integration claim.",
     "Generation resolves Jira routing/field metadata and writes the final story.json4jira before scoring. SPEC remains Markdown; the standalone STORY.md is replaced by the JSON business projection inside SPEC.",
     "User-confirmed scorer is nodejs-base-mcp.scoreUserStory with story_json_workspace_path, specFileStatus and specFilePath. This clarification supersedes the screenshot scoring one-argument example.",
-    "Export retains java-base-mcp.exportjirabydynamicfield but uses only the same story_json_workspace_path. Backend linkage/queue replaces the old Agent B call.",
+    "Export retains java-base-mcp.exportJiraByDynamicFieldsV2 but uses only the same story_json_workspace_path. Backend linkage/queue replaces the old Agent B call.",
     "Story score stays in its independent report/UI. No SPEC score mutation or display-driven S2. Full responses and unknown outcomes are preserved.",
     "Shared content quality and independent review remain; destination assembly precedes scoring, final content confirmation follows scoring.",
     "Root issueIdOrKey is the confirmed update selector and must match the actual existing target/baseline. Explicit none preserves remote attachments with attachments=[] and no attachmentsJson while the synchronized local SPEC uses confirmed specFilePath without extra capability proof. Actual backend rejection or unavailable focused recovery is a precise gap, never permission to fabricate controls, override none or create another ticket.",
@@ -64,7 +64,7 @@
       ]
     },
     "export": {
-      "id": "java-base-mcp.exportjirabydynamicfield",
+      "id": "java-base-mcp.exportJiraByDynamicFieldsV2",
       "arguments": [
         "story_json_workspace_path"
       ]

@@ -39,7 +39,7 @@
 | `java-base-mcp.queryJiraProjectsByName` | 生成阶段，配置及已知证据不能确定项目时 | 业务输入为 `almType`、`projectName`，认证身份由可信平台上下文提供。用户可提供项目名；已有确定项目 key 时不为重复查项目而调用，也不编造该工具的 projectKey 参数。 |
 | `java-base-mcp.queryJiraIssueTypesByProject` | 生成阶段，缺少实际 Story 类型名/ID 时 | 业务输入为 `almType`、`projectKey`，认证身份由可信平台上下文提供。复用已验证类型；多个实际选择需要选择，无 Story 类型则阻塞本路线。 |
 | `java-base-mcp.queryJiraCreateMetaFields` | 生成阶段，缺少适用字段描述、实际 AC 字段 ID、required/type/options 等组件时 | 业务输入为 `almType`、`projectKey`，以及实时 schema 支持的 `issueType` 或 `issueTypeId`；认证身份由可信平台上下文提供。它查询 create metadata，不能证明 edit 权限。 |
-| `java-base-mcp.exportJiraByDynamicFields` | 当前审查、真实评分、整批覆盖及当前内容确认都通过后 | 恰好一个参数 `story_json_workspace_path`，值与通过评分时完全相同。创建和更新都使用这个接口。 |
+| `java-base-mcp.exportJiraByDynamicFieldsV2` | 当前审查、真实评分、整批覆盖及当前内容确认都通过后 | 恰好一个参数 `story_json_workspace_path`，值与通过评分时完全相同。创建和更新都使用这个接口。 |
 | `java-base-mcp.getJiraInfos` | 拆分前读取需求票；更新时读取原票；首次验证新提供的 Epic；必要的受支持只读核对 | 必须先确认该票的 Jira source。Description 和 AcceptanceCriteria 分别调用；其他参数和可读字段遵循实时 schema，不假设任意字段可读。 |
 | `java-base-mcp.fetchConfluenceContent` | 用户给出受支持的 Confluence URL 时 | 读取原文作为证据，参数遵循实时 schema。 |
 | `java-base-mcp.fuzzyMatchingConfluence` | 有针对性的关键词补充检索确有帮助时 | `queryType=true` 用于发现，`queryType=false` 获取少量详情，`number<=5`；使用提供的 spaceKey 或相关 URL。搜索背景不能自动成为交付范围。 |
@@ -282,7 +282,7 @@ Story 的标题、描述、AC、范围或其他业务内容改变，自动同步
 
 每个候选分配 `jira-export-attempt-<nnn>.md`，保存当前评分记录/输入、assembly/review/coverage、预览确认、提交前读回、准确单参数请求和完整响应。提交前再核对实际 JSON 和 SPEC 未改变、目标和确认一致。
 
-真正调用 `java-base-mcp.exportJiraByDynamicFields`，恰好一个参数 `story_json_workspace_path`，逐字复制当前通过评分输入及 `paths.storyJsonPath` 的值。不能改名、规范化、重新序列化或重建文件，不能额外传 Summary、Description、issueIdOrKey、staffId、conversationId、SPEC 参数、requestJson、dynamicFieldsJson、attachmentsJson、issuesJson、数组批量 wrapper 或内部状态信息。更新票号和 `attachmentsJson.add/replace` 已在已评分 JSON 内；禁止额外工具参数不表示禁止文件内的附件对象。
+真正调用 `java-base-mcp.exportJiraByDynamicFieldsV2`，恰好一个参数 `story_json_workspace_path`，逐字复制当前通过评分输入及 `paths.storyJsonPath` 的值。不能改名、规范化、重新序列化或重建文件，不能额外传 Summary、Description、issueIdOrKey、staffId、conversationId、SPEC 参数、requestJson、dynamicFieldsJson、attachmentsJson、issuesJson、数组批量 wrapper 或内部状态信息。更新票号和 `attachmentsJson.add/replace` 已在已评分 JSON 内；禁止额外工具参数不表示禁止文件内的附件对象。
 
 默认按确认的候选顺序，每候选一个文件、一次顺序导出，不假设批量原子性。第一个必需同步结果失败、部分成功或未知时停止后续写入，保留后续选择。确认入队且异步同步尚 pending 本身不是同步提交失败。
 
