@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Standalone demo of a Jira Story JSON Code and Preview page.">
+  <title>Jira Story JSON Preview Demo</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: Arial, Helvetica, sans-serif;
+      color: #202124;
+      background: #fff;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; }
+    button { font: inherit; }
+    .page {
+      width: min(100%, 1180px);
+      margin: 0 auto;
+      padding: 22px 32px 60px;
+    }
+    .view-tabs {
+      display: flex;
+      align-items: end;
+      gap: 2px;
+      margin-bottom: 28px;
+      border-bottom: 1px solid #d9dce1;
+    }
+    .view-tabs button {
+      appearance: none;
+      padding: 10px 18px;
+      border: 0;
+      border-bottom: 2px solid transparent;
+      background: transparent;
+      color: #5a5f67;
+      cursor: pointer;
+    }
+    .view-tabs button[aria-selected="true"] {
+      border-bottom-color: #2773bd;
+      color: #1e5c97;
+      font-weight: 600;
+    }
+    .view-tabs button:focus-visible {
+      outline: 2px solid #2773bd;
+      outline-offset: -2px;
+    }
+    [hidden] { display: none !important; }
+    .identity { margin: 0 0 28px; }
+    .identity p { margin: 0 0 16px; font-size: 17px; line-height: 1.4; }
+    .identity strong { font-weight: 600; }
+    h2 {
+      margin: 30px 0 12px;
+      font-size: 18px;
+      line-height: 1.4;
+      font-weight: 600;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      font-size: 16px;
+      line-height: 1.55;
+    }
+    th, td {
+      border: 1px solid #d8dadd;
+      padding: 18px 20px;
+      vertical-align: top;
+      text-align: left;
+    }
+    th {
+      width: 23%;
+      font-weight: 600;
+      background: #fff;
+    }
+    td { overflow-wrap: anywhere; }
+    .plain-label { margin: 0 0 12px; }
+    .plain-label:last-child { margin-bottom: 0; }
+    .plain-label strong { display: inline-block; min-width: 54px; }
+    .story-content { margin-bottom: 30px; }
+    .story-content section + section { margin-top: 30px; }
+    .story-content h2 { margin: 0 0 10px; }
+    .story-content .summary-value { margin: 0; font-size: 16px; line-height: 1.55; }
+    .wiki-content h3 {
+      margin: 0 0 10px;
+      font-size: 18px;
+      line-height: 1.4;
+      font-weight: 600;
+    }
+    .wiki-content h3:not(:first-child) { margin-top: 22px; }
+    .story-content .wiki-content h2 + h3 { margin-top: 0; }
+    .wiki-content p { margin: 0 0 13px; }
+    .wiki-content p:last-child { margin-bottom: 0; }
+    .wiki-content ul { margin: 0; padding-left: 21px; }
+    .wiki-content li + li { margin-top: 12px; }
+    .references { margin-top: 30px; font-size: 16px; line-height: 1.55; }
+    .references p { margin: 0 0 14px; overflow-wrap: anywhere; }
+    .references strong { font-weight: 600; }
+    code, pre { font-family: SFMono-Regular, Consolas, "Liberation Mono", monospace; }
+    .references code { font-size: 14px; }
+    .demo-note {
+      margin: 16px 0 0;
+      color: #61666e;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .code-view pre {
+      margin: 0;
+      padding: 20px 22px;
+      overflow-x: auto;
+      border: 1px solid #d8dadd;
+      background: #fafbfc;
+      color: #252a31;
+      font-size: 14px;
+      line-height: 1.7;
+      tab-size: 2;
+    }
+    .code-view .key { color: #a43248; }
+    .code-view .string { color: #185f9c; }
+    .code-view .punctuation { color: #42464d; }
+    @media (max-width: 680px) {
+      .page { padding: 12px 16px 36px; }
+      .view-tabs { margin-bottom: 23px; }
+      .identity p { font-size: 15px; margin-bottom: 11px; }
+      table { font-size: 14px; }
+      th, td { padding: 12px; }
+      th { width: 30%; }
+      .story-content .summary-value, .references { font-size: 14px; }
+      .wiki-content h3 { font-size: 16px; }
+      .code-view pre { padding: 14px; font-size: 12px; }
+    }
+    @media print {
+      .page { width: 100%; padding: 0; }
+      .view-tabs { display: none; }
+      .demo-note { display: none; }
+      th, td { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <nav class="view-tabs" role="tablist" aria-label="JSON file views">
+      <button id="preview-tab" type="button" role="tab" aria-controls="preview-panel" aria-selected="true">Preview</button>
+      <button id="code-tab" type="button" role="tab" aria-controls="code-panel" aria-selected="false">Code</button>
+    </nav>
+
+    <section id="preview-panel" role="tabpanel" aria-labelledby="preview-tab">
+      <div class="identity">
+        <p><strong>Jira Instance:</strong> wpb</p>
+        <p><strong>Project Key:</strong> JSPT</p>
+        <p><strong>Issue Type:</strong> Story</p>
+      </div>
+
+      <div class="story-content" aria-label="Story content preview">
+        <section aria-labelledby="story-summary">
+          <h2 id="story-summary">Summary:</h2>
+          <p class="summary-value">Display Open Term Deposit confirmation details and next-step actions</p>
+        </section>
+        <section class="wiki-content" aria-labelledby="story-description">
+          <h2 id="story-description">Description:</h2>
+          <h3>Summary</h3>
+          <p>Provide the customer with a clear confirmation of a successfully created Open Term Deposit, the key details, and the next-step actions.</p>
+          <h3>User Story</h3>
+          <p>As an Open Term Deposit customer, I want to see a confirmation page after I confirm my reviewed term deposit, so that I understand the result and what to do next.</p>
+          <h3>Business Context</h3>
+          <p>The confirmation page presents the outcome and the key information the customer needs to continue.</p>
+        </section>
+        <section class="wiki-content" aria-labelledby="story-ac">
+          <h2 id="story-ac">Acceptance Criteria:</h2>
+          <ul>
+            <li><strong>AC-001:</strong> Given the customer has confirmed the reviewed term deposit, when the request succeeds, then the confirmation page displays the outcome and key details.</li>
+            <li><strong>AC-002:</strong> Given the confirmation page is displayed, when the customer reviews it, then the available next-step actions are visible.</li>
+          </ul>
+        </section>
+      </div>
+
+      <h2>Fields:</h2>
+      <table aria-label="Other Jira fields">
+        <tbody>
+          <tr>
+            <th scope="row">Project:</th>
+            <td><p class="plain-label"><strong>Key:</strong> JSPT</p></td>
+          </tr>
+          <tr>
+            <th scope="row">Issuetype:</th>
+            <td><p class="plain-label"><strong>Id:</strong> 7</p></td>
+          </tr>
+          <tr>
+            <th scope="row">Summary:</th>
+            <td>Display Open Term Deposit confirmation details and next-step actions</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="references" aria-label="Field mapping, content paths, and attachments">
+        <p><strong>acceptanceCriteria:</strong> <code>customfield_27708</code></p>
+        <p><strong>acPath:</strong> <code>output/pp/app-ac.jirawiki</code></p>
+        <p><strong>descPath:</strong> <code>output/pp/app-description.jirawiki</code></p>
+        <p><strong>attachments:</strong> <code>[]</code></p>
+      </div>
+      <p class="demo-note">Demo content and paths are illustrative. Description and Acceptance Criteria are shown as rendered Jira Wiki content.</p>
+    </section>
+
+    <section id="code-panel" class="code-view" role="tabpanel" aria-labelledby="code-tab" hidden>
+      <pre aria-label="Proposed Story JSON"><code><span class="punctuation">{</span>
+  <span class="key">"jiraInstance"</span>: <span class="string">"wpb"</span>,
+  <span class="key">"projectKey"</span>: <span class="string">"JSPT"</span>,
+  <span class="key">"issueType"</span>: <span class="string">"Story"</span>,
+  <span class="key">"fields"</span>: <span class="punctuation">{</span>
+    <span class="key">"project"</span>: <span class="punctuation">{</span> <span class="key">"key"</span>: <span class="string">"JSPT"</span> <span class="punctuation">}</span>,
+    <span class="key">"issuetype"</span>: <span class="punctuation">{</span> <span class="key">"id"</span>: <span class="string">"7"</span> <span class="punctuation">}</span>,
+    <span class="key">"summary"</span>: <span class="string">"Display Open Term Deposit confirmation details and next-step actions"</span>
+  <span class="punctuation">}</span>,
+  <span class="key">"acceptanceCriteria"</span>: <span class="string">"customfield_27708"</span>,
+  <span class="key">"acPath"</span>: <span class="string">"output/pp/app-ac.jirawiki"</span>,
+  <span class="key">"descPath"</span>: <span class="string">"output/pp/app-description.jirawiki"</span>,
+  <span class="key">"attachments"</span>: <span class="punctuation">[]</span>
+<span class="punctuation">}</span></code></pre>
+      <p class="demo-note">This is the proposed path-based JSON shape. The rendered text above is example content; no Jira connection is used.</p>
+    </section>
+  </main>
+
+  <script>
+    const tabs = {
+      preview: document.getElementById('preview-tab'),
+      code: document.getElementById('code-tab')
+    };
+    const panels = {
+      preview: document.getElementById('preview-panel'),
+      code: document.getElementById('code-panel')
+    };
+
+    function showView(view) {
+      for (const name of ['preview', 'code']) {
+        const selected = name === view;
+        tabs[name].setAttribute('aria-selected', String(selected));
+        panels[name].hidden = !selected;
+      }
+    }
+
+    for (const name of ['preview', 'code']) {
+      tabs[name].addEventListener('click', () => showView(name));
+    }
+  </script>
+</body>
+</html>
