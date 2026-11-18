@@ -1,6 +1,6 @@
 # Path-only export examples
 
-Tool: java-base-mcp.exportjirabydynamicfield. Every invocation has exactly one argument. Example paths are structural, never evidence or defaults.
+Tool: java-base-mcp.exportJiraByDynamicFieldsV2. Every invocation has exactly one argument. Example paths are structural, never evidence or defaults.
 
 ## One reviewed, scored and currently confirmed Story
 

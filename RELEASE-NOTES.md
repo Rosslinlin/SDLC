@@ -113,7 +113,7 @@ Story 更新模板明确必留提示，补齐两个 Test Case 模板的路由对
 - Story JSON 模板与组装规则移除根级 `staffId`，保留 `jiraInstance`、`projectKey`、`issueType`。身份配置及现有查询工具所需的员工号按实际 schema 保留；`fields.reporter.name` 仍按 metadata 要求与授权使用真实身份，不依赖根级字段。
 - 在生成、评分之前将 `fields.description` 和 `fields[customFields.acceptanceCriteria]` 写成 Jira wiki 字符串：标题使用 `h1.` / `h2.`，AC 例如 `* *AC-001*: Given ... When ... Then ...`。其他获准富文本遵从 metadata，保留措辞、顺序、换行、代码和 AC；不转换 summary、路由/身份/选项、普通文本或更新中未改动的字段。
 - SPEC 保留 Markdown 格式，从 JSON 中同一业务语义生成可读投影。生成、自检、reviewer 与评分继续解析同一动态 AC 映射，不新增评分门槛；导出阶段不再转换文字。
-- 评分仍为 `scoreUserStory` 三参数，导出仍为 `exportJiraByDynamicFields` 单路径，提交与评分相同的当前文件。旧 JSON 删除字段或转换格式后需重新评分和内容确认，不能沿用旧 checksum 或重放已成功/未知写入。
+- 评分仍为 `scoreUserStory` 三参数，导出仍为 `exportJiraByDynamicFieldsV2` 单路径，提交与评分相同的当前文件。旧 JSON 删除字段或转换格式后需重新评分和内容确认，不能沿用旧 checksum 或重放已成功/未知写入。
 - 三个独立包保持不改。平台清单补充字段移除、wiki 编码和 Markdown 投影场景，真实平台结果留空，历史本地及隔离验证不作为本次后端实测。
 
 ---
@@ -144,7 +144,7 @@ Story 更新模板明确必留提示，补齐两个 Test Case 模板的路由对
 - `customFields.acceptanceCriteria` 仅存实际字段 ID 映射；AC 正文存放在 `fields[customFields.acceptanceCriteria]`，值为 Markdown 字符串。其他已获准的自定义业务值也按实际字段 ID 放入 `fields`，不把映射 ID 当正文或 AC 数量依据。
 - `fields.summary` 为标题，`fields.description` 为 Markdown 字符串；删除旧顶层 `summary`、`description`、`acceptanceCriteria`、`bddScenarios`。员工号、项目、类型 ID 与自定义字段 ID 全部来自实际上下文/metadata，不硬编码截图示例。
 - 生成模板、组装自检、SPEC/测试投影、reviewer 读取及评分 AC 识别按同一字段结构处理。缺失映射、数组描述、目标/身份冲突等属于结构问题，Q1–Q7 业务审查标准不加严。
-- 评分仍为 `scoreUserStory` 三参数，导出仍为 `exportJiraByDynamicFields` 单路径；SPEC 不写分数、后端关联/队列分项记录和失败恢复规则不变。转换旧 JSON 后须重新评分并确认当前内容，不重放已成功或未知的远端写入。
+- 评分仍为 `scoreUserStory` 三参数，导出仍为 `exportJiraByDynamicFieldsV2` 单路径；SPEC 不写分数、后端关联/队列分项记录和失败恢复规则不变。转换旧 JSON 后须重新评分并确认当前内容，不重放已成功或未知的远端写入。
 - 本次仍不修改三个独立包；平台清单补充新字段结构场景，真实平台结果留空。preview.1 的本地检查和 mock 轨迹属于历史证据，不能替代本次 schema 验证。
 
 ---
@@ -160,7 +160,7 @@ Story 更新模板明确必留提示，补齐两个 Test Case 模板的路由对
 - 每候选的最终 `story.json4jira` 成为唯一 Story 业务源及提交文件。取消独立 `STORY.md`，SPEC 中 Story 投影来自 JSON；`TEST_CASE.md` 保留。
 - 项目、Story 类型、字段 metadata 查询和跨会话配置复用前移至 generation，在最终 JSON 写成前完成。成功后保存已确认 profile，export 不再另组装一套提交字段。
 - 评分改用 `nodejs-base-mcp.scoreUserStory`，仅传 `story_json_workspace_path`、`specFileStatus`（精确 `Pass` / `Fail`）和 `specFilePath`。完整响应与真实输入/标识保留；主链内容 PASS 不代替真实评分及持久化。
-- 分数不写 SPEC，取消旧显示字段及仅为显示引起的 S2。导出工具仍为 `java-base-mcp.exportJiraByDynamicFields`，但**仅传 `story_json_workspace_path`**；评分与导出使用同一候选最终 JSON 路径。
+- 分数不写 SPEC，取消旧显示字段及仅为显示引起的 S2。导出工具仍为 `java-base-mcp.exportJiraByDynamicFieldsV2`，但**仅传 `story_json_workspace_path`**；评分与导出使用同一候选最终 JSON 路径。
 - 真实评分通过后，先展示当前业务内容、目标与附件操作的前端 HTML 预览，用户明确确认当前内容后才导出。内容变化使旧评分/确认失效，必须重新完成相应步骤。
 - 后端导出负责校验 score checksum/threshold、写入 Jira 与所需附件、回填数据库关联并入异步队列。前端不再执行旧五字段 B；分别记录 issue、attachments、linkage、queue、async sync 真实证据，不能把普通 success 或入队当作数据库/Jira UI 分数全部完成。
 - 批量仍为每候选一个 JSON，默认逐票调用，不使用旧 `issuesJson`。外部未知/部分结果先核对，不能为修复关联或队列状态重建已成功票据。
@@ -260,7 +260,7 @@ v5.3 最初的导出专用化改动保留生成候选串行/阶段依赖和评�
 
 ## v5：Jira Ticket 与 Story 评分记录关联
 
-在 v4.2 的 Jira create/update 调用及要求的附件操作确认成功、取得该项返回的 Ticket Key 后，`jira-createissue-helper` 的 SDLC gateway 才对该项执行第二次 `exportJiraByDynamicFields` 调用。第二次调用恰好使用五个真实非空字段：`staffId`、`almType`、`issueIdOrKey`（返回的 Ticket Key）、`conversationId`、`markdownReviewRelativePath`（本次 PASS 评分所用的 `STORY.md` 工作区相对路径）。第一次调用不带 `markdownReviewRelativePath`；第二次调用不带 Jira 内容、附件或批量字段。
+在 v4.2 的 Jira create/update 调用及要求的附件操作确认成功、取得该项返回的 Ticket Key 后，`jira-createissue-helper` 的 SDLC gateway 才对该项执行第二次 `exportJiraByDynamicFieldsV2` 调用。第二次调用恰好使用五个真实非空字段：`staffId`、`almType`、`issueIdOrKey`（返回的 Ticket Key）、`conversationId`、`markdownReviewRelativePath`（本次 PASS 评分所用的 `STORY.md` 工作区相对路径）。第一次调用不带 `markdownReviewRelativePath`；第二次调用不带 Jira 内容、附件或批量字段。
 
 批量 Jira 返回按每项结果和路径分别关联。Jira 写入、附件、`markdownReview` 绑定结果分别留痕和报告；绑定失败或未知时保留已成功的 Ticket Key，不重建 Ticket、不重放已成功的 Jira 写入。所有绑定完成前不宣布整条流程成功。普通 Jira 和 Test Case 路由保持 v4.2 行为。
 
@@ -325,7 +325,7 @@ v4 以 v3 为基线，将最后的 Jira 写入阶段从 `ceaia-sdlc-only-jira-pu
 
 ### 7. v4.1 直接导出与路由修正
 
-- 删除 SDLC 对额外审批工具的依赖；最终 preview、payload read-back 和附件 preflight 通过后直接调用 `exportJiraByDynamicFields`。
+- 删除 SDLC 对额外审批工具的依赖；最终 preview、payload read-back 和附件 preflight 通过后直接调用 `exportJiraByDynamicFieldsV2`。
 - `handoffType=ceaia-sdlc-validated` 仅作为内部路由状态，禁止进入任何 Jira MCP 参数或序列化字段。
 - SDLC 批量导出使用工具实际暴露的 `issuesJson`；所有参数直接传递，不使用 `requestJson` wrapper。
 - 项目、issue type 和 metadata 查询参数与当前工具契约对齐。
