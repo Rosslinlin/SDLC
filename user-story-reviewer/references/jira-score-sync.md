@@ -1,6 +1,6 @@
 # Existing-Jira score synchronization, persistence and recovery
 
-Read after a direct Jira score response, for a score-sync/recovery request, or before returning a scored JSON to its caller. This reviewer synchronizes existing-Jira scores through java-base-mcp.exportjirabydynamicfield. Business-content export, attachments and local-JSON association remain with the separately maintained export workflow.
+Read after a direct Jira score response, for a score-sync/recovery request, or before returning a scored JSON to its caller. This reviewer synchronizes existing-Jira scores through java-base-mcp.exportJiraByDynamicFieldsV2. Business-content export, attachments and local-JSON association remain with the separately maintained export workflow.
 
 ## Preserve the actual assessment
 
@@ -21,7 +21,7 @@ For JSON without a SPEC, retain the actual one-argument call. Do not invent SPEC
 
 Current-Jira review includes one score-sync submission after scoreUserStory returns boolean ok=true and finite numeric finalScore, including low scores, 0 and cache hits. Use the same selected primary ticket and confirmed uppercase source as the actual scoring call. Honor an explicit assessment-only/no-Jira-write request. Do not ask again whether to synchronize when that action is already included in the authorized workflow.
 
-Call java-base-mcp.exportjirabydynamicfield with exactly these two direct arguments:
+Call java-base-mcp.exportJiraByDynamicFieldsV2 with exactly these two direct arguments:
 
 ```json
 {

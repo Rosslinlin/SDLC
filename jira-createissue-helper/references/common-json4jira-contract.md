@@ -46,7 +46,7 @@ Read the manifest and every child, verifying their actual saved filenames end in
 
 ## Exact production invocation
 
-Call `java-base-mcp.exportjirabydynamicfield` with exactly one direct argument:
+Call `java-base-mcp.exportJiraByDynamicFieldsV2` with exactly one direct argument:
 
 ```json
 {
@@ -54,7 +54,7 @@ Call `java-base-mcp.exportjirabydynamicfield` with exactly one direct argument:
 }
 ```
 
-For one issue/single-mode aggregate, this value is its actual `.json4jira` issue file path. For an approved batch, it is the actual `.json4jira` manifest file path. Confirm that exact file exists; changing a tool argument's suffix alone does not create it. Keep the tool's singular argument distinct from the manifest's plural property. The screenshots' `exportJiraByDynamicFieldsV2` name is a test-environment alias, not the production tool ID.
+For one issue/single-mode aggregate, this value is its actual `.json4jira` issue file path. For an approved batch, it is the actual `.json4jira` manifest file path. Confirm that exact file exists; changing a tool argument's suffix alone does not create it. Keep the tool's singular argument distinct from the manifest's plural property. The production tool name is `exportJiraByDynamicFieldsV2`.
 
 Do not add source, staffId, ticket, fields, attachments, SPEC status/path, `requestJson`, `issuesJson`, batch arrays or workflow controls beside that path. Platform request headers supply authentication/session context; do not collect or serialize them. `uploadType` stays current-request routing state, never an issue-file/manifest/tool property.
 

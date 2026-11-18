@@ -1,6 +1,6 @@
 # Preview, path-only submission and backend recovery
 
-Use a [current validated handoff](handoff-and-content.md), verified assembly and authorized [attachments](attachments.md). Tool: java-base-mcp.exportjirabydynamicfield. The user-confirmed interface has exactly one argument, story_json_workspace_path. There is no separate five-field B call. See [examples](call-examples.md).
+Use a [current validated handoff](handoff-and-content.md), verified assembly and authorized [attachments](attachments.md). Tool: java-base-mcp.exportJiraByDynamicFieldsV2. The user-confirmed interface has exactly one argument, story_json_workspace_path. There is no separate five-field B call. See [examples](call-examples.md).
 
 ## 1. Preview the actual scored package and obtain confirmation
 

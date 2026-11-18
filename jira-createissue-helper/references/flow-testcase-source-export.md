@@ -71,7 +71,7 @@ Obtain explicit confirmation for these current files. Existing actual confirmati
 
 ## 5. Submit once and report the actual outcomes
 
-Call `java-base-mcp.exportjirabydynamicfield` once with exactly:
+Call `java-base-mcp.exportJiraByDynamicFieldsV2` once with exactly:
 
 ```json
 {

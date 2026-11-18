@@ -17,7 +17,7 @@ Use the actual requested primary ticket and confirmed source: WPB, ALM, DATA, FC
 
 Pass exactly jira_number and source. Do not pass a JSON/Markdown carrier path, SPEC parameters, staffId or session values. Do not create a local input file, query project/type/metadata, or fetch Jira content separately before this call; the service reads current Jira itself. A raw Jira dump remains this route even when saved as Markdown/JSON to Workspace. A failed Jira assessment does not fall back to local file scoring.
 
-After ok=true and finite numeric finalScore, including 0/cache hits, synchronize the score through java-base-mcp.exportjirabydynamicfield using the identical two arguments under [score synchronization](jira-score-sync.md). Respect assessment-only/no-Jira-write requests and retain any prior submission outcome. Scoring failures, SKIPPED and unknown outcomes do not trigger synchronization.
+After ok=true and finite numeric finalScore, including 0/cache hits, synchronize the score through java-base-mcp.exportJiraByDynamicFieldsV2 using the identical two arguments under [score synchronization](jira-score-sync.md). Respect assessment-only/no-Jira-write requests and retain any prior submission outcome. Scoring failures, SKIPPED and unknown outcomes do not trigger synchronization.
 
 ### New or selected local JSON, no SPEC
 

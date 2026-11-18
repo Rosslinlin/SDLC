@@ -7,7 +7,7 @@ description: Prepare or export ordinary Jira issues and source Test Cases throug
 
 Version: 3.0.0-json-preview.5 — 2026-11-09. Runtime: GPT-5.6 Luna or GPT-6 Luna, platform text/file tools only; no scripts.
 
-Every submitted file uses the exact `.json4jira` extension: an individual issue, a single-mode aggregate, or an approved batch path manifest. Every manifest child also uses `.json4jira`; a non-Story batch is no exception. Verify actual saved filenames before preview and final submission; a `.json` manifest is not export-ready. Production content export calls `java-base-mcp.exportjirabydynamicfield` with only `story_json_workspace_path`. Read [the JSON contract](references/common-json4jira-contract.md) and the selected flow; load preparation references only when facts/files are missing. CEAIA SDLC handoffs belong to their dedicated exporter; this helper has no legacy SDLC execution route.
+Every submitted file uses the exact `.json4jira` extension: an individual issue, a single-mode aggregate, or an approved batch path manifest. Every manifest child also uses `.json4jira`; a non-Story batch is no exception. Verify actual saved filenames before preview and final submission; a `.json` manifest is not export-ready. Production content export calls `java-base-mcp.exportJiraByDynamicFieldsV2` with only `story_json_workspace_path`. Read [the JSON contract](references/common-json4jira-contract.md) and the selected flow; load preparation references only when facts/files are missing. CEAIA SDLC handoffs belong to their dedicated exporter; this helper has no legacy SDLC execution route.
 
 ## Select one flow
 
@@ -36,7 +36,7 @@ A complete trustworthy upstream JSON keeps its exact path/content and needs no d
 
 ## Tools to expose
 
-- `java-base-mcp.exportjirabydynamicfield`: required production content export, exactly one path argument here. The test alias `exportJiraByDynamicFieldsV2` is not used.
+- `java-base-mcp.exportJiraByDynamicFieldsV2`: required production content export, exactly one path argument here. Use this production tool name for the existing invocation contract.
 - `java-base-mcp.queryJiraProjectsByName`, `java-base-mcp.queryJiraIssueTypesByProject`, `java-base-mcp.queryJiraCreateMetaFields`: prepare genuinely missing routing/field facts after profile lookup. Use their actual exposed production schemas under [tools](references/common-tools-and-inputs.md).
 - `java-base-mcp.getJiraInfos`: current target facts for update/association/attachment work when not already established. Use a supported attachment-inventory reader if the issue response does not expose needed real IDs.
 - Platform Workspace file/folder search/read/write with a supported user destination, native file preview and `ask_user_question` or supported confirmation/selection UI. Ordinary file tools or supported native Workspace file actions executable by this agent can persist profiles; reuse the actual user-destination binding, and use the normal reader for read-back. Do not require a dedicated user-level tool name or returned scope property. No scorer, reviewer delegation or sibling filesystem access is required for ordinary export.

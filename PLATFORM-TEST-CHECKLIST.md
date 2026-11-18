@@ -25,7 +25,7 @@
 | J12 | SPEC 不出现 Story Score/真实分数显示；没有为显示分数再调用 S2。合法低分/解析阻塞停止，不以内容 PASS 或缓存命中绕过评分保存。 | | |
 | J13 | 当前通过评分的内容生成并展示前端 HTML 预览，清楚呈现目标、业务内容与获准附件操作；用户明确确认当前内容才可调用导出。初始请求、设置确认或旧预览不替代本次内容确认。 | | |
 | J14 | 预览后修改 JSON、已评分 SPEC、附件选择、目标或提交字段时，使旧确认/评分失效并重新执行所需审查/评分/HTML 确认；仅 path 相同不能证明 bytes 未变，后端 stale checksum 拒绝不得绕过。 | | |
-| J15 | exportJiraByDynamicFields 实际只传 story_json_workspace_path，且等于该候选最终通过评分的路径。不传 direct fields、旧 B 五字段、issuesJson、requestJson 或内部 handoffType。 | | |
+| J15 | exportJiraByDynamicFieldsV2 实际只传 story_json_workspace_path，且等于该候选最终通过评分的路径。不传 direct fields、旧 B 五字段、issuesJson、requestJson 或内部 handoffType。 | | |
 | J16 | 后端真实执行已评分内容 checksum/threshold 校验；缺评分、低分、未保存或内容不匹配明确拒绝。记录实际服务错误和已知/未知写入结果，不宣称本地检查等同后端校验。 | | |
 | J17 | 正常 create 分别记录真实 issue key/URL、每项附件结果、数据库 linkage、queue 以及 async sync 结果；普通 success 或只有 ticketKey 不足以宣布全部完成。 | | |
 | J18 | queue 已接受但 async sync 未完成时内部记为待处理；常规最终回复不列同步状态，只有后端真实完成证据才可声称 Jira UI 分数已同步。不臆造查询工具、任务ID或完成字段。 | | |
