@@ -15,8 +15,8 @@
 | J02 | 所有用户未写 push/export 也默认继续 Jira-backed 完整流程，入口不提供路线选择；缺信息只补缺项，不推荐 preparation-only。仅用户主动明确只准备/不导出时遵从；阶段调用不越界。默认流程最终仍须评分后的当前内容 HTML 预览及用户明确确认。 | | |
 | J03 | 项目/type/meta 查询在生成最终 JSON 前完成；只使用 live schema 真实字段、类型、选项和必要值，不把旧 direct 参数直接猜成 JSON 字段。缓存命中复用，缺项/显式变更才查相应部分。 | | |
 | J04 | 创建和更新都读真实跨 session 用户 Workspace；issue 一经确认成功便执行 populated snapshot 的 fresh-read/merge/write/read-back，附件/关联/队列失败也不跳过配置保存。失败/未知 issue 不伪造成功。saved 需在实际用户目的地正常读回；普通文件工具的真实选择器或隐式用户空间即可，不额外索取 scope 返回，配置/会话文件不混淆。 | | |
-| J05 | 每候选只有一个最终 story.json4jira 和保留的 test-case.md、SPEC；不生成独立 STORY.md。SPEC Story 投影与 JSON 业务字段一致，测试镜像与当前表一致；内部路由/诊断不泄露到 Jira。 | | |
-| J06 | 生成前加载 Q1–Q7；review 独立读取原来源、JSON、测试和所有 SPEC。实际遗漏/编造/不可验证行为被定位，or、机械命名/布局、负向标签位置不单独构成业务失败。 | | |
+| J05 | 每候选只有一个最终 story.json4jira、两个引用的独立 .jirawiki 文件和保留的 test-case.md、SPEC；不生成独立 STORY.md。SPEC Story 投影与 Story 包业务内容一致，测试镜像与当前表一致；内部路由/诊断不泄露到 Jira。 | | |
+| J06 | 生成前加载 Q1–Q7；review 独立读取原来源和所有 SPEC，按需读取 JSON、两个引用 Wiki 文件和测试核对一致性，对 SPEC 给出结论。实际遗漏/编造/不可验证行为被定位，or、机械命名/布局、负向标签位置不单独构成业务失败。 | | |
 | J07 | 新 Story 按内聚价值拆分而非 AC 数；每 AC/FR 有可执行测试，不为拒绝型 AC 编造 Positive 伴侣，不发明接口、日志、SLAs 或无来源场景。 | | |
 | J08 | review/score 共用两批内容修复；机械 cause 一次独立，变更仍使受影响 review/score/确认失效。续跑保留计数，无进展提前停止，外部操作不由本地额度授权重发。 | | |
 | J09 | 真实业务缺口以具体文件/条目和所需事实询问；部分回答只追问未解决事实，充分回答后恢复局部内容；未知可选 metadata 不虚构、不造成无关阻塞。 | | |
@@ -24,7 +24,7 @@
 | J11 | 每次实际评分的完整原始响应、未知字段及真实输入/标识保存为新的编号记录；ok=true 不等于质量通过，数值 76–100、解析/完整性证据及当前内容绑定按 live 契约验证；不自造 checksum 或强制刷分。 | | |
 | J12 | SPEC 不出现 Story Score/真实分数显示；没有为显示分数再调用 S2。合法低分/解析阻塞停止，不以内容 PASS 或缓存命中绕过评分保存。 | | |
 | J13 | 当前通过评分的内容生成并展示前端 HTML 预览，清楚呈现目标、业务内容与获准附件操作；用户明确确认当前内容才可调用导出。初始请求、设置确认或旧预览不替代本次内容确认。 | | |
-| J14 | 预览后修改 JSON、已评分 SPEC、附件选择、目标或提交字段时，使旧确认/评分失效并重新执行所需审查/评分/HTML 确认；仅 path 相同不能证明 bytes 未变，后端 stale checksum 拒绝不得绕过。 | | |
+| J14 | 预览后修改 JSON、任一引用 Wiki 文件、已评分 SPEC、附件选择、目标或提交字段时，使旧确认/评分失效并重新执行所需审查/评分/HTML 确认；仅 path 相同不能证明 bytes 未变，后端 stale checksum 拒绝不得绕过。 | | |
 | J15 | exportJiraByDynamicFieldsV2 实际只传 story_json_workspace_path，且等于该候选最终通过评分的路径。不传 direct fields、旧 B 五字段、issuesJson、requestJson 或内部 handoffType。 | | |
 | J16 | 后端真实执行已评分内容 checksum/threshold 校验；缺评分、低分、未保存或内容不匹配明确拒绝。记录实际服务错误和已知/未知写入结果，不宣称本地检查等同后端校验。 | | |
 | J17 | 正常 create 分别记录真实 issue key/URL、每项附件结果、数据库 linkage、queue 以及 async sync 结果；普通 success 或只有 ticketKey 不足以宣布全部完成。 | | |
@@ -35,19 +35,19 @@
 | J22 | 更新读取 source、目标、Description/独立AC状态和完整附件 inventory；根级 issueIdOrKey 与 baseline 一致。先读用户 profiles，按组件复用稳定配置，必要 baseline 读取不被缓存替代；相关 SPEC 默认同步，不因未说 update spec 跳过，真实能力缺口准确 WAITING_TOOL。 | | |
 | J23 | 用户明确不改远端附件时省略 attachmentsJson、保留 attachments=[]，本地 SPEC/测试仍更新并经 specFilePath 评分；有原件用已确认 attachmentsJson.replace，无原件用 add。readJiraAttachments 取得真实旧 ID，无需另问技术 ID 或重复证明格式能力。 | | |
 | J24 | 旧 v6 会话迁移保留原始状态、编号证据、修复计数及所有已知/未知远端结果；不把旧 STORY.md 评分当新 JSON 评分，不通过调用重放完成迁移，也不补旧 S2/B。 | | |
-| J25 | 按实际 metadata 取得 AC 字段 ID，根级 `acceptanceCriteria` 保存该 ID 字符串，不再使用 customFields 包装；正文从 `fields[acceptanceCriteria]` 读取且为 Jira wiki 字符串。SPEC/测试/reviewer/评分 AC 识别指向相同正文，截图示例值不被硬编码。 | | |
-| J26 | 输入旧扁平 summary/description/AC 正文或数组/bddScenarios，或旧 customFields.acceptanceCriteria 包装时，在组装/自检修正为当前结构：根级 acceptanceCriteria 仅映射字段 ID，正文在 fields。不得混用两套映射或旧评分继续导出；迁移后按当前包重新评分、确认，不重放已有远端写入。 | | |
-| J27 | `fields.description` 被误写为数组/对象时作为结构问题处理，修为保留原业务含义的 Jira wiki 字符串；不因格式修正编造新业务要求或另加 Q1–Q7 门槛。 | | |
-| J28 | 根级 `acceptanceCriteria` 的字段 ID 不被计作 AC 正文/AC 数量；读取对应 fields 值，缺少实际正文不能被映射字符串伪装成内容通过。 | | |
-| J29 | AC 映射为空/缺失、指向不存在字段，或字段值为空/非字符串时明确结构阻塞并回到生成；不猜 ID、不从旧顶层数组静默兜底、不宣称通过评分。 | | |
+| J25 | 按实际 metadata 取得 AC 字段 ID，根级 `acceptanceCriteria` 保存该 ID 字符串，不再使用 customFields 包装；正文从 `acPath` 引用的独立 `.jirawiki` 文件 读取且为 Jira wiki 字符串。SPEC/测试/reviewer/评分 AC 识别指向相同正文，截图示例值不被硬编码。 | | |
+| J26 | 输入旧扁平 summary/description/AC 正文或数组/bddScenarios，或旧 customFields.acceptanceCriteria 包装时，在组装/自检修正为当前结构：根级 acceptanceCriteria 仅映射字段 ID，Description、AC 正文分别在 descPath/acPath 引用的两个独立 .jirawiki 文件中。不得混用两套映射或旧评分继续导出；迁移后按当前包重新评分、确认，不重放已有远端写入。 | | |
+| J27 | 新路径版 Story 验证 descPath/acPath 指向两个不同、可读的 .jirawiki 文件，fields 省略 Description 和映射 AC 正文。转换旧输入时保留原业务含义，按该流程取得当前评分及确认。 | | |
+| J28 | 根级 `acceptanceCriteria` 的字段 ID 不被计作 AC 正文/AC 数量；读取 acPath 引用的实际 Wiki 正文，缺少实际正文不能被映射字符串伪装成内容通过。 | | |
+| J29 | AC 映射为空/缺失、Wiki 路径缺失/不可读，或正文为空时明确结构阻塞并回到生成；不猜 ID、不从旧顶层数组静默兜底、不宣称通过评分。 | | |
 | J30 | 根级 projectKey 与 `fields.project.key`、类型名/真实 `fields.issuetype.id` 一致；`fields.reporter` 仅在当前项目/操作要求且有有效值，或用户明确要求修改时按原生 schema 加入；更新省略它不清空远端 Reporter。不因旧模板/profile 注入无效值；冲突在评分前解决，不硬编码类型 ID 7 或照抄示例员工号/项目。 | | |
 | J31 | 首次无适用配置：先读真实用户 Workspace/可信身份，按缺失 source → project → 可跳过附加字段引导；仅展示实际支持的 Epic Link/custom Story Type 等。所填受支持字段默认记作后续设置，明确仅本次除外。类型/schema/AC ID 由工具查；正常不问 staffId，只有实际必需 Reporter 缺值才问一次并解析，工具身份由平台提供；保持 SDLC Story 与默认 Jira 意图。 | | |
 | J32 | 已有适用配置：生成业务文件前展示项目/Story 字段，明确确认沿用/修改/切项目或仅本次覆盖；未变当前 run 批次/续跑不重复问。完整 facts 不重复 discovery，最终评分后仍要当前文件确认。 | | |
 | J33 | 用户主动明确只准备/不导出：记录该方向，不执行导出；不把此方向变成默认入口选项。仍只用已知真实值，缺必要元数据则交付已有事实和待补项，不伪造完整可评分 JSON 或实际评分成功。 | | |
 | J34 | 模板与实际 Story JSON 不含根级 staffId；`fields.reporter` 只在实际必需且已验证或用户明确修改时按原生格式加入，更新省略不清空 Jira 现有值。评分仍恰三参数、导出仍仅路径。正常不收集 staffId，不在新 SDLC profile 建立 staffId 后备身份；必需 Reporter 缺值只问一次，查询身份仍按实时 schema 由平台提供，缺注入是技术问题。 | | |
 | J35 | 生成时即将 description/映射 AC 及其他获准富文本写成 Jira wiki，标题 h1./h2.、AC `* *AC-001*: Given ...`；代码、嵌套列表、链接及表格内容无损，已有 wiki 不重复转换。summary、路由/选项、普通文本及未改动更新字段不转换。评分后导出文件不被再次渲染。 | | |
-| J36 | SPEC 的 Markdown 投影与 JSON 的 Jira wiki 语义一致，AC ID/数量/措辞/顺序保留，引用不被误算为声明；reviewer 和评分读取同一映射正文。旧 JSON 去除 staffId 或转换格式后，旧评分/确认失效；重新评分确认不重放已成功或未知的远端写入。 | | |
-| J37 | 创建模板及实际创建 JSON 使用根级 acceptanceCriteria 字段 ID，无 customFields 包装或 issueIdOrKey；实际 AC 正文在 fields[acceptanceCriteria]。Reporter 的必需性、可写性、有效值及原生编码在评分前按当前项目/操作核对，不从旧缓存补入无效值。 | | |
+| J36 | SPEC 的 Markdown 投影与 JSON 引用的两个 Wiki 文件 语义一致，AC ID/数量/措辞/顺序保留，引用不被误算为声明；reviewer 和评分读取同一实际 Wiki 正文。旧 JSON 去除 staffId 或转换格式后，旧评分/确认失效；重新评分确认不重放已成功或未知的远端写入。 | | |
+| J37 | 创建模板及实际创建 JSON 使用根级 acceptanceCriteria 字段 ID，无 customFields 包装或 issueIdOrKey；实际 AC 正文在 acPath 引用的独立 .jirawiki 文件。Reporter 的必需性、可写性、有效值及原生编码在评分前按当前项目/操作核对，不从旧缓存补入无效值。 | | |
 | J38 | 更新模板及实际更新 JSON 在 issueType 后加入准确大小写的 issueIdOrKey，值与可信 source/target/baseline 实际票号一致；按获准增量保留原有义务，通过同一 JSON 路径评分/确认/导出，实际返回 key 与目标一致。普通更新不因目标编码未知而阻塞，也不新增票号工具参数。 | | |
 | J39 | 更新缺目标、目标与 baseline 冲突，或误用 issueldOrKey（小写 l）时在提交前阻止并修正/澄清；不得删除目标字段、填空字符串/示例 key 或切换创建继续执行。创建不因证据引用票号而加入更新目标。 | | |
 | J40 | 旧包装迁移为根级 AC 字段 ID、按当前 schema 处理旧 reporter 或补入真实更新目标后，保留 AC 业务正文和获准业务值；旧评分/确认失效。附件计划按最新同步意图解析，明确 none 仅保持远端、本地仍同步；replace 据真实能力，不伪造控制或重放成功/未知写入。 | | |

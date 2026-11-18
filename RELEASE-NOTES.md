@@ -1,3 +1,11 @@
+# 2026-11-18 — Jira Wiki 路径格式与 V2 导出工具整合
+
+Story 使用 story.json4jira 和两个独立 .jirawiki 文件。SDLC 生成、SPEC 审查、导出、独立 Story Reviewer 和通用 Jira helper 按职责处理对应正文；review-requirements 在收到路径版 Story 时读取实际引用内容。Task 纳入 Wiki 文件的生成、评分版本绑定、预览确认和最终核对。
+
+导出工具统一为 java-base-mcp.exportJiraByDynamicFieldsV2。前端 demo、UI/后端 Story、根目录现行说明和五个独立 Skill 压缩包随流程整合。平台验证以实际执行证据为准。
+
+---
+
 # 2026-11-09 — 6.1.0-preview.10：修正用户 Workspace 能力误判与首次引导
 
 普通 Workspace 工具或当前代理实际可执行的原生保存/打开/读取动作支持用户目的地，就用于 profile；复用本轮已成功的用户空间操作。读回是正常文件读，不再要求专用 user-level API、独立 read-back 工具、返回 scope 字段或数据库证明。先检查并实际使用可用操作，not-found 时用真实目录工具或自动父目录创建，不能按名称猜 unavailable。没有可见工具记录既不证明能力缺失，也不证明保存成功；聊天声明/路径/代码块不算文件证据，不虚构隐藏 API 或原生指令。写成功只证明可写；缺读能力或实际错误精准报告，未知旧文件不覆盖。

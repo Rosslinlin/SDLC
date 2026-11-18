@@ -34,6 +34,8 @@ For a PR:
 
 For direct documents or workspace paths, use the supplied material without requiring a PR. Preserve actual artifact names and identifiers in findings. Do not rename existing SDLC artifacts or confuse a task plan with the platform's SDLC Task JSON.
 
+When selected requirements include a Story `.json4jira`, read its actual `fields.summary` and approved business fields. If either root `descPath` or `acPath` is present, resolve both distinct referenced `.jirawiki` files relative to the same session Workspace root and use their complete Description and AC content for the requested review. Interpret Jira wiki presentation while preserving wording, criterion labels and order. Root `acceptanceCriteria` identifies the mapped Jira field. Keep the JSON and both Wiki paths/current revisions together in the report's existing artifact references. For a supported inline Story, read the actual inline bodies. An unavailable or ambiguous required reference leaves the affected review coverage incomplete and identifies the file to resolve. Apply these file-reading rules only when such Story inputs participate in the requested review.
+
 If a required artifact is missing, ask for it. If the user requests a requirements-only or decomposition-only review, complete that scope and mark the other phase `NOT REVIEWED`; do not claim a combined PASS. Do not create missing requirements or tasks to make the review pass.
 
 ## 2. Review requirements

@@ -97,7 +97,7 @@ requiredness、可写操作、权限和默认值必须保留原操作证据范�
 
 ## 7. 最终 Story JSON 及文本格式
 
-每个候选唯一权威 Story 为真实 Workspace 文件 `story.json4jira`。它是一个有效 JSON 对象，使用平台识别的专用扩展名，不是 Markdown、被再次 JSON 编码的字符串或旧请求 wrapper。不再生成独立 `STORY.md`。测试、SPEC 投影、审查、评分、预览和提交都基于此文件。
+每个候选的权威 Story 包由真实 Workspace 文件 `story.json4jira` 和根级 `descPath`、`acPath` 引用的两个独立 `.jirawiki` 文件组成。它是一个有效 JSON 对象，使用平台识别的专用扩展名，不是 Markdown、被再次 JSON 编码的字符串或旧请求 wrapper。不再生成独立 `STORY.md`。测试、SPEC 投影、审查、评分、预览和提交都使用这三个文件的当前内容。
 
 | JSON 位置 | 强制规则 |
 | --- | --- |
@@ -106,22 +106,22 @@ requiredness、可写操作、权限和默认值必须保留原操作证据范�
 | 根级 `issueType` 与 `fields.issuetype.id` | 根级为实际 Story 类型名，后者为实际类型 ID 字符串；保持 `issuetype` 的精确大小写。 |
 | 根级 `issueIdOrKey` | 仅更新时放在 `issueType` 后，值为非空、准确的已确认现有票号，和 source/target/baseline/state 一致。`Id` 使用大写 I。创建完全省略此键，不能传 null、空串或来源证据票号。 |
 | `fields.summary` | 有来源支持、已审查的标题字符串；没有旧根级 summary。 |
-| `fields.description` | 非 AC 业务内容的单个 Jira wiki 字符串，保留所有非 AC 段落，包括原本在 AC 后的内容；不能是数组、对象或内层 JSON 文档。 |
+| 根级 `descPath` | 指向 Description 的 `.jirawiki` 文件，以 session Workspace 根目录为相对路径基准，保存所有非 AC 业务段落及其顺序。 |
 | 根级 `acceptanceCriteria` | metadata/profile 确认的真实 AC 字段 ID 字符串。它是映射，不是 AC 正文、数组或 descriptor。 |
-| `fields[acceptanceCriteria]` | 对应实际字段中的非空 AC Jira wiki 正文，包含稳定唯一 AC ID、条件、动作及可观察结果。 |
+| 根级 `acPath` | 指向独立 AC `.jirawiki` 文件，采用同一 session Workspace 相对路径基准，正文包含稳定唯一 AC ID、条件、动作及可观察结果。 |
 | `fields[其他实际字段 ID]` | 仅加入批准且对本操作可写的业务值，使用真实类型、选项和编码，不复制未批准 baseline/profile 字段。 |
 | 根级 `attachmentsJson` | 用户已实测适用于路径流程的 JSON 对象，非字符串：`add` 数组条目为 `relativePath/fileName`；`replace` 数组条目还包含实际旧 `attachmentId`。新建用 add，更新按已确认原件选择 replace 或首次 add，不再用裸路径数组表达替换。 |
 | 明确不改远端附件 | 省略 `attachmentsJson`，维持 `attachments=[]`；本地 SPEC 仍同步并通过 `specFilePath` 评分。add/replace 时省略旧 `attachments` 路径数组，避免重复上传。 |
 
 创建和更新均不生成根级 `staffId`、根级 `summary/description/bddScenarios` 或 `customFields` 包装。`fields.reporter` 仅在当前项目/操作 schema 要求且有已验证值，或用户明确要求修改时，以实际支持的原生表示加入；更新省略它不表示清空远端值。正常流程不收集 staffId；必需 Reporter 缺值时仅问一次所需身份，不能把它用于 profile 身份键、根级 Story、评分或导出参数。工具认证身份由可信平台上下文处理。BDD 细节放在真实 AC 正文中，不维护独立 BDD 对象。
 
-先确认实际 AC 字段 ID，再将同一精确字符串放在根级映射和 fields 的键中。不得硬编码截图 ID，不能把映射 ID 当 AC 文本/数量，不能从旧根级 AC 数组静默兜底。映射缺失、指向不存在字段、正文为空或类型错误，均回到生产/组装阶段处理。
+先确认实际 AC 字段 ID，写入根级 acceptanceCriteria；descPath/acPath 分别引用两个不同的实际 Wiki 文件，新路径版 fields 省略 Description 和 AC 正文。不得硬编码截图 ID，不能把映射 ID 当 AC 文本/数量，不能从旧根级 AC 数组静默兜底。映射缺失、Wiki 路径缺失或不可读、正文为空或类型错误，均回到生产/组装阶段处理。
 
 Description、AC 及 metadata 明确允许的其他新编写富文本在生成阶段完成 Jira wiki 编码。标题用 `h1.` 至 `h6.`；AC 声明例如 `* *AC-001*: Given … When … Then …`，列表和单星号粗体均保留。每条 AC 和相应行为仅声明一次，字段自身已有标签时不再加重复 AC 标题。不要新增未经证实的精确标题解析门槛。
 
 格式转换只改变表现：Markdown 粗体转 Jira 单星号，列表保留层级，代码块转 `{code}`、行内代码转 `{{…}}`，链接转 Jira 链接语法，引用转 `bq.`，表格保留各单元格并移除 Markdown 分隔行。代码正文、字面量、ID、顺序、链接目标、日期、数字和标点保真。已有 Jira wiki 先识别格式，不重复转换。普通文本不强加标记；summary、身份/路由/选项/标签/日期/数字/路径及未改动更新字段不做富文本转换。
 
-保存后解码一次检查字符串中的真实换行、引号和反斜杠，不能双重编码、产生字面量反斜杠 n 或用 HTML 换行替代正文换行。导出阶段不再转换格式或重新序列化。
+保存后读回 JSON 和两个 Wiki 文件，检查真实换行、引号和反斜杠，不能双重编码、产生字面量反斜杠 n 或用 HTML 换行替代正文换行。导出阶段不再转换格式或重新序列化。
 
 ## 8. 测试、SPEC 和一次生产自检
 
@@ -133,7 +133,7 @@ Description、AC 及 metadata 明确允许的其他新编写富文本在生成�
 
 按实质不同条件/结果拆分用例；等价且来源支持的数据可明确参数化。单词 `or` 本身不构成缺陷，也不能按词数或组合数虚构案例。不能编造错误消息、阈值、权限、端点、日志、表或观察位置来让用例看起来完整。
 
-从 JSON 的真实 Jira wiki 业务字段生成可读 Markdown Story 投影，放入每个相关 SPEC 的 Jira Story 节内；投影标题从 `###` 起，不嵌入 `#` 主标题或 `##` 同级章节。仅下调标题层级，保留所有业务小节内容、顺序、AC ID、文字、BDD、代码和链接；用一个 AC 标题展示实际正文，不把路由、身份、字段 ID、原始 JSON 或内部控制信息复制成需求。SPEC 是权威 JSON 的视图，不能另写一份不同 Story。
+从 JSON 的 Summary、两个引用 Wiki 文件及其他业务字段生成可读 Markdown Story 投影，放入每个相关 SPEC 的 Jira Story 节内；投影标题从 `###` 起，不嵌入 `#` 主标题或 `##` 同级章节。仅下调标题层级，保留所有业务小节内容、顺序、AC ID、文字、BDD、代码和链接；用一个 AC 标题展示实际正文，不把路由、身份、字段 ID、原始 JSON 或内部控制信息复制成需求。SPEC 是权威 Story 包的视图，不能另写一份不同 Story。
 
 SPEC 必须包含 Summary、Jira Story 投影、与独立文件完全相同的可执行测试表、Functional Requirements 和 Measurable Success Criteria。按证据保留相关 Edge Cases、Key Entities、上下文及流程。有证据支持用户动作或状态转换时，User Flow 一律使用一个非空、闭合并标记 `mermaid` 的代码块；简单流程也画最小图，不以纯叙述替代。确实不适用时写 `Not applicable` 和简短事实理由；缺少业务事实仍须精确等待，不能伪装成不适用，或给图补未提供的系统、重试、持久化、后端及错误分支。不能编造量化目标。
 
@@ -163,7 +163,7 @@ SPEC 文件名用安全小写 kebab-case 并以 `-spec.md` 结尾。文件顶部
 
 ## 10. 独立审查、修复和澄清
 
-每次由新的只读审查角色先读原始来源，再读当前 JSON、测试及全部 SPEC；更新还要读 baseline、完整附件证据、批准 delta 和 add/replace/explicit none 计划。父角色提供实际字段语义和已观察修订。审查同时检查“来源到输出遗漏”和“输出到来源无依据承诺”，不能用生成摘要、以前 PASS、自检或 Header 代替阅读。
+每次由新的只读审查角色先读原始来源及全部当前 SPEC，对 SPEC 给出结论，按需读取当前 JSON、两个引用 Wiki 文件和测试核对 SPEC 一致性；更新还要读 baseline、完整附件证据、批准 delta 和 add/replace/explicit none 计划。父角色提供实际字段语义和已观察修订。审查同时检查“来源到输出遗漏”和“输出到来源无依据承诺”，不能用生成摘要、以前 PASS、自检或 Header 代替阅读。
 
 所有 SPEC 都要审，包括不上传、只用于评分的本地 SPEC。审过一个文件不能代表未读的其他 SPEC。已读未变的适用结论可以复用；修复后读取改动及依赖并验证受影响标准，不无故重写正确 JSON。
 
@@ -235,19 +235,19 @@ Story 的标题、描述、AC、范围或其他业务内容改变，自动同步
 
 独立内容 PASS 后，父角色将全部 SPEC 的 Result/Reviewer Notes 写为当前实际审查结果和 Attempt，再读取完整文件，确认业务正文未改变。第一次 Header 不一致允许一次仅 Header 重试；再次不一致等待技术恢复。全部 Header 写入必须在评分前结束。审查角色不执行评分，也不以未产生的评分记录作为内容审查前提。
 
-评分前读取实际 JSON 和相关 SPEC，确认 schema、来源覆盖、更新目标、附件计划、review 绑定以及真实文件当前。调用 `nodejs-base-mcp.scoreUserStory`，只传以下三个参数：`story_json_workspace_path` 为该候选真实 JSON 的 Workspace 相对路径；`specFileStatus` 为严格大小写 `Pass`；`specFilePath` 为实际主 SPEC 的 Workspace 相对路径。接口枚举是 Pass/Fail，但正常主链非 PASS 不进入评分。
+评分前读取实际 JSON、两个引用 Wiki 文件和相关 SPEC，确认 schema、来源覆盖、更新目标、附件计划、review 绑定以及真实文件当前。调用 `nodejs-base-mcp.scoreUserStory`，只传以下三个参数：`story_json_workspace_path` 为该候选真实 JSON 的 Workspace 相对路径；`specFileStatus` 为严格大小写 `Pass`；`specFilePath` 为实际主 SPEC 的 Workspace 相对路径。接口枚举是 Pass/Fail，但正常主链非 PASS 不进入评分。
 
 不传 `relativePath`、`force_review`、jira_number/source、conversationId、staffId、票号额外参数、粘贴正文或评分报告路径。路径不能是绝对路径、URL、别名、含父目录穿越的路径或猜测的会话前缀。保存此路径，后续预览/导出逐字复用。
 
-为真实调用分配下一编号 `story-quality-score-attempt-<nnn>.md`，记录实际三参、JSON/SPEC 修订、review attempt 和完整实际响应，包括未知字段、错误及服务标识。文本里含 JSON 时保留原文并解析完整 assessment，不挑有利的嵌套结果；已解码对象则完整序列化一次并标记保存模式，不能声称字节原文。响应截断或冲突是技术阻塞。保存后读回，确认调用期间输入未改变，才可设通过状态。
+为真实调用分配下一编号 `story-quality-score-attempt-<nnn>.md`，记录实际三参、JSON/两个引用 Wiki 文件/SPEC 修订、review attempt 和完整实际响应，包括未知字段、错误及服务标识。文本里含 JSON 时保留原文并解析完整 assessment，不挑有利的嵌套结果；已解码对象则完整序列化一次并标记保存模式，不能声称字节原文。响应截断或冲突是技术阻塞。保存后读回，确认调用期间输入未改变，才可设通过状态。
 
 通过政策为真实 boolean `ok=true`、有限数值 `finalScore` 在 76–100 之间，并且输入校验和 AC/parser 识别有效。分数 75、字符串数值、标签、维度推算、人工判断、SKIPPED 或 VALIDATION_FAILED 都不能代替通过。76 是当前 SDLC 政策，不能声称已验证后端实际配置阈值就是 76；后端拒绝仍阻塞导出。
 
-检查真实 parseErrors/warnings 和返回的 AC 数量，和 `fields[acceptanceCriteria]` 中独立声明的 AC 对照；映射 ID、引用和重复提及不算 AC。可选 count/ID 不返回不自动判失败，但非空 AC 返回零/矛盾数量或未解决识别错误阻塞 readiness。规范 AC 仍不被识别时进入技术诊断，不把权威字段换回 Markdown 追分，不编造 evaluator 权重或本地算分。
+检查真实 parseErrors/warnings 和返回的 AC 数量，和 `acPath` 对应 Wiki 文件中独立声明的 AC 对照；映射 ID、引用和重复提及不算 AC。可选 count/ID 不返回不自动判失败，但非空 AC 返回零/矛盾数量或未解决识别错误阻塞 readiness。规范 AC 仍不被识别时进入技术诊断，不把权威字段换回 Markdown 追分，不编造 evaluator 权重或本地算分。
 
-缓存命中只在后端真实返回且当前包匹配时有效；不保证每次调用都命中、不声称每次调用必新增审计版本。后端计算 checksum，模型不得计算替代品或猜归一化规则。session/path/version 及 JSON、评分 SPEC 的实际内容共同关系到当前性。
+缓存命中只在后端真实返回且当前包匹配时有效；不保证每次调用都命中、不声称每次调用必新增审计版本。后端计算 checksum，模型不得计算替代品或猜归一化规则。session/path/version 及 JSON、两个引用 Wiki 文件、评分 SPEC 的实际内容共同关系到当前性。
 
-评分后冻结 JSON 和评分 SPEC 的实际文件内容，分数只在独立记录/UI 展示，不写 JSON、SPEC 或附件，不调用旧显示分数 S2 或五字段关联 B。不能为了换分重复评分未改内容。
+评分后冻结 JSON、两个引用 Wiki 文件和评分 SPEC 的实际文件内容，分数只在独立记录/UI 展示，不写 JSON、SPEC 或附件，不调用旧显示分数 S2 或五字段关联 B。不能为了换分重复评分未改内容。
 
 收到响应后本地保存失败，只重试保存；评分已知在评估前失败时最多一次有依据的修正重试；超时结果不明先使用真实支持的核对能力，不能盲重放。低分只允许在共享内容预算内按现有证据修复；真实业务缺项等待用户。无有效评分、响应未保存或当前性不明时 readiness 保持 false。
 
@@ -257,7 +257,7 @@ Story 的标题、描述、AC、范围或其他业务内容改变，自动同步
 
 | 变化 | 必须返回的步骤 |
 | --- | --- |
-| JSON 任意字节，包括路由、字段映射和附件列表 | 检查并同步受影响投影/测试/SPEC；业务或映射语义改变时独立复核；对当前包重新校验/评分，按影响复核整批覆盖，再取得新内容确认。 |
+| JSON 任意字节，包括路由、字段映射和附件列表，或任一引用 Wiki 正文/路径 | 检查并同步受影响投影/测试/SPEC；业务或映射语义改变时独立复核；对当前包重新校验/评分，按影响复核整批覆盖，再取得新内容确认。 |
 | 已评分 SPEC 的内容、名称/路径或评分附件选择 | 对齐引用并独立检查改变的业务内容，先同步 Header 再评分，重新确认；不能假设 metadata 改动不影响缓存。 |
 | 只改测试 | 同步 SPEC 嵌入表，完成受影响独立复核；SPEC 已变化，须新评分及确认。 |
 | Result/Reviewer Notes | 评分前完成；评分后 Header 改动也改变已评分文件，需当前评估及确认。 |
@@ -268,19 +268,19 @@ Story 的标题、描述、AC、范围或其他业务内容改变，自动同步
 
 ## 14. 整批交接、最终预览与明确确认
 
-父角色在当前独立 PASS、Header 同步读回、真实通过评分和整批覆盖通过后，才设置 `jiraReady=true`；更新仅在完整受支持时设置 `updateReady=true`。交接包含 statePath、实际 batchStatePath、原始来源、assembly/review/score 记录、原样 JSON 路径、全部 SPEC、更新 baseline/manifest/真实附件映射及能力依据。内部 `handoffType=ceaia-sdlc-validated` 不进入工具参数。
+父角色在当前独立 PASS、Header 同步读回、真实通过评分和整批覆盖通过后，才设置 `jiraReady=true`；更新仅在完整受支持时设置 `updateReady=true`。交接包含 statePath、实际 batchStatePath、原始来源、assembly/review/score 记录、原样 JSON 路径、两个引用 Wiki 文件路径/修订、全部 SPEC、更新 baseline/manifest/真实附件映射及能力依据。内部 `handoffType=ceaia-sdlc-validated` 不进入工具参数。
 
 导出角色读取当前实际文件及编号记录，核对身份、全部 SPEC 清单、审查实际读取绑定、Header、评分输入、assembly、覆盖、更新目标和附件计划。可复用未变的完整读取，不能仅信 PASS 文本或修订计数。缺失、过期或冲突返回上游；导出阶段不重新做内容生成或评分。
 
 只准备模式在完成真实可完成的覆盖/文件/评分后交付，不能声称 Jira 成功。正常导出模式使用平台原生 `.json4jira` 前端预览展示实际已评分文件：创建/更新操作、source/project/Story type、准确更新目标、全部业务内容、已同步本地 SPEC 及精确 add/replace/explicit none 计划。前端可能呈现为 HTML，这不要求另生成 HTML 上传文件或发明预览工具。
 
-必须得到用户对当前包的真实内容/上传确认，且绑定 JSON 路径、revision 和全部相关 SPEC file revisions。初始“做完整 SDLC”、较早设置确认、旧版本确认和模型写“confirmed”均不算。相同文件/版本已有真实确认可复用；可一次确认多个清楚标识的当前包。用户拒绝时保留结果并按明确修改或停止决定处理，不擅自提交。
+必须得到用户对当前包的真实内容/上传确认，且绑定 JSON 路径/revision、两个 Wiki 文件路径/revisions 和全部相关 SPEC file revisions。初始“做完整 SDLC”、较早设置确认、旧版本确认和模型写“confirmed”均不算。相同文件/版本已有真实确认可复用；可一次确认多个清楚标识的当前包。用户拒绝时保留结果并按明确修改或停止决定处理，不擅自提交。
 
-保存当前唯一 `jira-preview.md`：实际单参数调用、JSON 路径/修订、SPEC 路径/文件修订、target/附件摘要、真实预览和确认依据。preview confirmation 设 confirmed 并引用证据记录；不用再编写一份不同的业务 Story。历史实际确认保存在编号 export attempt，不用覆盖历史记录来表示新授权。
+保存当前唯一 `jira-preview.md`：实际单参数调用、JSON 路径/修订、两个 Wiki 路径/文件修订、SPEC 路径/文件修订、target/附件摘要、真实预览和确认依据。preview confirmation 设 confirmed 并引用证据记录；不用再编写一份不同的业务 Story。历史实际确认保存在编号 export attempt，不用覆盖历史记录来表示新授权。
 
 ## 15. 按原路径导出及后端结果
 
-每个候选分配 `jira-export-attempt-<nnn>.md`，保存当前评分记录/输入、assembly/review/coverage、预览确认、提交前读回、准确单参数请求和完整响应。提交前再核对实际 JSON 和 SPEC 未改变、目标和确认一致。
+每个候选分配 `jira-export-attempt-<nnn>.md`，保存当前评分记录/输入、assembly/review/coverage、预览确认、提交前读回、准确单参数请求和完整响应。提交前再核对实际 JSON、两个引用 Wiki 文件和 SPEC 的当前内容与评分及确认一致、目标和确认一致。
 
 真正调用 `java-base-mcp.exportJiraByDynamicFieldsV2`，恰好一个参数 `story_json_workspace_path`，逐字复制当前通过评分输入及 `paths.storyJsonPath` 的值。不能改名、规范化、重新序列化或重建文件，不能额外传 Summary、Description、issueIdOrKey、staffId、conversationId、SPEC 参数、requestJson、dynamicFieldsJson、attachmentsJson、issuesJson、数组批量 wrapper 或内部状态信息。更新票号和 `attachmentsJson.add/replace` 已在已评分 JSON 内；禁止额外工具参数不表示禁止文件内的附件对象。
 
