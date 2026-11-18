@@ -3,6 +3,8 @@
   "projectKey": "<actual project key>",
   "issueType": "<actual Story type name>",
   "acceptanceCriteria": "<actual AC field ID>",
+  "acPath": "outputs/jira/<candidate>/<candidate>-ac.jirawiki",
+  "descPath": "outputs/jira/<candidate>/<candidate>-description.jirawiki",
   "fields": {
     "project": {
       "key": "<actual project key>"
@@ -10,9 +12,7 @@
     "issuetype": {
       "id": "<actual Story type ID>"
     },
-    "summary": "<source Summary exactly; do not invent a missing title>",
-    "description": "<source Description and additional business prose in Jira wiki>",
-    "<actual AC field ID>": "<complete source criteria in Jira wiki; preserve existing labels and gaps>"
+    "summary": "<source Summary exactly; do not invent a missing title>"
   },
   "attachments": []
 }
