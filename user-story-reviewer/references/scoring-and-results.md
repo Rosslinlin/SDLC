@@ -17,7 +17,7 @@ Use the actual requested primary ticket and confirmed source: WPB, ALM, DATA, FC
 
 Pass exactly jira_number and source. Do not pass a JSON/Markdown carrier path, SPEC parameters, staffId or session values. Do not create a local input file, query project/type/metadata, or fetch Jira content separately before this call; the service reads current Jira itself. A raw Jira dump remains this route even when saved as Markdown/JSON to Workspace. A failed Jira assessment does not fall back to local file scoring.
 
-After ok=true and finite numeric finalScore, including 0/cache hits, synchronize the score through java-base-mcp.exportJiraByDynamicFieldsV2 using the identical two arguments under [score synchronization](jira-score-sync.md). Respect assessment-only/no-Jira-write requests and retain any prior submission outcome. Scoring failures, SKIPPED and unknown outcomes do not trigger synchronization.
+After ok=true and finite numeric finalScore, including 0/cache hits, synchronize the score through java-base-mcp.exportJiraByDynamicFieldsV2 with only the jira_number from the scoring call under [score synchronization](jira-score-sync.md). Respect assessment-only/no-Jira-write requests and retain any prior submission outcome. Scoring failures, SKIPPED and unknown outcomes do not trigger synchronization.
 
 ### New or selected local JSON, no SPEC
 
@@ -76,7 +76,7 @@ Use these concise sections in the existing Markdown result:
 - Complete raw scoring response/error, including all observed service IDs/checksums/version evidence. For existing-Jira synchronization, retain its separate actual call arguments and full response/error without overwriting the scoring result.
 - Persistence, score synchronization and any requested handoff: actual observed score-save/linkage/queue/Jira-sync evidence or not returned/unknown, plus the exact selected JSON/SPEC paths and known target when relevant. These are observations, not mandatory invented response keys. Follow [synchronization and handoff](jira-score-sync.md).
 
-Read the saved result back. Render the requested Story or ticket/source, exact returned score/status, actual synchronization outcome and material user-facing limitations under [output format](output-format.md); keep full diagnostics and the result path in the saved record, linking it only when needed for the requested handoff or explicitly requested. Combine independent batch results for the user. A failure for one independent target does not block the others. Missing optional sync evidence does not turn a completed assessment into a score failure or justify duplicate sync calls. Only the direct Jira route has a two-argument score-sync follow-up; no legacy four/five-field trigger or business-content export follows scoring here.
+Read the saved result back. Render the requested Story or ticket/source, exact returned score/status, actual synchronization outcome and material user-facing limitations under [output format](output-format.md); keep full diagnostics and the result path in the saved record, linking it only when needed for the requested handoff or explicitly requested. Combine independent batch results for the user. A failure for one independent target does not block the others. Missing optional sync evidence does not turn a completed assessment into a score failure or justify duplicate sync calls. Only the direct Jira route has a jira_number-only score-sync follow-up; no legacy four/five-field trigger or business-content export follows scoring here.
 
 ## User-facing score presentation
 

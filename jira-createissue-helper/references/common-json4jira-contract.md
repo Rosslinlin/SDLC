@@ -58,7 +58,7 @@ For one issue/single-mode aggregate, this value is its actual `.json4jira` issue
 
 Do not add source, staffId, ticket, fields, attachments, SPEC status/path, `requestJson`, `issuesJson`, batch arrays or workflow controls beside that path. Platform request headers supply authentication/session context; do not collect or serialize them. `uploadType` stays current-request routing state, never an issue-file/manifest/tool property.
 
-The ticket/source two-argument mode of this same tool is existing-Jira score-only synchronization owned by reviewer. It is not a second call after JSON export and cannot repair a local JSON association. No historical four/five-field binding call follows this route.
+The jira_number-only mode of this same tool is existing-Jira score-only synchronization owned by reviewer. It is not a second call after JSON export and cannot repair a local JSON association. No historical four/five-field binding call follows this route.
 
 ## Currentness and file use
 
