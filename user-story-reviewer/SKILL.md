@@ -39,6 +39,8 @@ No independent SDLC content-review agent, script or sibling Skill is required. R
 
 ## Assessment sequence
 
+When preparing a new local Story for scoring, write the Description and Acceptance Criteria (AC) in Jira Wiki format in the separate `.jirawiki` files referenced by `descPath` and `acPath`, respectively. Follow the [Jira Wiki rendering rules](references/input-format.md#jira-visible-text-before-scoring).
+
 1. Read original inputs and resolve current Jira versus selected local content. Collect all missing ticket-to-source mappings for a batch together; do not infer source from key prefixes. Reuse actual confirmed mappings. Jira source values are WPB/ALM/DATA/FCR/GO.
 2. For direct Jira, use only the confirmed ticket/source pair. Do not read profiles, ask staffId, query fields or create score-input JSON just to assess that ticket.
 3. For local content, read the actual selected JSON or original text. Reuse complete trustworthy JSON and its established path. In a creation handoff, compare the candidate JSON with the complete authored draft before treating it as complete; preserve all draft business content through the source-preserving field mapping. When JSON preparation needs routing or field facts, reuse verified creation-workflow evidence and read the real user-Workspace profiles.json before any discovery query or metadata question unless a verified read of that same file for this preparation is already available. Query only facts still missing after that check, then preserve source content in the final JSON using the local templates/encoding rules. Do not generate missing business content to satisfy schema or improve a score.

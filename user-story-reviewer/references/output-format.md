@@ -1,49 +1,62 @@
 # User Story Reviewer Output Format
 
-Read this file when preparing the final user-facing response after an assessment or score-synchronization task. This is a presentation contract only; scoring, persistence and Jira calls remain governed by the other references.
-
 ## Mandatory requirements
 
-The final response contains the actual User Story title followed by only these three sections, in order: **1. Evaluation**, **2. Recommendations**, **3. Clarifying questions**. For a batch, repeat this structure for each selected Story. Do not add a general Jira export summary or extra sections such as Rule hits, Retained AC assessments, Evidence gaps, Diagnostics or Validation.
+The final response MUST contain only the User Story title and the three sections `1. Evaluation`, `2. Recommendations`, and `3. Clarifying questions` in that exact order, and MUST NOT include any other sections or content, including rule hits, retained AC assessments, evidence gaps, diagnostics, acceptance-criteria counts, structured JSON, validation details, or internal processing notes.
 
-- Return user-readable Markdown, not structured JSON unless the user explicitly requests JSON.
-- Use UK English unless the user requests another language.
-- Do not expose internal rule codes, diagnostic field names, ledger values, validator output, raw JSON, validation details, AC counts or internal processing notes. Keep the complete evidence in the saved result record.
-- Replace every template placeholder with actual content. Never return a bracketed placeholder, invented Jira key, invented Story title or fabricated score.
-- Keep Notes concise, evidence-based and understandable to a business reader. State a material score or Jira-synchronization limitation in plain language within Evaluation when it affects the result; do not add a fourth section.
+- Return the final response as user-readable Markdown.
+- Do not return JSON unless the user explicitly requests JSON.
+- Do not provide a general Jira export summary.
+- Do not include sections named `Rule hits`, `Retained AC assessments`, `Evidence gaps`, `Diagnostics`, `Validation`, or similar.
+- Do not expose internal rule codes, diagnostic field names, ledger values or validator output.
+- Replace every placeholder in the template with actual content before returning the response.
+- Never return angle-bracket placeholders such as `<score>` or `<recommendation>`.
+- Use English (UK spelling).
+- Keep the notes concise, evidence-based and understandable to a business reader.
 
 ## Required final response template
 
-```markdown
-# User Story — [actual Jira key when known] — [actual Story title]
+# User Story – [actual JIRA ID] - [actual user story title]
 
 ## 1. Evaluation
 
 | Section | Score | Max | Notes |
-| --- | ---: | ---: | --- |
-| Description format | [returned score] | [rubric max] | [brief supported note] |
-| Acceptance criteria format | [returned score] | [rubric max] | [brief supported note] |
-| Description understandability | [returned score] | [rubric max] | [brief supported note] |
-| Acceptance criteria specificity | [returned score] | [rubric max] | [brief supported note] |
-| Acceptance criteria testability and coverage | [returned score] | [rubric max] | [brief supported note] |
-| Scope | [returned score] | [rubric max] | [brief supported note] |
-| Overall | [actual finalScore] | [overall rubric max] | [quality band and concise overall note] |
+|---|---:|---:|---|
+| Description format | [score] | [max] | [notes] |
+| Acceptance criteria format | [score] | [max] | [notes] |
+| Description understandability | [score] | [max] | [notes] |
+| Acceptance criteria specificity | [score] | [max] | [notes] |
+| Acceptance criteria testability and coverage | [score] | [max] | [notes] |
+| Scope | [score] | [max] | [notes] |
+| Overall | [overall score] | [overall max] | [quality band] – [overall notes] |
 
 ## 2. Recommendations
 
-- [Evidence-based action, or None identified.]
+- [Evidence-based recommendation 1]
+- [Evidence-based recommendation 2]
 
 ## 3. Clarifying questions
 
-1. [Direct unresolved business question, or None identified.]
-```
-
-Omit the Jira key when no actual key exists. If a title is unavailable, identify the selected target using only a verified available identifier; never create a title to fill the template. Do not leave template labels or sample content in the delivered response.
+1. [Clarifying question 1]
+2. [Clarifying question 2]
 
 ## Rendering instructions
 
-- For a completed numeric assessment, render Evaluation as exactly one Markdown table with `Section`, `Score`, `Max` and `Notes`, using the six section rows and Overall in the order above. Read each Score from the validated actual service response and Max from the supplied rubric under [calls and results](scoring-and-results.md#user-facing-score-presentation). The template supplies names and layout, not new scoring weights. Do not calculate, infer, alter, cap or invent a returned score; use `—` and a plain note for a missing section score as specified there.
-- Use the returned `finalScore` for Overall and the actual quality band only when available. If the scoring response is failed, skipped or unknown, explain the actual state in Evaluation without a fabricated numeric table or Overall score. A sync-only response uses the retained real assessment and states the observed sync outcome within Evaluation.
-- Write recommendations as concise actions based on material quality gaps. Write clarifying questions only for unresolved business scope, behaviour or testability decisions. Put `None identified.` in a section with no applicable items; do not omit the section.
-- Keep score completion, score-update submission and confirmed Jira-field completion distinct. Include a result or deliverable link inside an existing section only when needed for the requested handoff or explicitly requested by the user; never use a link in place of the required score presentation.
-- Before responding, check that the only headings are the Story title and the three numbered sections, in the required order, and that no placeholders or internal diagnostics remain.
+- Render the Evaluation section as exactly one Markdown table with the columns `Section`, `Score`, `Max` and `Notes`.
+- Include the six section rows and the Overall row shown in the required template.
+- Populate every Score and Max value from the validated evaluation result.
+- Do not calculate, infer, alter or hard-code score values during rendering.
+- Preserve the section names and order defined in the required template.
+- The section maximums are supplied by the validated evaluation result. The format file is only a presentation template.
+- Render the Overall row using the calculated overall score, overall maximum, quality band and overall notes.
+- Write recommendations as concise action statements based on material quality gaps.
+- Write clarifying questions as direct questions that address unresolved business, scope, behavioural or testability issues.
+- If there are no material recommendations or clarifying questions, write `None identified` under the relevant required section. Do not omit either section.
+
+## Internal rendering workflow
+
+1. Complete the evaluation using the authoritative Rubric.
+2. Generate the structured evaluation result.
+3. Validate the structured result against the output schema and runtime validator when available.
+4. Render the validated result using the Required final response template.
+5. Before returning the response, remove all content other than the User Story title, Evaluation, Recommendations and Clarifying questions sections.
