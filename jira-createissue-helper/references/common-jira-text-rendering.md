@@ -1,6 +1,6 @@
 # Render authored rich text during issue preparation
 
-Use only for newly prepared or explicitly changed non-Test rich text whose source is known to be Markdown. Complete conversion before any requested/upstream assessment and final preview. For a new Story, Description and AC are written to two distinct `.jirawiki` files referenced by the final `.json4jira`; other applicable rich-text fields remain native JSON values. Export does not trigger another rendering pass. Keep original source documents unchanged.
+Use only for newly prepared or explicitly changed non-Test rich text whose source is known to be Markdown. Complete conversion before any requested/upstream assessment and final preview. For a new Story, write Description and AC as Jira Wiki using the one- or two-file layout in [Story field assembly](common-field-assembly.md#story-specific-mapping). Keep other applicable rich-text fields as native JSON values. Export does not trigger another rendering pass. Keep original source documents unchanged.
 
 ## Eligible values and exclusions
 
@@ -30,6 +30,6 @@ Keep actual newlines and intentional blank lines in `.jirawiki` files and decode
 
 ## Verify, save and freeze
 
-Compare the complete source and rendered value once after assembly. For a new Story, read back both Wiki files and verify that Description and AC retain their full supported content in separate files. Confirm presentation-only changes and full content coverage, and record a concise conversion basis in existing preview/context. Do not create another business-content copy.
+Compare the complete source and rendered value once after assembly. For a new Story, read back the referenced Wiki file or files and verify full Description and AC coverage in their assigned locations. Confirm presentation-only changes and full content coverage, and record a concise conversion basis in existing preview/context. Do not create another business-content copy.
 
 Save and read back native JSON and any referenced Story Wiki files under [the file contract](common-json4jira-contract.md); preview the resolved content. Preserve any [assessment evidence](story-assessment-evidence.md) against its actual input. No late rendering, partition or reserialization is permitted. A user-authorized file change makes an earlier score historical and needs fresh [confirmation](common-preview-confirm-export.md); obtain another assessment upstream only where the actual project/backend/user requires it. This helper does not call the scorer or require every Story to be scored. An unchanged final read-back reuses verified conversion evidence instead of repeating the procedure.
