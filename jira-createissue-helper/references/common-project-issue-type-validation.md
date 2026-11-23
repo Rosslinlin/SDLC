@@ -24,6 +24,8 @@ Match a requested type to actual returned name/ID or verified saved binding. Sam
 
 Use supported pagination where available and needed; never invent pagination parameters. A truncated list does not prove a missing item does not exist. Unknown completeness stays explicit. Verified root/baseline/profile facts can establish the binding without redundant discovery, but every issue file, including a Test Case, must still contain actual `fields.project.key` and `fields.issuetype.id`. A root type name alone cannot supply a missing real type ID; resolve only the missing binding before completing preparation.
 
+For a Story create whose request or upstream workflow does not require assessment, a successful field response capped at 50 without supported pagination does not block creation on its own. Use the returned fields and applicable verified facts. Omit unused optional fields. Show any explicitly requested optional field that cannot be mapped as unset in the normal preview and confirm the omission before submission. Follow [Story field assembly](common-field-assembly.md#story-specific-mapping) for an unresolved independent AC field. Keep known required field checks and let the backend report any further required field missing from the capped response.
+
 ## Interpret metadata at its evidenced scope
 
 Decode the actual outer response first. If `result` is a JSON string, decode that returned string once. Where `result.fields.values[]` exists, read its actual descriptors. Preserve wrapper/business errors; MCP transport success is not proof of successful metadata discovery.
