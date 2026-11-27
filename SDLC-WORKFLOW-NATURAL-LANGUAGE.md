@@ -110,8 +110,8 @@ requiredness、可写操作、权限和默认值必须保留原操作证据范�
 | 根级 `acceptanceCriteria` | metadata/profile 确认的真实 AC 字段 ID 字符串。它是映射，不是 AC 正文、数组或 descriptor。 |
 | `fields[acceptanceCriteria]` | 对应实际字段中的非空 AC Jira wiki 正文，包含稳定唯一 AC ID、条件、动作及可观察结果。 |
 | `fields[其他实际字段 ID]` | 仅加入批准且对本操作可写的业务值，使用真实类型、选项和编码，不复制未批准 baseline/profile 字段。 |
-| 根级 `attachmentsJson` | 用户已实测适用于路径流程的 JSON 对象，非字符串：`add` 数组条目为 `relativePath/fileName`；`replace` 数组条目还包含实际旧 `attachmentId`。新建用 add，更新按已确认原件选择 replace 或首次 add，不再用裸路径数组表达替换。 |
-| 明确不改远端附件 | 省略 `attachmentsJson`，维持 `attachments=[]`；本地 SPEC 仍同步并通过 `specFilePath` 评分。add/replace 时省略旧 `attachments` 路径数组，避免重复上传。 |
+| 根级 `attachmentsJson` | 根级原生 JSON 对象。创建和更新都通过 `add` 追加已评审 SPEC，每项是实际 `relativePath/fileName`。旧附件全部保留。 |
+| 明确不改远端附件 | 省略 `attachmentsJson`，维持 `attachments=[]`；本地 SPEC 仍同步并通过 `specFilePath` 评分。add 时省略旧 `attachments` 路径数组，避免重复上传。 |
 
 创建和更新均不生成根级 `staffId`、根级 `summary/description/bddScenarios` 或 `customFields` 包装。`fields.reporter` 仅在当前项目/操作 schema 要求且有已验证值，或用户明确要求修改时，以实际支持的原生表示加入；更新省略它不表示清空远端值。正常流程不收集 staffId；必需 Reporter 缺值时仅问一次所需身份，不能把它用于 profile 身份键、根级 Story、评分或导出参数。工具认证身份由可信平台上下文处理。BDD 细节放在真实 AC 正文中，不维护独立 BDD 对象。
 
@@ -163,7 +163,7 @@ SPEC 文件名用安全小写 kebab-case 并以 `-spec.md` 结尾。文件顶部
 
 ## 10. 独立审查、修复和澄清
 
-每次由新的只读审查角色先读原始来源，再读当前 JSON、测试及全部 SPEC；更新还要读 baseline、完整附件证据、批准 delta 和 add/replace/explicit none 计划。父角色提供实际字段语义和已观察修订。审查同时检查“来源到输出遗漏”和“输出到来源无依据承诺”，不能用生成摘要、以前 PASS、自检或 Header 代替阅读。
+每次由新的只读审查角色先读原始来源，再读当前 JSON、测试及全部 SPEC；更新还要读 baseline、完整附件证据、批准 delta 和 add 或明确 none 的计划。父角色提供实际字段语义和已观察修订。审查同时检查“来源到输出遗漏”和“输出到来源无依据承诺”，不能用生成摘要、以前 PASS、自检或 Header 代替阅读。
 
 所有 SPEC 都要审，包括不上传、只用于评分的本地 SPEC。审过一个文件不能代表未读的其他 SPEC。已读未变的适用结论可以复用；修复后读取改动及依赖并验证受影响标准，不无故重写正确 JSON。
 
@@ -195,28 +195,24 @@ SPEC 文件名用安全小写 kebab-case 并以 `-spec.md` 结尾。文件顶部
 
 更新读取完整 Description、单独 AC 结果，并通过 `java-base-mcp.readJiraAttachments` 读取完整附件 inventory（包括零附件）、实际原件 ID 和可读内容。这个工具已提供旧 ID，不再要求用户填写或猜测。保存实际 ID、名称、相关性和跳过理由；读取所有相关可读附件。重要附件不可读/跳过必须得到有依据的处理决定。Description 不可用或相关清单不全阻塞该目标。
 
-替换前必须把每个候选原件的完整正文、reader 返回的实际附件 ID/路径与当前 source+ticket 对上，依据文档用途、原业务义务及本票关联确认它确实是受影响 SPEC。在现有 manifest 中区分“确认相关 SPEC / 其他证据或无关附件 / 待确认”，只把确认的 SPEC 原 ID 纳入替换映射。名称含 spec、扩展名、MIME、清单位置、新旧顺序或曾被读取都不能单独证明身份；旧 SPEC 无需符合当前命名或模板。FSD、测试报告、截图、其他票的 SPEC 等资料保留。不可读、同名或关联不明的候选先保留并补原文/精确选择，不能把待确认当作无 SPEC 而直接 add。
+确认原附件的用途和本票业务义务时，从同一 source+ticket 的实际清单和相关原文取证。原 ID 保留作证据。相关原文不可读或有歧义时，补齐影响业务保留的证据。只缺旧 ID 时，若业务基线已有可靠证据，可以继续准备新增的 SPEC。
 
-建立 `update-manifest.md`：真实 source/target、baseline 路径、每项原义务保留/明确变更/待澄清、获准 delta、Summary 决定、实际附件原件到输出的映射和问题。保留原标题及 priority、assignee、labels、自定义字段、status、links、Epic/Parent，除非对应变更被明确授权；设置默认值不能扩大授权。评分/审计资料另存内部记录。
+建立 `update-manifest.md`：真实 source/target、baseline 路径、每项原义务保留/明确变更/待澄清、获准 delta、Summary 决定、实际原附件的证据、计划新增的 SPEC 路径和待澄清问题。保留原标题及 priority、assignee、labels、自定义字段、status、links、Epic/Parent，除非对应变更被明确授权；设置默认值不能扩大授权。评分/审计资料另存内部记录。
 
 Story 的标题、描述、AC、范围或其他业务内容改变，自动同步全部受影响本地 SPEC、投影、FR/SC/流程、测试和嵌入表；用户无需另说 update SPEC。已有本地 SPEC 则复用，无则由 baseline、相关原 SPEC 和批准 delta 生成。无远端 SPEC 也要生成当前本地 SPEC。纯路由/schema 变化或正文已一致时记录核对，不为制造变化重写正文。
 
 | 真实情况 | 默认远端附件计划 | 必须保留的边界 |
 | --- | --- | --- |
-| 已有相关 Jira SPEC | `attachmentsJson.replace` | 每条写入 readJiraAttachments 返回的实际旧 `attachmentId`、当前新文件 `relativePath/fileName`；保留原件义务和无关附件，原件歧义只问具体选择。 |
-| 完整清单确认没有相关或待确认 SPEC | `attachmentsJson.add` | 条目为新 SPEC 的实际 `relativePath/fileName`；保留所有现有非 SPEC 附件，不创建另一 Story。 |
-| 用户明确要求不改远端附件 | `none`：省略 `attachmentsJson`，`attachments=[]` | 本地 SPEC/测试仍同步、审查及通过 `specFilePath` 评分；明确报告远端有意保留。 |
+| 普通 Story 业务更新 | `attachmentsJson.add` | 将当前受影响且已评审的 SPEC 作为新附件上传，无论 Jira 上是否已有相关 SPEC。所有旧附件保留。 |
+| 用户明确要求不改远端附件 | `none`，省略 `attachmentsJson`，保留 `attachments=[]` | 本地 SPEC/测试仍同步、审查并通过 `specFilePath` 评分。 |
 
-用户只提 Story/AC 不构成 none，也不需要额外询问是否进行普通本地同步。最终当前内容确认展示实际 add/replace/none 计划和文件映射。
-
-2026-11-06 用户提供了旧接口 add/replace 截图，并确认已实测同样用法适用于新路径流程。生成阶段在 `story.json4jira` 内写原生对象，例如下面的替换片段（ID、路径、名称均须换成真实值）：
+用户只提 Story 或 AC 时仍同步本地 SPEC。生成阶段在 `story.json4jira` 内保存实际新增文件的路径和文件名。最终确认展示新文件和保留的旧件。文件结构例如：
 
 ```json
 {
   "attachmentsJson": {
-    "replace": [
+    "add": [
       {
-        "attachmentId": "<readJiraAttachments返回且确认为本票SPEC的原ID>",
         "relativePath": "outputs/ceaia/updates/<SOURCE>/<TICKET-KEY>/current-spec.md",
         "fileName": "current-spec.md"
       }
@@ -225,11 +221,7 @@ Story 的标题、描述、AC、范围或其他业务内容改变，自动同步
 }
 ```
 
-新增用同一对象的 `add` 数组，每条只有新文件 `relativePath/fileName`；不要给 add 编造旧 ID。add/replace 不再附带旧 `attachments` 路径数组。附件操作在文件内，不成为导出工具的第二个参数。只有确认本票 SPEC 原件后才把其实际 ID 放入 replace；不能按名称删附件或把非 SPEC 证据也列入。独立 delete 参数不在本次确认范围，不能自动组合额外删除调用。
-
-在 Assembly、审查和评分前完成操作对象与原件映射核对，然后冻结文件。已确认的 add/replace 不再重复索取能力证明或因为旧文档写“编码未知”而等待。替换仍要求先上传确认成功再删除所选旧 ID，最终预览展示旧件、新件和保留项；本次用户测试不替代每次执行的真实结果证据。只上传成功或旧件删除失败/未知仍为 partial，核对后仅用受支持恢复处理缺失删除，不能重传新文件或重放 Story 更新。
-
-普通更新目标的 `issueIdOrKey` 和上述附件对象均已确认。明确 none 保留空上传列表及当前本地 SPEC 评分，不增加额外能力证明门槛。若后端真实拒绝，保存精确错误再定向处理，不能覆盖用户 none、删目标改创建或回退旧接口。
+添加新文件时省略旧 `attachments` 路径数组。旧 `attachmentId` 属于原件证据，上传对象只提供新路径及文件名。在评审和评分前确定上传计划，冻结后按原 JSON 路径导出。未执行的旧 `replace` 计划先回到准备，确认当前上传范围、评审、评分及确认。已经成功的写入和上传保留证据，未知结果先核对。
 
 ## 12. SPEC Header 同步和真实评分
 
@@ -272,7 +264,7 @@ Story 的标题、描述、AC、范围或其他业务内容改变，自动同步
 
 导出角色读取当前实际文件及编号记录，核对身份、全部 SPEC 清单、审查实际读取绑定、Header、评分输入、assembly、覆盖、更新目标和附件计划。可复用未变的完整读取，不能仅信 PASS 文本或修订计数。缺失、过期或冲突返回上游；导出阶段不重新做内容生成或评分。
 
-只准备模式在完成真实可完成的覆盖/文件/评分后交付，不能声称 Jira 成功。正常导出模式使用平台原生 `.json4jira` 前端预览展示实际已评分文件：创建/更新操作、source/project/Story type、准确更新目标、全部业务内容、已同步本地 SPEC 及精确 add/replace/explicit none 计划。前端可能呈现为 HTML，这不要求另生成 HTML 上传文件或发明预览工具。
+只准备模式在完成真实可完成的覆盖/文件/评分后交付，不能声称 Jira 成功。正常导出模式使用平台原生 `.json4jira` 前端预览展示实际已评分文件：创建/更新操作、source/project/Story type、准确更新目标、全部业务内容、已同步本地 SPEC 及精确 add 或明确 none 的计划。前端可能呈现为 HTML，这不要求另生成 HTML 上传文件或发明预览工具。
 
 必须得到用户对当前包的真实内容/上传确认，且绑定 JSON 路径、revision 和全部相关 SPEC file revisions。初始“做完整 SDLC”、较早设置确认、旧版本确认和模型写“confirmed”均不算。相同文件/版本已有真实确认可复用；可一次确认多个清楚标识的当前包。用户拒绝时保留结果并按明确修改或停止决定处理，不擅自提交。
 
@@ -282,7 +274,7 @@ Story 的标题、描述、AC、范围或其他业务内容改变，自动同步
 
 每个候选分配 `jira-export-attempt-<nnn>.md`，保存当前评分记录/输入、assembly/review/coverage、预览确认、提交前读回、准确单参数请求和完整响应。提交前再核对实际 JSON 和 SPEC 未改变、目标和确认一致。
 
-真正调用 `java-base-mcp.exportJiraByDynamicFields`，恰好一个参数 `story_json_workspace_path`，逐字复制当前通过评分输入及 `paths.storyJsonPath` 的值。不能改名、规范化、重新序列化或重建文件，不能额外传 Summary、Description、issueIdOrKey、staffId、conversationId、SPEC 参数、requestJson、dynamicFieldsJson、attachmentsJson、issuesJson、数组批量 wrapper 或内部状态信息。更新票号和 `attachmentsJson.add/replace` 已在已评分 JSON 内；禁止额外工具参数不表示禁止文件内的附件对象。
+真正调用 `java-base-mcp.exportJiraByDynamicFields`，恰好一个参数 `story_json_workspace_path`，逐字复制当前通过评分输入及 `paths.storyJsonPath` 的值。不能改名、规范化、重新序列化或重建文件，不能额外传 Summary、Description、issueIdOrKey、staffId、conversationId、SPEC 参数、requestJson、dynamicFieldsJson、attachmentsJson、issuesJson、数组批量 wrapper 或内部状态信息。更新票号和 `attachmentsJson.add` 已在已评分 JSON 内；禁止额外工具参数不表示禁止文件内的附件对象。
 
 默认按确认的候选顺序，每候选一个文件、一次顺序导出，不假设批量原子性。第一个必需同步结果失败、部分成功或未知时停止后续写入，保留后续选择。确认入队且异步同步尚 pending 本身不是同步提交失败。
 
@@ -314,7 +306,7 @@ Story 的标题、描述、AC、范围或其他业务内容改变，自动同步
 
 校验/checksum/阈值拒绝时先确认是否有外部效果；输入陈旧或无效回到生成层有界修正、受影响审查/评分和新确认。只有真实契约证明没有外部效果，且必需修正/确认已完成，才允许新的受支持尝试。导出时不临时删字段或改文件，不自动盲重试。
 
-替换的新上传未知时保留旧附件；只有新上传已确认成功才允许受支持后端继续删除所选旧附件。不能按名称删、重放成功上传或把追加文件说成已替换。
+新上传未知时保留原附件及全部已确认结果。先核对实际结果，再按可用能力恢复待处理项。
 
 异步任务由后端处理。不要编造 polling/recovery 工具、循环等待或重导出来推动队列。真实 pending/failed 与受支持恢复步骤保留在内部记录；影响交付或完成的问题才用简短普通语言说明实际影响和下一步。缺后端 schema、恢复能力或结果证据是明确工具缺口，不等于成功。
 
@@ -360,7 +352,7 @@ profile 保留可信用户范围、source/project/规范 issueType（Story 保�
 2. 未确认 source 的多个 Jira 票各有独立选择；空独立 AC 配合可读 Description 能继续；真正票/source 错误不自动换源。
 3. 新建没有 issueIdOrKey；更新使用准确目标；根级 AC 是实际字段 ID，正文从实际 fields 映射读取；无 root staffId/customFields，Reporter 仅在实际必需或明确修改时按 schema 加入。
 4. Jira wiki 在评分前完成，SPEC Markdown 投影、AC 顺序/ID/代码/链接及测试保持一致，评分后导出无文件转换。
-5. Story-only 业务更新自动同步所有本地 SPEC/测试；已有 SPEC 用 attachmentsJson.replace 并携带 readJiraAttachments 实际旧 ID，无 SPEC 用 add，明确保留远端省略对象且 attachments=[]。保护非 SPEC，不因已确认格式重复等待；真实服务拒绝和部分结果准确记录。
+5. Story-only 业务更新自动同步受影响的本地 SPEC/测试。默认通过 attachmentsJson.add 新增已评审 SPEC，保留全部原附件。明确不改变远端附件时用 attachments=[] 并省略 attachmentsJson。
 6. 审查先读原文，reviewer 只读不评分；合理 or/N/A/拒绝型 AC 不因旧模板规则误失败；真遗漏和无依据承诺被发现。
 7. 内容修复共享两批、每机械原因一次，续跑不清零；真实新事实只影响对应候选。
 8. 评分恰三参且发生于 Header 完成后；75、SKIPPED、VALIDATION_FAILED、AC 识别冲突、响应未保存均不能导出；分数不写 SPEC，无 S2/B。

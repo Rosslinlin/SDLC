@@ -12,9 +12,8 @@
     "<actual AC field ID>": "* *AC-001*: Given <preserved or explicitly changed condition>, when <action>, then <observable result>."
   },
   "attachmentsJson": {
-    "replace": [
+    "add": [
       {
-        "attachmentId": "<actual original ID from readJiraAttachments>",
         "relativePath": "outputs/ceaia/updates/<SOURCE>/<TICKET-KEY>/final-story-name-spec.md",
         "fileName": "final-story-name-spec.md"
       }

@@ -23,9 +23,9 @@
 | 后端评分检查与写入 | 新导出后端 | 校验 score checksum/threshold，写入 Jira 及要求附件，回填数据库关联、入异步队列；本仓库保存真实请求/响应，不能凭一般 success 代替分项证据。 |
 | 分项结果 | exporter | issue、attachments、linkage、queue、async sync 各自记录真实成功/失败/未知/待处理。入队不等于 Jira UI 分数同步完成；后端未确认时不得补造完成状态。 |
 | 批量执行与恢复 | exporter | 每候选一个 JSON、默认逐票导出，保持选定顺序与个体结果。失败/partial/unknown 按契约停止或核对；不重放未知/成功写入，不因关联/队列问题重建票据。 |
-| 现有票与附件边界 | generation [existing-jira-update](ceaia-sdlc-story-spec-generation/references/existing-jira-update.md)；exporter | 保留 source+target、baseline/AC 状态及完整附件清单。业务 Story 变更默认相关已有 SPEC→replace、无相关 SPEC→add。2026-11-06 用户实测确认文件内根级 `attachmentsJson` 对象沿用 `add`/`replace`：条目含 `relativePath`/`fileName`，replace 另含 `attachmentId`，原ID来自 `readJiraAttachments` 的同source/同票原件。先读原文确认SPEC身份，非SPEC、无关和未选项保留；distinct原件保留各自输出映射。使用该对象时禁止再用非空 `attachments` 数组重复上传。 |
+| 现有票与附件边界 | generation [existing-jira-update](ceaia-sdlc-story-spec-generation/references/existing-jira-update.md)；exporter | 保留 source+target、baseline/AC 和附件证据。更新时将当前已评审 SPEC 作为新附件上传，使用根级 `attachmentsJson.add` 的实际路径和文件名。所有原附件均保留。 |
 | 显式保留远端附件 | generation + exporter | 用户明确不改远端附件才 none：`attachments: []` 且省略 `attachmentsJson`；本地SPEC/测试仍同步、审查，并通过 `specFilePath` 评分，无额外score-only能力证明。 |
-| 附件替换确认与结果 | generation assembly；exporter结果核对 | 普通replace格式已确认，不再以schema未知或重复能力证明阻塞。最终预览展示实际原ID→输出及保留项；删除属于replace后端效果，不新增独立delete操作。真实服务错误、上传/旧件移除失败或未知仍分别记录，部分成功不称全完成，不重放已成功操作、不猜恢复或回退create。 |
+| 附件追加确认与结果 | generation assembly；exporter 结果核对 | 预览展示新增文件及保留的旧件。旧替换计划返回准备、评审、评分和确认。分开记录 Story 写入和每项新上传的实际结果，保留已成功的操作证据。 |
 | 旧会话/接口迁移 | generation workflow-contract | 保留原状态、编号记录、消耗计数及全部远端结果；旧 Markdown 评分/五字段绑定不能当新 JSON 评分证据。迁移不自动重放外部操作。 |
 
 移除的是独立 Story Markdown 及派生分数显示链，不是评分与数据库保存职责。新接口由后端承担的 checksum 检查、关联与队列处理必须以实际证据分别确认；不再由前端额外执行旧 S2/B。
