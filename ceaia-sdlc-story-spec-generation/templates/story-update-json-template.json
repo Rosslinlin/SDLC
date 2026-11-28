@@ -12,9 +12,8 @@
     "summary": "<preserved baseline title or explicitly approved replacement>"
   },
   "attachmentsJson": {
-    "replace": [
+    "add": [
       {
-        "attachmentId": "<actual original ID from readJiraAttachments>",
         "relativePath": "outputs/ceaia/updates/<SOURCE>/<TICKET-KEY>/final-story-name-spec.md",
         "fileName": "final-story-name-spec.md"
       }

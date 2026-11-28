@@ -42,14 +42,13 @@ The user-confirmed update JSON has root issueIdOrKey after issueType, containing
 }
 ```
 
-This is a structural example, not a real ticket or an authorized write. Its JSON target must match the actual selected baseline and confirmed update intent; use approved changed fields with preservation/omission semantics. Story changes synchronize related local SPECs without waiting for the words "update SPEC". Identified related Jira SPECs use the tested root object below, assembled before scoring; each original ID comes from readJiraAttachments for this same source/ticket and its read contents positively identify the related SPEC. Example placeholders are not actual IDs or paths:
+This example uses the direct Story update target and preserves applicable baseline values. Assemble reviewed SPEC uploads before scoring using this root property:
 
 ```json
 {
   "attachmentsJson": {
-    "replace": [
+    "add": [
       {
-        "attachmentId": "<actual old SPEC ID returned by readJiraAttachments>",
         "relativePath": "outputs/ceaia/updates/WPB/EXAMPLE-123/current-story-spec.md",
         "fileName": "current-story-spec.md"
       }
@@ -58,7 +57,7 @@ This is a structural example, not a real ticket or an authorized write. Its JSON
 }
 ```
 
-This is a property excerpt inside the full Story JSON, not another tool invocation. With established absence of a related SPEC, use attachmentsJson.add entries containing relativePath/fileName instead. For add/replace omit the legacy attachments path list; never combine operations with a nonempty path list. Explicit remote-preservation intent uses attachments=[] without attachmentsJson, with the synchronized local SPEC still scored through specFilePath. Non-SPEC/unselected/unresolved originals remain untouched. This confirmed format needs no repeated capability proof; do not emulate replace with add or introduce standalone delete.
+This excerpt is inside the full Story JSON. Omit the legacy attachments path list when adding files. All existing attachments stay on the issue. Explicit no remote attachment change uses attachments=[] and omits attachmentsJson. The synchronized local SPEC is still scored through specFilePath.
 
 The backend response schema is not fully supplied. Interpret and preserve the real response under [submission and recovery](jira-write-and-recovery.md); do not copy a fictional success response or send the old five-field B call.
 

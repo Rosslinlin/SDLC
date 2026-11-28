@@ -14,7 +14,7 @@ Internal evidence only. Use actual source locations and short facts; preserve or
 ## Candidate decision
 | Candidate / mode / source / ticket | Cohesive value and scope | SR IDs | Split / inherited-scope rationale | Dependencies / blockers | Canonical Story package / SPEC names / attachment action |
 | --- | --- | --- | --- | --- | --- |
-| [identity] | [supported outcome] | SR-001 | [short evidence-based decision] | [actual facts] | [actual JSON and distinct Description/AC wiki paths / synchronized SPEC names / add for create; update related SPECs=replace, first SPEC=add, explicit no remote change=none] |
+| [identity] | [supported outcome] | SR-001 | [short evidence-based decision] | [actual facts] | [actual JSON and distinct Description/AC wiki paths / synchronized SPEC names / add reviewed SPECs for create or update, or explicit none] |
 
 ## Artifact coverage
 Fill when files exist; do not create placeholder future artifacts.
@@ -31,8 +31,8 @@ Fill when files exist; do not create placeholder future artifacts.
 - Clarifications / user scope decisions: [exact facts or None]
 
 - Jira assembly snapshot: [Assembly section in this same internal file and exact JSON plus two wiki revisions; complete before scoring]
-- Update synchronization: [Story business delta → affected local SPEC/tests/projection changes or verified unchanged sections; actual related original SPEC IDs → outputs; confirmed add/replace object or explicit none; precise identity/content gaps or actual backend errors]
-- Update original identity: [manifest's per-original content/path/ID classification and source+ticket binding; confirmed SPEC targets versus preserved other evidence/unresolved originals; first add only after complete no-SPEC evidence]
+- Update synchronization: [Story business delta → affected local SPEC/tests/projection changes or verified unchanged sections. Record baseline obligations, reviewed new SPEC paths or explicit none, and material evidence gaps.]
+- Update baseline evidence: [related original SPEC content and actual source/ticket binding. Preserve all existing attachments and resolve material evidence gaps.]
 
 ## Assembly — storyJsonRevision [actual value]
 - Actual JSON and two distinct wiki paths, mode and target: [verified current facts]
@@ -40,8 +40,8 @@ Fill when files exist; do not create placeholder future artifacts.
 - Optional fields decision: [provided/skipped/reused plus actual user answer/explicit skip or approval of displayed saved fields; source/project-only choices are insufficient; exportContext.assembly.optionalFieldsDecision.recordPath points to this section and remains pending until that evidence exists]
 - Source/project/type/field mapping and confirmed values: [compact schema and field-provenance rows; real profile/query/baseline references]
 - Relationship targets: [confirmed key/source, requirement-source versus relationship-only role, actual lookup status/type; empty body is not invalid]
-- Attachment representation: [confirmed root attachmentsJson.add entries relativePath/fileName or replace entries attachmentId/relativePath/fileName; omit legacy attachments for active operations; explicit none uses attachments=[] and omits attachmentsJson]
-- Replacement binding, when applicable: [actual readJiraAttachments original ID + read content + confirmed source/ticket → affected SPEC output; preserve other IDs and upload before deleting only that old ID; no additional proof of the confirmed schema]
+- Attachment representation: [Root attachmentsJson.add with actual relativePath/fileName. Omit legacy attachments for add. Explicit none uses attachments=[] and omits attachmentsJson.]
+- Attachment confirmation: [Show the exact reviewed new files and retained existing attachments. Old IDs are baseline evidence only.]
 - Currentness/read-back: [actual paths/revisions and observed verification, never invented success]
 
 <!-- Initial working sections may be filled until first consumption. Later real changes append the affected version-bound section and reference unchanged prior facts. Do not duplicate complete sources, JSON bodies or raw tool responses here. -->
