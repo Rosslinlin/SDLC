@@ -33,7 +33,7 @@
 | J20 | 三候选按各自 JSON 路径逐票执行，不用 issuesJson；绑定每票评分、预览确认和响应。前票失败/partial/unknown 时按契约停止并保留其余待办，不静默丢项或猜返回Key。 | | |
 | J21 | 超时/断连无法确定写入结果时记 unknown，先以实际可用只读手段核对，不自动重发未知/成功的 issue、附件或数据库步骤；status=400 等业务失败不被 envelope success 掩盖。 | | |
 | J22 | 更新读取 source、目标、Description/独立AC状态和完整附件 inventory；根级 issueIdOrKey 与 baseline 一致。先读用户 profiles，按组件复用稳定配置，必要 baseline 读取不被缓存替代；相关 SPEC 默认同步，不因未说 update spec 跳过，真实能力缺口准确 WAITING_TOOL。 | | |
-| J23 | 明确不改远端附件时省略 attachmentsJson、保留 attachments=[]，本地 SPEC/测试仍更新并经 specFilePath 评分。其他更新只追加已评审的 SPEC。 | | |
+| J23 | 创建和更新都要求非空的 attachmentsJson.add，上传至少一份已评审的 SPEC，保留全部现有附件。主 SPEC 继续通过 specFilePath 评分。 | | |
 | J24 | 旧 v6 会话迁移保留原始状态、编号证据、修复计数及所有已知/未知远端结果；不把旧 STORY.md 评分当新 JSON 评分，不通过调用重放完成迁移，也不补旧 S2/B。 | | |
 | J25 | 按实际 metadata 取得 AC 字段 ID，根级 `acceptanceCriteria` 保存该 ID 字符串，不再使用 customFields 包装；正文从 `acPath` 引用的独立 `.jirawiki` 文件 读取且为 Jira wiki 字符串。SPEC/测试/reviewer/评分 AC 识别指向相同正文，截图示例值不被硬编码。 | | |
 | J26 | 输入旧扁平 summary/description/AC 正文或数组/bddScenarios，或旧 customFields.acceptanceCriteria 包装时，在组装/自检修正为当前结构：根级 acceptanceCriteria 仅映射字段 ID，Description、AC 正文分别在 descPath/acPath 引用的两个独立 .jirawiki 文件中。不得混用两套映射或旧评分继续导出；迁移后按当前包重新评分、确认，不重放已有远端写入。 | | |
@@ -55,23 +55,23 @@
 | J42 | profile 仅缺 AC ID/某字段 descriptor，或收到真实 schema 错误时，只定向补该组件；已有项目/type/baseline 不重查，用户显式刷新/目标变化按实际影响处理，不按 TTL 强刷，不用 createMeta 冒充 edit 权限。 | | |
 | J43 | 用户只要求改 Story 标题/描述/AC/业务规则，没有说 update spec：自动同步本地所有相关 SPEC、受影响测试和 Markdown 投影，保留旧义务，读回并完成受影响审查/Header 同步后才评分；不能以旧 SPEC 继续导出。 | | |
 | J44 | 已有相关 Jira SPEC 的 Story 业务变更通过 attachmentsJson.add 上传已评审的新文件，已有 SPEC 和其他附件保持原样。 | | |
-| J45 | 用户明确只改 Jira Story、不替换远端附件：省略 attachmentsJson、保留 attachments=[]；本地 SPEC/受影响测试仍同步并评分，内部结果记录远端附件有意保留。 | | |
+| J45 | 用户要求跳过上传或替换、删除附件时，说明 SDLC 必须新增已评审 SPEC 并保留旧件。待用户确认这一计划后才写 Jira。 | | |
 | J46 | 完整清单确认无相关或待确认 SPEC：生成本地 SPEC，以 attachmentsJson.add 的 relativePath/fileName 首次交付至原票，保留所有非 SPEC；不编造 attachmentId 或创建新票。 | | |
-| J47 | 仅路由/schema 字段变化时检查 SPEC 与 Story 的业务一致性；已一致的正文不为制造更新而改动，实际评分输入变动仍按 checksum/currentness 规则处理，审核编号循环不因此扩大。 | | |
+| J47 | 仅路由/schema 字段变化时检查 SPEC 与 Story 的业务一致性，已一致的正文保留并上传已评审的当前主 SPEC。实际评分输入变动仍按 checksum/currentness 规则处理，审核编号循环不因此扩大。 | | |
 | J48 | 读取混合附件时按原文和实际同票证据识别本次相关 SPEC。所有旧件保留，只有获准的新 SPEC 进入上传列表。 | | |
 | J49 | 真实旧 SPEC 名称不规范，普通资料文件名含 spec，或同名不同用途：不按名称/扩展名/MIME/位置/时间推断；以完整原文及本票关联判断，歧义时保留并只问具体选择。 | | |
 | J50 | 相关原件不可读或清单不全影响业务基线时，报告实际证据缺口；仅缺旧 ID 且业务基线已证实时可以继续准备追加。 | | |
-| J51 | 多份不同相关 SPEC 逐原 ID 映射当前输出并保留各自义务；未选 SPEC 不动，多对一须明确授权。完整清单仅非 SPEC 或零附件时才走首次 add，明确 none 仍保留所有远端附件。 | | |
+| J51 | 多份相关 SPEC 各自保留对应的业务义务，受影响且已评审的文件通过 add 上传。所有原附件保留，原 ID 只用于基线证据。 | | |
 | J52 | 新增使用根级 attachmentsJson.add 原生对象，每项只有实际 relativePath/fileName。验证旧 replace 和旧 attachmentId 不能提交。 | | |
-| J53 | 最终预览展示确切的新文件及保留的旧件或明确 none，绑定已评分文件与当前用户确认。 | | |
+| J53 | 最终预览展示确切的必传新文件及保留的旧件，绑定已评分文件与当前用户确认。 | | |
 | J54 | 已知成功上传与失败或未知上传分别记录，保留先前结果，并阻止重放已成功写入。 | | |
 | J55 | 同时保留原 SPEC 和新上传的同名或异名 SPEC。只用实际结果确认上传成功。 | | |
 
 
 | J56 | readJiraAttachments 的同票 ID 和原文用于基线核对。旧 ID 不写入新增附件条目。 | | |
 | J57 | 新增计划省略旧 attachments 路径数组。存在两套上传表示时先修正，再评审、评分和确认。 | | |
-| J58 | 新建和更新模板都默认 add。明确 none 则保留 attachments=[]，省略 attachmentsJson。评分和导出复用同一修订。 | | |
-| J59 | 旧 replace 计划在尚未执行时回到准备阶段，更新为获准的 add 或 none 计划后取得当前评分和确认。 | | |
+| J58 | 新建和更新模板都使用非空的 attachmentsJson.add。缺少或清空 add 的包须在提交前退回准备阶段。评分和导出复用同一修订。 | | |
+| J59 | 旧替换或不上传的计划在尚未执行时回到准备阶段，按必传 add 计划完成当前评审、评分和确认。 | | |
 | J60 | 真实后端错误、附件部分成功或未知均按证据处理；历史删除结果仅作为原尝试的审计证据。 | | |
 
 ### 2026-11-06 新增：SPEC 格式稳定性

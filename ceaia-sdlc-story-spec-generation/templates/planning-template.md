@@ -14,7 +14,7 @@ Internal evidence only. Use actual source locations and short facts; preserve or
 ## Candidate decision
 | Candidate / mode / source / ticket | Cohesive value and scope | SR IDs | Split / inherited-scope rationale | Dependencies / blockers | Canonical Story package / SPEC names / attachment action |
 | --- | --- | --- | --- | --- | --- |
-| [identity] | [supported outcome] | SR-001 | [short evidence-based decision] | [actual facts] | [actual JSON and distinct Description/AC wiki paths / synchronized SPEC names / add reviewed SPECs for create or update, or explicit none] |
+| [identity] | [supported outcome] | SR-001 | [short evidence-based decision] | [actual facts] | [actual JSON and distinct Description/AC wiki paths / synchronized SPEC names / required reviewed SPEC uploads for create or update] |
 
 ## Artifact coverage
 Fill when files exist; do not create placeholder future artifacts.
@@ -31,7 +31,7 @@ Fill when files exist; do not create placeholder future artifacts.
 - Clarifications / user scope decisions: [exact facts or None]
 
 - Jira assembly snapshot: [Assembly section in this same internal file and exact JSON plus two wiki revisions; complete before scoring]
-- Update synchronization: [Story business delta → affected local SPEC/tests/projection changes or verified unchanged sections. Record baseline obligations, reviewed new SPEC paths or explicit none, and material evidence gaps.]
+- Update synchronization: [Story business delta → affected local SPEC/tests/projection changes or verified unchanged sections. Record baseline obligations, required reviewed SPEC upload paths, and material evidence gaps.]
 - Update baseline evidence: [related original SPEC content and actual source/ticket binding. Preserve all existing attachments and resolve material evidence gaps.]
 
 ## Assembly — storyJsonRevision [actual value]
@@ -40,7 +40,7 @@ Fill when files exist; do not create placeholder future artifacts.
 - Optional fields decision: [provided/skipped/reused plus actual user answer/explicit skip or approval of displayed saved fields; source/project-only choices are insufficient; exportContext.assembly.optionalFieldsDecision.recordPath points to this section and remains pending until that evidence exists]
 - Source/project/type/field mapping and confirmed values: [compact schema and field-provenance rows; real profile/query/baseline references]
 - Relationship targets: [confirmed key/source, requirement-source versus relationship-only role, actual lookup status/type; empty body is not invalid]
-- Attachment representation: [Root attachmentsJson.add with actual relativePath/fileName. Omit legacy attachments for add. Explicit none uses attachments=[] and omits attachmentsJson.]
+- Attachment representation: [Nonempty root attachmentsJson.add array with actual relativePath/fileName. Omit legacy attachments.]
 - Attachment confirmation: [Show the exact reviewed new files and retained existing attachments. Old IDs are baseline evidence only.]
 - Currentness/read-back: [actual paths/revisions and observed verification, never invented success]
 

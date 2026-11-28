@@ -28,7 +28,7 @@
 | `fields.project.key`、`fields.issuetype.id` | 项目与根级一致，类型 ID 来自实际查询；保留精确大小写和对象结构。仅当实际字段要求且已解析出有效值，或用户明确要求更改 Reporter 时，按真实 schema 添加 `fields.reporter`；更新省略它不改变 Jira 上的原 Reporter。 |
 | `fields.summary` 和其他获准字段 | 标题保持原文；其他获准自定义业务值按真实字段 ID、类型和选项写入 `fields`。 |
 | 根级 `descPath`、`acPath` | 指向两个不同的 session Workspace 相对路径，文件扩展名为 `.jirawiki`，分别保存完整 Description 和 AC；新路径版 JSON 的 `fields` 省略这两个正文。 |
-| 根级 `attachmentsJson` | 只使用 `add`，条目包含实际 `relativePath`、`fileName`。评分和导出共用该 JSON 路径。上传计划存在时省略旧 `attachments` 路径数组。 |
+| 根级 `attachmentsJson` | 必填且只包含非空的 `add` 数组。每项包含实际 `relativePath` 和 `fileName`。评分和导出共用该 JSON 路径。省略旧 `attachments` 路径数组。 |
 
 生成阶段、评分之前就完成 Jira wiki 编码：描述标题使用 `h1. 标题`、`h2. 标题`；AC 例如 `* *AC-001*: Given ... When ... Then ...`，以 Jira 列表和单星号粗体保留每条 AC 的声明。Wiki 文件正文有真实换行，普通正文与代码内容保真；不对 summary、路由/身份/选项、附件路径或更新中未改动字段做格式转换。SPEC 仍为 Markdown，从 Summary、两个 Wiki 文件及其他业务字段的相同语义生成可读投影，不能直接贴入 wiki 标记。导出只提交已评分的原文件，不再临时转换格式。
 
@@ -55,9 +55,9 @@
 
 Story 的标题、描述、AC 或其他业务内容一旦改变，generation 自动更新本地 SPEC、受影响测试与 Story 投影，保留原票及相关 SPEC 的原有义务；无需用户另外说“update spec”。每个相关 SPEC 都要读回并核对当前 Story，完成审查及 Header 同步后再评分。纯路由/schema 变更只核对业务一致性，不为制造文件变化而重写正确内容。
 
-更新 Story 时，默认把当前受影响且已评审的 SPEC 用 `attachmentsJson.add` 上传为新附件，并保留所有现有附件。原附件及其 ID 仅用于核对业务基线。上传计划包含新文件的 `relativePath` 和 `fileName`。
+每次创建或更新 Jira Story 都要通过非空的 `attachmentsJson.add` 上传至少一份已评审的当前 SPEC。更新时上传受影响的 SPEC，正文无需修改时则上传当前主 SPEC。所有已有附件保留，原附件及其 ID 仅用于核对业务基线。上传计划包含文件的 `relativePath` 和 `fileName`。
 
-用户明确要求不动远端附件时，维持 `attachments: []` 并省略 `attachmentsJson`。本地 SPEC 仍同步并通过 `specFilePath` 评分。最终预览显示本次新增的文件及保留的旧附件。旧替换计划在尚未提交时返回准备阶段，重新确认附件范围、评审及评分；已有成功或未知的远端结果按实际证据处理。
+最终预览显示本次新增的文件及保留的旧附件。缺少有效新增计划的待提交包返回准备阶段，按当前计划完成评审、评分及确认。已有成功或未知的远端结果按实际证据处理。
 
 安装与验证：
 

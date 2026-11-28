@@ -25,22 +25,17 @@ Bind each relevant original to the confirmed source+ticket and its actual invent
 
 An SDLC Story update includes automatic consistency of its local SPEC and tests; the user does not need to say update SPEC. For changes to Summary, Description, AC, scope, behavior or other business fields, update every affected Story projection, SPEC section, FR/SC/flow and test/embedded table from the approved delta, preserving original obligations. Reuse the current local SPEC when available; otherwise derive it from the actual baseline, relevant original SPECs and approved change. No original SPEC does not waive producing a current one. Read back all related SPECs before review/score. If a field change has no SPEC meaning or the content already agrees, record the check and keep that content unchanged rather than manufacturing edits.
 
-Remote attachment intent is separate from local synchronization:
+Every Jira update adds the affected reviewed current SPECs as new attachments via `attachmentsJson.add`, including when related SPECs already exist. If the update requires no SPEC content change, add its reviewed current primary SPEC. Keep all existing attachments. Retain distinct output SPECs when their source obligations differ.
 
-| Actual request | Internal action and plan |
-| --- | --- |
-| Ordinary business Story update | add: upload every affected, reviewed current SPEC as a new attachment via `attachmentsJson.add`, including when related SPECs already exist on Jira. Keep all existing attachments. |
-| User explicitly requests no remote attachment changes | none: use `attachments=[]` and omit `attachmentsJson`. Keep the local SPECs and tests synchronized, reviewed and scored. |
+Present the exact new attachments and retained originals in final content confirmation. If the user asks to skip uploading, replace or delete attachments, explain the required append-only plan and wait for confirmation of that plan before writing to Jira.
 
-Present the exact new attachments and retained originals in final content confirmation. Retain distinct output SPECs when their source obligations differ. If the user explicitly requests attachment replacement or deletion, explain that SDLC currently supports adding attachments and ask whether to add the new files or leave attachments unchanged.
-
-Use [confirmed attachment operations](jira-json-assembly.md#4-confirmed-attachment-operations): every root `attachmentsJson.add` entry contains the reviewed file's actual `relativePath` and `fileName`. The update template defaults to add. Existing attachment IDs are baseline evidence and never enter the upload entries.
+Use [confirmed attachment operations](jira-json-assembly.md#4-confirmed-attachment-operations): every root `attachmentsJson.add` entry contains the reviewed file's actual `relativePath` and `fileName`. The update template requires a nonempty add array. Keep existing attachment IDs as baseline evidence.
 
 Use the [update JSON template](../templates/story-update-json-template.json): root issueIdOrKey, placed after jiraInstance/projectKey/issueType, is the exact confirmed existing ticket key (uppercase I in Id). This selector is user-confirmed backend support; a basic update no longer waits for an unknown target-property name. Verify it against the actual baseline and exportContext.target.ticketKey before review/scoring/export. A cited evidence ticket, key prefix or saved profile cannot select the update target. Creates omit this property; a missing/empty/mismatched update value blocks the update and never becomes a create.
 
 Both modes use root acceptanceCriteria as the real AC field-ID string and two distinct root descPath/acPath files for Description and AC Jira wiki content, with no inline fields.description or fields[acceptanceCriteria], customFields wrapper or root staffId. Include fields.reporter only when actual update evidence requires it or the user explicitly requests a supported change, with the native value resolved; omission preserves the remote Reporter. Keep the scoreable supported business view and preserve unchanged baseline values; include only approved changes and fields allowed by the actual update contract. Do not copy create defaults or treat create metadata as edit permission. Omission must preserve remote values where supported, not silently clear them.
 
-Assemble the approved upload plan before scoring. Use root `attachmentsJson.add` and omit the legacy attachment path array. Explicit none uses `attachments=[]` and omits `attachmentsJson`, while the synchronized local SPEC still supplies `specFilePath`. Resolve material baseline content gaps and target ambiguity. Keep any actual backend rejection and the confirmed update target. `issueIdOrKey` and `attachmentsJson` stay in the scored JSON and are not separate tool arguments.
+Assemble the approved upload plan before scoring. Use a nonempty root `attachmentsJson.add` array and omit the legacy attachment path array. The current primary SPEC still supplies `specFilePath`. Resolve material baseline content gaps and target ambiguity. Keep any actual backend rejection and the confirmed update target. `issueIdOrKey` and `attachmentsJson` stay in the scored JSON and are not separate tool arguments.
 
 ## Generate, review and score
 

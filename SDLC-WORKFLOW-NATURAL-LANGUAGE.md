@@ -110,8 +110,7 @@ requiredness、可写操作、权限和默认值必须保留原操作证据范�
 | 根级 `acceptanceCriteria` | metadata/profile 确认的真实 AC 字段 ID 字符串。它是映射，不是 AC 正文、数组或 descriptor。 |
 | 根级 `acPath` | 指向独立 AC `.jirawiki` 文件，采用同一 session Workspace 相对路径基准，正文包含稳定唯一 AC ID、条件、动作及可观察结果。 |
 | `fields[其他实际字段 ID]` | 仅加入批准且对本操作可写的业务值，使用真实类型、选项和编码，不复制未批准 baseline/profile 字段。 |
-| 根级 `attachmentsJson` | 根级原生 JSON 对象。创建和更新都通过 `add` 追加已评审 SPEC，每项是实际 `relativePath/fileName`。旧附件全部保留。 |
-| 明确不改远端附件 | 省略 `attachmentsJson`，维持 `attachments=[]`；本地 SPEC 仍同步并通过 `specFilePath` 评分。add 时省略旧 `attachments` 路径数组，避免重复上传。 |
+| 根级 `attachmentsJson` | 创建和更新均必填，通过非空的 `add` 数组上传已评审的当前 SPEC。每项包含实际 `relativePath` 和 `fileName`。省略旧 `attachments` 路径数组，保留所有原附件。 |
 
 创建和更新均不生成根级 `staffId`、根级 `summary/description/bddScenarios` 或 `customFields` 包装。`fields.reporter` 仅在当前项目/操作 schema 要求且有已验证值，或用户明确要求修改时，以实际支持的原生表示加入；更新省略它不表示清空远端值。正常流程不收集 staffId；必需 Reporter 缺值时仅问一次所需身份，不能把它用于 profile 身份键、根级 Story、评分或导出参数。工具认证身份由可信平台上下文处理。BDD 细节放在真实 AC 正文中，不维护独立 BDD 对象。
 
@@ -163,13 +162,13 @@ SPEC 文件名用安全小写 kebab-case 并以 `-spec.md` 结尾。文件顶部
 
 ## 10. 独立审查、修复和澄清
 
-每次由新的只读审查角色先读原始来源及全部当前 SPEC，对 SPEC 给出结论，按需读取当前 JSON、两个引用 Wiki 文件和测试核对 SPEC 一致性；更新还要读 baseline、完整附件证据、批准 delta 和 add 或明确 none 的计划。父角色提供实际字段语义和已观察修订。审查同时检查“来源到输出遗漏”和“输出到来源无依据承诺”，不能用生成摘要、以前 PASS、自检或 Header 代替阅读。
+每次由新的只读审查角色先读原始来源及全部当前 SPEC，对 SPEC 给出结论，按需读取当前 JSON、两个引用 Wiki 文件和测试核对 SPEC 一致性；更新还要读 baseline、完整附件证据、获准的变更和必传 SPEC 的新增计划。父角色提供实际字段语义和已观察修订。审查同时检查“来源到输出遗漏”和“输出到来源无依据承诺”，不能用生成摘要、以前 PASS、自检或 Header 代替阅读。
 
-所有 SPEC 都要审，包括不上传、只用于评分的本地 SPEC。审过一个文件不能代表未读的其他 SPEC。已读未变的适用结论可以复用；修复后读取改动及依赖并验证受影响标准，不无故重写正确 JSON。
+所有当前 SPEC 都要审，必传文件由父角色根据当前计划从中确定。审过一个文件不能代表未读的其他 SPEC。已读未变的适用结论可以复用；修复后读取改动及依赖并验证受影响标准，不无故重写正确 JSON。
 
 审查报告包含候选身份/模式、实际 artifact paths、读过的 sources、evidence/JSON/test/SPEC body 绑定、每份 SPEC 结果、Q1–Q7 证据、发现、是否需要改 JSON 及一个下一步。不存在或未观察的 revision 用 null，不编造。父角色分配并保存编号审查报告、维护计数和状态。
 
-报告返回一个 JSON，完整保留以下字段：`identity`、`reviewResult`、`artifactPaths`、`reviewedBindings`、`reviewedSpecArtifacts`、`criteriaResults`、`findings`、`coverage`、`sizingSplitRecommendation`、`preservationConclusion`、`clarifications`、`nextAction`，无需重复一份散文报告。`artifactPaths.sourcesRead` 每项包含真实 path/location；JSON/测试绑定及每份 SPEC 的 `contentReadBack=true` 只能由实际读取支持。每 SPEC 记录 path/bodyRevision/result 和 preservation，更新时列出适用原件 ID、保留义务及 gaps；first add/explicit none 即使没有选定原件，也要保留适用 baseline 义务。
+报告返回一个 JSON，完整保留以下字段：`identity`、`reviewResult`、`artifactPaths`、`reviewedBindings`、`reviewedSpecArtifacts`、`criteriaResults`、`findings`、`coverage`、`sizingSplitRecommendation`、`preservationConclusion`、`clarifications`、`nextAction`，无需重复一份散文报告。`artifactPaths.sourcesRead` 每项包含真实 path/location；JSON/测试绑定及每份 SPEC 的 `contentReadBack=true` 只能由实际读取支持。每 SPEC 记录 path/bodyRevision/result 和 preservation，更新时列出适用原件 ID、保留义务及 gaps；即使 Jira 没有旧附件，也要保留适用的基线义务。
 
 `findings` 每项含 id、criterion、classification、path、location、sourceEvidence、problem、impact、action、affectedPaths 和 storyJsonChangeRequired；`clarifications` 用 findingId 关联具体 question。`coverage` 记录 coveredRequirementRefs、gaps、approvedExclusions、crossCandidateIssues，不能用编造计数代替真实来源引用；`sizingSplitRecommendation.decision` 限 NO_SPLIT/SPLIT_RECOMMENDED/NOT_ASSESSABLE 并给理由；`preservationConclusion` 覆盖完整目标而不只主 SPEC，含 result/attachmentAction/authorizedChanges/gaps，新建的 attachmentAction 为 null。SPEC result 用 PASS/FAIL/NOT_ASSESSED，preservation 仅新建可 N/A。
 
@@ -201,12 +200,7 @@ SPEC 文件名用安全小写 kebab-case 并以 `-spec.md` 结尾。文件顶部
 
 Story 的标题、描述、AC、范围或其他业务内容改变，自动同步全部受影响本地 SPEC、投影、FR/SC/流程、测试和嵌入表；用户无需另说 update SPEC。已有本地 SPEC 则复用，无则由 baseline、相关原 SPEC 和批准 delta 生成。无远端 SPEC 也要生成当前本地 SPEC。纯路由/schema 变化或正文已一致时记录核对，不为制造变化重写正文。
 
-| 真实情况 | 默认远端附件计划 | 必须保留的边界 |
-| --- | --- | --- |
-| 普通 Story 业务更新 | `attachmentsJson.add` | 将当前受影响且已评审的 SPEC 作为新附件上传，无论 Jira 上是否已有相关 SPEC。所有旧附件保留。 |
-| 用户明确要求不改远端附件 | `none`，省略 `attachmentsJson`，保留 `attachments=[]` | 本地 SPEC/测试仍同步、审查并通过 `specFilePath` 评分。 |
-
-用户只提 Story 或 AC 时仍同步本地 SPEC。生成阶段在 `story.json4jira` 内保存实际新增文件的路径和文件名。最终确认展示新文件和保留的旧件。文件结构例如：
+每次更新 Jira Story 都通过非空的 `attachmentsJson.add` 上传受影响且已评审的当前 SPEC。SPEC 正文无需修改时，上传已评审的当前主 SPEC。所有已有附件保留。用户只提 Story 或 AC 时仍同步本地 SPEC。生成阶段在 `story.json4jira` 内保存实际新增文件的路径和文件名。最终确认展示必传的新文件和保留的旧件。下面的文件片段展示新增条目。
 
 ```json
 {
@@ -221,7 +215,7 @@ Story 的标题、描述、AC、范围或其他业务内容改变，自动同步
 }
 ```
 
-添加新文件时省略旧 `attachments` 路径数组。旧 `attachmentId` 属于原件证据，上传对象只提供新路径及文件名。在评审和评分前确定上传计划，冻结后按原 JSON 路径导出。未执行的旧 `replace` 计划先回到准备，确认当前上传范围、评审、评分及确认。已经成功的写入和上传保留证据，未知结果先核对。
+添加新文件时省略旧 `attachments` 路径数组。旧 `attachmentId` 属于原件证据，上传对象只提供新路径及文件名。在评审和评分前确定上传计划，冻结后按原 JSON 路径导出。缺少有效新增计划的待提交包先返回准备阶段，按必传附件计划重新评审、评分和确认。已经成功的写入和上传保留证据，未知结果先核对。
 
 ## 12. SPEC Header 同步和真实评分
 
@@ -264,7 +258,7 @@ Story 的标题、描述、AC、范围或其他业务内容改变，自动同步
 
 导出角色读取当前实际文件及编号记录，核对身份、全部 SPEC 清单、审查实际读取绑定、Header、评分输入、assembly、覆盖、更新目标和附件计划。可复用未变的完整读取，不能仅信 PASS 文本或修订计数。缺失、过期或冲突返回上游；导出阶段不重新做内容生成或评分。
 
-只准备模式在完成真实可完成的覆盖/文件/评分后交付，不能声称 Jira 成功。正常导出模式使用平台原生 `.json4jira` 前端预览展示实际已评分文件：创建/更新操作、source/project/Story type、准确更新目标、全部业务内容、已同步本地 SPEC 及精确 add 或明确 none 的计划。前端可能呈现为 HTML，这不要求另生成 HTML 上传文件或发明预览工具。
+只准备模式在完成真实可完成的覆盖/文件/评分后交付，不能声称 Jira 成功。正常导出模式使用平台原生 `.json4jira` 前端预览展示实际已评分文件：创建/更新操作、source/project/Story type、准确更新目标、全部业务内容、已同步本地 SPEC 及必传 SPEC 的精确新增计划。前端可能呈现为 HTML，这不要求另生成 HTML 上传文件或发明预览工具。
 
 必须得到用户对当前包的真实内容/上传确认，且绑定 JSON 路径/revision、两个 Wiki 文件路径/revisions 和全部相关 SPEC file revisions。初始“做完整 SDLC”、较早设置确认、旧版本确认和模型写“confirmed”均不算。相同文件/版本已有真实确认可复用；可一次确认多个清楚标识的当前包。用户拒绝时保留结果并按明确修改或停止决定处理，不擅自提交。
 
@@ -287,14 +281,14 @@ Story 的标题、描述、AC、范围或其他业务内容改变，自动同步
 | 结果类别 | 需要什么证据 |
 | --- | --- |
 | issue | 明确的真实创建/更新结果和无歧义票据身份，返回 URL 时保留；更新返回 key 必须等于目标。 |
-| attachments | 每项获准新增附件的实际上传结果，或确实覆盖这些上传的文档保证。明确 none 时没有计划上传，现有附件全部保留。 |
+| attachments | 每项必传附件的实际上传结果，或确实覆盖这些上传的文档保证。 |
 | databaseLink | 真实评分记录到票据的关联证据，或实际契约明确保证；只有票号不够。 |
 | scoreSyncQueue | 真实 accepted/enqueued 证据或明确契约保证，真实返回队列 ID 才记录。 |
 | jiraScoreSync | 真正完成/失败/pending 证据；入队只证明调度，没有完成证据则报告 pending/unknown。 |
 
 若权威响应的明确语义保证多个结果，可记录该依据。一般 success、MCP `isError=false` 或“票已创建”不能证明全部步骤；还要检查嵌套业务失败、400、checksum 或阈值拒绝。可选 ID 缺失不自动算失败，必需效果缺证据则保留 unknown/pending。
 
-同步提交完整仍需内部确认 issue、要求附件、databaseLink 和 queue；常规最终回复不逐项展示技术状态，正常异步处理不新增待处理提示。不能因为工具返回或队列存在就说 Jira UI 分数已更新。某必需 SPEC 未确认时不能称整条 Story/SPEC 同步完成；明确 none 时内部记录远端附件有意不变。
+同步提交完整仍需内部确认 issue、要求附件、databaseLink 和 queue；常规最终回复不逐项展示技术状态，正常异步处理不新增待处理提示。不能因为工具返回或队列存在就说 Jira UI 分数已更新。必传 SPEC 尚未确认时，Story/SPEC 同步仍待完成。
 
 ## 16. 写入失败、部分成功和未知结果恢复
 
@@ -352,7 +346,7 @@ profile 保留可信用户范围、source/project/规范 issueType（Story 保�
 2. 未确认 source 的多个 Jira 票各有独立选择；空独立 AC 配合可读 Description 能继续；真正票/source 错误不自动换源。
 3. 新建没有 issueIdOrKey；更新使用准确目标；根级 AC 是实际字段 ID，正文从实际 fields 映射读取；无 root staffId/customFields，Reporter 仅在实际必需或明确修改时按 schema 加入。
 4. Jira wiki 在评分前完成，SPEC Markdown 投影、AC 顺序/ID/代码/链接及测试保持一致，评分后导出无文件转换。
-5. Story-only 业务更新自动同步受影响的本地 SPEC/测试。默认通过 attachmentsJson.add 新增已评审 SPEC，保留全部原附件。明确不改变远端附件时用 attachments=[] 并省略 attachmentsJson。
+5. Story-only 业务更新自动同步受影响的本地 SPEC/测试。每次 Jira 写入都通过非空的 attachmentsJson.add 新增已评审 SPEC，保留全部原附件。
 6. 审查先读原文，reviewer 只读不评分；合理 or/N/A/拒绝型 AC 不因旧模板规则误失败；真遗漏和无依据承诺被发现。
 7. 内容修复共享两批、每机械原因一次，续跑不清零；真实新事实只影响对应候选。
 8. 评分恰三参且发生于 Header 完成后；75、SKIPPED、VALIDATION_FAILED、AC 识别冲突、响应未保存均不能导出；分数不写 SPEC，无 S2/B。

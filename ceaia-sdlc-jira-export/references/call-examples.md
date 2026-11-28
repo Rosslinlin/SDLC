@@ -57,7 +57,7 @@ This example uses the direct Story update target and preserves applicable baseli
 }
 ```
 
-This excerpt is inside the full Story JSON. Omit the legacy attachments path list when adding files. All existing attachments stay on the issue. Explicit no remote attachment change uses attachments=[] and omits attachmentsJson. The synchronized local SPEC is still scored through specFilePath.
+This excerpt is inside the full Story JSON. Both create and update require a nonempty attachmentsJson.add array. Omit the legacy attachments path list and keep all existing attachments on the issue. The synchronized local SPEC is still scored through specFilePath.
 
 The backend response schema is not fully supplied. Interpret and preserve the real response under [submission and recovery](jira-write-and-recovery.md); do not copy a fictional success response or send the old five-field B call.
 

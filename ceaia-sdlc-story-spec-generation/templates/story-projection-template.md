@@ -6,7 +6,7 @@
 [Read acceptanceCriteria as the actual field ID, then project the Jira wiki file at root acPath as Markdown, e.g. * *AC-001*: to - **AC-001**:. Keep each AC's stable ID and Given/When/Then and any supported BDD detail. Never render the mapping ID as AC text or look for an old top-level AC/BDD array.]
 
 #### Attachments
-[Name only the business SPEC files actually selected for upload, or state no attachment changes for an authorized none update.]
+[List the current business SPEC files in the required upload plan.]
 
 <!-- This projection lives inside SPEC, not a standalone STORY.md file.
 The JSON and its two referenced Jira wiki files are the authoritative Story package. Preserve all business sections including those after AC and approved business values from fields; root acceptanceCriteria is a field-ID mapping only. Omit routing/staff/session/schema IDs and transport controls.

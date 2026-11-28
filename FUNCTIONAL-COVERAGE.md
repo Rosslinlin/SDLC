@@ -13,7 +13,7 @@
 | Jira 文本格式 | generation assembly/precheck | 评分前将 description、映射 AC 及 metadata 确认的其他获准富文本写成 Jira wiki：标题 `h1.`/`h2.`，AC 如 `* *AC-001*: Given ...`；保留措辞、顺序、换行、代码及每条 AC。普通文本、summary、身份/路由/选项和未改动更新字段不转换；export 不再加工。 |
 | 单一 Story 业务源 | generation 模板及 authoring | 每候选一个最终 `story.json4jira` 及其引用的两个独立 `.jirawiki` 文件，共同构成权威 Story 包。业务内容和获准的提交/附件配置由 live schema 约束，不能凭旧 direct 参数猜 JSON 字段。 |
 | 创建/更新路由 | generation create/update JSON 模板；exporter 核对 | 创建省略 `issueIdOrKey`；更新在 issueType 后加入该根级字段（大写 I），值为实际已确认票号，与 source/target/baseline 一致。两种操作共用 JSON 路径评分、确认和导出；工具参数不增加票号，更新不能省略目标回退创建，返回 key 必须匹配。 |
-| 测试与 SPEC | generation | Story 业务变化自动同步本地 SPEC、受影响 test-case.md 和 Markdown 投影，无需用户提 update spec；每个相关 SPEC 保留原有义务、读回并与当前 JSON 对齐。none 仅控制远端附件，本地仍同步；纯路由/schema 只核对，不制造业务改动。SPEC 不显示分数。 |
+| 测试与 SPEC | generation | Story 业务变化自动同步本地 SPEC、受影响 test-case.md 和 Markdown 投影，无需用户提 update spec；每个相关 SPEC 保留原有义务、读回并与当前 JSON 对齐。纯路由/schema 只核对，不制造业务改动。SPEC 不显示分数。 |
 | 独立内容审查 | review [contract](ceaia-spec-review/references/review-contract.md) / [report](ceaia-spec-review/references/review-report-template.md) | 独立读取原来源和所有当前 SPEC；按需读取 Story JSON、两个引用 Wiki 文件及测试作为对照，返回 SPEC 的 Q1–Q7 内容结论及绑定，不评分、不管理预算/导出就绪、不把机械偏好升级为业务阻塞。 |
 | 局部修复与澄清 | generation workflow-contract / [clarification](ceaia-sdlc-story-spec-generation/references/user-clarification-and-resume.md) | review/score 共用两批内容修复；每个机械原因另限一次，仍保持变更失效。缺事实只问所需事实，续跑不重置计数。 |
 | 路径评分与完整记录 | generation [scoring-tool-contract](ceaia-sdlc-story-spec-generation/references/scoring-tool-contract.md) | `scoreUserStory(story_json_workspace_path, specFileStatus, specFilePath)`；真实输入/完整响应保留，同一候选的最终评分路径必须等于导出路径。 |
@@ -24,8 +24,8 @@
 | 分项结果 | exporter | issue、attachments、linkage、queue、async sync 各自记录真实成功/失败/未知/待处理。入队不等于 Jira UI 分数同步完成；后端未确认时不得补造完成状态。 |
 | 批量执行与恢复 | exporter | 每候选一个 JSON、默认逐票导出，保持选定顺序与个体结果。失败/partial/unknown 按契约停止或核对；不重放未知/成功写入，不因关联/队列问题重建票据。 |
 | 现有票与附件边界 | generation [existing-jira-update](ceaia-sdlc-story-spec-generation/references/existing-jira-update.md)；exporter | 保留 source+target、baseline/AC 和附件证据。更新时将当前已评审 SPEC 作为新附件上传，使用根级 `attachmentsJson.add` 的实际路径和文件名。所有原附件均保留。 |
-| 显式保留远端附件 | generation + exporter | 用户明确不改远端附件才 none：`attachments: []` 且省略 `attachmentsJson`；本地SPEC/测试仍同步、审查，并通过 `specFilePath` 评分，无额外score-only能力证明。 |
-| 附件追加确认与结果 | generation assembly；exporter 结果核对 | 预览展示新增文件及保留的旧件。旧替换计划返回准备、评审、评分和确认。分开记录 Story 写入和每项新上传的实际结果，保留已成功的操作证据。 |
+| 必须上传 SPEC | generation + exporter | 创建和更新均要求非空的 `attachmentsJson.add`，至少上传一份已评审的当前 SPEC。更新没有 SPEC 正文改动时上传已评审的主 SPEC。 |
+| 附件追加确认与结果 | generation assembly；exporter 结果核对 | 预览展示新增文件及保留的旧件。缺少有效新增计划的待提交包返回准备、评审、评分和确认。分开记录 Story 写入和每项新上传的实际结果，保留已成功的操作证据。 |
 | 旧会话/接口迁移 | generation workflow-contract | 保留原状态、编号记录、消耗计数及全部远端结果；旧 Markdown 评分/五字段绑定不能当新 JSON 评分证据。迁移不自动重放外部操作。 |
 
 移除的是独立 Story Markdown 及派生分数显示链，不是评分与数据库保存职责。新接口由后端承担的 checksum 检查、关联与队列处理必须以实际证据分别确认；不再由前端额外执行旧 S2/B。

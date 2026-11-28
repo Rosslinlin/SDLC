@@ -7,7 +7,7 @@
 - 新后端截图说明 `.json4jira` 文件驱动、服务端格式校验/checksum/评分保存、创建时自动关联及异步同步队列。
 - 用户随后明确：评分工具改名 **scoreUserStory**，仍传 **JSON 路径 + SPEC 状态 + SPEC 路径**；导出工具仍为 **exportJiraByDynamicFieldsV2**，只传该 JSON 路径；Story 分数暂不写入 SPEC。这些澄清优先于截图中的评分单参数样例及示意名称 create_jira。
 - 2026-11-03 用户向开发确认的最新格式：根级 acceptanceCriteria 直接存实际 AC 字段 ID，不再有 customFields 包装或 fields.reporter/root staffId；新生成格式已更新为根级 descPath/acPath 分别引用两个独立 .jirawiki 文件，AC 正文保存在 acPath 对应文件中。创建省略 issueIdOrKey；更新在 jiraInstance/projectKey/issueType 后加入根级 issueIdOrKey（大写 I），值为确认的现有票号。Description/AC 在生成时完成 Jira wiki 编码，SPEC 保留 Markdown 语义投影；字段 ID、查询身份与项目取真实上下文/metadata。
-- SDLC 创建和更新 Jira Story 时，通过根级 `attachmentsJson.add` 追加已评审的 SPEC。条目包含实际 `relativePath` 和 `fileName`。现有附件全部保留。调用仍只传 JSON 路径。
+- SDLC 每次创建和更新 Jira Story 都通过根级非空的 `attachmentsJson.add` 上传已评审的 SPEC。条目包含实际 `relativePath` 和 `fileName`。现有附件全部保留。调用仍只传 JSON 路径。
 - 工具实时 schema 和以上已确认文件契约是实际调用依据，新增附件沿用已确认的 add 格式。缺失的返回字段及恢复能力不能由调用方编造。完整后端评分权重没有提供；Q1–Q7 是共享内容标准，不是替代评分器。
 
 Task v3 采用阶段 Skill/输出关联，不内嵌旧 tools 数组；运行时仍需在平台启用本文件及自然语言编排所列的十项业务工具与实际 Workspace/预览/确认能力，接口参数未随 Task 格式迁移改变。
@@ -57,9 +57,9 @@ Task v3 采用阶段 Skill/输出关联，不内嵌旧 tools 数组；运行时�
 }
 ```
 
-使用 `attachmentsJson.add` 追加经评审的当前 SPEC。旧件和其他证据附件保持原样。原 ID 只用于基线核对。明确不上传时保留 `attachments: []` 并省略 `attachmentsJson`，本地当前 SPEC 仍通过 `specFilePath` 评分。
+使用非空的 `attachmentsJson.add` 新增已评审的当前 SPEC，省略旧 `attachments` 数组。保留所有已有附件，原 ID 只用于基线核对。当前主 SPEC 继续通过 `specFilePath` 评分。
 
-提交前核对评分所用 JSON 与当前上传计划一致。按实际响应分别确认每个新增附件。遇到旧替换计划时先回到准备阶段确认当前计划并重新评分。未知结果通过支持的只读能力核对。
+提交前核对评分所用 JSON 与当前上传计划一致。按实际响应分别确认每个新增附件。遇到缺失、为空或旧格式的新增计划时，先回到准备阶段补齐必传附件计划，再完成评审、评分和确认。未知结果通过支持的只读能力核对。
 
 创建后端负责核评分记录/checksum/阈值、Jira/附件写入、匹配记录关联和同步任务入队。必须分别记录实际 issue、attachments、databaseLink、scoreSyncQueue 和 jiraScoreSync 结果；这些是本地规范化事实，不要求后端返回这些同名字段。普通成功或票号不能证明落库关联/入队全部完成。异步 PENDING 不等于 Jira 分数字段已同步。
 
@@ -81,7 +81,7 @@ Task v3 采用阶段 Skill/输出关联，不内嵌旧 tools 数组；运行时�
 
 创建与更新都先读取真实用户 Workspace 的 profiles.json，按相同用户/source/project/type 复用稳定项目、类型和 AC 字段 ID 等组件。已有 create profile 不因本次 update 就失效；权限、requiredness 与默认值保留原操作范围，不将 create metadata 当 edit 权限。配置与 baseline 信息足够时，三个 discovery query 均不调用；只有缺失/不适用组件、明确刷新/目标变更或实际 schema 错误时定向查询。getJiraInfos/readJiraAttachments 的当前票据/原 SPEC 读取仍必要，它们不是这些字段 discovery query。
 
-更新目标由用户确认的新契约确定：JSON 根级 issueIdOrKey 必须与该候选真实 source/target/baseline 一致；创建完全省略。这个值不是额外工具参数，两种模式仍按同一 JSON 路径评分、预览和导出。Story 业务变更自动同步所有受影响本地 SPEC/测试/投影，不等用户说 update spec；默认用文件内 `attachmentsJson.add` 追加已评审 SPEC，保留全部原附件。明确不改远端附件时使用 `attachments=[]` 并省略 `attachmentsJson`，本地仍更新并经 `specFilePath` 评分。最终预览展示新增路径和保留项。实际后端拒绝保留精确错误，不能默默跳过 SPEC、猜恢复控制或回退创建。
+更新目标由用户确认的新契约确定：JSON 根级 issueIdOrKey 必须与该候选真实 source/target/baseline 一致；创建完全省略。这个值不是额外工具参数，两种模式仍按同一 JSON 路径评分、预览和导出。Story 业务变更自动同步所有受影响本地 SPEC/测试/投影，不等用户说 update spec；每次更新都用文件内的非空 `attachmentsJson.add` 新增已评审 SPEC，保留全部原附件。若没有 SPEC 正文改动，则新增已评审的当前主 SPEC。最终预览展示新增路径和保留项。实际后端拒绝保留精确错误，不能默默跳过 SPEC、猜恢复控制或回退创建。
 
 平台文件能力可以是普通 Workspace 工具或当前代理实际可执行的原生保存、打开、读取动作：只要它们按真实 schema 选择用户 Workspace，或工具默认就是当前认证用户空间，就用于 profile 读写；复用本轮已成功的用户 Workspace 操作绑定。无需名称含 user-level 的专用 API、单独 read-back 工具、额外 scope 返回字段或数据库证明；读回就是正常读取刚保存的文件。先使用可用操作读取目标，not-found 时按实际目录工具或自动建父目录能力创建有意义的 JSON；没有可见工具调用不等于不支持或已保存；聊天声明、路径和代码块不足为据，不猜隐藏 API 或原生指令。仅在检查实际可用机制及结果后报告具体 read/write/read-back 失败，不按工具命名猜 unavailable。写入成功只证明可写，未读回不能报 saved，未知旧文件不可覆盖；会话目录仍不能冒充用户空间。独立只读 reviewer、.json4jira 内容预览和当前用户确认能力保留。Task 的十个业务工具位置不变，平台文件工具遵循其实际暴露方式，不杜撰工具名/参数。
 
@@ -89,4 +89,4 @@ Task v3 采用阶段 Skill/输出关联，不内嵌旧 tools 数组；运行时�
 
 jira-createissue-helper 独立通用导出已同步本次用户配置读写/引导规则，共用 profiles 文件但不加入 SDLC 三 Skill Task，也不作为其 fallback。user-story-reviewer 支持引用 Wiki 的本地 Story 评分；review-requirements 在相关输入参与评审时按需读取引用正文。各包的评分及业务行为仍按其自身契约；共用配置规则不代表全平台后端集成已通过。
 
-已有票根级目标、三参数评分及同一 JSON 路径导出保持适用。文件内附件计划支持 add 或明确 none。按实际响应记录部分或未知结果。平台验收见 [测试清单](PLATFORM-TEST-CHECKLIST.md)。
+已有票根级目标、三参数评分及同一 JSON 路径导出保持适用。创建和更新的文件内均须包含非空的 add 数组。按实际响应记录部分或未知结果。平台验收见 [测试清单](PLATFORM-TEST-CHECKLIST.md)。
